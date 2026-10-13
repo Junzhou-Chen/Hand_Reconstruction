@@ -244,4 +244,4 @@ U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 
 基线包含last-state、可用上下文内的插值/外推、GRU/普通temporal模型，以及DIP纯运动受损恢复的公平对照。不能把用未来端点的插值与严格past-only模型混成同一输入条件。[前作与评测范围](WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
-先证明真实几何恢复能力，再训练图像Corrector与质量头。所有数据下载、预处理、MANO解码验收和实验在`ssh hongfei`的`/data/hongfei/zhou/Hand_Reconstruction`运行；本机处理源码/论文/文档，GitHub不上传数据与权重。
+先证明真实几何恢复能力，再训练图像Corrector与质量头。所有数据下载、预处理、MANO解码验收和实验按D19优先在`ssh ds`已授权Pod运行，持久项目/数据路径见[操作记录](DS_SERVER_OPERATIONS.md)；本机处理源码/论文/文档，GitHub不上传数据与权重。

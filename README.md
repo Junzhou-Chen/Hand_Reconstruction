@@ -21,7 +21,7 @@
 
 - GitHub：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`，主分支`main`。
 - 本机：代码、论文、文档与轻量静态检查。
-- 实验：`ssh hongfei`，项目路径`/data/hongfei/zhou/Hand_Reconstruction`。
+- 当前计算：`ssh ds`进入SciClone Kubernetes，用户已授权复用Pod `jchen57-debug-mpd5p`；实验在Pod内进行。hongfei原checkout保留备用。详见[服务器操作](docs/DS_SERVER_OPERATIONS.md)。
 - 数据集下载、预处理、模型推理、训练和评测全部在远程服务器执行。
 - 数据优先无需申请、直接下载，并参考论文实际训练/评测用法；需审批资源不作为首轮开工前置。
 - Git跟踪源码、配置、论文、记忆、下载说明及小型结果摘要。数据集、模型权重、缓存、原始日志和大文件按[.gitignore](.gitignore)排除。

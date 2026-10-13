@@ -124,4 +124,4 @@ instruction/description episode行只是某个file的 `[start_timestep,end_times
 3. **EgoVerse与Lightwheel进入规模扩展候选**，OOJU用于完整设备手骨架adapter；对视觉/设备数据采用独立source和quality标签，不因不是glove而从调查清单隐藏。
 4. 聚合库优先评估格式复用价值与去重；申请访问的库先完成许可/manifest核验，再统计实际公开净时长。
 
-所有下载、样本数值检查、FK/模型推理和训练都在hongfei远程项目进行；本机仅处理文档与获取说明。此处是研究建议，未自动选定最终混合、下载全集或向公司发送申请。
+所有下载、样本数值检查、FK/模型推理和训练都远程进行；D19当前优先ds已授权Pod；本机仅处理文档与获取说明。此处是研究建议，未自动选定最终混合、下载全集或向公司发送申请。

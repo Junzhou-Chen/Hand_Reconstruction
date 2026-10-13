@@ -77,7 +77,7 @@ DexWild固定源码commit `5fa34af5115bb6f54320d0071c3b1d4864cd224a`的tracker�
 
 [GRAB官方decoder](https://github.com/otaheri/GRAB/blob/master/grab/save_grab_vertices.py)使用个性化v_template。β10-only拟合可能存在形态表达残差，保存source template/原几何，不能把所有人β=0后把形状差异算成姿态误差。[FSGlove](https://arxiv.org/html/2509.21242v1)的shape-aware标定提供校准思路，硬件/代码开放不等于已发布大规模训练轨迹。
 
-验收记录单位/时间、源关节定义、校准、native→99D joint残差、有效性、fit error、腕跳变与split。没有独立真值时，骨长稳定/低抖动只能筛异常，不能证明毫米精度。实际preprocess/FK与精度测试全部在hongfei执行。
+验收记录单位/时间、源关节定义、校准、native→99D joint残差、有效性、fit error、腕跳变与split。没有独立真值时，骨长稳定/低抖动只能筛异常，不能证明毫米精度。实际preprocess/FK与精度测试全部远程执行；D19当前优先ds已授权Pod。
 
 ## 4. StableHand参考范围
 

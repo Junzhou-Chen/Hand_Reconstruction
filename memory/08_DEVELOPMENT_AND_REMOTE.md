@@ -1,6 +1,6 @@
 # 开发、GitHub同步和远程实验约定
 
-记录日期：2026-10-13。来源：用户本轮明确指令；本文件属于已采纳工作约定，不是助手建议。
+记录日期：2026-10-13。D13/D14为原GitHub与远程分工约定；最新D19因hongfei GPU占用改用ssh ds，并明确授权复用用户预申请Pod。已定约定与下文建议路径分别标注。
 
 ## GitHub与版本管理
 
@@ -12,27 +12,31 @@
 - 小型手工整理的指标/表格放在`reports/`并跟踪，原始结果放在忽略目录；论文图和源文件不做全局图像/PDF忽略。
 - 正常push，不force-push覆盖远程历史；有远程新提交时先核查并保留已有工作。
 
-## 机器分工
+## 机器分工与当前入口
 
-| 用途 | 位置 |
+| 用途 | 当前位置/状态 |
 |---|---|
 | 编辑代码、论文、文档、Git同步、静态检查 | 本机 `/Users/junzhou/Project/Visual_Hand_Reconstruction` |
-| 初步实验服务器 | `ssh hongfei` |
-| 用户指定远程根目录 | `/data/hongfei/zhou` |
-| 本项目远程checkout | `/data/hongfei/zhou/Hand_Reconstruction` |
-| 数据、权重、缓存、完整日志 | 远程存储，不进入Git |
+| 当前远程登录入口 | `ssh ds` → `cm.geo.sciclone.wm.edu`（Kubernetes登录节点） |
+| 当前计算资源 | 用户明确授权的Pod `jchen57-debug-mpd5p`，namespace `jchen57` |
+| 当前GPU/CPU/RAM | 已分配2×约96GiB Blackwell、12CPU、128Gi；GPU检查时空闲 |
+| 代码目录建议 | `/sciclone/home/jchen57/project/Hand_Reconstruction`，本轮未创建/clone |
+| 大数据/产物目录建议 | `/sciclone/data10/jchen57/Hand_Reconstruction`下分目录，本轮未创建 |
+| 原hongfei checkout | `/data/hongfei/zhou/Hand_Reconstruction`保留备用，不再是当前唯一入口 |
 
-训练、模型推理、数据预处理、性能评测及依赖GPU的sanity checks全部远程运行。本机不承担实验，即便当前可运行一个小模型也不改变此约定。远程项目目录名沿用GitHub仓库名，是本次实施选择。
+训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、当前资源、环境和存储细节见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。用户指定先学习运维，本轮未创建/删除Job、迁移项目、安装依赖或训练。
 
-建议将本项目的数据/checkpoint/outputs/logs分别放在远程checkout的`data/`、`checkpoints/`、`outputs/`、`logs/`，这些目录已经忽略。后续若共享大数据，可使用`/data/hongfei/zhou`下独立数据目录并通过配置引用。
+用户home和data10为Pod持久NFS挂载，`/dev/shm`为64Gi临时内存盘；scr清理政策及个人存储配额未核，不当永久唯一存储。Pod默认Python不等于zhou：默认Torch2.6/cu126在Blackwell上tiny CUDA失败，现有zhou Torch2.12/cu130两卡均通过。正式TWM依赖仍待验；不改旧项目环境/数据。
+
+当前Job从2026-10-12 16:37:28 UTC起最多3天，按配置约10-15 16:37 UTC到期，需checkpoint持久化与续跑；退出exec不释放GPU。本轮复用用户现有Job，不按旧模板自动删除它。未来另建本项目Job时使用独立名称、label与本项目配置。
 
 ## 运行与复现
 
-每次实验记录本地已推送commit、远程实际commit、配置、数据版本/split、命令、设备、随机种子与产物路径。服务器长期任务采用可恢复会话或调度器；具体环境、GPU资源和调度方式在首次实验前检查，不预先占GPU或启动训练。
+每次实验记录本地已推送commit、远程实际commit、配置、数据版本/split、命令、设备、随机种子与产物路径。当前通过Kubernetes Job/Pod运行，长期任务在持久挂载保存checkpoint/日志，并考虑Job时限；基础GPU/CUDA已核，完整训练依赖、恢复和数据路径仍在首次实验前检查。用户现有两卡已申请，不再为本轮学习新申请资源。
 
 常规同步流程：本机整理并提交→push `origin/main`→远程确认工作区状态→fast-forward更新→远程运行。若远程修改了代码，先保存并提交这些改动，不用reset或rsync覆盖。
 
-## 本轮连接核验
+## 历史连接核验：hongfei（D19前）
 
 - GitHub `git ls-remote`成功，初始化前远程无refs。
 - `ssh hongfei`连接成功，`/data/hongfei/zhou`存在；可找到`git`和`nvidia-smi`。
@@ -40,3 +44,7 @@
 - 远程`data/`、`checkpoints/`、`outputs/`、`logs/`已创建并受`.gitignore`保护。本轮后续文档提交继续正常push/pull；实际最新版本以Git HEAD为准。
 - 初始提交20个文件、约1.78MB工作树内容，最大为约1.45MB历史方法图；没有训练数据/权重。已检查忽略规则与凭据特征。
 - 以上是仓库/目录配置完成；未创建训练环境、占用GPU或启动实验。
+
+## D19当前ds核验
+
+ssh ds、kubectl context/namespace、用户现有Pod、持久挂载与两套Python已实测。极小CUDA检查配置、失败/通过结果和UTC时间见[操作记录](../docs/DS_SERVER_OPERATIONS.md#2-python环境与cuda验证)。这是服务器兼容检查，未运行项目模型/实验。ds本项目checkout仍未建立；下一轮可按用户指令落实上述建议目录，旧VLM_KD只作运维参考。

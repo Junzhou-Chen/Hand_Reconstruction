@@ -247,4 +247,4 @@ EgoDex、GigaHands、TACO等可作质量分层扩展/留出评测，具体角色
 
 仍需通过样本和代码确定：标准关节映射/骨长、模型资产、训练数据split、mask/quality粒度、可靠性目标、corruption分布、证据读取位置/范围、训练损失权重、历史/reset与梯度策略。
 
-实施顺序：在hongfei完成直接可下载数据样本契约→纯轨迹restoration baseline→真实HaWoR误差上的一次校正→候选引导取证与多轮迭代→自身历史rollout及消融。代码、论文和小型结果同步GitHub，训练数据/权重不上传。
+实施顺序：按D19在ds已授权Pod完成直接可下载数据样本契约→纯轨迹restoration baseline→真实HaWoR误差上的一次校正→候选引导取证与多轮迭代→自身历史rollout及消融。代码、论文和小型结果同步GitHub，训练数据/权重不上传。

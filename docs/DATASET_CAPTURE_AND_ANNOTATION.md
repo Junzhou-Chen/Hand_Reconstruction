@@ -113,4 +113,4 @@ raw人体骨架、腕SLAM和机器人训练文件不同：四指LEAP retarget明
 
 ## 对99D预训练的处理要求
 
-已有MANO按源decoder转换；glove/native skeleton先保留原几何，再标定/拟合或直接几何监督99D。分别保存measurement来源、个人形态、转换残差、腕world定义、人工/插值/平滑mask、时间与split。不能由接触或平滑外观宣称姿态精度，也不能把未测的twist、缺失world腕补成GT。实际标定、解码、样本处理和实验全部在hongfei执行。[训练契约](TWM_PRETRAIN_PLAN.md)
+已有MANO按源decoder转换；glove/native skeleton先保留原几何，再标定/拟合或直接几何监督99D。分别保存measurement来源、个人形态、转换残差、腕world定义、人工/插值/平滑mask、时间与split。不能由接触或平滑外观宣称姿态精度，也不能把未测的twist、缺失world腕补成GT。实际标定、解码、样本处理和实验全部远程执行；D19当前优先ds已授权Pod。[训练契约](TWM_PRETRAIN_PLAN.md)

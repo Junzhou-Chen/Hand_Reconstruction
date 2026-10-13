@@ -129,6 +129,13 @@
 - 在[预训练计划§0](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)区分目标池与首checkpoint依赖；不等待所有库，不预设比例，保持99D与部分监督、split/去重及远程实验约定。此为建议，未登记为用户采纳的混合。
 - 更新入口、决策边界、数据/状态及传感器专题；无数据下载、转换实现或训练结果。
 
+## 2026-10-13 ds现有GPU Pod操作学习
+
+- 用户说明hongfei GPU忙，指定ssh ds及旧项目运维参考，随后明确授权使用昨天申请的jchen57-debug-mpd5p；登记D19，当前入口替代D14的hongfei，旧checkout保留备用。
+- 新建[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)，只读核包、远程运维/非敏感设置、Kubernetes context/用户任务、NFS及Job时限。附件与live配置Debug CPU/Eval GPU不同，模板不等于实时资源。
+- 已进入用户Pod，12CPU/128Gi/2×约96GiB Blackwell；默认Torch2.6/cu126两卡tiny CUDA失败，zhou Torch2.12/cu130两卡8元素平方和140通过。记录失败与成功，非模型实验。
+- 不提交原包、凭据、内部NFS地址或原始日志；未创建/删除Job、改旧项目、clone ds本项目、安装依赖或训练。更新当前计划中的远程位置，保留历史hongfei记录；home/data10项目路径仍为建议未创建。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

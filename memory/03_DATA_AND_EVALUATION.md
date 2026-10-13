@@ -43,7 +43,7 @@ v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验�
 
 上述均为来源事实与使用建议，尚未选定最终训练混合。完整事实、许可入口与未验收事项见[2026-10-13专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)。预训练只需要运动状态，不必限制头戴相机或配对RGB。
 
-用户指出数采团队覆盖不足后，[产业补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)新增SynData（10fps/ITW qpos映射）、OpenGraph（glove局部关节）、Daimon DataDex（手部分量待查）、OOJU（Quest26joints）、EgoVerse（完整手字段可缺省）、Lightwheel（申请开放视觉手标注）和UniHand（已有数据格式聚合）。规模扩展不能只沿首轮学术清单；先列全来源，再根据完整性、质量、许可筛选。所有数据验收/处理在hongfei运行。
+用户指出数采团队覆盖不足后，[产业补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)新增SynData（10fps/ITW qpos映射）、OpenGraph（glove局部关节）、Daimon DataDex（手部分量待查）、OOJU（Quest26joints）、EgoVerse（完整手字段可缺省）、Lightwheel（申请开放视觉手标注）和UniHand（已有数据格式聚合）。规模扩展不能只沿首轮学术清单；先列全来源，再根据完整性、质量、许可筛选。所有数据验收/处理远程运行；D19当前优先ds已授权Pod。
 
 GT 来源必须按 **joint articulation 与 wrist/global pose** 分开记录，不能一个 `gt_source=glove` 字段掩盖腕部来自 SLAM。设备输出也可能有误差；对 GT 来源和可用性的描述，不等于估计出了传感器误差分布。
 

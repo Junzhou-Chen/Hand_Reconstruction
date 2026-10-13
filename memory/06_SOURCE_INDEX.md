@@ -85,6 +85,8 @@
 
 - [八库采集与标注来源](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)：2026-10-13核GRAB/ARCTIC/Oak/HOT/UmeTrack及HumanTouch/DexWild/DexCap的测量、拟合、人工/QC和发布层；新增HumanTouch VIVE系统证据、DexWild固定处理路径frame问题、DexCap原人体21点与EMF/IMU边界。
 
+- [ds服务器操作](../docs/DS_SERVER_OPERATIONS.md)：2026-10-13用户D19改计算入口并明确已有Pod授权；附包/旧项目运维只读核查、实时资源/挂载与两环境CUDA tiny check。未迁移项目、安装依赖或训练。
+
 ## 维护来源的方式
 
 - [WestWorld与视觉手重建精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)：2026-10-13按用户要求精读WestWorld与主流方法，含DIP直接前作、候选视觉查询谱系、HaWoR/HMP/StableHand/PAD-Hand固定SHA与世界指标口径。为文献及静态源码事实，不是实验复现或新用户选型。
