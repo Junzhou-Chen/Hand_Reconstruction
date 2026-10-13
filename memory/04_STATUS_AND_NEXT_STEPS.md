@@ -34,6 +34,8 @@
 
 按已定99D与免申请偏好，v1先固定HOT原recording排除表/Oak官方split及父序列映射，再在hongfei验收**HOT可用train＋OakInk2 train**。Re/GigaHands逐源消融扩展，EgoDex增joint规模；DexYCB独立同数据恢复对照/真实HaWoR数值适配，HOI4D先域外。glove小样本与HandX自采作为支线，登记资源不挡开工。数据组合、配比和模型细节未定，99D不再作为开放选型。[首轮步骤](../docs/TWM_PRETRAIN_PLAN.md)
 
+第一个checkpoint只依赖HOT/Oak两套loader；不等Re或EgoDex全量到位。优先增量是core＋Re与core＋筛选EgoDex，另做DexYCB-only合成恢复；DexYCB是否混入主池由增量验证决定。以上未实施。
+
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
 | P0 split与状态契约 | 固定HOT基准排除表、内部val与Oak官方split/父录制；在hongfei验HOT/Oak少量train的99D/wrist roundtrip | 原recording清单/hash及字段/形态/坐标/mask/真实dt；不要求full VRS manifest |

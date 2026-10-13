@@ -8,6 +8,8 @@
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
 
+同日进一步收敛首轮：只要求HOT＋Oak核心，Re作为优先姿态增量，EgoDex在joint/shape映射后扩规模。两核心足够支持第一个实验，不代表已验证全面覆盖。DexYCB亦可纯轨迹预训练，先单独DexYCB-only synthetic restoration对照，再研究core＋DexYCB；固定第三视角不是TWM排除条件。详细依据见[现行计划§3](../docs/TWM_PRETRAIN_PLAN.md#3-重规划后的数据角色与顺序)。此为助手推荐，不登记新用户混合决定。
+
 **Motion-only pool** 用于独立训练 TWM，不要求配对图像。需要高质量 joints/wrist trajectories、采样时间、骨架定义与质量来源。只有局部手指姿态而缺 wrist 6DoF 的记录，不能直接冒充完整 69D GT；如何做部分监督是待决接口。
 
 **Video–reference paired pool** 用于训练/评估图像取证、可靠性与 Corrector。需要同步视频、相机参数、参考状态，以及真实 HaWoR 输出。纯人工 corruption 的表现不能代替真实视觉错误上的表现。

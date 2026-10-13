@@ -46,6 +46,10 @@
 
 **首轮高质量核心：HOT3D可用训练recordings＋OakInk2官方train。** HOT3D补ego目标域、缺测和独立marker参考；OakInk2补复杂双手操作、较长连续过程和OptiTrack参数。这比“先挑最容易读取的MANO包”更符合高质量运动知识改善视觉的目标。
 
+**本轮选库判断收敛：第一个restoration checkpoint只要求HOT＋Oak，两库适配通过即可训练。** Re:InterHand是优先MANO姿态扩展，比较core与core＋Re后决定；EgoDex在joint/shape映射通过后扩动作与规模，并持续回放原生参数核心。它们不是首轮前置，也不预先保证混入有益。HOT/Oak能支持第一个可反驳实验，不等于已证明覆盖全部动作；pilot统计独立时长、主体/任务、静止/突变/缺测及腕位移后判断是否需要扩库。
+
+**DexYCB也能纯轨迹预训练。** 固定第三视角不构成TWM排除理由；其MANO/关节数值可供恢复监督。当前优先单独运行DexYCB-only synthetic restoration，参考DIP同数据协议，再决定是否core＋DexYCB；真实HaWoR错误适配是另一用途。不得把这项实验角色安排说成“DexYCB只能paired训练”。
+
 [OakInk2官方annotations](https://huggingface.co/datasets/kelvin34501/OakInk-v2/tree/main/anno_preview)627段约36.7GB可独立下载；[TaMF](https://github.com/oakink/OakInk2-TaMF)确实用其运动参数做条件生成，已有[431train/39val/157test序列清单](https://github.com/oakink/OakInk2-TaMF/tree/dev/asset/split)。默认只取431 train，val/test隔离。该split尚未证实subject-disjoint，复杂/primitive切片与父recording的跨split关系需验收；若冲突，先合并父序列后重建split并单独报告协议，不把627段全部当train。
 
 | 角色 | 推荐数据 | 使用方式与验收条件 |
