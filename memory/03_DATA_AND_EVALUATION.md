@@ -4,6 +4,8 @@
 
 ## 两个数据池
 
+[八库采集与标注报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)按原测量、标定/拟合、人工/QC、发布参考分层。HumanTouch团队MANUS＋VIVE系统已核，公开episode配置待验；DexWild固定tracker处理代码未显式完成camera-world组合，发布版本需核；它仍是glove候选，不能凭world_abs名直接训练world腕GT。
+
 **已定D15–D18：免申请、每手99D、论文机制参考、传感器姿态精度优先。** 用户本轮纠正v1过度沿视觉论文选库，v2恢复GRAB/ARCTIC/Oak/HOT的MoCap核心候选，新增UmeTrack，HumanTouch/DexWild升主要glove。实际先可公开来源，注册有授权再接；Re/EgoDex降后续视觉标签扩展。混合未定。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)、[传感器精度核验](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。

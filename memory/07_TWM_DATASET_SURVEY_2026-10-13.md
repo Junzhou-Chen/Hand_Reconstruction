@@ -29,7 +29,7 @@ TWM 不看图像，所以预训练轨迹不必来自头戴 RGB。外部 MoCap、
 | HOT3D | 全集 833 分钟、19 人、30 Hz；不等于全部时长均有公开 GT | 专业 optical-marker MoCap，UmeTrack/MANO | 用公开 TRAIN reference；与 HaWoR/头戴应用接近 |
 | DexWild human | 公开 release 人类子集 7,917 episodes、2,924,588 transitions；若按30Hz解释，约27.08小时 | MANUS 手套；ArUco tracker + ZED视觉/SLAM测腕部 | 扩展跨环境手套操作；不用重定向后的机器人 action 代替人手 |
 | DexCap public subset | 官方公开 30 分钟 wiping + 60 分钟 packaging | Rokoko 手指 + T265 wrist SLAM | 数据量小但与原始 idea 很贴近，适合 adapter 验证和补充 |
-| HumanTouch，主要glove验收候选 | 官方约100h；十份meta累计约132.75h，非去重/QC净量 | MANUS EMF、25点/方向＋world腕契约，腕硬件型号待核 | HF公开，pose可单取，CC BY-NC4.0已核；manifest/标定/数值质量待验 |
+| HumanTouch，主要glove验收候选 | 官方约100h；十份meta累计约132.75h，非去重/QC净量 | MANUS EMF、25点/方向＋world腕契约；团队系统VIVE，公开episode硬件版本待核 | HF公开，pose可单取，CC BY-NC4.0已核；manifest/标定/数值质量待验 |
 
 各项事实、资源入口和限制如下。有效可训练时长还需扣除 test split、缺标签、跳帧、坏拟合及重复来源；不能把上表简单求和当训练总量。
 
@@ -71,7 +71,7 @@ HF 文件索引中 `anno_preview` 有 627 个 pickle，总约 36.65 GB；可先�
 
 [项目](https://dexwild.github.io/)、[论文](https://arxiv.org/html/2505.07813v1)、[代码](https://github.com/dexwild/dexwild)和[实际HF数据卡](https://huggingface.co/datasets/boardd/dexwild-dataset)都已核验。五任务human条目合计7,917 episodes、2,924,588 transitions；若按30Hz解释，约27.08小时。30Hz依据来自论文环境/策略频率，各段实际采样间隔仍须通过timesteps.txt验收。33+小时和9,505 episodes包含机器人，论文9,290 human demos也不是当前release数量。
 
-原始包列出 `left/right_manus_full.pkl`、`left/right_manus.pkl`、`*tracker_cam_frame_abs.pkl` 与 `timesteps.txt`。**应从原始human字段构造状态，不能用LEAP机器人action替代完整人手。** 腕部须结合tracker与相机/SLAM变换，不能仅凭文件名当成固定world frame。论文含追踪筛选、插值和Gaussian smoothing，参考轨迹已有处理。
+原始包列出 `left/right_manus_full.pkl`、`left/right_manus.pkl`、`*tracker_cam_frame_abs.pkl` 与 `timesteps.txt`。**应从原始human字段构造状态，不能用LEAP机器人action替代完整人手。** 腕部须结合tracker与相机/SLAM变换，不能仅凭文件名当成固定world frame。后续固定源码发现tracker处理路径读ZED pose却未显式组合，world_abs为相对首tracker参考；发布版本/样本待验，详见[采集来源审计](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#7-dexwildmanus手指与aruco腕标记)。论文含追踪筛选、插值和Gaussian smoothing，参考轨迹已有处理。
 
 HF标注MIT，总文件约2.14TB；可按任务、人/机器人区分，但未找到官方轻量pose-only包。大包传输、原始骨架和坐标映射是比MANO数据更实际的接入成本。
 
@@ -79,7 +79,7 @@ HF标注MIT，总文件约2.14TB；可按任务、人/机器人区分，但未�
 
 [官方仓库](https://github.com/j96w/DexCap)链接的[公开数据卡](https://huggingface.co/datasets/chenwangj/DexCap-Data)只列 1.5 小时、两个任务，含 raw ZIP 与 processed HDF5，标注 CC BY 4.0。不要把论文系统的数据规模与公开子集混为一谈。
 
-raw wiping约22.7GB、packaging约42GB。`pose_2.txt / pose_3.txt`为双腕6DoF，`left/right_hand_joint.txt`为palm-local人手关节；world参考为初始胸前T265。公开关节数量尚未通过文件确认。[论文](https://arxiv.org/html/2403.07788v2)采集60Hz，但长录制会降帧并可能出现SLAM jump。
+raw wiping约22.7GB、packaging约42GB。`pose_2.txt / pose_3.txt`为双腕6DoF，`left/right_hand_joint.txt`为palm-local人手关节；world参考为初始胸前T265。官方采集代码保存每手21节点位置/方向；公开raw文件是否包含全部方向仍未样本确认。[论文](https://arxiv.org/html/2403.07788v2)采集60Hz，但长录制会降帧并可能出现SLAM jump。
 
 TWM不需要胸前RGB-D。**glove指关节与SLAM全局腕位姿须分别记录质量来源**；processed HDF5偏机器人训练，不应使用还舍弃小指的LEAP 16D action代替人手。
 

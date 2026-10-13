@@ -13,7 +13,7 @@
 | [OakInk2](https://github.com/oakink/OakInk2) | OptiTrack→SMPL-X/MANO；部分遮挡marker人工修复 | 直接公开的完整状态核心；取annotations，不依赖RGB；验父序列/时间/个体shape |
 | [HOT3D](https://github.com/facebookresearch/hot3d/blob/main/hot3d/clips/README.md) | optical marker＋scan→UmeTrack→MANO | 直接公开Clips；native几何参考优先，不因有ego图像提高纯TWM权重；split先排benchmark原录制 |
 | [UmeTrack独立集](https://huggingface.co/datasets/facebook/hand_tracking_challenge_umetrack) | 36-camera MoCap＋scan；分离手势、双手交互与pinch | **新增直接公开marker候选**；world wrist/native pose/converted MANO；补非抓取动作，真实/合成共用motion需去重 |
-| [HumanTouch](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch) | MANUS EMF、25点/方向；world腕位姿契约，具体腕硬件需核 | **主要glove候选，优先验收**；parquet/meta独立于视频，CC BY-NC4.0已核实；源骨架与MANO转换仍需验收 |
+| [HumanTouch](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch) | MANUS EMF、25点/方向；团队系统VIVE腕追踪，公开episode硬件版本待核 | **主要glove候选，优先验收**；parquet/meta独立于视频，CC BY-NC4.0已核实；源骨架与MANO转换仍需验收 |
 | [DexWild human](https://huggingface.co/datasets/boardd/dexwild-dataset) | MANUS full；ArUco腕tracker＋ZED/相机变换 | **主要glove候选**；公开MIT；7,917episodes/2,924,588transitions为发布量，actual dt/world/已有平滑须验；只取raw human |
 | [DexCap raw](https://huggingface.co/datasets/chenwangj/DexCap-Data) | Rokoko手指、T265 SLAM腕 | 公开1.5h，适合快速glove adapter；别用LEAP action，别把腕SLAM当光学参考 |
 | [OpenGraph MANUS](https://huggingface.co/datasets/OpenGraphLabs-Research/manus-egocentric-sample) | 每手25点、双手40个finger-angle通道 | 公开约54min、parquet可单取；未见独立world wrist SE3，做local部分监督/映射验收 |
@@ -56,6 +56,12 @@ summary页面`window.__detail_data__`转义JSON顶层字段为`Id=211198, Namesp
 公开pose parquet索引计17,576文件，与metadata episodes不同：X005 meta722/文件723、X008 meta744/文件711。manifest需按实际episode/timestamp验收，不由此断言轨迹坏或未发布。统一60Hz含插值/SLERP，不代表各硬件原生频率。
 
 [官方README](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/README.md)给出自接触辅助标定骨长/关节偏移与episode人工审核；尚无全库独立毫米误差验证。[episode契约](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/X001/meta/humantouch/episodes/episode_000001.json)提供米、xyzw、world wrist与左右25点/方向、validity/source/session。只取parquet/meta训练运动，不读RGB、触觉或机器人action；触觉辅助标定是采集质量资料，不是新增TWM输入。
+
+### 后续采集来源核验
+
+[八库采集与标注报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)补充了各传感器→骨架→模型参考的链条。HumanTouch官方主页及[同团队论文§III-C](https://arxiv.org/html/2609.20649v2#S3.SS3)明确MANUS/VIVE系统，解决腕追踪技术完全未知的问题；精确设备代际及HF episode对应仍未核。触觉辅助自接触标定与60Hz同步/QC和原MANO监督分开；论文50任务与HF10任务版本不直接合并。
+
+DexWild固定源码commit `5fa34af5115bb6f54320d0071c3b1d4864cd224a`的tracker处理路径将到相机的pose相对首帧归一化，读取ZED pose但未显式组合，随后以world_abs命名；发布样本/处理版本仍待验。此为代码事实，非整个release无world的结论。DexCap确认Rokoko骨架采集21节点，论文EMF表述与同期厂商EMF/IMU资料可共存；不假定它是纯IMU。两库原人手与robot retarget继续分开。
 
 ## 3. 99D输出不要求各库原生MANO
 

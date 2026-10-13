@@ -84,6 +84,8 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 | OakInk2 | OptiTrack marker → 人工清理及遮挡marker多视角补齐 → 两阶段SMPL-X拟合 → MANO | [论文](https://openaccess.thecvf.com/content/CVPR2024/papers/Zhan_OAKINK2_A_Dataset_of_Bimanual_Hands-Object_Manipulation_in_Complex_Task_CVPR_2024_paper.pdf)、[补充](https://openaccess.thecvf.com/content/CVPR2024/supplemental/Zhan_OAKINK2_A_Dataset_CVPR_2024_supplemental.pdf)；T-pose定shape/marker位置，再拟合pose |
 | HOT3D | 每手19枚marker+个人hand scan → OptiTrack → UmeTrack个人模型拟合 → 转换MANO | [论文附录C](https://arxiv.org/html/2411.19167)、[官方toolkit说明](https://github.com/facebookresearch/hand_tracking_toolkit#important-notes)；官方明确转换MANO精度略低，推荐用UmeTrack关键点监督 |
 
+本轮[八库采集报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)补充UmeTrack独立marker集及三套glove：HumanTouch MANUS/VIVE与自接触标定，DexWild MANUS＋ArUco/ZED及world处理版本边界，DexCap Rokoko21节点＋T265。它们的原始骨架与厂商四元数不自动等于MANO local rotations。
+
 合成数据是另一路径：先选择MANO参数并渲染，标签来自生成过程；这与真实数据拟合的provenance不同。把已有单目预测器生成的MANO直接当标签则是伪标注，不能称独立高精度GT。
 
 ## 有joint标签也能训练MANO输出

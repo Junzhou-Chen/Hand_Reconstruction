@@ -110,6 +110,13 @@
 - [预训练计划](../docs/TWM_PRETRAIN_PLAN.md#候选数据的完整适配判定)分开记录完整字段MoCap候选、高价值但需映射/腕链验收的glove、OpenGraph局部补充及其它未验扩查资源；不因非MANO降低glove科学优先级。
 - 只读复核官方ARCTIC/Meta字段说明、HumanTouch episode契约与OpenGraph README。没有库通过本项目adapter或数值质量验收，没有数据预处理或模型运行。
 
+## 2026-10-13 八库采集与标注来源精读
+
+- 按用户要求新建[采集来源报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)，逐一核硬件、原测量、扫描/标定、模型拟合、人工清理/QC与发布标签层；不改99D或glove优先原则。
+- 补HumanTouch官方主页和DexTouch-WM论文MANUS/VIVE证据，保留HF与论文任务版本及逐episode配置未核；精确设备代际仍待验。
+- 固定DexWild `5fa34af5115bb6f54320d0071c3b1d4864cd224a`审tracker/camera上游：当前路径未显式组合ZED world，world_abs名不证明世界真值；结论限该路径，不断言全部发布无world。DexCap固定采集代码核每手21节点/方向、四指LEAP与原人体分离，Rokoko同期资料EMF/IMU并存。
+- 核OakInk2官方论文/补充的人工marker补齐与两阶段拟合；论文PDF仅为静态文献阅读，临时文本不提交。同步专题、入口与进展，无实际数据处理、模型实现或训练结果。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。
