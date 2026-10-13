@@ -14,9 +14,11 @@
 
 已完成项目理解、来源核对、文件化记忆，以及针对TWM的公开数据集专项调研；尚未实现模型、下载完整训练数据或验证效果。原有材料完整保留。
 
-**2026-10-13数据建议：** GRAB + ARCTIC先建立纯轨迹基线，OakInk2扩任务；HOT3D的公开训练GT可补目标域，DexWild补手套数据规模。HumanTouch已有实际文件，但完整上传量和许可仍待核实。AMASS须筛hand-marker子集；GigaHands/TACO/EgoDex等视觉估计来源单独分层。这是调研建议，尚未成为用户选定的训练组合。详见[完整调查](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)。
+**最新数据决定（2026-10-13）：** 用户优先使用无需申请、可直接下载的公开数据，并参考论文实际用法。此前GRAB+ARCTIC先开工、HOT3D首轮paired的建议不再作为默认；需注册/登记的路线暂降级，Lightwheel等人工审批资源留作调查背景。建议先验收OakInk2/DexCap/DexWild等直接发布的motion；paired协议参考DexYCB/HO3D，保留来源质量与目标域区别。最终混合未定。[数据与评测](memory/03_DATA_AND_EVALUATION.md)
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
+
+完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、单手69D、统一TWM输入提案、w/q分工和三阶段训练。统一槽位、残差坐标、初始化和单手共享参数等是明确标注的实现建议，尚未运行。
 
 ## 快速恢复上下文
 
@@ -24,6 +26,7 @@
 |---|---|
 | 理解总体方向和项目事实 | 本文件；[现行原始方案](HandLoop_Project/START_HERE.md) |
 | 设计模块、状态接口、训练闭环 | [方法与接口](memory/01_METHOD.md) |
+| 连贯阅读完整方法与训练/实验安排 | [完整方法框架](docs/METHOD_FRAMEWORK.md) |
 | 判断某个想法是否已经定案或放弃 | [决策与演进](memory/02_DECISIONS.md) |
 | 选择数据、设计实验和消融 | [数据与评测](memory/03_DATA_AND_EVALUATION.md) |
 | 查找可用于TWM预训练的公开数据、下载和许可 | [数据集专项调研（2026-10-13）](memory/07_TWM_DATASET_SURVEY_2026-10-13.md) |

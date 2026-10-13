@@ -4,6 +4,10 @@
 
 ## 两个数据池
 
+**用户最新决定D15：优先无需申请、可直接下载的数据，并参考论文实际使用。** 首轮建议GRAB/ARCTIC/HOT3D的路线涉及注册/登记，不再作为默认开工条件；Lightwheel等人工审批资源留在背景调查。直接公开的OakInk2/DexCap/DexWild可先验收，SynData需骨架映射、HumanTouch需许可核实；最终混合尚未决定。
+
+论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
+
 **Motion-only pool** 用于独立训练 TWM，不要求配对图像。需要高质量 joints/wrist trajectories、采样时间、骨架定义与质量来源。只有局部手指姿态而缺 wrist 6DoF 的记录，不能直接冒充完整 69D GT；如何做部分监督是待决接口。
 
 **Video–reference paired pool** 用于训练/评估图像取证、可靠性与 Corrector。需要同步视频、相机参数、参考状态，以及真实 HaWoR 输出。纯人工 corruption 的表现不能代替真实视觉错误上的表现。
@@ -12,9 +16,9 @@
 
 | 资源 | 项目中的角色 | 已知限制与下一步 |
 |---|---|---|
-| GRAB + ARCTIC | 推荐先建立纯轨迹TWM基线 | Vicon→MANO/SMPL-X；注册科研下载；ARCTIC参数与meta约306MB。多视角不能重复计量；评测划分先保留 |
+| GRAB + ARCTIC | 文献对照/后备MoCap来源；不再默认首批 | Vicon→MANO/SMPL-X；需注册科研下载，与D15免申请偏好有获取成本。多视角不能重复计量 |
 | OakInk2 | 推荐扩展双手复杂操作 | OptiTrack→SMPL-X/MANO；627段annotations约36.65GB独立可下；需FK、单位、wrist映射验收 |
-| HOT3D | MoCap motion与首轮paired候选 | 纯轨迹可用Aria和Quest3；RGB paired首轮选Aria。TEST被试无公开GT；全库833分钟不能全计训练量 |
+| HOT3D | MoCap motion与头戴paired后备候选 | 完整版登记获取manifest，按D15暂非首批默认；纯motion可Aria/Quest3，RGB用Aria。TEST无公开GT |
 | DexWild | 推荐扩展真实手套操作 | 公开human 7,917 episodes/2,924,588 transitions；MANUS手指+视觉/SLAM腕部。取原始human，不取LEAP action |
 | HumanTouch | 优先验收的新手套候选 | 25 joints/手、world腕部、统一60Hz；parquet与视频分开。已核验两个分区meta约30.40小时，非全库统计；具体许可尚未读到 |
 | DexCap | 小规模glove轨迹及adapter对照 | 公开30分钟wiping+60分钟packaging；Rokoko指关节、T265腕部；不能冒充论文全集或无漂移world GT |

@@ -5,6 +5,7 @@
 当前仓库处于研究设计、数据调研与论文草稿阶段；尚无模型实现或实验结果。
 
 - [项目记忆入口](MEMORY.md)
+- [完整方法框架](docs/METHOD_FRAMEWORK.md)
 - [现行原始方案](HandLoop_Project/START_HERE.md)
 - [TWM数据集调研](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)
 - [产业数采团队与大规模手部数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)
@@ -16,6 +17,7 @@
 - 本机：代码、论文、文档与轻量静态检查。
 - 实验：`ssh hongfei`，项目路径`/data/hongfei/zhou/Hand_Reconstruction`。
 - 数据集下载、预处理、模型推理、训练和评测全部在远程服务器执行。
+- 数据优先无需申请、直接下载，并参考论文实际训练/评测用法；需审批资源不作为首轮开工前置。
 - Git跟踪源码、配置、论文、记忆、下载说明及小型结果摘要。数据集、模型权重、缓存、原始日志和大文件按[.gitignore](.gitignore)排除。
 
 数据文件和模型资产遵守各自许可，不随本仓库分发。仓库暂未指定统一开源许可证。

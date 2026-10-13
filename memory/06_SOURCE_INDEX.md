@@ -75,6 +75,7 @@
 - [07_TWM_DATASET_SURVEY_2026-10-13.md](07_TWM_DATASET_SURVEY_2026-10-13.md)：后续用户请求的TWM公开数据专项调查，含官方论文/发布链接、字段/许可、部分文件索引与元数据检查；推荐组合不是用户决策。
 - [08_DEVELOPMENT_AND_REMOTE.md](08_DEVELOPMENT_AND_REMOTE.md)：用户明确的GitHub同步、忽略大文件、本地编辑/远程实验约定及实际连接/clone记录。
 - [09_INDUSTRY_HAND_DATASETS_2026-10-13.md](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)：用户纠正首轮覆盖不足后的产业补查；含SynData、Lightwheel、EgoVerse等实际入口和访问限制。
+- [docs/METHOD_FRAMEWORK.md](../docs/METHOD_FRAMEWORK.md)：随后用户要求的完整方法梳理；区别已定主线与接口提案，纳入D15免申请数据偏好及论文实际数据角色。
 
 已按后续用户要求创建Git历史、推送指定GitHub并在hongfei创建checkout；尚未训练、完整数据下载、安装实验依赖或改写原论文草稿。专项调查读取部分公开metadata和文件目录，不代表加载完整轨迹。新记忆不能替代相应代码/数据/论文证据。
 

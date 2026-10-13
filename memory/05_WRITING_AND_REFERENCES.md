@@ -68,6 +68,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 ## 数据来源核验
 
+同日方法整理新增[论文数据角色对照](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：明确区分HMP先验/恢复评测、HaWoR视觉/infiller、StableHand quality/generative模型、PAD-Hand训练/TACO跨域评测。用户已明确免申请数据优先，论文常用不自动意味着照搬其需注册数据组合。新判断来自原论文，不代表已复现。
+
 ### HOT3D
 
 [官方项目](https://facebookresearch.github.io/hot3d/)说明 professional optical-marker MoCap 与 UmeTrack/MANO 标注。Aria 有 RGB 流，Quest 3 为双灰度流，所以本项目 RGB 首轮候选应选 Aria。[官方 README](https://github.com/facebookresearch/hot3d)明确其列出的 TEST 被试（P0004、P0005、P0006、P0008、P0016、P0020）没有公开 GT，MANO annotations 另有协议要求。未下载序列验证同步和映射。
