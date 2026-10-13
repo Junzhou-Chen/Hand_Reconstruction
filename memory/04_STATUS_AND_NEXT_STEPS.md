@@ -70,6 +70,8 @@
 
 ## 已识别的主要风险与验证路径
 
+2026-10-13完成[WestWorld与视觉手重建方法精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)，含原论文方法/附录及关键源码。DIP补入直接条件恢复基线；DIR/WiLoR/GeoHand补入视觉迭代前作。确认HaWoR非因果及missing-only infiller、HMP局部prior、StableHand增强版差异和W/WA对齐口径。仅更新文献事实与实验约束，未改用户主线、运行模型或新增性能结果。
+
 2026-10-13已补充核验HaWoR原生MANO字段与双手infiller，澄清69D/66D为编码长度；字段层面有可转换的公开数据。下一步应做adapter roundtrip及实际样本检查，尚不能将所有数据标为“69D验收通过”。
 
 - **收益只是平滑。** 用 true geometric error、快速动作和准确点退化测量。
@@ -77,7 +79,8 @@
 - **GT 质量混合。** joint/wrist 来源分开；辅助设备追踪不冒充独立高精度标签。
 - **HaWoR 工程接入失误。** `hawor_infiller()` 含 world 转换；去掉补全时单独保留转换。
 - **递归累积与合成噪声偏差。** 比较真实误差、自身历史 rollout 和再可见恢复。
-- **创新性不足。** 三个候选贡献需在强基线下分别证明作用，不能只换术语。
+- **创新性不足。** 三个候选贡献需在强基线下分别证明作用；DIP已有纯运动当前恢复和序列内反馈，DIR/WiLoR/GeoHand已有候选图像查询，不能只换术语。
+- **评测同名异义。** 先固定HaWoR/StableHand版本、W/WA对齐、scale与camera/shape来源，再和明确world gauge的几何误差并列报告。
 
 ## 下次会话可直接使用的任务说明
 

@@ -24,7 +24,7 @@
 | Evidence-guided iterative correction with reliability reassessment | 候选改变真实图像查询，能修正假高置信错误，同时保护准确观测与真实动作突变 |
 | Reliability-aware temporal feedback | 自身状态反馈和 rollout 能改善连续恢复与跨域鲁棒性，而非放大错误 |
 
-“传感器数据学运动先验”“引入 confidence”“加入 temporal model”本身不是新贡献。不能仅凭相关工作的摘要判断其缺少本项目机制；需进一步逐项比较训练任务、条件输入、独立证据和反馈。
+“传感器数据学运动先验”“引入 confidence”“加入 temporal model”本身不是新贡献。2026-10-13全文精读进一步确认：DIP已有纯运动受损条件恢复和序列内预测反馈；DIR/WiLoR/GeoHand已有候选引导图像查询。以上候选贡献需要相对具体前作证明区别和收益，不能当成已确认的新颖点。完整版本、方法和源码证据见[论文精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)。
 
 Method 建议四节：State Representation and Visual Observations；Trajectory-Only Conditional State Restoration；Evidence-Guided Iterative State Correction；Reliability-Aware Temporal Feedback and Training。最终写法应服从真正实现的模块。
 
@@ -42,7 +42,7 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 - bbox 插值后局部 `valid` 区间会设为 True；需保存插值前 raw detection。没有据此确认原始 tracklet 中各条目的 `t['det']` 被永久修改。
 - **`hawor_infiller()` 内也读取 SLAM 结果并调用 `cam2world_convert`。绕开补全网络时必须保留世界坐标转换，不宜直接跳过整个函数。**
 
-未验证 feature hook 运行、权重下载、延迟和因果性；目前没有本地 pinned checkout。
+后续已静态核验官方 `66c7d4108d58a716deccd192cb7645170cdc7bd7`：视觉侧16帧与infiller 120帧上下文均非严格因果；infiller仅替换missing slots，保留valid输出。feature hook、模型运行与延迟未实测。[固定源码和评测口径](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
 2026-10-13回答69D问题时进一步读[视频脚本](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)、[MANO wrapper](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/mano_wrapper.py)、[world转换](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/custom_utils.py)。原生按手保存root rotation、15个关节rotation、3D translation、10D shape；wrapper有21点映射（可另加extra regressor）。视频脚本分左右手track，原infiller用`2*(3+10+16*6)=218`维双手表示。故“HaWoR原生单手69D”或“整个HaWoR只处理单手”均不准确；69D是我们经adapter构建的每手状态。world转换显式处理MANO translation与wrist joint offset，直接复制trans为wrist位置不正确。均为源码核验，无数值复现。
 
@@ -50,7 +50,7 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 ### HMP
 
-[原论文](https://arxiv.org/abs/2312.16737)、[作者项目](https://hmp.is.tue.mpg.de/)和[官方代码](https://github.com/enesduran/HMP)对应 WACV 2024。项目说明以 AMASS 学习手部生成运动先验，通过 latent optimization 辅助视频手运动估计。它是“独立 MoCap prior + visual recovery”的已有工作，必须纳入 novelty 分析。未全面审查模型实现或复现效果。
+[原论文](https://arxiv.org/abs/2312.16737)、[作者项目](https://hmp.is.tue.mpg.de/)和[官方代码](https://github.com/enesduran/HMP)对应 WACV 2024。以 AMASS 学习局部手指 VAE/NeMF prior，通过 latent optimization 辅助视觉恢复；原设定static camera，wrist位姿独立优化。后续已审 `35d799f76b2b2bc1d1e945117b021014b099e7e6` 的实际fitting路径；2D条件含MediaPipe与缺测时的初始3D投影fallback，并非全部独立图像测量。未复现效果。[精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
 数据专项调研进一步核验了其split和预处理：论文选GRAB/TCDHands/SAMP，但当前代码默认train为GRAB+ARCTIC、valid为SAMP、test为TCDHands。没有因此复现模型效果；细节和源码链接见[专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md#amass-必须筛选子集)。[HaWoR论文](https://arxiv.org/html/2501.02973v1)的motion infiller在HOT3D训练，是配对/先验对照中需要单独记录的训练来源。
 
@@ -58,7 +58,7 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 [论文](https://arxiv.org/abs/2605.18553)、[作者项目](https://huajian-zeng.github.io/projects/stablehand/)和[官方仓库](https://github.com/huajian-zeng/stablehand)描述质量信号、质量网络与 quality-aware flow matching。与保留可靠观测、恢复不可靠运动的目标接近。
 
-核验时仓库标注 NeurIPS 2026，并记录 2026-09-07 发布推理、评测、权重和缓存数据；训练及预处理仍列 TODO。这是 README 发布状态，未审模型源码或验证可运行性，也未据此证明本项目的新颖性。
+仓库标注 NeurIPS 2026，并记录 2026-09-07 发布Enhanced推理、评测、权重和缓存数据；训练及预处理仍列 TODO。后续已审 `0471a45e325ffa167cc6a8484d712a21befd3e47`：增强版backbone、QN输入、wrist residual与指标定义均有变化，不能与v1表格混用。原论文QN不读image feature，但生成DiT读图像/scene/camera，因此整体不是纯轨迹先验；quality在flow循环内固定。模型未运行。[版本对照](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
 后续读取[论文§3](https://arxiv.org/html/2605.18553v1)确认每手54D=3trans+6wrist rotation+45finger axis-angle，双手108D；shape不含在该动态state中。未据此复现生成/质量模型。
 
@@ -66,15 +66,19 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 准确题名为 **PAD-Hand: Physics-Aware Diffusion for Hand Motion Recovery**，作者 Elkhan Ismayilzada、Yufei Zhang、Zijun Cui。[arXiv 2603.26068](https://arxiv.org/abs/2603.26068)注明 Accepted to CVPR 2026；[论文正文](https://arxiv.org/html/2603.26068v1)描述条件 diffusion、Euler–Lagrange residual virtual observables 与 last-layer Laplace uncertainty。
 
-其 physics-consistency variance 不等同本项目按 GT 几何误差学习的 observation reliability。CVF 条目搜索可见但本次直接抓取失败；官方代码可用性尚未核实。不将题名中的 physics 当作本项目必须添加物理引擎的理由。
+其 physics-consistency variance 不等同本项目按 GT 几何误差学习的 observation reliability。不将题名中的 physics 当作本项目必须添加物理引擎的理由。后续已精读2026-03-30的v2及官方 `ca9ed97bc671199c25cf569d3b1de0e6f7937251`，训练用真实视觉估计→GT配对；公开demo存在，但发布树未提供完整训练/LLLA执行路径。[精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
 后续已找到并审查[官方demo](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/demo.py)和[model](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/models/pad_hand.py)：Euler姿态48D扰动、MANO vertices为MeshConv输入、16×6旋转输出；demo在refinement中沿用初始cam_t，不据此认为在恢复world wrist translation。源码存在已核验，模型未运行。
 
 ### WestWorld
 
-[官方仓库](https://github.com/511205787/WestWorld)和实际读取的 [westworld.py](https://raw.githubusercontent.com/511205787/WestWorld/main/models/WestWorld/westworld.py)包含 observation/action channels、action conditioning、结构编码、离散通道与 observation next-token loss。
+[v2全文](https://arxiv.org/html/2603.14392v2)与官方 `0a90776aeaa43f47c97f3c05eb75418b377b73ae` 已精读核验。任务为action-conditioned future-state预测；结构编码、通道attention、Mamba-style SSM与Sys-MoE结合。官方配置确认256 bins、6 blocks、hidden256、4 heads/experts，替代此前“bin数未核验”状态。它支持结构化轨迹建模的启发，不证明已具有人手受损当前状态恢复能力；只借鉴思想仍是项目决定。[详细方法与协议限制](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
-它支持轨迹空间建模的启发，不提供可直接拿来做人手 69D 当前状态恢复的依据。只借鉴思想是本项目决定；并非 WestWorld 官方对用途的限制。本次未核验具体 bin 数，旧文档里的 “256-bin” 不作为新增验证事实。
+### 新增直接前作与图像取证
+
+[DIP，ICCV2025](https://arxiv.org/html/2508.01835v1)的准确题名为 *Diffusion-based 3D Hand Motion Recovery with Intuitive Physics*：随机扰动GT训练纯运动条件恢复，固定初始估计与变化candidate分开，并有序列内自回归预测反馈。它是TWM最直接的恢复基线之一，不能将其归为仅未来预测。
+
+[DIR，ICCV2023](https://arxiv.org/pdf/2302.02410)、WiLoR和GeoHand已核验候选引导视觉查询；WiLoR公开实现一次多尺度读取后更新，DIR/GeoHand明确多轮。另核验Dyn-HaMR、JoHan与AffHandGen/ACE-Ego-Hand的相邻机制，正式发表与预印本分开。所有方法位置和链接集中在[精读报告](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)，尚无同协议实验比较。
 
 ## 数据来源核验
 

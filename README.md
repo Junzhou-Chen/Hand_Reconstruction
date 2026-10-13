@@ -6,6 +6,7 @@
 
 - [项目记忆入口](MEMORY.md)
 - [完整方法框架](docs/METHOD_FRAMEWORK.md)
+- [WestWorld与主流视觉手部重建论文精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 - [主流表示与MANO标注来源](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 - [现行原始方案](HandLoop_Project/START_HERE.md)
 - [TWM数据集调研](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)

@@ -37,6 +37,7 @@
 | 数采团队、商业厂商和大规模数据发布 | [产业手部数据补充调查](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md) |
 | 主流表示、MANO标签来源及69D比较 | [表示与标注核验](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md) |
 | 写 Introduction、定位贡献、引用论文 | [写作与外部核验](memory/05_WRITING_AND_REFERENCES.md) |
+| 精读 WestWorld 与主流视觉手重建方法 | [论文方法对照](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md) |
 | 回溯原文、检查材料覆盖与版本 | [来源索引](memory/06_SOURCE_INDEX.md) |
 | 了解记忆发生了什么变化 | [变更记录](memory/CHANGELOG.md) |
 
@@ -81,11 +82,13 @@ flowchart TD
     P[训练专用同步视频与参考状态] -.-> C
 ```
 
-这是依据现行文字方案重建的概念图，未代表已运行代码。HaWoR 可能使用时间上下文；闭环后端不意味着完整系统已满足严格在线/因果条件。
+这是依据现行文字方案重建的概念图，未代表已运行代码。HaWoR 官方源码已核验使用非因果时间上下文；闭环后端不意味着完整系统严格在线。代码版本及16/120帧范围见[论文精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)。
 
 ## 研究价值与证据边界
 
-潜在贡献是 **当前部分状态条件恢复 + 候选引导的独立视觉取证 + 可靠性重估和时间反馈** 的有效配合，尚未证明优于已有方法。HMP、StableHand、PAD-Hand 和 HaWoR 自有 infiller 是必须认真比较的相关工作；不能声称首次使用运动先验或 confidence。
+潜在贡献是 **当前部分状态条件恢复 + 候选引导的独立视觉取证 + 可靠性重估和时间反馈** 的有效配合，尚未证明优于已有方法。[2026-10-13精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)补充：DIP 已有纯运动受损条件恢复及序列内预测反馈；DIR/WiLoR/GeoHand 已有候选引导图像查询，HMP/StableHand/PAD-Hand/HaWoR infiller 也须正面对照。不能把当前恢复、重取证或反馈分别宣称首次。
+
+评测新增核验：HaWoR 的 W/WA 含 similarity/scale 对齐；StableHand v1 与增强版指标同名但实现不同。不能直接将其表格解释成未经对齐的绝对世界精度；详见[评测专题](memory/03_DATA_AND_EVALUATION.md)。
 
 部署免手套不等于训练免手套；“学习动力学”目前指运动学结构与时序统计，不能据此宣称学会力、力矩或人的动作意图。长期完全遮挡的唯一真值、全局 SLAM gauge/漂移，均不能仅由手部运动先验保证恢复。
 

@@ -88,6 +88,8 @@ MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是�
 
 PA-MPJPE 可作补充，不能代替 world-space accuracy。指标具体聚合方式、阈值、报告置信区间的方式均尚未决定，不预填数字。
 
+**2026-10-13论文/代码核验：** HaWoR `66c7d410…` 在100帧段的前两帧求含scale的similarity alignment后算W-MPJPE，WA用整段对齐；不是无对齐绝对世界误差。StableHand v1的首帧/全段对齐定义，又与Enhanced `0471a45e…` 的W无对齐/WA逐帧wrist减除不同。坐标anchor、shape来源及对齐前处理也应记录。建议兼容论文指标与明确world gauge/固定尺度的几何误差并列，不能跨版本拼表。固定SHA、函数及来源见[论文精读的指标部分](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md#世界误差与复现协议)。
+
 ## 能检验贡献的对照
 
 | 对照 | 要隔离的作用 |
@@ -101,7 +103,8 @@ PA-MPJPE 可作补充，不能代替 world-space accuracy。指标具体聚合�
 | 有无 candidate-guided independent visual re-observation | 收益是否来自新图像证据，而非重复计算 |
 | 有无最终状态反馈 | 递归状态维护的作用 |
 | 有无自身状态 rollout training | 是否改善训练/部署历史分布差异 |
-| HMP、StableHand、PAD-Hand 等 | 与已有 motion prior/refinement 的真实差异；同数据/输入/GT条件 |
+| HMP、DIP、StableHand、PAD-Hand 等 | 与已有 motion prior/refinement 的真实差异；DIP也做受损当前条件恢复，不只预测未来 |
+| DIR/WiLoR/GeoHand等取证机制 | 与已有候选投影/查询及多轮细化区分，保持相同视觉前端和时间信息 |
 
 跨数据集/被试、突发动作、长遮挡和再可见诊断应覆盖上述关键版本。相同 frozen TWM 接不同视觉 backbone、预训练数据规模扩展、机器人 retargeting 是后续验证方向，不是首轮必须全做的工程。
 

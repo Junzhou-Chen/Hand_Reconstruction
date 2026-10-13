@@ -82,6 +82,8 @@
 
 ## 维护来源的方式
 
+- [WestWorld与视觉手重建精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)：2026-10-13按用户要求精读WestWorld与主流方法，含DIP直接前作、候选视觉查询谱系、HaWoR/HMP/StableHand/PAD-Hand固定SHA与世界指标口径。为文献及静态源码事实，不是实验复现或新用户选型。
+
 对新用户决定保留原意、日期及影响；对代码事实记录 commit 与符号；对论文记录准确版本和 URL；对实验记录可访问的产物路径。外部网页随时间变化，标记核验日期，复现前再固定版本。
 
 记忆错误可直接更正并在 CHANGELOG 说明；不要为了保持旧记忆而维护已被原始证据推翻的主张。
