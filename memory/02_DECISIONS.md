@@ -30,7 +30,8 @@
 | D16 | 采用每手99D MANO动态状态（p3＋root6＋15×finger6）；β另存；TWM主输出固定完整99D，异构标签不改变输出维数 | 2026-10-13用户明确“我们使用99D”，本轮再次强调“我希望我训练的TWM是能够预测99D的”；替代69D默认候选；部分监督/拟合不等于全参数GT，实现与效果未验证 |
 | D17 | 以后plan广泛对照当前最新相关论文实际做法，适当参考后再规划，避免凭直觉 | 2026-10-13用户直接指令；已采纳；任务角色/GT/split/时间上下文分开比较，工作约定写入AGENTS |
 | D18 | TWM不需要视觉；选库优先更准确的手姿态，恢复glove/MoCap导向；论文用库作参考，不必照搬 | 2026-10-13用户直接纠正；已采纳，限定D17用法并替代v1 glove支线/Re-EgoDex优先扩展建议；99D与免申请偏好未撤销 |
-| D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；未创建任务、迁移项目或训练。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
+| D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；该运维核验阶段未迁移/训练，后续下载见D20。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
+| D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已实现续传/校验与查询脚本并在12CPU Pod启动。具体scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；属于本轮获取实施选择，不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
 
 ## 已替代的历史路线
 
@@ -55,7 +56,7 @@
 
 数据建议演进：v0 HOT＋Re→v1 HOT＋Oak及Re/EgoDex扩展→D18用户纠正为传感器精度主导。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)恢复GRAB/ARCTIC/Oak/HOT高优先，新增UmeTrack、提升HumanTouch/DexWild主要glove；Re/EgoDex后续单列。**精度优先原则已定，具体库/比例仍建议**；免申请资源先验，未新增用户采纳的混合。[专题证据](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
-HaWoR及本地/远程分工已选定；D19当前选ds的用户预申请Pod，GPU和zhou基础CUDA已核。首个数据源、接口规范、完整训练依赖与后续Job续跑仍需验收。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
+HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。GPU和zhou基础CUDA已核；下载脚本有实际文件验收，数据native→99D、完整训练依赖与后续Job续跑仍需检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 

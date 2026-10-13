@@ -1,5 +1,13 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-13 三库远程后台下载
+
+- D20用户要求下载OakInk2/HOT3D train/UmeTrack，澄清ds登录入口CPU少，需进入现有计算Pod；脚本确认正常后启动并结束对话，由用户后续检查。
+- 新增`download_twm_data.py`、`ds_downloads.py`与4项续传/校验检查，固定官方源revision，支持Range、重试、hash、锁、状态与后台进程；`.gitignore`补partial/坏文件隔离规则。
+- 在ds home建立GitHub checkout，数据只存远程data10；12CPU Pod内4项HTTP检查全部通过。代码`853d2da`于22:57 UTC启动三库各4workers；22:58:42 UTC三进程存活，首批校验通过、failed=0，仍在下载。
+- 范围Oak全627姿态＋元数据36.67GB，HOT排349个HaWoR评测source clips后2455TAR约257.07GB，Ume HF real train1020TAR约110.51GB，合计404.25GB。HOT BOP不包含27评测ID中的2个，记录缺席而不误判为映射失败；官方train IDs/device一致性已验。
+- 新增[下载与检查](../docs/TWM_DATA_DOWNLOADS.md)，更新入口/进展/远程记录，原始档案不变。没有下载到本机、提交数据/日志、生成99D、训练或宣称全量下载完成。
+
 ## 2026-10-13 初始建库
 
 - 按用户“仔细理解完整项目细节和 idea，构建项目记忆库”的要求，阅读全部分文档、核对总档案精确重复关系，并检查旧方法图。

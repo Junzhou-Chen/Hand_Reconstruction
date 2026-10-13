@@ -1,6 +1,6 @@
 # ds / SciClone Kubernetes服务器操作记录
 
-核验日期：2026-10-13。用户说明hongfei GPU已占用，指定改用`ssh ds`并参考旧项目运维；随后明确授权使用其昨天申请的`jchen57-debug-mpd5p`。本轮完成文档/配置/挂载核验和极小CUDA检查，没有创建/删除Job、修改VLM_KD或安装依赖，未运行模型、数据处理或训练。
+核验日期：2026-10-13。用户改用`ssh ds`并授权使用其昨天申请的`jchen57-debug-mpd5p`。先完成运维和极小CUDA检查；随后按D20建立持久checkout并在Pod启动三库后台下载。没有创建/删除Job、修改VLM_KD或安装依赖，未运行模型、转换轨迹或训练。[数据下载记录](TWM_DATA_DOWNLOADS.md)
 
 来源：用户提供的`kubectl_server_request_bundle_20260930.tar.gz`（只读tar内容）；ds上`/sciclone/home/jchen57/project/VLM_KD/{how_to_use.md,MIGRATION.md,config/project.env,conda.sh,script/*.sh}`中的运维部分；实时kubectl/NVIDIA/Python检查。未读取旧项目method。原包、完整配置、凭据、内部NFS地址与其他用户任务信息不提交Git。
 
@@ -56,13 +56,15 @@ python -c 'import torch; print(torch.__version__, torch.version.cuda)'
 
 登录节点与Pod共享相同NFS路径：用户home、data10、scr10、scr20、scr30。它们已确认在Pod内可见且可写；scr目录的长期清理/配额政策未核，不能因NFS就承诺永久保存。
 
-- 代码建议放`/sciclone/home/jchen57/project/Hand_Reconstruction`。
-- 数据、权重、checkpoint、输出与日志建议放`/sciclone/data10/jchen57/Hand_Reconstruction`下分目录。
-- 上述两个本项目路径是建议，本轮未创建；已确认home项目目录不存在。
+- 代码已clone到`/sciclone/home/jchen57/project/Hand_Reconstruction`，从GitHub同步。
+- 数据下载已落地`/sciclone/data10/jchen57/Hand_Reconstruction/datasets`；权重/checkpoint/输出以后也放data10分目录。
+- D19运维核验时目录尚不存在；后续D20已建立这两个持久项目路径。
 - `/dev/shm`为64Gi memory-backed emptyDir，适合临时缓存/共享内存，Pod删除后消失；使用会计入内存，不放唯一checkpoint。
 - `df`显示home所在文件系统当时98%已用，data10约73%；这是共享文件系统状态，不是用户个人可用配额。
 
-Pod默认工作目录`/workspace`不在上述项目持久路径。代码同步可在登录节点完成：那里有git；Pod默认PATH未找到git。共享home使Pod直接看到登录节点更新后的checkout。继续本机编辑→GitHub→远程持久checkout→Pod执行，数据/模型不上传GitHub。当前尚未clone本项目到ds。
+Pod默认工作目录`/workspace`不在上述项目持久路径。代码同步在登录节点完成：那里有git；Pod默认PATH未找到git。共享home使Pod直接看到登录节点checkout。保持本机编辑→GitHub→远程持久checkout→Pod执行，数据/模型不上传GitHub。下载器后台进程明确使用持久checkout为cwd。
+
+D20用户明确担心登录入口CPU少，下载须在计算Pod：`scripts/ds_downloads.py`虽在登录入口调用，文件传输/hash校验通过kubectl进入12CPU Pod。三库各4workers，退出SSH后继续；Pod到期停止，data10文件可续传。查询与实际scope见[下载检查](TWM_DATA_DOWNLOADS.md)，不会为了下载再次申请GPU。
 
 ## 4. 将来需要新Job时的参考流程
 
