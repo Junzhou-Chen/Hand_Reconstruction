@@ -83,6 +83,10 @@ DexWild固定源码commit `5fa34af5115bb6f54320d0071c3b1d4864cd224a`的tracker�
 
 可借鉴的是异构标注分层、腕/手指质量分组与故障扰动；**99D joint-only几何恢复是本项目方案，非StableHand已验证的motion预训练协议**。高质量reference选择独立于它的八库名单。[HMP](https://arxiv.org/html/2312.16737v1)从GRAB/TCDHands/SAMP学无图像prior，更接近最初思路；其当前代码GRAB/ARCTIC train与原论文分开保存。
 
+## 精度判断补充
+
+用户询问哪类精度更好；[来源报告的精度判断](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#精度判断工程建议与实测排名分开)记录工程建议：完整world腕＋手指参考更信校准且可追踪的外部多相机MoCap，局部手指不能断言glove一定差。HumanTouch/DexWild继续主要候选，实际标定及转换残差决定字段质量。没有同一独立真值上的八库排序；唯一直接链路比较为Meta明确native UmeTrack略优于转换MANO。GRAB网络误差、DexCap闭环终点漂移不是GT逐帧误差。本轮为建议而非用户新选库决定，无实验。
+
 ## 5. 当前建议执行顺序
 
 - **第一批共同验收**：OakInk2/HOT3D/UmeTrack的native/99D桥接，与HumanTouch/DexWild原人体骨架；DexCap/OpenGraph小样本辅助glove adapter。glove不再被默认降为远期支线。

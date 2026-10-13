@@ -99,6 +99,18 @@ raw人体骨架、腕SLAM和机器人训练文件不同：四指LEAP retarget明
 
 来源：[论文§III-A及采集附录](https://arxiv.org/html/2403.07788v2)、[固定人体骨架采集代码](https://github.com/j96w/DexCap/blob/4b0bed0966c87368f3cde4476aadb7585c3b94b5/STEP1_collect_data/redis_glove_server.py)、[固定记录脚本](https://github.com/j96w/DexCap/blob/4b0bed0966c87368f3cde4476aadb7585c3b94b5/STEP1_collect_data/data_recording.py#L230)、[Rokoko同期固件](https://support.rokoko.com/hc/en-us/articles/22103913523857-Smartgloves-firmware-v2-3-0)、[公开数据卡](https://huggingface.co/datasets/chenwangj/DexCap-Data)。
 
+## 精度判断：工程建议与实测排名分开
+
+2026-10-13用户进一步问哪种更准确。**工程判断：对完整世界系腕6DoF＋手指参考，更信通过标定、清理与有效性筛选的外部多相机MoCap；局部手指不能一概判所有glove低于marker。** 这是根据采集链作出的选择建议，不是已验证的八库精度排行榜。
+
+- world腕：GRAB/ARCTIC/Oak/HOT/UmeTrack的外部marker参考可优先验收；形态拟合、tracker到解剖wrist偏移仍有误差。DexCap腕依赖T265 SLAM；DexWild需先核camera/world处理链。VIVE追踪也需设备/标定验收，未给出与这些库同基准的姿态误差排名。
+- 局部手指：个人扫描/形态标定的MoCap可追踪片段提供可审计参考；EMF glove抗图像遮挡，保留HumanTouch/DexWild主要候选地位。分别检查marker遮挡与模型拟合、glove个体骨长/rest frame/佩戴和环境条件；不存在由相机台数或厂商名称直接推出的排序。
+- 转换到MANO：Meta官方明确native UmeTrack优于转换MANO，支持保留原生几何监督。99D编码不增加原数据准确度；姿态参数误差与原生→MANO几何残差分别报告。
+
+没有独立真值时，marker重建残差、自接触一致性、平滑/骨长稳定只能作QC，不能称真实joint毫米误差。GRAB主文RefineNet的4.4mm是网络重建指标；DexCap附录约0.4/0.8cm是闭环终点漂移，均不能拿来当全库逐帧GT精度。来源：[GRAB](https://arxiv.org/html/2008.11200)、[DexCap附录](https://arxiv.org/html/2403.07788v2)、[Meta转换说明](https://github.com/facebookresearch/hand_tracking_toolkit#important-notes)。
+
+本轮建议按world腕位置/朝向、root-relative joints/指尖、可用方向、原生→MANO残差分项验收；MoCap与glove同时进行，不预设固定配比，也不将手套降成只补数据量。此为待验证建议，没有运行误差评测。
+
 ## 对99D预训练的处理要求
 
 已有MANO按源decoder转换；glove/native skeleton先保留原几何，再标定/拟合或直接几何监督99D。分别保存measurement来源、个人形态、转换残差、腕world定义、人工/插值/平滑mask、时间与split。不能由接触或平滑外观宣称姿态精度，也不能把未测的twist、缺失world腕补成GT。实际标定、解码、样本处理和实验全部在hongfei执行。[训练契约](TWM_PRETRAIN_PLAN.md)
