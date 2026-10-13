@@ -94,16 +94,17 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 
 建议数据adapter同时保留：原始参数（若有）、原始测量/关键点、解码关节、wrist/root定义、shape、时间及fit来源。不能把MANO解码点与原始marker/joint标签混成同一类测量。
 
-## 对本项目的建议：表示仍需对照，主线不变
+## 后续已定99D与实现边界
 
-以下是本次调查后的研究建议，不是用户已采纳决定：
+早先调查建议MANO输出＋joint监督；2026-10-13用户明确“我们使用99D”，现按D16采纳，取代69D默认候选。主线不变，转换/监督/效果仍待验收。
 
-1. 若首轮紧接HaWoR、要求输出mesh，优先建立**MANO姿态输出 + joints输入/监督**baseline。候选动态编码为54D，或finger也用6D得到99D；shape10可序列级单独保留。root translation与实际wrist点仍需正确换算。
+1. **已选99D动态MANO状态**：实际wrist p3＋root6＋15×finger6；shape10人物/序列条件另存。root translation与腕点正确换算，源45D先完整解码hand mean后统一旋转。
 2. 保留69D joint-state作为有意义的对照，验证跨glove骨架接入和局部当前状态恢复的收益；不能宣传它是行业通用标准。
-3. 两种输出用相同数据/splits/corruptions比较joint/wrist误差；mesh有reference时再比mesh误差。若69D要输出mesh，计入IK/拟合成本和误差。
+3. 99D主要以真实joint/wrist误差验收；mesh有reference时补充。69D不再首轮必做选型，后续比较仍需同数据/split/corruption及IK成本。
 
-随后用户把重点转到预训练，具体的[八库数据/任务/输出提案](../docs/TWM_PRETRAIN_PLAN.md)建议99D v0并保留69D对照；Q需按源MANO hand mean完整解码，β另存且真实视觉评测不暗用GT shape。尚未由用户定案，也未进行表示消融。
 4. 不因表示变化而改变pure-trajectory TWM、current-state restoration、固定Z/变化candidate、独立图像取证、w/q或最终反馈的研究主线。
+
+[v1预训练方案](../docs/TWM_PRETRAIN_PLAN.md)已广泛对照最新论文重新规划数据，β真实评测不暗用GT shape；Corrector51D切向残差是新增实现建议，非99D选择自动证明。暂无表示实验。
 
 ## HaWoR论文与代码的一个边界
 

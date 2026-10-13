@@ -14,15 +14,15 @@
 
 已完成项目理解、来源核对、文件化记忆，以及针对TWM的公开数据集专项调研；尚未实现模型、下载完整训练数据或验证效果。原有材料完整保留。
 
-**最新数据决定（2026-10-13）：** 用户优先使用无需申请、可直接下载的公开数据，并参考论文实际用法。GRAB/ARCTIC等需注册路线暂降级，Lightwheel等人工审批资源留作调查背景。**同日八库核验纠正：HOT3D-Clips官方train可从HF直接获取，不能因full VRS需manifest而一起排除。** 当前v0建议HOT3D-Clips train＋Re:InterHand 3D train，后续HOI4D/OakInk2扩操作、EgoDex扩规模；DexCap/DexWild等手套源继续保留。最终混合未定。[预训练方案](docs/TWM_PRETRAIN_PLAN.md)、[数据与评测](memory/03_DATA_AND_EVALUATION.md)
+**最新数据决定（2026-10-13）：** 用户优先无需申请、直接下载，并要求以后plan广泛对照最新论文。注册/审批路线暂不挡开工；HOT3D公开Clips与full VRS入口分开。**v1建议核心HOT3D可用训练recordings＋OakInk2 train**，替代HOT＋Re优先的v0建议；Re/GigaHands是拟合扩展，EgoDex是joint规模池，DexYCB承担独立恢复基线/真实HaWoR数值适配，HOI4D先域外留出。glove支线保留；数据组合未由用户定案。[预训练方案](docs/TWM_PRETRAIN_PLAN.md)、[12项论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md)
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
-完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、单手69D、统一TWM输入提案、w/q分工和三阶段训练。统一槽位、残差坐标、初始化和单手共享参数等是明确标注的实现建议，尚未运行。
+完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、用户已选单手99D、统一TWM输入、w/q分工和三阶段训练。统一槽位、51D切向残差、初始化和单手共享参数等仍是实现建议，尚未运行。
 
-**同日表示核验：** 69D是本项目坐标状态候选，非行业通用标准。HaMeR/WiLoR/HaWoR等常输出MANO，HMP内部混合运动学特征，StableHand每手54D，HandX/METRO有坐标路线。建议首轮同时考虑MANO输出+joint监督与69D对照，最终表示尚未定案；MANO标签通常拟合得到。[表示与标注调查](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
+**已选表示D16：** 用户明确“我们使用99D”。每手p3＋root rotation6D6＋15×finger rotation6D90，β10为人物/序列条件另存；69D只留历史/可选对照。MANO标签通常拟合得到，99是编码长度而非99个物理DoF；adapter未实现。[表示调查及后续决定](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 
-**本轮预训练收敛：** 截图八库约10M帧属于StableHand质量网络预训练，并非其统一运动先验训练池。新增[首轮预训练方案](docs/TWM_PRETRAIN_PLAN.md)，建议每手99D MANO运动状态（p3＋root6＋15×finger6），shape10另存；当前受损恢复为主、短预测为辅，joint-only通过可微MANO几何loss加入。数据组合、99D与采样均为提案，尚无loader或实验。
+**v1重规划边界：** 截图10M是quality网络，不作TWM数据配方。依据HMP/DIP/TaMF及2026年UniHand/HandX/HandFlow/ACE/EgoFound3R/JoHan等重新分角色，先高质量core restoration，再单源扩展/真实HaWoR错误适配。HOT官方train含论文另留出的公开GT benchmark，须按原recording排除再切窗；Oak沿431/39/157序列split并验父录制重叠。配比/窗口由远程pilot验证，无loader或实验。
 
 ## 快速恢复上下文
 
@@ -35,6 +35,7 @@
 | 选择数据、设计实验和消融 | [数据与评测](memory/03_DATA_AND_EVALUATION.md) |
 | 查找可用于TWM预训练的公开数据、下载和许可 | [数据集专项调研（2026-10-13）](memory/07_TWM_DATASET_SURVEY_2026-10-13.md) |
 | 决定首轮数据、训练任务和输出契约 | [TWM首轮预训练方案](docs/TWM_PRETRAIN_PLAN.md) |
+| 查规划对应的论文训练职责及替代理由 | [TWM数据论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md) |
 | 开始下一步工作、查接口缺口 | [进展与下一步](memory/04_STATUS_AND_NEXT_STEPS.md) |
 | GitHub同步、服务器和实验位置 | [开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md) |
 | 数采团队、商业厂商和大规模数据发布 | [产业手部数据补充调查](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md) |
@@ -53,7 +54,7 @@
 5. **视觉和先验都可能出错。** 高 confidence 仍需检验；真实急停/转向应能推翻错误运动预期。
 6. **两个闭环有不同作用。** 帧内候选改变图像证据查询位置；跨帧仅回灌最终校正状态及其可靠性。它们不是长短记忆双分支。
 7. **状态与测量分开。** 固定原始观测 `Z_t`，更新候选 `S_t^(k)`；当前帧内历史 `H_t` 和参考系 `A_t` 固定。不能把中间输出当成新测量。
-8. **状态编码尚未定案。** 原框架69D为wrist p3＋root6＋20非根关节60；最新v0建议99D MANO姿态、β另存，并保留69D对照。两者均非相应数量的独立物理DoF。HaWoR视频支持双手，原infiller同时输入两手；adapter尚未实现验收。
+8. **每手99D已定。** p3＋root6＋15个finger rotation6D90，β另存；不是99个独立物理DoF。HaWoR输出经hand mean/腕偏移等adapter统一，视频支持双手；adapter尚未实现验收。
 9. **有效性不等于正确性。** raw detection、joint availability、原观测可靠性 `w`、最终状态可靠性 `q` 含义不同。
 10. **精度优先于平滑。** 报告 world/camera/local 几何误差及突变、遮挡、再可见恢复；不以平滑度或 PA-MPJPE 代替绝对世界精度。
 

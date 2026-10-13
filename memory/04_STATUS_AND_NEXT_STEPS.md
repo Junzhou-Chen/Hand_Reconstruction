@@ -16,8 +16,8 @@
 | Git与远程工作方式 | 本地main已推送GitHub；hongfei已clone项目并建忽略的存储目录 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
-| MANO/69D表示与标签来源 | 已核验代表性论文与源码；按用户要求补充StableHand状态/flow velocity/四路观测质量/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；最终编码仍未定，未生成MANO fits |
-| 八库与TWM首轮预训练方案 | 已核验数据角色、公开版本和标签；形成HOT3D-Clips＋Re:InterHand、99D及混合监督提案 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)；未下载/验收完整轨迹或训练 |
+| MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
+| TWM数据重规划与已选99D | 用户采纳99D；重新核验12项论文并形成v1核心/扩展/适配/域外方案 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；数据混合仍建议，无训练 |
 | 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
@@ -32,11 +32,11 @@
 
 以下是下一阶段计划，不是已经执行的任务。建库和首轮TWM数据调查已完成，随后用户明确GitHub同步与远程实验约定并要求扩查数采团队。尚未创建模型工程或启动完整数据下载、训练；所有后续实验在hongfei执行。
 
-按用户最新D15与本轮预训练重点，纯轨迹在hongfei先验收**HOT3D-Clips官方train与Re:InterHand 3D train**，建立99D MANO输出＋joint观测/监督提案，69D保留对照；然后HOI4D/OakInk2扩操作、EgoDex扩规模。HOT3D公开Clips不需full VRS manifest，旧的全HOT3D后备判断已修正。DexCap/DexWild继续作为手套源，SynData需ITW映射、HumanTouch需补许可；ARCTIC/H2O/Ego-Exo4D等登记/审批暂不挡首轮。最终数据组合与编码仍未定，不要求等HaWoR跑通才开始TWM适配。[首轮详细步骤](../docs/TWM_PRETRAIN_PLAN.md)
+按已定99D与免申请偏好，v1先固定HOT原recording排除表/Oak官方split及父序列映射，再在hongfei验收**HOT可用train＋OakInk2 train**。Re/GigaHands逐源消融扩展，EgoDex增joint规模；DexYCB独立同数据恢复对照/真实HaWoR数值适配，HOI4D先域外。glove小样本与HandX自采作为支线，登记资源不挡开工。数据组合、配比和模型细节未定，99D不再作为开放选型。[首轮步骤](../docs/TWM_PRETRAIN_PLAN.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
-| P0 可用性与契约 | 在hongfei取HOT3D-Clips/Re:InterHand少量train段，检查源解码与99D/wrist roundtrip；固定HaWoR commit/配置 | 字段/形态/坐标/mask/时间表；不要求HOT3D full VRS manifest |
+| P0 split与状态契约 | 固定HOT基准排除表、内部val与Oak官方split/父录制；在hongfei验HOT/Oak少量train的99D/wrist roundtrip | 原recording清单/hash及字段/形态/坐标/mask/真实dt；不要求full VRS manifest |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
 | P2 纯轨迹恢复 baseline | 统一 TWM 训练/部署输入；corruption + current restoration，辅短预测 | clean/noisy/missing 验证；与 last-value、interpolation、GRU/temporal model 对比 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
@@ -65,7 +65,7 @@
 | O13 | split、指标聚合、序列/world 对齐、阈值、runtime 协议 | 防止指标不可比或 GT 泄漏 |
 | O14 | 远程实验的软件环境、可用GPU、分辨率、FPS及是否严格causal | 已明确hongfei和项目根路径，但未验训练环境；后端反馈不能证明系统在线 |
 | O15 | 最终预训练数据组合与目标评测保留 | 已有来源调研建议；仍需实际schema/质量检查、许可和split，HumanTouch完整上传量尚未核实 |
-| O16 | 99D MANO参数输出与69D关节坐标输出如何取舍 | 本轮建议99D v0、β另存、joint-only混合监督；仍需同数据/同corruption比较、源hand mean与shape条件验收 |
+| O16 | 已选99D的adapter、β与异构监督契约 | 表示选择已关闭；源hand mean/root offset/shape估计与51D残差、native/joint-only mask尚待实现验收 |
 
 这些是规格空缺，不是要求现在逐项询问用户。后续实现可先提出小而明确的契约，用数据和 sanity check 决定；会改变核心研究方向的选择应明确说明。
 

@@ -27,6 +27,8 @@
 | D13 | 正常同步到`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`的`main`；排除数据集和大文件，维护`.gitignore` | 2026-10-13用户直接指令；已采纳，详见[开发约定](08_DEVELOPMENT_AND_REMOTE.md) |
 | D14 | 本机只写代码/论文等，所有实验远程；初步用`ssh hongfei`，在`/data/hongfei/zhou`下创建项目 | 2026-10-13用户直接指令；已采纳；项目子目录采用`Hand_Reconstruction` |
 | D15 | 数据优先无需申请、可直接下载，参考当前相关论文实际使用的训练/评测数据；不把申请资源当开工前置 | 2026-10-13用户直接指令；已采纳，替代助手先GRAB/ARCTIC、优先申请产业库的默认顺序；不自动决定具体训练混合 |
+| D16 | 采用每手99D MANO动态状态（p3＋root6＋15×finger6）；β另存 | 2026-10-13用户明确“我们使用99D”；替代69D默认候选；实现与效果未验证 |
+| D17 | 以后plan广泛对照当前最新相关论文实际做法，适当参考后再规划，避免凭直觉 | 2026-10-13用户直接指令；已采纳；任务角色/GT/split/时间上下文分开比较，工作约定写入AGENTS |
 
 ## 已替代的历史路线
 
@@ -38,18 +40,18 @@
 | TWM 只读历史预测下一帧 | 恢复当前受损状态为主，短预测为辅 | D05 |
 | 可见关节信视觉，不可见关节独立补全 | 可信局部观测通过结构和时序关系帮助恢复其他部分 | D06 |
 | 固定 confidence gate，high confidence 不可修改 | 图像证据和候选支持下重估可靠性 | D06、D08 |
-| 72D：3+6+21×3 | 当前建议 69D：排除重复 wrist root 的 20 个非根关节；骨架映射仍待实现 | 归档 §15.2；START §2 |
+| 72D→69D关节坐标 | 历史上排除重复wrist得到69D；随后D16明确选99D MANO，69D只留可选对照 | 归档§15.2；START§2；2026-10-13 D16 |
 | 直接 WestWorld checkpoint、action conditioning、MPPI、MoE | 仅借鉴 structured/kinematic trajectory modelling | D04；START §1 |
 | 全身/物体接触图/长短记忆/完整机器人执行链 | 暂不进入第一版；只有明确研究必要性时再扩展 | D02、D07 |
 | 旧方法图作为最终架构 | 保留作历史示意；新的概念图见 MEMORY，论文图以后按实现重画 | 归档 §15.1；START 开头说明 |
 
 ## 没有定案的事项
 
-69D/66D是原框架候选，最新v0建议99D MANO编码，均不代表canonicalizer已存在。`K=8`、6层、`d=256`、4heads、`N=2`、共享迭代权重和约16帧unroll是历史起步配置。数据、evidence head具体结构、可靠性目标、训练配比和loss权重都未实验确定。
+**99D状态已按D16选定**，69D/66D是被替代的原框架候选；Corrector的51D切向残差仍为实现建议，canonicalizer不存在。`K=8`、6层、`d=256`、4heads、`N=2`和16帧unroll是历史起步配置。数据、evidence head、可靠性目标、配比和loss权重未实验确定。
 
-用户随后要求检查主流表示与MANO标注。[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)明确69D非通用标准，新增建议为MANO输出+joint输入/监督baseline与69D对照。该建议尚未由用户采纳；最终状态编码仍未定案，主路线D03–D09不因此改变。
+用户先要求核验主流表示与MANO标注，[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)提出MANO输出＋joint监督；随后D16采纳99D。状态选择不改变D03–D09，参数转换和joint-only监督仍需验收。
 
-2026-10-13用户进一步要求重点明确截图八库能否预训练、怎么训练和输出。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)提出HOT3D-Clips＋Re:InterHand先训，HOI4D/OakInk2与EgoDex后扩；99D动态MANO状态、β另存、current restoration＋辅助forecast。它是本轮可实施建议，未自动升级为D16选型；HOT3D公开Clips免full manifest为来源事实修正。混合参考包含marker和视觉拟合，不能把拟合池改称glove/MoCap。
+v0提出HOT＋Re先训；用户认可99D并要求重新看论文后，[v1预训练方案](../docs/TWM_PRETRAIN_PLAN.md)改为HOT可用train＋OakInk2核心、Re/Giga拟合扩展、EgoDex规模、DexYCB适配/同数据基线、HOI4D先域外。**数据角色仍为建议，未新增已定混合。** 替代理由与12项证据见[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)。
 
 HaWoR及本地/远程分工已选定，不再作为开放选型问题；首个数据源、接口规范、远程软件环境和GPU可用性仍需实际检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 

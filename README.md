@@ -7,6 +7,7 @@
 - [项目记忆入口](MEMORY.md)
 - [完整方法框架](docs/METHOD_FRAMEWORK.md)
 - [TWM首轮数据、训练与输出方案](docs/TWM_PRETRAIN_PLAN.md)
+- [TWM数据规划的12项论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md)
 - [WestWorld与主流视觉手部重建论文精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 - [主流表示与MANO标注来源](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 - [现行原始方案](HandLoop_Project/START_HERE.md)

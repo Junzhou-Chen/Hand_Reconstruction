@@ -77,7 +77,8 @@
 - [09_INDUSTRY_HAND_DATASETS_2026-10-13.md](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)：用户纠正首轮覆盖不足后的产业补查；含SynData、Lightwheel、EgoVerse等实际入口和访问限制。
 - [docs/METHOD_FRAMEWORK.md](../docs/METHOD_FRAMEWORK.md)：随后用户要求的完整方法梳理；区别已定主线与接口提案，纳入D15免申请数据偏好及论文实际数据角色。
 - [10_MANO_REPRESENTATION_AND_ANNOTATION.md](10_MANO_REPRESENTATION_AND_ANNOTATION.md)：用户要求的主流表示与MANO标注来源核验；含参数/坐标路线、HOT3D转换误差及MANO输出可用joint监督的证据。
-- [docs/TWM_PRETRAIN_PLAN.md](../docs/TWM_PRETRAIN_PLAN.md)：2026-10-13针对用户截图的StableHand八库核验与首轮数据/训练/输出提案；纠正公开HOT3D-Clips访问、quality训练角色和帧数口径，99D等仍为建议。
+- [docs/TWM_PRETRAIN_PLAN.md](../docs/TWM_PRETRAIN_PLAN.md)：2026-10-13八库核验后更新v1；99D已被用户采纳，数据组合仍为建议；含公开Clips访问、quality角色、split/帧数和训练契约。
+- 上项后续已更新v1：用户采纳99D，并要求广泛参考最新论文；数据组合仍建议。[docs/TWM_DATA_PAPER_EVIDENCE.md](../docs/TWM_DATA_PAPER_EVIDENCE.md)记录12项实际训练角色、HOT基准留出、Oak升核心及新来源分层，不以截图代替完整证据。
 
 已按后续用户要求创建Git历史、推送指定GitHub并在hongfei创建checkout；尚未训练、完整数据下载、安装实验依赖或改写原论文草稿。专项调查读取部分公开metadata和文件目录，不代表加载完整轨迹。新记忆不能替代相应代码/数据/论文证据。
 

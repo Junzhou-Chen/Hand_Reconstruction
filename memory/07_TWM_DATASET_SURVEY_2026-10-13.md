@@ -4,7 +4,7 @@
 
 **后续补充：本报告首轮检索偏学术，并非完整全景。** 用户指出产业数采覆盖不足后，已新增[产业手部数据调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，包含SynData、Lightwheel、EgoVerse、OOJU、OpenGraph、Daimon和UniHand。选择数据时两份一起读，尤其不要由这里的短名单推断“大规模公开人手数据只有这些”。
 
-**最新选择原则覆盖下面历史推荐顺序：** 用户随后明确优先无需申请、直接可下载且论文常用的数据；GRAB/ARCTIC与HOT3D full VRS的注册/登记路线不作为首批默认。**后续核验HOT3D-Clips官方train可HF直下，当前建议它与Re:InterHand 3D train建立首轮基线，不能排除所有HOT3D。** 详见[最新数据记忆](03_DATA_AND_EVALUATION.md)、[八库预训练方案](../docs/TWM_PRETRAIN_PLAN.md)。保留本报告的来源事实，不将旧推荐当新决定。
+**最新原则与v1覆盖下面历史推荐：** 用户已选99D、免申请数据优先、plan广泛参考最新论文。HOT3D-Clips可HF直下，但需先排论文held-out；v1核心建议HOT可用train＋OakInk2 train，替代v0 HOT＋Re优先，Re作拟合扩展、EgoDex规模、HOI4D先留出。[现行计划](../docs/TWM_PRETRAIN_PLAN.md)、[12项论文证据](../docs/TWM_DATA_PAPER_EVIDENCE.md)明确来源与替代理由；保留本报告历史事实/顺序，不当新决定。
 
 **建议先用 GRAB 与 ARCTIC 建立可复现基线，再加入 OakInk2；HOT3D 的公开训练标签适合补充目标域，DexWild 和 HumanTouch 值得用于扩展真实手套数据。** 这是本次研究建议，不是用户已选定的训练组合。
 
@@ -50,6 +50,8 @@ TWM 不看图像，所以预训练轨迹不必来自头戴 RGB。外部 MoCap、
 [项目](https://oakink.net/v2)；[论文](https://arxiv.org/abs/2403.19417)；[官方发布数据](https://huggingface.co/datasets/kelvin34501/OakInk-v2)。12 台 OptiTrack 跟踪身体、手和物体 marker，拟合 SMPL-X 并导出 MANO；不是仅由头戴图像估计手。627 段包含 primitive 和 complex task sequences，适合学习跨动作的手部关系。
 
 HF 文件索引中 `anno_preview` 有 627 个 pickle，总约 36.65 GB；可先取这些 annotations，不必下载约 2.13 TB 全库。数据卡标注 CC BY-SA 4.0，人体模型另外授权。**拟合值仍有误差，遮挡 marker 含人工视觉修复**；需要检查拟合、连续性和 root 坐标，不能称为所有关节直接传感器读数。
+
+同日v1核验：[TaMF](https://github.com/oakink/OakInk2-TaMF)已有运动生成训练，[split](https://github.com/oakink/OakInk2-TaMF/tree/dev/asset/split)431/39/157序列，非已核实主体留出；提升为核心候选。raw_mano16×wxyz、tsl/β支持99D，[源decoder](https://github.com/oakink/OakInk2/blob/dev/src/oakink2_preview/launch/viz/seg_3d.py)root-centered FK后加tsl支持米制腕解释，仍需样本验收。MoCap/RGB索引分别处理，PT/CT父录制与时间去重。
 
 [官方schema](https://github.com/oakink/OakInk2)有 `frame_id_list`、`mocap_frame_id_list`、`raw_smplx` 和 `raw_mano`。后者的左右手 `pose_coeffs:[1,16,4]` 使用 wxyz quaternion，`tsl:[1,3]`、`betas:[1,10]`；SMPL-X还有world rotation/translation。固定MoCap参考系可支持全局运动，但长度单位、root定义与实际wrist点仍需通过样本和FK核验。
 

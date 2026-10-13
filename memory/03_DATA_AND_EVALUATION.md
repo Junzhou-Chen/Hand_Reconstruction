@@ -4,7 +4,7 @@
 
 ## 两个数据池
 
-**用户最新决定D15：优先无需申请、可直接下载的数据，并参考论文实际使用。** GRAB/ARCTIC及HOT3D full VRS的注册/登记路线不作为默认开工条件；**HOT3D-Clips官方train直接公开，不能一并排除。** 当前v0建议HOT3D-Clips＋Re:InterHand 3D train，随后HOI4D/OakInk2、EgoDex；DexCap/DexWild等手套候选继续保留。SynData需骨架映射、HumanTouch需许可核实，最终混合尚未决定。[八库与预训练契约](../docs/TWM_PRETRAIN_PLAN.md)
+**已定D15/D16/D17：免申请数据优先、每手99D、plan广泛对照最新论文。** 当前v1建议高质量核心HOT可用train＋OakInk2 train，Re/GigaHands拟合扩展、EgoDex joint规模、DexYCB独立同数据恢复基线/真实HaWoR数值适配、HOI4D先留出；替代v0 HOT＋Re优先、HOI4D直接训练顺序。数据混合仍未定。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[12项论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
 
@@ -17,17 +17,17 @@
 | 资源 | 项目中的角色 | 已知限制与下一步 |
 |---|---|---|
 | GRAB + ARCTIC | 文献对照/后备MoCap来源；不再默认首批 | Vicon→MANO/SMPL-X；需注册科研下载，与D15免申请偏好有获取成本。多视角不能重复计量 |
-| OakInk2 | 推荐扩展双手复杂操作 | OptiTrack→SMPL-X/MANO；627段annotations约36.65GB独立可下；需FK、单位、wrist映射验收 |
-| HOT3D-Clips / full VRS | Clips train为v0主池建议；full为后备 | Clips官方HF直下，train 2,804×150帧，约3.89小时为片段累计、非去重净量；full另需manifest。纯motion可Aria/Quest，RGB用Aria；test手GT未公开 |
-| Re:InterHand 3D train | v0完整MANO姿态扩展建议 | 官方S3直下，7train/3test captures；scan/视觉拟合，不称MoCap。原帧索引需切gap，参数trans与PLY/camera单位分别处理 |
-| HOI4D / H2O | 完整MANO扩展 / 登记后备 | HOI4D公开分包、15Hz拟合标签，实际覆盖待验；H2O邮箱登记但未见人工审批，30Hz列表存在gap |
+| OakInk2 | v1核心：独立marker＋复杂操作 | 627段annotations约36.7GB独立可下；TaMF431/39/157序列split；用train并验父序列/PT-CT重复、FK/时间映射；非已核实主体留出 |
+| HOT3D-Clips / full VRS | v1核心：目标域marker参考 | HF直下；官方train累计42万帧不是净训练量，须排HaWoR/衍生benchmark held-out原recordings。full另需manifest；Aria/Quest均motion可用，官方test无手GT |
+| Re:InterHand 3D train | 完整参数拟合扩展，降出高质量核心 | S3直下，7train/3test；scan/视觉拟合，原帧索引切gap，trans与PLY/camera单位分开；单源加入消融 |
+| HOI4D / H2O | 首轮域外留出 / 登记后备 | HOI4D15Hz拟合，只评GT-valid；缺out-of-sight GT不声称真值恢复。H2O登记，未见人工审批，30Hz列表有gap |
 | DexWild | 推荐扩展真实手套操作 | 公开human 7,917 episodes/2,924,588 transitions；MANUS手指+视觉/SLAM腕部。取原始human，不取LEAP action |
 | HumanTouch | 优先验收的新手套候选 | 25 joints/手、world腕部、统一60Hz；parquet与视频分开。已核验两个分区meta约30.40小时，非全库统计；具体许可尚未读到 |
 | DexCap | 小规模glove轨迹及adapter对照 | 公开30分钟wiping+60分钟packaging；Rokoko指关节、T265腕部；不能冒充论文全集或无漂移world GT |
 | AMASS | 必须筛选子集的MoCap来源 | 原论文明确无hand markers时手姿为平均值；GRAB/TCDHands/SAMP有证据，不能整库当真实手指动态；与独立GRAB去重 |
 | GigaHands / TACO | 单独的多视角视觉估计扩展池 | 可提供轨迹但非独立finger marker GT；TACO的MoCap主要用于物体/头相机；GigaHands检查重心化版本 |
 | EgoDex / HoloAssist / SHOW3D | 规模、泛化或质量分层实验 | 设备/视觉估计，不能称glove-only；SHOW3D的world是移动背包rig。详见专项调研 |
-| HandX | 快速短窗loader与自采MoCap小补充 | 大部分聚合自HoloAssist等；自采发布短窗约17.23分钟（推算）。按来源和实际NPZ keys拆分、去重 |
+| HandX | 自采marker补充；聚合短窗后备 | 大部分来自HoloAssist/GigaHands等；先选自采或按mapping回源split，val复用test须改。两手强动态过滤不照搬，长时world回原库 |
 | TCDHands / SAMP / FPHA / HUMOTO / BigHand2.2M | 手势、局部姿态或腕运动补充 | 规模、公开子集、完整腕朝向和连续性条件不同，不能统一当完整69D监督 |
 | DexYCB / InterHand / Re:InterHand / HO-3D；AssemblyHands等 | 视觉拟合补充或跨域评测候选 | 前几项已核验部分release与限制；AssemblyHands尚未专项审核。采用前需同输入、同坐标、标签可比 |
 
@@ -43,7 +43,7 @@ MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是�
 
 ## 当前 schema 的状态
 
-本轮v0新增**99D MANO输出＋joint观测/监督**提案：p为实际wrist joint、R/Q为统一解码后的root/15个local旋转，β为序列条件。native参数loss与joint-only几何loss分mask；未知腕朝向、shape和角度不造GT。下列69D字段分析仍为对照路线，未成为运行实现。[具体输入、损失与shape评测边界](../docs/TWM_PRETRAIN_PLAN.md)
+**每手99D已按D16选定**：p为实际wrist joint、R/Q为统一解码后的root/15个local旋转，β序列条件另存。native参数loss与joint-only几何loss分mask仍为实现契约；未知腕朝向/shape/角度不造GT。下列69D字段分析为历史转换参考，未成为现行输出或运行实现。[输入、损失与shape边界](../docs/TWM_PRETRAIN_PLAN.md)
 
 **69D字段满足性（2026-10-13）：** HaWoR和数据不必原生输出69个数；只要能给一致参考系的wrist position/rotation、标准21点与时间信息，就可构造3+6+20×3。69是表示长度，非独立物理DoF。
 
@@ -74,6 +74,8 @@ MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是�
 ## 分割与可比性
 
 在训练前记录 train/validation/test 划分及主体、序列、场景标识；避免同一轨迹相邻片段跨划分造成泄漏。先定义 OOD 是跨被试、场景、数据集还是视觉 backbone，不将同域随机切分叫跨域泛化。
+
+**v1新增split契约：** HOT官方train包含HaWoR27个held-out Aria原录制的公开GT，Clips/full/HandX聚合/StableHand缓存共享原ID+timestamp排除表；若27作最终比较，另从110 train划内部val调参。Oak沿431train/39val/157test清单但不宣称subject-disjoint；验父recording重复。DexYCB训练的同数据对照独立命名，HOI4D初版不训练/调参、只GT-valid评价；HO3D仅TWM未见，HaWoR本身见过。
 
 相机世界坐标和参考世界坐标需有可复现的固定对齐协议。不能逐帧用评测 GT 优化对齐后，再声称获得绝对世界精度。是否允许一次序列级 gauge 对齐、尺度对齐及其数据来源仍需定案并单独报告。
 

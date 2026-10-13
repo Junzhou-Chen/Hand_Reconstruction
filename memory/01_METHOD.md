@@ -16,25 +16,23 @@
 
 ## 状态几何
 
-69D是本项目提出的坐标候选，尚非最终表示决定。[同日文献核验](10_MANO_REPRESENTATION_AND_ANNOTATION.md)记录了MANO参数/混合特征/直接坐标路线；建议比较MANO输出+joint监督与69D，而不是按维数或“主流”直接判定优劣。下面公式仍描述69D候选的几何语义。
-
-同日针对截图八库的[预训练提案](../docs/TWM_PRETRAIN_PLAN.md)建议99D MANO动态状态（p3＋root6＋15×finger6）作为v0，β序列级另存；固定raw包含joint观测、参数可用mask，native/joint-only分别监督。该提案尚未采纳/实现，不改下列69D几何为既定接口。
+**2026-10-13用户已选每手99D（D16）**，替代原69D坐标状态候选。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)给出固定raw、参数/joint mask和混合监督；实现与效果尚未验证。
 
 \[
-S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
+S_t=(p_t^W,R_t^W,Q_{t,1:15}),\quad Q_{t,i}\in SO(3),\quad\beta\in\mathbb R^{10}\text{另存}.
 \]
 
 | 分量 | 物理定义 | 建议网络表示 |
 |---|---|---|
 | 腕部位置 | 世界坐标 3D translation，存储单位米 | 3D |
 | 腕部朝向 | proper rotation，属于 SO(3) | rotation6D，6D |
-| 手指关节 | 腕部自身局部坐标中的 20 个非根关节 | 60D |
-| 完整输入 | 不重复 wrist root | 69D |
-| 更新量 | 平移增量、旋转切向量、关节增量 | 建议 3+3+60 = 66D |
+| 手指姿态 | 按MANO/hand mean完整解码后的15个local rotations | 15×6=90D |
+| 完整动态状态 | p3＋root6＋finger90，β人物/序列条件 | 99D，用户已选 |
+| Corrector更新量 | 平移、root与finger旋转切向量 | 建议3+3+15×3=51D |
 
-69D/66D指编码维数，不能写成69/66个独立物理DoF；腕部物理6DoF中的旋转有3DoF，6D只是冗余编码，关节点坐标受骨架约束。HaWoR原生为MANO root/15关节旋转、beta10和translation，经解码及坐标转换后才能得到我们的69D；其视频pipeline支持左右手，原infiller为双手输入。完整源码事实见[外部核验](05_WRITING_AND_REFERENCES.md)。
+99D是编码长度，非99个物理DoF；16个SO(3)旋转各用6D冗余编码。HaWoR原生root/15joint rotation、β10、translation经adapter统一hand mean/腕偏移/坐标后组成99D；视频支持左右手，原infiller为双手输入。[外部核验](05_WRITING_AND_REFERENCES.md)
 
-几何含义是 `J_world = p_world + R_world @ J_local`，其中 wrist-local 关节和时序 canonical frame 是两层不同坐标概念。MANO 可用于从 HaWoR 解码 joints/mesh，不作为所有传感器必须共享的状态参数。
+几何为`J_local=MANO(Q,beta)`腕中心化，再`J_world=p_world+R_world@J_local`。21点/778vertices由99D＋β解码；joint-only/glove观测不用造MANO角度GT，可以几何监督参数输出。wrist-local与时序anchor是不同坐标。
 
 时序建模参考系建议取上一帧最终腕部位姿 `A_t = T̂_(t−1)^W`。对历史和当前候选统一变换，例如：
 
@@ -44,7 +42,7 @@ S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 
 **同一帧全部迭代保持 `A_t` 固定。** 腕局部关节不能又被当成世界点重复转换。首帧无历史的参考系、旋转增量的左/右乘及其坐标系、平移增量在哪个 frame 输出，尚待明确。
 
-本次建议以anchor坐标输出平移/旋转增量、旋转左复合，关节残差在wrist-local输出，见[完整框架§3](../docs/METHOD_FRAMEWORK.md#3-任务输出与统一状态)。此为候选契约，需代码/数据验收；69D为单手，初版两手分别维护状态和历史、共享参数是建议，不宣称已实现双手联合约束。
+建议平移/root切向增量在anchor中，finger切向增量在MANO父关节frame中，各旋转左复合；51D残差需代码/数据验收，见[完整框架§3](../docs/METHOD_FRAMEWORK.md#3-任务输出与统一状态)。99D为单手；两手分别维护状态/历史、共享参数仍为建议，不宣称已实现双手交互。
 
 旋转更新必须通过有效旋转复合，不能直接相加两个 rotation6D 向量。输入 6D rotation 编解码的行/列约定、左右手镜像、骨长和 hand scale 都需要固定，并做 roundtrip 验证。
 
@@ -52,7 +50,7 @@ S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 
 | 符号 | 语义 | 帧内是否改变 |
 |---|---|---|
-| `Z_t` | 原始 HaWoR wrist/joints 估计 | 固定并保留 |
+| `Z_t` | 原始HaWoR MANO/腕位姿及可用joint数值观测 | 固定并保留 |
 | `F_t` | 当前真实图像提取的特征缓存 | 缓存固定，读取位置可变 |
 | `Γ_t` | intrinsics、camera pose、crop transform 等 | 固定 |
 | `M_t` | 原始检测和各部分可用性 | 原始记录固定 |
@@ -78,17 +76,19 @@ S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 
 \[
 \tilde S_t=\operatorname{Corrupt}(S_t^{GT}),\quad
-\mathcal L_W=\mathcal L_{restore}+\lambda_f\mathcal L_{short\ forecast}+\lambda_b\mathcal L_{bone}.
+\mathcal L_W=\mathcal L_{restore}+\lambda_f\mathcal L_{short\ forecast}+\lambda_v\mathcal L_{GT\ velocity}.
 \]
 
 扰动应覆盖关节缺失、整指缺失、局部错误但 mask 仍有效、连续偏差、历史误差、质量提示失真，以及无需修复的干净输入。噪声分布及强度尚未选定。完全正确的输入用于检验模型是否错误地强加运动先验。
 
 建议结构是 wrist/joint structured tokens + temporal Transformer；起步 `K=8, layers=6, d=256, heads=4`。骨架 token 的确切映射、attention mask、loss 权重、预测辅助时域尚未确定。它们不是论文贡献本身。
 
+99D后默认监督MANO解码几何＋可用root/finger旋转，MANO耦合骨架使bone loss不作必需项。历史K=8为旧建议；v1按真实时间比较0.5/1/2秒，不从不同论文的16至150帧平均出最优长度。GT来源与数据职责见[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)。
+
 部署时的完整概念接口为：
 
 \[
-W_\theta(H_t,Z_t,S_t^{(k)},M_t,w_t^{(k)})\rightarrow(U_t^{(k)},h_t^{W,(k)}).
+W_\theta(H_t,Z_t,S_t^{(k)},M_t,w_t^{(k)};\Delta t,\beta)\rightarrow(U_t^{(k)},h_t^{W,(k)}).
 \]
 
 TWM 可以看到视觉模型输出的低维数值状态，不看到 RGB、图像 feature 或 appearance。候选随 k 变化，所以 TWM 可以提出不同恢复建议；如果只读取固定历史，重复前向不会凭空产生新信息。

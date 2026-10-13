@@ -44,7 +44,7 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 后续已静态核验官方 `66c7d4108d58a716deccd192cb7645170cdc7bd7`：视觉侧16帧与infiller 120帧上下文均非严格因果；infiller仅替换missing slots，保留valid输出。feature hook、模型运行与延迟未实测。[固定源码和评测口径](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 
-2026-10-13回答69D问题时进一步读[视频脚本](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)、[MANO wrapper](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/mano_wrapper.py)、[world转换](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/custom_utils.py)。原生按手保存root rotation、15个关节rotation、3D translation、10D shape；wrapper有21点映射（可另加extra regressor）。视频脚本分左右手track，原infiller用`2*(3+10+16*6)=218`维双手表示。故“HaWoR原生单手69D”或“整个HaWoR只处理单手”均不准确；69D是我们经adapter构建的每手状态。world转换显式处理MANO translation与wrist joint offset，直接复制trans为wrist位置不正确。均为源码核验，无数值复现。
+2026-10-13回答69D问题时进一步读[视频脚本](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)、[MANO wrapper](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/mano_wrapper.py)、[world转换](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/custom_utils.py)。原生按手保存root rotation、15个关节rotation、3D translation、10D shape；wrapper有21点映射（可另加extra regressor）。视频脚本分左右手track，原infiller用`2*(3+10+16*6)=218`维双手表示。故“HaWoR原生单手69D”或“整个HaWoR只处理单手”均不准确；69D是当时的adapter坐标候选，后被D16的99D替代。world转换显式处理MANO translation与wrist joint offset，直接复制trans为wrist位置不正确。均为源码核验，无数值复现。
 
 进一步查[filling_preprocess](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/filling_utils.py)确认逐手canonicalize后拼接两手218输入；但[论文§9](https://arxiv.org/html/2501.02973v1)称各手独立、无交互/不穿透约束。拼接是当前实现事实，不等于证明已学到双手交互；main代码与发表版本事实分开，复现前pin版本。
 
@@ -83,6 +83,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 [DIR，ICCV2023](https://arxiv.org/pdf/2302.02410)、WiLoR和GeoHand已核验候选引导视觉查询；WiLoR公开实现一次多尺度读取后更新，DIR/GeoHand明确多轮。另核验Dyn-HaMR、JoHan与AffHandGen/ACE-Ego-Hand的相邻机制，正式发表与预印本分开。所有方法位置和链接集中在[精读报告](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)，尚无同协议实验比较。
 
 ## 数据来源核验
+
+按用户D17广泛对照后新增[12项数据论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)：HMP/TaMF/HaWoR/DIP/PAD/UniHand/HandX/StableHand/HandFlow/ACE/EgoFound3R/JoHan，记录prior/restoration/visual/quality训练与留出。新核验指出HOT官方train含公开GT benchmark held-out，需原recording排除；Oak已存在TaMF运动生成及431/39/157序列split，故v1升为核心。HOI4D先域外、DexYCB独立恢复基线与真实前端适配，GT来源分层。编码99D已被用户采纳，数据角色与配方仍为提案，无复现结果。
 
 同日方法整理新增[论文数据角色对照](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：明确区分HMP先验/恢复评测、HaWoR视觉/infiller、StableHand quality/generative模型、PAD-Hand训练/TACO跨域评测。用户已明确免申请数据优先，论文常用不自动意味着照搬其需注册数据组合。新判断来自原论文，不代表已复现。
 

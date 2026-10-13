@@ -14,9 +14,16 @@
 - TWM 学习当前受损状态恢复，短期预测仅作辅助；TWM 不接收图像或 RGB features。
 - 训练借助 glove/MoCap，部署只需相机。WestWorld 仅作结构思想参考。
 - 第一版范围是 wrist 6DoF 与手指关节。不要无依据切换视觉主干或增加机器人规划、物体物理、MoE、长短记忆等模块。
+- 用户已选每手99D MANO动态状态：wrist p3＋root rotation6D6＋15个finger rotation6D90；shape beta10另存。69D只保留历史/可选对照，不再当现行接口。
 - 原始观测、迭代候选、已完成的历史状态必须分开；高 confidence 不是不可修改的真值。
 - 用真实几何误差衡量效果，不能把平滑、合理外观、预期收益写成实验结果。
 - 数据优先无需申请、可直接下载的公开资源，参考论文实际训练/评测角色；需人工审批或联系作者的数据不作为开工前置。完整方法见[docs/METHOD_FRAMEWORK.md](docs/METHOD_FRAMEWORK.md)，其中新增实现契约仍标为建议。
+
+## 研究规划依据
+
+- 制定或实质修改plan前，广泛对照当前相关论文及最新公开方法，先读官方全文/训练协议，必要时核查源码；不要只围绕最近截图或单篇论文设计。
+- 按任务接近程度比较motion prior、current restoration、visual reconstruction、quality learning，分别记录训练/评测数据、GT来源、输入上下文、split和可迁移部分。
+- 回顾既有方案，明确哪些保留、哪些替代及其证据；论文先例、工程建议、用户决定和实验验证分开。超参或混合比例没有依据时写成待验证假设。
 
 ## 开发与实验位置
 
