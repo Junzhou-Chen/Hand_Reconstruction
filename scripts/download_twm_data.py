@@ -183,8 +183,15 @@ def plan(dataset, directory):
         if len(heldout) != 27:
             raise RuntimeError("HaWoR evaluation sequence list changed or could not be parsed")
         available = {d["sequence_id"] for d in definitions.values()}
-        if not heldout <= available:
-            raise RuntimeError("HaWoR evaluation recordings not all found in clip definitions")
+        if not heldout & available:
+            raise RuntimeError("No HaWoR evaluation recordings found in clip definitions")
+        # BOP clips are a subset of the original release; two listed recordings
+        # are absent entirely. Exclude every match and record the absence explicitly.
+        for prefix, device in (("train_aria/", "Aria"), ("train_quest3/", "Quest3")):
+            directory_ids = {int(PurePosixPath(p).stem.split("-")[-1])
+                             for p in items if p.startswith(prefix) and p.endswith(".tar")}
+            if directory_ids != set(splits["train"][device]):
+                raise RuntimeError(f"HOT3D {device} train directory disagrees with official split")
         selected = []
         for p, item in items.items():
             if p.startswith(("train_aria/", "train_quest3/")) and p.endswith(".tar"):
@@ -192,14 +199,18 @@ def plan(dataset, directory):
                 definition = definitions[clip_id]
                 item["sequence_id"] = definition["sequence_id"]
                 item["device"] = definition["device"]
+                expected_device = "Aria" if p.startswith("train_aria/") else "Quest3"
+                if definition["device"] != expected_device:
+                    raise RuntimeError("HOT3D clip device disagrees with its train directory")
                 if item["sequence_id"] in heldout:
                     excluded.append(item)
                 else:
                     selected.append(item)
         selected += [items[p] for p in ("README.md", "clip_definitions.json", "clip_splits.json", "hot3d_dataset_license_agreement.pdf", "hot3d_base.zip")]
         split_summary = {"hawor_excluded_recordings": sorted(heldout),
+                         "hawor_recordings_absent_from_bop_release": sorted(heldout - available),
                          "excluded_train_clips": len(excluded), "excluded_bytes": sum(x["size"] for x in excluded),
-                         "official_clip_splits_root_type": type(splits).__name__}
+                         "official_train_split_and_devices_verified": True}
         scope = "Official train Aria/Quest3 mixed TARs, excluding all 27 HaWoR evaluation source recordings before windowing. Other benchmark overlaps still need audit."
     else:
         selected = [x for p, x in items.items() if p.startswith("train/") and p.endswith(".tar") and "_synthetic_" not in p]
