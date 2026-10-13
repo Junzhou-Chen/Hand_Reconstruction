@@ -7,6 +7,7 @@
 - [项目记忆入口](MEMORY.md)
 - [现行原始方案](HandLoop_Project/START_HERE.md)
 - [TWM数据集调研](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)
+- [产业数采团队与大规模手部数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)
 - [开发、同步和远程实验约定](memory/08_DEVELOPMENT_AND_REMOTE.md)
 
 ## 工作方式

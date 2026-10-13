@@ -36,4 +36,7 @@
 
 - GitHub `git ls-remote`成功，初始化前远程无refs。
 - `ssh hongfei`连接成功，`/data/hongfei/zhou`存在；可找到`git`和`nvidia-smi`。
-- GitHub push与远程checkout的最终结果由本轮执行后补记；连接成功不等于已跑实验。
+- 初始提交`20fe231`已成功push到GitHub main并设置upstream；远程已从GitHub clone到`/data/hongfei/zhou/Hand_Reconstruction`，当时双方HEAD一致、远程干净。
+- 远程`data/`、`checkpoints/`、`outputs/`、`logs/`已创建并受`.gitignore`保护。本轮后续文档提交继续正常push/pull；实际最新版本以Git HEAD为准。
+- 初始提交20个文件、约1.78MB工作树内容，最大为约1.45MB历史方法图；没有训练数据/权重。已检查忽略规则与凭据特征。
+- 以上是仓库/目录配置完成；未创建训练环境、占用GPU或启动实验。

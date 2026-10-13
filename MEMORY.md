@@ -16,6 +16,8 @@
 
 **2026-10-13数据建议：** GRAB + ARCTIC先建立纯轨迹基线，OakInk2扩任务；HOT3D的公开训练GT可补目标域，DexWild补手套数据规模。HumanTouch已有实际文件，但完整上传量和许可仍待核实。AMASS须筛hand-marker子集；GigaHands/TACO/EgoDex等视觉估计来源单独分层。这是调研建议，尚未成为用户选定的训练组合。详见[完整调查](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)。
 
+**同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
+
 ## 快速恢复上下文
 
 | 需要做什么 | 阅读入口 |
@@ -27,6 +29,7 @@
 | 查找可用于TWM预训练的公开数据、下载和许可 | [数据集专项调研（2026-10-13）](memory/07_TWM_DATASET_SURVEY_2026-10-13.md) |
 | 开始下一步工作、查接口缺口 | [进展与下一步](memory/04_STATUS_AND_NEXT_STEPS.md) |
 | GitHub同步、服务器和实验位置 | [开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md) |
+| 数采团队、商业厂商和大规模数据发布 | [产业手部数据补充调查](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md) |
 | 写 Introduction、定位贡献、引用论文 | [写作与外部核验](memory/05_WRITING_AND_REFERENCES.md) |
 | 回溯原文、检查材料覆盖与版本 | [来源索引](memory/06_SOURCE_INDEX.md) |
 | 了解记忆发生了什么变化 | [变更记录](memory/CHANGELOG.md) |

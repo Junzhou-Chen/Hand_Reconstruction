@@ -13,7 +13,8 @@
 | 项目记忆库 | 本次建立 | 根目录 MEMORY/AGENTS 与 `memory/` |
 | 部分第三方论文/源码核验 | 本次完成只读核验 | [写作与外部核验](05_WRITING_AND_REFERENCES.md) |
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
-| Git与远程工作方式 | 已初始化本地main，指定GitHub origin；已连通hongfei | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；最终push/checkout结果见该文件 |
+| Git与远程工作方式 | 本地main已推送GitHub；hongfei已clone项目并建忽略的存储目录 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
+| 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
@@ -28,7 +29,7 @@
 
 以下是下一阶段计划，不是已经执行的任务。建库和首轮TWM数据调查已完成，随后用户明确GitHub同步与远程实验约定并要求扩查数采团队。尚未创建模型工程或启动完整数据下载、训练；所有后续实验在hongfei执行。
 
-纯轨迹工作可独立先行：先验收GRAB/ARCTIC各一条序列，确定69D骨架与腕部契约；再扩OakInk2/HOT3D和DexWild。HumanTouch优先补许可、完整发布量和一段parquet数值检查。最终来源混合及HOT3D作为训练域/OOD域的角色仍未定案。此建议不要求等HaWoR跑通才开始TWM数据适配。
+纯轨迹工作可独立先行：在hongfei先验收GRAB/ARCTIC样本，确定69D契约；并行评估产业规模候选SynData/HumanTouch/DexWild，以及EgoVerse/Lightwheel完整手标签子集。SynData需ITW映射，HumanTouch需补许可，申请开放的数据先确认获取方式；最终混合及HOT3D训练/OOD角色仍未定案。不要求等HaWoR跑通才开始TWM适配。
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
