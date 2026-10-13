@@ -1,6 +1,6 @@
 # TWM首轮数据与预训练方案
 
-日期：2026-10-13，v1重规划。**用户已选每手99D MANO动态状态，并要求以后plan广泛对照最新论文。** 当前建议高质量核心为HOT3D可用训练recordings＋OakInk2 train；Re/GigaHands等为来源分层扩展，EgoDex为joint规模池，DexYCB承担独立恢复基线/真实前端适配，HOI4D先留出。数据角色与混合仍为建议，尚未下载完整数据、实现loader或训练。
+日期：2026-10-13，v2传感器精度优先。**用户强调TWM无视觉，应重视更准确的手姿态；99D已选，论文用库作参考。** 建议MoCap主候选GRAB/ARCTIC/OakInk2/HOT3D/UmeTrack，主要glove候选HumanTouch/DexWild，小样本DexCap/OpenGraph；访问按免申请偏好执行，具体混合仍建议。尚无完整数据验收、loader或训练。
 
 本次不再只由截图八库决定训练组合。12项相关论文的数据职责、版本与来源见[论文证据表](TWM_DATA_PAPER_EVIDENCE.md)。99D替代原69D默认接口；选定表示不代表已验证训练效果。
 
@@ -22,10 +22,10 @@
 |---|---|---|
 | **HOT3D-Clips train** | 官方HF直接发布；2,804个150帧/5秒clips，累计420,600帧条目、约3.89小时；这不是排除论文held-out与去重后的可训练净量；MANO、UmeTrack、world camera、shape齐备，各手仍有缺失字段 | **核心之一**；先排除基准留出原recordings，Aria/Quest都能做纯轨迹 |
 | **ARCTIC full** | 官方username/password注册；world MANO与30Hz参考；不能只看2.1M多view images | 已有授权时可用，否则按免申请偏好暂不挡开工 |
-| **Re:InterHand 3D train** | 官方S3脚本直下；MANO包约17GB（含meshes），original joints约4.7GB；官网7train/3test captures，train标注时刻109,763，名义30Hz | **完整参数拟合扩展**；不再与marker核心同等视作高精度，不用ego图像 |
+| **Re:InterHand 3D train** | 官方S3脚本直下；MANO包约17GB（含meshes），original joints约4.7GB；官网7train/3test captures，train标注时刻109,763，名义30Hz | 后续拟合扩展；不因参数方便排在glove前，非marker核心 |
 | **H2O** | 需姓名/邮箱/机构登记，邮件凭据7天有效；未见人工审批要求；官方MANO和camera-to-world可用 | 完整状态可用，但当前暂作备选；只下pose也需登记 |
 | **HOI4D** | 官网公开Hand Pose/Camera Parameters分包与镜像，无人工申请步骤；本轮未完成share包传输；最终标签为MANO拟合，原始采集15Hz | **首轮域外留出**；后续加入训练另报扩展版本 |
-| **EgoDex train** | Apple直链ZIP，725h train、7h test、97h additional；30Hz，25点与各joint SE3、wrist/camera，confidence部分缺失；ZIP含视频 | **规模扩展首选**；joint几何监督，ARKit标签需质量分层 |
+| **EgoDex train** | Apple直链ZIP，725h train、7h test、97h additional；30Hz，25点与各joint SE3、wrist/camera，confidence部分缺失；ZIP含视频 | 后续视觉追踪扩展；不优先于通过验收的glove/MoCap，ARKit标签分层 |
 | **EgoVerse** | 公开registry/download pipeline；world21点/wrist可整项缺省，typical30Hz；需按实际episode筛选 | EgoDex之后接入；全库小时不能当完整手GT时长 |
 | **Ego-Exo4D** | 签许可后审批，官网预计约2天；3D三角化21点，无原生MANO/独立wrist rotation；实际序列采样须验收 | 当前免申请原则下搁置；以后用于joint/quality监督 |
 
@@ -42,48 +42,38 @@
 - Ego-Exo4D当前官方更新为4.3M自动3D手姿、21M自动2D，而非21M自动3D。manual和automatic、原始帧率与有效标注帧率分别记录。[changelog](https://docs.ego-exo4d-data.org/changelog/)、[pose schema](https://docs.ego-exo4d-data.org/annotations/ego_pose/)
 - StableHand公开`stablehand-data`是244 HOT3D/155 ARCTIC评测clips与proposal/features，**不是八库训练cache**；不得训练后继续用它做原协议评测。[数据卡](https://huggingface.co/datasets/huajian-zeng/stablehand-data)
 
-## 3. 重规划后的数据角色与顺序
+## 3. 传感器精度优先的数据池
 
-**首轮高质量核心：HOT3D可用训练recordings＋OakInk2官方train。** HOT3D补ego目标域、缺测和独立marker参考；OakInk2补复杂双手操作、较长连续过程和OptiTrack参数。这比“先挑最容易读取的MANO包”更符合高质量运动知识改善视觉的目标。
+**用户最新纠正覆盖v1排序：纯轨迹TWM首先按姿态参考质量选数据，论文用库只作参考。** 不要求ego图像、RGB配对或原生MANO；99D是统一输出，不是拒绝高质量glove骨架的理由。v1把glove留为支线、优先Re/EgoDex扩展的安排已被替代。
 
-**本轮选库判断收敛：第一个restoration checkpoint只要求HOT＋Oak，两库适配通过即可训练。** Re:InterHand是优先MANO姿态扩展，比较core与core＋Re后决定；EgoDex在joint/shape映射通过后扩动作与规模，并持续回放原生参数核心。它们不是首轮前置，也不预先保证混入有益。HOT/Oak能支持第一个可反驳实验，不等于已证明覆盖全部动作；pilot统计独立时长、主体/任务、静止/突变/缺测及腕位移后判断是否需要扩库。
+**MoCap高优先候选恢复为GRAB、ARCTIC、OakInk2、HOT3D，并新增UmeTrack独立集；主要glove候选为HumanTouch与DexWild。** 科学适合程度与访问成本分别记录：用户免申请偏好仍有效，GRAB/ARCTIC有既有授权再接入，不通过聚合包绕过条款。实际先验收公开Oak/HOT/UmeTrack及HumanTouch/DexWild；细节与本轮证据见[传感器专题](../memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)。
 
-**DexYCB也能纯轨迹预训练。** 固定第三视角不构成TWM排除理由；其MANO/关节数值可供恢复监督。当前优先单独运行DexYCB-only synthetic restoration，参考DIP同数据协议，再决定是否core＋DexYCB；真实HaWoR错误适配是另一用途。不得把这项实验角色安排说成“DexYCB只能paired训练”。
-
-[OakInk2官方annotations](https://huggingface.co/datasets/kelvin34501/OakInk-v2/tree/main/anno_preview)627段约36.7GB可独立下载；[TaMF](https://github.com/oakink/OakInk2-TaMF)确实用其运动参数做条件生成，已有[431train/39val/157test序列清单](https://github.com/oakink/OakInk2-TaMF/tree/dev/asset/split)。默认只取431 train，val/test隔离。该split尚未证实subject-disjoint，复杂/primitive切片与父recording的跨split关系需验收；若冲突，先合并父序列后重建split并单独报告协议，不把627段全部当train。
-
-| 角色 | 推荐数据 | 使用方式与验收条件 |
+| 数据池 | 推荐来源 | 为什么纳入与训练方式 |
 |---|---|---|
-| 高质量完整状态核心 | HOT3D可用train＋OakInk2 train | 完整99D＋几何监督；marker拟合也有误差，保留原参考与模型点 |
-| 拟合参数多样性扩展 | Re:InterHand train，随后GigaHands train | 各自来源和质量分层；先单源加入消融，不能与marker核心合称纯MoCap |
-| joint-only规模扩展 | EgoDex train；之后EgoVerse/HoloAssist完整手段 | 有效joint几何loss＋可靠腕标签；不可用角度/shape不强监督，核心数据持续回放 |
-| 真实视觉错误适配 | HOT3D/OakInk2可用paired train；DexYCB s0 train | 只在train运行HaWoR并提取数值错误，校准corruption/适配TWM；RGB仍不输入TWM |
-| 独立同数据恢复基线 | DexYCB s0 train/eval | 参考DIP的合成恢复及PAD/UniHand/HandFlow协议，单独训练对照，不和“DexYCB未见”混报 |
-| 域外验证 | 首轮HOI4D全留出；HO3D作为TWM未见域 | 不参与训练/校准/调参；HaWoR已训HO3D，因此HO3D仅叫TWM未见，不叫整系统zero-shot |
-| glove与新marker支线 | DexCap小样本；HandX自采；以后DexWild | raw人体骨架/腕标定通过再接joint监督；不使用机器人retarget action；短窗不能冒充长时world |
-| local/relative后续扩展 | SHOW3D v3 | 手是三角化＋IK、world随背包rig移动，先只用local articulation或已验证relative状态 |
+| 高质量完整运动候选 | GRAB / ARCTIC / OakInk2 / HOT3D | marker→骨架/模型，native参数与几何参考；GRAB无RGB无妨。保留fit来源与原模板/marker，不能仅按品牌宣称谁最准确 |
+| 自由手势与pinch marker补充 | UmeTrack独立train | world wrist、native UmeTrack与converted MANO；补非抓取，真实/合成逐段复用motion不重复计量 |
+| 主要glove规模与操作 | HumanTouch / DexWild raw human | 测得人体joints/orientations＋可用腕；不以robot action训练。几何监督99D，只有标定对应旋转才计算该参数loss |
+| 小型glove接入与局部补充 | DexCap raw / OpenGraph MANUS | 分别有SLAM腕/未核实独立world wrist；用于adapter和部分监督，不因缺global字段排除可靠finger |
+| 手势与marker补充 | TCDHands / HandX自采 | TCD小且需AMASS；HandX须按source筛自采、审canonical/world与源split，不能混称聚合全MoCap |
+| 后续视觉标签扩展 | Re / EgoDex / GigaHands等 | 可用，但不再优先于sensor参考；单独检验加规模是否牺牲精度 |
+| 恢复对照/后续域适配 | DexYCB等训练split的数值轨迹 | 可以pure-motion恢复；真实HaWoR输出适配是后续任务，不成为传感器预训练前置 |
+| 域外评测 | HOI4D / HO3D等留出 | 先验后校正的迁移检验；HO3D只称TWM未见，HOI4D仅GT-valid评价 |
 
-TWM不读图像，所以HOT3D Aria/Quest均可供motion；Re不限定ego渲染，不因随机相机/重光照重复运动；静态FreiHAND/RHD不能复制成伪连续motion。
+**当前可执行的第一批应同时考虑marker和glove。** Oak/HOT/UmeTrack建立native→99D桥接，HumanTouch/DexWild建立raw人体骨架→MANO几何监督；DexCap/OpenGraph小样本辅助映射。通过哪条链就先训练，不等所有库；glove不再默认等native核心训练完才调查。matched-budget比较marker-only、marker＋glove与glove-only可监督范围。
 
-**先建立全局split排除表。** 建议以HaWoR的110train/27held-out原recording为HOT主协议，核对StableHand/UniHand/JoHan衍生clips；Clips、full和HandX聚合都按原recording＋timestamp排除held-out。官方2,804段train不是可直接全部用后再评公开GT benchmark的清单。精确排除清单尚待取得并固定，之后才统计train净量。[关键证据](TWM_DATA_PAPER_EVIDENCE.md#3-hot3d最需要修正的split)
+HumanTouch本轮核实HF公开免申请、[ModelScope许可CC BY-NC4.0](https://modelscope.cn/datasets/chuqiaoLyu/Xspark-HumanTouch/summary)，parquet/meta可单取；十份meta累计约132.75h是声明fps推算，非去重/QC净量。DexWild公开human 7,917episodes，包混装、world腕关系和已有平滑需验收；其局部手指与global腕分别赋监督mask/质量。没有同基准标签误差证据时不声称glove优于所有marker数据。
 
-该110/27针对Aria原录制，不能当整个Aria＋Quest的完整清单。Quest可另用官方train原recordings并划内部val，排查source/subject/时间关系，作为明确披露的motion扩展条件；若评测要求subject-disjoint，则同subject的Quest也必须排除。各基线使用相同训练池或另报数据扩展消融。
+### 获取与划分保持可审计
 
-HaWoR称27段为val；若本项目用它作最终held-out比较，就从其110 train中再划内部validation用于早停、history/corruption与配比选择，不能用27段调参后叫独立test。Oak官方39 val负责调参、157 test最终检验；主体不重叠与否另行记录。HOI4D只评GT-valid帧，完全out-of-sight缺GT时不宣称恢复了真值；受控完全缺测主要在HOT/Oak有效reference上制造并检验。
+- OakInk2沿[TaMF431/39/157序列split](https://github.com/oakink/OakInk2-TaMF/tree/dev/asset/split)，先验PT/CT父录制重复；非已证实subject-disjoint，不将627段全部当train。
+- HOT Aria建议沿HaWoR110train/27held-out原recording，并在110内另划val；Clips/full/聚合共享原ID+timestamp排除表。Quest motion扩展另用官方train及内部val，subject-disjoint时同主体也排除。官方2,804train不等于全部可用于已有公开GT benchmark。
+- UmeTrack用官方train并内划subject/recording val；test未公开手GT。真实与合成render同源去重，native与MANO失败mask保存。
+- glove各source按subject/session/original recording切分；统一60Hz不当所有硬件原生60Hz，缺帧、插值、tracker reset与校准记录保留。
+- 质量先看native几何、标定、有效性/fit error和转换残差；骨长稳定与低抖动只筛异常，不能当独立真值精度证明。
 
-**规模扩展不预设50:50。** 先按source/subject/task及静止/运动/缺测分层；pilot统计有效时长、完整腕字段、拟合质量、速度谱、重复量后再设采样。比较core-only、core＋fit、core＋EgoDex与真实HaWoR适配，同训练预算报告新增源的收益/退化。不要由论文总帧数决定损失权重。
+### 替代关系
 
-ARCTIC/GRAB是很好的文献质量对照，但当前注册偏好下不挡开工；H2O/Ego-Exo4D亦不前置。STERA、Open-AoE/EgoSteer等伪标签不进入首轮高质量核心；存在字段/访问/老师偏差等限定，详见[论文证据](TWM_DATA_PAPER_EVIDENCE.md#4-之前忽略的来源与当前角色)。
-
-### 为什么替代之前的建议
-
-| 之前的思路 | 本次处理 | 依据 |
-|---|---|---|
-| GRAB/ARCTIC先建prior | 保留质量依据，暂降获取优先级 | HMP有效先例＋用户免申请偏好 |
-| HOT3D＋Re优先，OakInk2之后 | 小样本接口可保留；正式核心改HOT＋Oak | Oak独立marker与TaMF训练先例更贴近idea，Re格式完整不等于高精 |
-| 由StableHand截图八库决定全部训练池 | 改按任务与GT来源筛选，补DexYCB/GigaHands/HandX等角色 | QN、motion prior、visual recovery目标不同 |
-| HOI4D直接第二批训练 | 先保留域外，再单独做加入训练版本 | ACE held-out与EgoFound3R in-domain是两种协议 |
-| native/joint各半、约2秒作为默认 | 改为pilot驱动配比和history长度对照 | 论文窗口/监督条件不同，不能视为最优配方 |
+v0 HOT＋Re、v1 HOT＋Oak后优先Re/EgoDex的顺序主要便利参数接口与文献对照；用户本轮要求恢复glove/MoCap主导。保留Oak/HOT的质量价值，但将GRAB/ARCTIC恢复高优先科学候选，UmeTrack新增，HumanTouch/DexWild提升主要glove池。StableHand只借标注分层与故障任务，不拿其QN八库决定TWM参考质量。
 
 ## 4. 已选输出：每手99D MANO运动状态
 
@@ -97,7 +87,7 @@ x_t=[p_t^A(3),\;\rho(R_t^A)(6),\;\rho(Q_{t,1})(6),\ldots,\rho(Q_{t,15})(6)]\in\m
 - `R`为统一MANO root/wrist旋转，`Q`为按源配置解码并应用hand mean后的15个local finger rotations；不能直接把各源45D转成同一6D。全部6D解码为合法SO(3)，99是编码长度，不是99个物理DoF。
 - shape `beta[10]`为序列/人物条件，另存，不让网络每帧任意改变手形。
 - 固定anchor A只用于网络条件化；输出恢复world wrist与姿态后，可用MANO得到21点与778vertices。
-- 当源β/骨架不完整时记录shape mask；joint-only数据需要形态标定或一致骨长方案，不能给所有人固定默认β后把形状差异当姿态误差。
+- 当源β/骨架不完整时记录shape mask；joint-only数据先做形态标定，不能给所有人默认β后把形状差异当姿态误差。GRAB个性化v_template另存参考，β10无法表达的残差单独记录，不据此把raw GT替换成拟合值。
 - native预训练可使用release的β条件；真实视觉评测采用HaWoR或训练好的序列估计shape，不能暗用评测GT shape。reference-shape诊断若运行，单独标明协议。
 
 **TWM主要输出当前恢复建议U_t，不替代后续Corrector的最终状态。** 辅助未来运动头只作训练任务；v0不要求TWM输出w/q，真实观测与最终质量头属于后续校正训练。
@@ -131,6 +121,8 @@ candidate初始化有raw参数时从raw开始，缺失部分由历史/既有模�
 U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 \]
 
+这是统一记法；joint-only/glove没有canonical参数GT时，只对source-native可用joints、bone方向和腕字段构造Corrupt，缺少的x*参数保持无监督，不先制造完整99D GT。bone方向只约束测得的方向，不能代替完整SO(3)扭转标签。
+
 扰动包含：
 
 | 扰动 | 要覆盖的实际问题 |
@@ -146,9 +138,9 @@ U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 
 训练顺序建议：
 
-1. **合成受损恢复。** 先用原生完整轨迹训练，history也含可控误差；保证clean、missing、wrong、false-high-confidence均有验证。
+1. **合成受损恢复。** 使用已验收MoCap/glove的有效reference，history也含可控误差；完整参数与部分几何分别mask，保证clean、missing、wrong、false-high-confidence验证。
 2. **候选与自身历史适配。** 保留固定raw，使用相关的部分恢复candidate，逐步加入模型自己的输出；不只用干净GT历史。
-3. **混合标签扩展。** 在保持native监督池的同时加入EgoDex/EgoVerse的joint监督，比较其收益；未来GT只作forecast target，不进入当前/历史输入。
+3. **混合标签与规模。** glove从第一批按字段能力加入，不必全库先拟合MANO；后续才另试EgoDex/Re等视觉来源扩展。未来GT只作forecast target，不进入当前/历史输入。
 
 真实HaWoR error分布随后由paired序列校准；TWM仍只读取数值状态。质量网络训练要有真实visual prediction与reference配对，不能只凭一条轨迹就当已有真实观测错误。
 
@@ -165,9 +157,10 @@ U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 
 | 数据提供什么 | 可用的监督 |
 |---|---|
-| 原生MANO＋位姿 | pose rotations测地误差＋wrist误差＋解码joint几何；保留fit来源 |
+| 经核验MANO＋位姿 | pose rotations测地误差＋wrist误差＋解码joint几何；保留fit来源 |
 | 原生关节更可靠（如HOT3D UmeTrack） | joint几何优先使用原始reference，与MANO-fit点分别记录 |
 | 仅3D joints | MANO解码后对有效点计算几何loss；finger参数直接loss mask为0 |
+| glove骨段方向/旋转 | 骨架/rest/sensor frame标定后，仅对应且测到的分量计算rotation loss；未知twist不造GT |
 | 无独立腕朝向 | wrist旋转直接loss mask为0；掌frame派生量另标来源 |
 | 局部点，没有可靠world | 只做local articulation，不补造world wrist GT |
 
@@ -177,7 +170,7 @@ U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 
 ## 8. 时间、坐标与采样契约
 
-论文DIP/HandFlow用16帧、UniHand48、HandX60、HMP128，但任务/输入不同，不作为统一最优值。首轮建议按真实时间比较约0.5/1/2秒history；连续训练片段需额外覆盖当前与辅助future target。15/30Hz用真实dt及padding/mask，不上采样后当新增数据。短期forecast horizon、corruption长度/幅度和batch/步数在远程pilot与validation上固定，不能用域外HOI4D调参。
+论文DIP/HandFlow用16帧、UniHand48、HandX60、HMP128，但任务/输入不同，不作为统一最优值。首轮建议按真实时间比较约0.5/1/2秒history；连续训练片段需额外覆盖当前与辅助future target。15/30/60/120Hz等源用真实dt及padding/mask，不上采样后当新增数据。短期forecast horizon、corruption长度/幅度和batch/步数在远程pilot与validation上固定，不能用域外HOI4D调参。
 
 - 依据真实frame index/timestamps切段；缺帧/长gap/reset不跨窗，不能用排序后相邻行冒充连续帧。
 - wrist与所有状态在同一固定anchor；camera frame先经正确方向的camera transform到固定world，避免把头动当手动。
@@ -191,11 +184,11 @@ U_t=W(H_t,\widetilde O_t,S_t^{(0)},M_t,\widetilde w_t,\Delta t,\beta).
 
 | 步骤 | 可检查的产物 |
 |---|---|
-| split与小样本接入 | 固定HOT原recording排除清单、Oak官方split及父序列映射；取两库少量train段，字段/帧率/单位/shape表 |
+| split与小样本接入 | MoCap原recording排除/split；HumanTouch/DexWild原session与校准；少量train段的字段/帧率/单位/shape表 |
 | 统一状态 | 99D encoder/decoder、MANO↔wrist root转换；源解码joint roundtrip |
 | restoration baseline | noisy vs restored的joint/wrist真实误差、clean退化、gap/突变分组 |
 | 条件与同数据基线 | history-only vs当前部分状态；DexYCB协议下与DIP/普通时序恢复公平比较 |
-| 规模/质量扩展 | core-only、core＋Re/GigaHands、core＋EgoDex逐项收益和退化；来源分层 |
+| 来源/质量扩展 | marker-only、marker＋glove、glove-only适用监督范围；后续视觉标签扩展逐项收益和退化 |
 | 真实错误与域外 | synthetic-only vs HaWoR数值适配；HOT held-out、Oak test、HOI4D域外独立报告 |
 
 基线包含last-state、可用上下文内的插值/外推、GRU/普通temporal模型，以及DIP纯运动受损恢复的公平对照。不能把用未来端点的插值与严格past-only模型混成同一输入条件。[前作与评测范围](WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)

@@ -7,6 +7,7 @@
 - [项目记忆入口](MEMORY.md)
 - [完整方法框架](docs/METHOD_FRAMEWORK.md)
 - [TWM首轮数据、训练与输出方案](docs/TWM_PRETRAIN_PLAN.md)
+- [传感器姿态精度优先的glove/MoCap预训练](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 - [TWM数据规划的12项论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md)
 - [WestWorld与主流视觉手部重建论文精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)
 - [主流表示与MANO标注来源](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)

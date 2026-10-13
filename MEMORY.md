@@ -14,7 +14,7 @@
 
 已完成项目理解、来源核对、文件化记忆，以及针对TWM的公开数据集专项调研；尚未实现模型、下载完整训练数据或验证效果。原有材料完整保留。
 
-**最新数据决定（2026-10-13）：** 用户优先无需申请、直接下载，并要求以后plan广泛对照最新论文。注册/审批路线暂不挡开工；HOT3D公开Clips与full VRS入口分开。**v1建议核心HOT3D可用训练recordings＋OakInk2 train**，替代HOT＋Re优先的v0建议；Re/GigaHands是拟合扩展，EgoDex是joint规模池，DexYCB承担独立恢复基线/真实HaWoR数值适配，HOI4D先域外留出。glove支线保留；数据组合未由用户定案。[预训练方案](docs/TWM_PRETRAIN_PLAN.md)、[12项论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md)
+**最新数据原则D18（2026-10-13）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入，混合未定。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
@@ -22,7 +22,7 @@
 
 **已选表示D16：** 用户明确“我们使用99D”。每手p3＋root rotation6D6＋15×finger rotation6D90，β10为人物/序列条件另存；69D只留历史/可选对照。MANO标签通常拟合得到，99是编码长度而非99个物理DoF；adapter未实现。[表示调查及后续决定](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 
-**v1重规划边界：** 截图10M是quality网络，不作TWM数据配方。依据HMP/DIP/TaMF及2026年UniHand/HandX/HandFlow/ACE/EgoFound3R/JoHan等重新分角色，先高质量core restoration，再单源扩展/真实HaWoR错误适配。HOT官方train含论文另留出的公开GT benchmark，须按原recording排除再切窗；Oak沿431/39/157序列split并验父录制重叠。配比/窗口由远程pilot验证，无loader或实验。
+**v2证据与边界：** StableHand v1 QN读数值但标签仍需视觉prediction/reference误差，Enhanced另有depth cues；八库不决定pure-motion GT质量。HumanTouch许可已核实CC BY-NC4.0，十份meta累计约132.75h非QC净量，pose可单取；UmeTrack独立marker集补自由手势/pinch，real/synthetic motion需去重。native→99D误差与finger/wrist来源分别保存，不能只以平滑或品牌宣称精度。原HOT/Oak split约束保留，无训练。
 
 ## 快速恢复上下文
 
@@ -34,6 +34,7 @@
 | 判断某个想法是否已经定案或放弃 | [决策与演进](memory/02_DECISIONS.md) |
 | 选择数据、设计实验和消融 | [数据与评测](memory/03_DATA_AND_EVALUATION.md) |
 | 查找可用于TWM预训练的公开数据、下载和许可 | [数据集专项调研（2026-10-13）](memory/07_TWM_DATASET_SURVEY_2026-10-13.md) |
+| 按手姿态精度选glove/MoCap、核HumanTouch与UmeTrack | [传感器优先预训练](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md) |
 | 决定首轮数据、训练任务和输出契约 | [TWM首轮预训练方案](docs/TWM_PRETRAIN_PLAN.md) |
 | 查规划对应的论文训练职责及替代理由 | [TWM数据论文依据](docs/TWM_DATA_PAPER_EVIDENCE.md) |
 | 开始下一步工作、查接口缺口 | [进展与下一步](memory/04_STATUS_AND_NEXT_STEPS.md) |

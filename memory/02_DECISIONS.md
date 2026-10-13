@@ -29,6 +29,7 @@
 | D15 | 数据优先无需申请、可直接下载，参考当前相关论文实际使用的训练/评测数据；不把申请资源当开工前置 | 2026-10-13用户直接指令；已采纳，替代助手先GRAB/ARCTIC、优先申请产业库的默认顺序；不自动决定具体训练混合 |
 | D16 | 采用每手99D MANO动态状态（p3＋root6＋15×finger6）；β另存 | 2026-10-13用户明确“我们使用99D”；替代69D默认候选；实现与效果未验证 |
 | D17 | 以后plan广泛对照当前最新相关论文实际做法，适当参考后再规划，避免凭直觉 | 2026-10-13用户直接指令；已采纳；任务角色/GT/split/时间上下文分开比较，工作约定写入AGENTS |
+| D18 | TWM不需要视觉；选库优先更准确的手姿态，恢复glove/MoCap导向；论文用库作参考，不必照搬 | 2026-10-13用户直接纠正；已采纳，限定D17用法并替代v1 glove支线/Re-EgoDex优先扩展建议；99D与免申请偏好未撤销 |
 
 ## 已替代的历史路线
 
@@ -51,7 +52,7 @@
 
 用户先要求核验主流表示与MANO标注，[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)提出MANO输出＋joint监督；随后D16采纳99D。状态选择不改变D03–D09，参数转换和joint-only监督仍需验收。
 
-v0提出HOT＋Re先训；用户认可99D并要求重新看论文后，[v1预训练方案](../docs/TWM_PRETRAIN_PLAN.md)改为HOT可用train＋OakInk2核心、Re/Giga拟合扩展、EgoDex规模、DexYCB适配/同数据基线、HOI4D先域外。**数据角色仍为建议，未新增已定混合。** 替代理由与12项证据见[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)。
+数据建议演进：v0 HOT＋Re→v1 HOT＋Oak及Re/EgoDex扩展→D18用户纠正为传感器精度主导。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)恢复GRAB/ARCTIC/Oak/HOT高优先，新增UmeTrack、提升HumanTouch/DexWild主要glove；Re/EgoDex后续单列。**精度优先原则已定，具体库/比例仍建议**；免申请资源先验，未新增用户采纳的混合。[专题证据](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
 HaWoR及本地/远程分工已选定，不再作为开放选型问题；首个数据源、接口规范、远程软件环境和GPU可用性仍需实际检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 

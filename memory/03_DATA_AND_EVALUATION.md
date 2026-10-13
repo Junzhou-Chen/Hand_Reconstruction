@@ -4,13 +4,13 @@
 
 ## 两个数据池
 
-**已定D15/D16/D17：免申请数据优先、每手99D、plan广泛对照最新论文。** 当前v1建议高质量核心HOT可用train＋OakInk2 train，Re/GigaHands拟合扩展、EgoDex joint规模、DexYCB独立同数据恢复基线/真实HaWoR数值适配、HOI4D先留出；替代v0 HOT＋Re优先、HOI4D直接训练顺序。数据混合仍未定。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[12项论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)
+**已定D15–D18：免申请、每手99D、论文机制参考、传感器姿态精度优先。** 用户本轮纠正v1过度沿视觉论文选库，v2恢复GRAB/ARCTIC/Oak/HOT的MoCap核心候选，新增UmeTrack，HumanTouch/DexWild升主要glove。实际先可公开来源，注册有授权再接；Re/EgoDex降后续视觉标签扩展。混合未定。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)、[传感器精度核验](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
 
-同日进一步收敛首轮：只要求HOT＋Oak核心，Re作为优先姿态增量，EgoDex在joint/shape映射后扩规模。两核心足够支持第一个实验，不代表已验证全面覆盖。DexYCB亦可纯轨迹预训练，先单独DexYCB-only synthetic restoration对照，再研究core＋DexYCB；固定第三视角不是TWM排除条件。详细依据见[现行计划§3](../docs/TWM_PRETRAIN_PLAN.md#3-重规划后的数据角色与顺序)。此为助手推荐，不登记新用户混合决定。
+v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验收可用MoCap及glove，按质量和字段能力训练；99D不要求源原生MANO。DexYCB仍可纯轨迹恢复对照，固定第三视角不是排除条件；它的论文用频率不使其GT优先于独立sensor参考。
 
-**Motion-only pool** 用于独立训练 TWM，不要求配对图像。需要高质量 joints/wrist trajectories、采样时间、骨架定义与质量来源。只有局部手指姿态而缺 wrist 6DoF 的记录，不能直接冒充完整 69D GT；如何做部分监督是待决接口。
+**Motion-only pool** 用于独立训练TWM，不要求配对图像。需要可靠native姿态、时间、骨架与校准；只有local finger也可参与99D几何恢复，缺腕/未测旋转单独mask，不冒充完整state GT。部分监督契约已有提案，待实现验收。
 
 **Video–reference paired pool** 用于训练/评估图像取证、可靠性与 Corrector。需要同步视频、相机参数、参考状态，以及真实 HaWoR 输出。纯人工 corruption 的表现不能代替真实视觉错误上的表现。
 
@@ -18,14 +18,16 @@
 
 | 资源 | 项目中的角色 | 已知限制与下一步 |
 |---|---|---|
-| GRAB + ARCTIC | 文献对照/后备MoCap来源；不再默认首批 | Vicon→MANO/SMPL-X；需注册科研下载，与D15免申请偏好有获取成本。多视角不能重复计量 |
-| OakInk2 | v1核心：独立marker＋复杂操作 | 627段annotations约36.7GB独立可下；TaMF431/39/157序列split；用train并验父序列/PT-CT重复、FK/时间映射；非已核实主体留出 |
-| HOT3D-Clips / full VRS | v1核心：目标域marker参考 | HF直下；官方train累计42万帧不是净训练量，须排HaWoR/衍生benchmark held-out原recordings。full另需manifest；Aria/Quest均motion可用，官方test无手GT |
+| GRAB + ARCTIC | 恢复高优先MoCap核心候选 | Vicon→MANO/SMPL-X；无RGB无妨，注册仍需已有授权；GRAB personalized template、ARCTIC fit error需保留 |
+| OakInk2 | MoCap核心候选：marker＋复杂操作 | 627段annotations约36.7GB独立可下；TaMF431/39/157序列split；用train并验父序列/PT-CT重复、FK/时间映射；非已核实主体留出 |
+| HOT3D-Clips / full VRS | MoCap核心候选：native marker参考 | HF直下；官方train累计42万帧不是净训练量，须排HaWoR/衍生benchmark held-out原recordings。full另需manifest；Aria/Quest均motion可用，官方test无手GT |
 | Re:InterHand 3D train | 完整参数拟合扩展，降出高质量核心 | S3直下，7train/3test；scan/视觉拟合，原帧索引切gap，trans与PLY/camera单位分开；单源加入消融 |
 | HOI4D / H2O | 首轮域外留出 / 登记后备 | HOI4D15Hz拟合，只评GT-valid；缺out-of-sight GT不声称真值恢复。H2O登记，未见人工审批，30Hz列表有gap |
-| DexWild | 推荐扩展真实手套操作 | 公开human 7,917 episodes/2,924,588 transitions；MANUS手指+视觉/SLAM腕部。取原始human，不取LEAP action |
-| HumanTouch | 优先验收的新手套候选 | 25 joints/手、world腕部、统一60Hz；parquet与视频分开。已核验两个分区meta约30.40小时，非全库统计；具体许可尚未读到 |
+| DexWild | 主要glove候选，优先验收 | 公开human 7,917episodes/2,924,588transitions；MANUS手指、tracker/camera腕，已有平滑与dt/world待验；不用LEAP action |
+| HumanTouch | 主要glove候选，优先验收 | HF公开、CC BY-NC4.0已核；25点/方向＋world腕，pose可单取。十份meta约132.75h累计非QC净量，manifest/校准待验 |
 | DexCap | 小规模glove轨迹及adapter对照 | 公开30分钟wiping+60分钟packaging；Rokoko指关节、T265腕部；不能冒充论文全集或无漂移world GT |
+| UmeTrack独立集 | 新增自由手势/pinch marker候选 | 官方HF直下，36相机MoCap＋scan；native几何比converted MANO更接近reference；real/synthetic同motion去重，train内划val |
+| OpenGraph MANUS | 小规模local glove/adapter | 25点/手＋40finger角，parquet独立；未见独立world wrist SE3，做部分监督 |
 | AMASS | 必须筛选子集的MoCap来源 | 原论文明确无hand markers时手姿为平均值；GRAB/TCDHands/SAMP有证据，不能整库当真实手指动态；与独立GRAB去重 |
 | GigaHands / TACO | 单独的多视角视觉估计扩展池 | 可提供轨迹但非独立finger marker GT；TACO的MoCap主要用于物体/头相机；GigaHands检查重心化版本 |
 | EgoDex / HoloAssist / SHOW3D | 规模、泛化或质量分层实验 | 设备/视觉估计，不能称glove-only；SHOW3D的world是移动背包rig。详见专项调研 |
@@ -55,7 +57,7 @@ MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是�
 | DexYCB / HO3D | MANO参数及参考位姿可构建完整状态 | camera/world约定、PCA/axis-angle解码与缺失mask；标签为视觉拟合 |
 | DexCap raw | 采集代码21点+orientation，README双腕6DoF | release保存字段、palm/tracker→wrist标定、归一化尺度及SLAM质量 |
 | DexWild raw | MANUS full、tracker与timesteps有接入基础 | 原始关节schema及world腕部变换未数值验收，不能直接宣称已完整69D |
-| HumanTouch | 25点及wrist7D、world数据契约支持转换 | 25→21对应、tracker偏置与实际parquet；具体许可待核实 |
+| HumanTouch | 25点/方向及wrist7D契约支持几何监督 | 25→MANO语义/rest-frame、tracker偏置与实际parquet待验；CC BY-NC4.0已核 |
 | SynData / OpenGraph | 分别为ITW qpos/11点、25点但无独立world wrist SE3 | 前者需FK/人体映射；后者只先做局部或部分监督，不补造全局GT |
 
 结论是已有完整状态资源可支持方案，并非所有调研库均可直接提供同质量69D监督。只有21点而无独立腕旋转时，可定义几何掌frame，但须统一且标记为派生标签；纯TWM预训练不需相机，图像取证/paired阶段则需相机和视频。

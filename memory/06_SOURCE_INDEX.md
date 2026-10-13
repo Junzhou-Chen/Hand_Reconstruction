@@ -78,7 +78,8 @@
 - [docs/METHOD_FRAMEWORK.md](../docs/METHOD_FRAMEWORK.md)：随后用户要求的完整方法梳理；区别已定主线与接口提案，纳入D15免申请数据偏好及论文实际数据角色。
 - [10_MANO_REPRESENTATION_AND_ANNOTATION.md](10_MANO_REPRESENTATION_AND_ANNOTATION.md)：用户要求的主流表示与MANO标注来源核验；含参数/坐标路线、HOT3D转换误差及MANO输出可用joint监督的证据。
 - [docs/TWM_PRETRAIN_PLAN.md](../docs/TWM_PRETRAIN_PLAN.md)：2026-10-13八库核验后更新v1；99D已被用户采纳，数据组合仍为建议；含公开Clips访问、quality角色、split/帧数和训练契约。
-- 上项后续已更新v1：用户采纳99D，并要求广泛参考最新论文；数据组合仍建议。[docs/TWM_DATA_PAPER_EVIDENCE.md](../docs/TWM_DATA_PAPER_EVIDENCE.md)记录12项实际训练角色、HOT基准留出、Oak升核心及新来源分层，不以截图代替完整证据。
+- 上项现行v2：99D已定，D18要求sensor手姿精度优先、论文用库仅参考；数据混合仍建议。[docs/TWM_DATA_PAPER_EVIDENCE.md](../docs/TWM_DATA_PAPER_EVIDENCE.md)保留12项实际训练角色与HOT留出等证据，其v1选库推论由传感器专题替代。
+- [11_SENSOR_FIRST_PRETRAIN_2026-10-13.md](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)：D18传感器精度纠正后的v2证据，含HumanTouch许可/十份meta、UmeTrack独立marker、glove/MoCap原姿态→99D与StableHand参考边界；具体混合未定。
 
 已按后续用户要求创建Git历史、推送指定GitHub并在hongfei创建checkout；尚未训练、完整数据下载、安装实验依赖或改写原论文草稿。专项调查读取部分公开metadata和文件目录，不代表加载完整轨迹。新记忆不能替代相应代码/数据/论文证据。
 

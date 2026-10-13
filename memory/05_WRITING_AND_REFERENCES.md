@@ -84,6 +84,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 ## 数据来源核验
 
+**D18后续纠偏：** 用户要求传感器姿态精度主导pure-motion，不照视觉论文用库。新[传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)恢复GRAB/ARCTIC质量候选，提升HumanTouch/DexWild、补UmeTrack；原12项论文数据事实保留，但不再主导选库。StableHand v1 QN数值输入不表示标签来源与视觉无关，Enhanced另有depth cues；借标注分层/故障任务而不直接搬八库。
+
 按用户D17广泛对照后新增[12项数据论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)：HMP/TaMF/HaWoR/DIP/PAD/UniHand/HandX/StableHand/HandFlow/ACE/EgoFound3R/JoHan，记录prior/restoration/visual/quality训练与留出。新核验指出HOT官方train含公开GT benchmark held-out，需原recording排除；Oak已存在TaMF运动生成及431/39/157序列split，故v1升为核心。HOI4D先域外、DexYCB独立恢复基线与真实前端适配，GT来源分层。编码99D已被用户采纳，数据角色与配方仍为提案，无复现结果。
 
 同日方法整理新增[论文数据角色对照](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：明确区分HMP先验/恢复评测、HaWoR视觉/infiller、StableHand quality/generative模型、PAD-Hand训练/TACO跨域评测。用户已明确免申请数据优先，论文常用不自动意味着照搬其需注册数据组合。新判断来自原论文，不代表已复现。

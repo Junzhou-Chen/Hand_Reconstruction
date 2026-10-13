@@ -17,7 +17,8 @@
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
 | MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
-| TWM数据重规划与已选99D | 用户采纳99D；重新核验12项论文并形成v1核心/扩展/适配/域外方案 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；数据混合仍建议，无训练 |
+| 99D与论文职责核验 | 用户采纳99D；12项论文数据事实已核；v1选库顺序随后被D18/v2替代 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；混合未定，无训练 |
+| 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
@@ -32,13 +33,11 @@
 
 以下是下一阶段计划，不是已经执行的任务。建库和首轮TWM数据调查已完成，随后用户明确GitHub同步与远程实验约定并要求扩查数采团队。尚未创建模型工程或启动完整数据下载、训练；所有后续实验在hongfei执行。
 
-按已定99D与免申请偏好，v1先固定HOT原recording排除表/Oak官方split及父序列映射，再在hongfei验收**HOT可用train＋OakInk2 train**。Re/GigaHands逐源消融扩展，EgoDex增joint规模；DexYCB独立同数据恢复对照/真实HaWoR数值适配，HOI4D先域外。glove小样本与HandX自采作为支线，登记资源不挡开工。数据组合、配比和模型细节未定，99D不再作为开放选型。[首轮步骤](../docs/TWM_PRETRAIN_PLAN.md)
-
-第一个checkpoint只依赖HOT/Oak两套loader；不等Re或EgoDex全量到位。优先增量是core＋Re与core＋筛选EgoDex，另做DexYCB-only合成恢复；DexYCB是否混入主池由增量验证决定。以上未实施。
+按D18与已定99D，v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
-| P0 split与状态契约 | 固定HOT基准排除表、内部val与Oak官方split/父录制；在hongfei验HOT/Oak少量train的99D/wrist roundtrip | 原recording清单/hash及字段/形态/坐标/mask/真实dt；不要求full VRS manifest |
+| P0 传感器split与状态契约 | MoCap原录制/split，glove source/session与标定；hongfei验native→99D及raw joint几何桥接 | 字段/形态/单位/dt、MANO转换残差、腕/finger质量来源与mask；不等全部loader |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
 | P2 纯轨迹恢复 baseline | 统一 TWM 训练/部署输入；corruption + current restoration，辅短预测 | clean/noisy/missing 验证；与 last-value、interpolation、GRU/temporal model 对比 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |

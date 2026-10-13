@@ -219,9 +219,9 @@ Corrector学习如何结合观测、运动建议和图像支持，输出腕部/�
 | [StableHand](https://arxiv.org/html/2605.18553v1) | 八库约10M帧用于quality network；生成模型按HOT3D/ARCTIC训练，含视觉条件 | 质量学习数据与生成恢复数据分开；不是纯轨迹TWM |
 | [PAD-Hand](https://arxiv.org/html/2603.26068v1) | DexYCB/HO3D训练评测，TACO为未参与训练的跨数据集测试 | 可参考直接可下载数据的恢复协议，保持TACO留出角色 |
 
-**v1建议，尚非已定混合：** 高质量核心HOT3D可用训练recordings＋OakInk2 train；Re/GigaHands作拟合扩展，EgoDex作joint规模，DexYCB作独立恢复基线/真实HaWoR数值适配，HOI4D先域外留出。HOT须先排除论文held-out原recordings，不能用全部官方train再评公开GT benchmark；Oak沿官方split并验父录制重叠。[12项论文依据](TWM_DATA_PAPER_EVIDENCE.md)和[完整预训练计划](TWM_PRETRAIN_PLAN.md)给出替代旧顺序的理由。
+**D18已定选库原则：纯轨迹按手姿态精度与标定选glove/MoCap，论文名单仅作参考。** v2高优先候选GRAB/ARCTIC/Oak/HOT/UmeTrack；主要glove HumanTouch/DexWild，DexCap/OpenGraph验小样本。免申请仍优先，注册资源有授权再接入；具体混合未定。[传感器证据](../memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](TWM_PRETRAIN_PLAN.md)
 
-DexCap/DexWild保留glove支线，HandX先考虑自采来源；SHOW3D moving rig仅作local/relative后备。SynData待ITW映射，HumanTouch待许可。真实视觉错误校准只用训练split；HO3D已有HaWoR训练重叠，只称TWM未见。数据source/质量分层与免申请偏好不变。
+glove raw人体joints/方向可以直接几何或部分旋转监督99D，不要求预先全库拟合MANO。native参数完整不等于所有角度独立精确，finger/wrist来源和转换误差分别保存。Re/EgoDex/Giga等降为后续视觉标签扩展；HumanTouch许可已核CC BY-NC4.0。HOT/Oak原split约束保留，UmeTrack真实/合成同motion去重；真实HaWoR数值适配属于后续阶段。
 
 EgoDex、GigaHands、TACO等可作质量分层扩展/留出评测，具体角色在split确定时固定。聚合库不能用于规避原数据许可，重复轨迹与相邻窗口跨split要排除。数据访问与MANO/SMPL-X模型资产的获取条件分开核查。
 

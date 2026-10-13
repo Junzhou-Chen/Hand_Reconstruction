@@ -4,7 +4,7 @@
 
 **后续补充：本报告首轮检索偏学术，并非完整全景。** 用户指出产业数采覆盖不足后，已新增[产业手部数据调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，包含SynData、Lightwheel、EgoVerse、OOJU、OpenGraph、Daimon和UniHand。选择数据时两份一起读，尤其不要由这里的短名单推断“大规模公开人手数据只有这些”。
 
-**最新原则与v1覆盖下面历史推荐：** 用户已选99D、免申请数据优先、plan广泛参考最新论文。HOT3D-Clips可HF直下，但需先排论文held-out；v1核心建议HOT可用train＋OakInk2 train，替代v0 HOT＋Re优先，Re作拟合扩展、EgoDex规模、HOI4D先留出。[现行计划](../docs/TWM_PRETRAIN_PLAN.md)、[12项论文证据](../docs/TWM_DATA_PAPER_EVIDENCE.md)明确来源与替代理由；保留本报告历史事实/顺序，不当新决定。
+**最新D18与v2：** 用户明确pure-motion按更准确的手姿态选glove/MoCap，论文数据清单仅参考；初始GRAB/ARCTIC质量方向恢复，99D/免申请偏好不变。高优先MoCap GRAB/ARCTIC/Oak/HOT＋新增UmeTrack，主要glove HumanTouch/DexWild，raw joints可几何监督，不因非MANO而降级。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)、[传感器精度新核验](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)覆盖v1 Re/EgoDex优先扩展与glove支线顺序。
 
 **建议先用 GRAB 与 ARCTIC 建立可复现基线，再加入 OakInk2；HOT3D 的公开训练标签适合补充目标域，DexWild 和 HumanTouch 值得用于扩展真实手套数据。** 这是本次研究建议，不是用户已选定的训练组合。
 
@@ -29,7 +29,7 @@ TWM 不看图像，所以预训练轨迹不必来自头戴 RGB。外部 MoCap、
 | HOT3D | 全集 833 分钟、19 人、30 Hz；不等于全部时长均有公开 GT | 专业 optical-marker MoCap，UmeTrack/MANO | 用公开 TRAIN reference；与 HaWoR/头戴应用接近 |
 | DexWild human | 公开 release 人类子集 7,917 episodes、2,924,588 transitions；若按30Hz解释，约27.08小时 | MANUS 手套；ArUco tracker + ZED视觉/SLAM测腕部 | 扩展跨环境手套操作；不用重定向后的机器人 action 代替人手 |
 | DexCap public subset | 官方公开 30 分钟 wiping + 60 分钟 packaging | Rokoko 手指 + T265 wrist SLAM | 数据量小但与原始 idea 很贴近，适合 adapter 验证和补充 |
-| HumanTouch，条件性候选 | 官方称首批约100小时；实际已核验X001/X002元数据合计约30.40小时，非全库统计 | MANUS手套 + VIVE追踪；每手25 joints、wrist 7D，统一60Hz | 文件已发布，pose可单独取；完整上传量、许可、数值质量尚未验收 |
+| HumanTouch，主要glove验收候选 | 官方约100h；十份meta累计约132.75h，非去重/QC净量 | MANUS EMF、25点/方向＋world腕契约，腕硬件型号待核 | HF公开，pose可单取，CC BY-NC4.0已核；manifest/标定/数值质量待验 |
 
 各项事实、资源入口和限制如下。有效可训练时长还需扣除 test split、缺标签、跳帧、坏拟合及重复来源；不能把上表简单求和当训练总量。
 
@@ -63,6 +63,10 @@ HF 文件索引中 `anno_preview` 有 627 个 pickle，总约 36.65 GB；可先�
 
 轨迹文件包括 `mano_hand_pose_trajectory.jsonl`、`umetrack_hand_pose_trajectory.jsonl`、user profile 和 `headset_trajectory.csv`，视频在VRS中；完整数据需登记邮箱取得manifest。独立的[HOT3D-Clips](https://huggingface.co/datasets/bop-benchmark/hot3d)官方HF可直下，不需该manifest；3,832个5秒片段中2,804为train，累计420,600帧/约3.89小时，非去重净时长。train tar有MANO/UmeTrack、shape、camera和原序列时间戳，图像与JSON混包，未确认官方pose-only轻包。Clips与full重叠，不能重复统计。手部数据依[发布协议](https://huggingface.co/datasets/bop-benchmark/hot3d/resolve/main/hot3d_dataset_license_agreement.pdf)采用CC BY-NC-SA 4.0，代码Apache 2.0不等于数据许可。
 
+### UmeTrack独立数据集
+
+[官方HF](https://huggingface.co/datasets/facebook/hand_tracking_challenge_umetrack)、[原论文§4](https://arxiv.org/html/2211.00099v1#S4)提供独立36-camera MoCap＋scan参考，补自由手势、hand-hand与pinch；train有native UmeTrack、world腕与转换MANO，test手GT未公开。真实/合成render共享原motion，TWM不重复计量；当前发布净有效量与论文统计尚未统一。优先native几何监督，MANO失败保留mask；不是HOT3D别名。[最新传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
+
 ### DexWild
 
 [项目](https://dexwild.github.io/)、[论文](https://arxiv.org/html/2505.07813v1)、[代码](https://github.com/dexwild/dexwild)和[实际HF数据卡](https://huggingface.co/datasets/boardd/dexwild-dataset)都已核验。五任务human条目合计7,917 episodes、2,924,588 transitions；若按30Hz解释，约27.08小时。30Hz依据来自论文环境/策略频率，各段实际采样间隔仍须通过timesteps.txt验收。33+小时和9,505 episodes包含机器人，论文9,290 human demos也不是当前release数量。
@@ -81,22 +85,13 @@ TWM不需要胸前RGB-D。**glove指关节与SLAM全局腕位姿须分别记录�
 
 ### HumanTouch
 
-[SparkLab官网](https://xsparkai.com/sparklab/humantouch/)及作者提供[Hugging Face](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch)、[ModelScope](https://www.modelscope.cn/datasets/chuqiaoLyu/Xspark-HumanTouch)入口；本次在HF核验到实际parquet、meta与视频文件，未成功读取ModelScope内容。官方称首批约100小时，HF目录X001–X010、文件约2.09TB；**计划中的1,000小时不能当成已发布量**。Viewer的文件级rows也不能当成动作或帧数。
+[官方HF](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch)公开parquet/meta与视频分离；60Hz统一时间轴，左右每手25点/方向、world腕7D、timestamp/validity/source契约。源骨架/rest-frame、tracker到wrist偏移与实际数值仍需验收；60Hz含插值/SLERP，不代表各传感器原生率。
 
-本次成功读取的元数据：
+**同日后续已核实许可**：[ModelScope官方summary](https://modelscope.cn/datasets/chuqiaoLyu/Xspark-HumanTouch/summary)内`window.__detail_data__`的dataset顶层License为CC-BY-NC-4.0；HF README以该页为准。旧“许可待核”已解决。
 
-| 分区 | Episodes | Frames | FPS | 元数据推算时长 |
-|---|---:|---:|---:|---:|
-| [X001](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/X001/meta/info.json) | 2,217 | 3,832,214 | 60 | 17.74小时 |
-| [X002](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/X002/meta/info.json) | 3,836 | 2,733,581 | 60 | 12.66小时 |
+HF SHA `81822a10cac5def2638db546eaeced581d71a8b5`十份meta累计28,674,858帧/60Hz约132.75h，metadata17,608episodes，实际pose parquet索引17,576文件；累计量非去重/QC净量，与官方“约100h”分口径保存。初轮仅X001/X002约30.40h是当时范围，不再充当当前全集统计。manifest计数差异、标定、shape与腕硬件型号继续验收；源没有独立全库毫米误差证明。
 
-两分区合计约30.40小时，不能写成全库总时长或质量筛选后的净时长。X003–X010因网页cache miss/访问限制未完成逐项核验；不能由旧缓存推断未发布。
-
-字段包括head/left_wrist/right_wrist各7D、每手 `position[25,3]` 与 `orientation[25,4]`、joint/source validity和timestamp。[episode data contract](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/X001/meta/humantouch/episodes/episode_000001.json)声明米、xyzw quaternion、world coordinates与joint names。还需实际parquet确认骨架/腕部数值一致、坐标手性、tracker到解剖wrist偏置。官方23DoF描述与25-joint schema不是同一个概念。
-
-这是位置插值、旋转SLERP后的统一60Hz时间轴，不代表所有硬件均原生60Hz。[format说明](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/main/X001/meta/humantouch/format.json)没有robot state/action；应做人体骨架映射，而非机器人retarget。
-
-可只下载 `X*/data/**/*.parquet` 与 `X*/meta/**`，[真实episode文件目录](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/tree/main/X001/data/chunk-000)与视频分开。HF将许可指向ModelScope，但本次未读到具体条款；**正式纳入训练前需核实许可**。因此推荐优先验收，不将它写成已可无条件训练的成熟数据源。
+只取`X*/data/**/*.parquet`和`X*/meta/**`可服务纯轨迹TWM，不必读RGB/触觉。native测量与99D拟合值分存，glove从主要候选验收，不再默认作为远期支线。[十份meta表、许可复核与质量契约](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
 ## 小规模传感器补充
 

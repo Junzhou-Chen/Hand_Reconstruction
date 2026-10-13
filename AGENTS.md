@@ -13,6 +13,7 @@
 - 主路线：头戴 RGB → HaWoR → 纯轨迹预训练的 TWM → 视觉证据引导的当前状态迭代校正 → 最终状态及可靠性跨帧反馈。
 - TWM 学习当前受损状态恢复，短期预测仅作辅助；TWM 不接收图像或 RGB features。
 - 训练借助 glove/MoCap，部署只需相机。WestWorld 仅作结构思想参考。
+- TWM选库优先手部姿态参考精度与可审计标定；glove/MoCap是主候选，不要求ego/RGB配对或原生MANO。99D统一输出可以用raw joints/可用方向做部分监督，不能因格式方便优先视觉伪标签。
 - 第一版范围是 wrist 6DoF 与手指关节。不要无依据切换视觉主干或增加机器人规划、物体物理、MoE、长短记忆等模块。
 - 用户已选每手99D MANO动态状态：wrist p3＋root rotation6D6＋15个finger rotation6D90；shape beta10另存。69D只保留历史/可选对照，不再当现行接口。
 - 原始观测、迭代候选、已完成的历史状态必须分开；高 confidence 不是不可修改的真值。
@@ -22,6 +23,7 @@
 ## 研究规划依据
 
 - 制定或实质修改plan前，广泛对照当前相关论文及最新公开方法，先读官方全文/训练协议，必要时核查源码；不要只围绕最近截图或单篇论文设计。
+- 论文用于参考机制与协议，不按视觉论文用库频率决定pure-motion训练池。StableHand八库服务quality network，不能直接当高精度运动GT清单。
 - 按任务接近程度比较motion prior、current restoration、visual reconstruction、quality learning，分别记录训练/评测数据、GT来源、输入上下文、split和可迁移部分。
 - 回顾既有方案，明确哪些保留、哪些替代及其证据；论文先例、工程建议、用户决定和实验验证分开。超参或混合比例没有依据时写成待验证假设。
 
