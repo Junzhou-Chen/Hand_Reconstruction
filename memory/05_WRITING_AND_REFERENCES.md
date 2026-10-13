@@ -62,6 +62,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 后续读取[论文§3](https://arxiv.org/html/2605.18553v1)确认每手54D=3trans+6wrist rotation+45finger axis-angle，双手108D；shape不含在该动态state中。未据此复现生成/质量模型。
 
+本轮按用户截图核验[Appendix F/Table10](https://arxiv.org/html/2605.18553v1#A6)：八库约10M用于QN，joint-only三库只计算视觉prediction与reference MPJPE，不拟合MANO；生成器另在HOT3D/ARCTIC训练。Table10/Re:InterHand provenance与官方独立捕获不一致，EE4D“21M3D”与官方4.3M3D/21M2D不一致，采用官方数据事实。公开399段`stablehand-data`是评测缓存，不是八库训练全集。[逐库核验与TWM提案](../docs/TWM_PRETRAIN_PLAN.md)
+
 ### PAD-Hand
 
 准确题名为 **PAD-Hand: Physics-Aware Diffusion for Hand Motion Recovery**，作者 Elkhan Ismayilzada、Yufei Zhang、Zijun Cui。[arXiv 2603.26068](https://arxiv.org/abs/2603.26068)注明 Accepted to CVPR 2026；[论文正文](https://arxiv.org/html/2603.26068v1)描述条件 diffusion、Euler–Lagrange residual virtual observables 与 last-layer Laplace uncertainty。
@@ -89,6 +91,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 [官方项目](https://facebookresearch.github.io/hot3d/)说明 professional optical-marker MoCap 与 UmeTrack/MANO 标注。Aria 有 RGB 流，Quest 3 为双灰度流，所以本项目 RGB 首轮候选应选 Aria。[官方 README](https://github.com/facebookresearch/hot3d)明确其列出的 TEST 被试（P0004、P0005、P0006、P0008、P0016、P0020）没有公开 GT，MANO annotations 另有协议要求。未下载序列验证同步和映射。
 
 新增标注链核验：[官方hand toolkit](https://github.com/facebookresearch/hand_tracking_toolkit#important-notes)说明MANO从UmeTrack求解，整体精度略低，建议用UmeTrack keypoints监督；[论文附录C](https://arxiv.org/html/2411.19167)给出19手marker+personal scan拟合UmeTrack流程。
+
+同日访问修正：[HOT3D-Clips](https://github.com/facebookresearch/hot3d/blob/main/hot3d/clips/README.md)的官方HF train可直接获取，区别于full VRS manifest。2,804段150帧为累计约3.89小时，按原sequence/timestamp去重后才是净量；MANO/UmeTrack、shape、camera齐备但各帧hand有效性需筛选。
 
 ### DexCap
 

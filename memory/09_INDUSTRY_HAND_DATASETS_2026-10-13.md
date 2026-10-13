@@ -69,7 +69,7 @@ OOJU适合验证26-joint adapter与设备估计扩展；其Quest手部是视觉�
 
 来源包括Aria MPS、MediaPipe+depth、OAK-D、Ultraleap等，主要为视觉/设备估计；world为序列SLAM参考系，不证明无漂移或跨episode统一。检查实际采样率、插值、`total_frames`、padding和sentinel。仓库2026-07-08修过Aria wrist/EE orientation，需固定版本。
 
-逐episode许可，已见Apache2.0样例，**不能用代码MIT推定全库数据许可**。优先筛human embodiment、完整wrist+keypoints、有效连续长度和许可；这是扩大TWM数据量的重要候选，来源需与clean sensor池区分。
+逐episode保留来源许可，已见Apache2.0样例；同日后续核验最新`CONTRIBUTING_DATA.md`资源表标CC BY-SA4.0，**不能用代码MIT推定数据许可或覆盖原episode条款**。优先筛human embodiment、完整wrist+keypoints、有效连续长度和许可；当前建议在EgoDex后扩展，来源与clean sensor池分开。[八库预训练核验](../docs/TWM_PRETRAIN_PLAN.md)
 
 ### Lightwheel EgoSuite：大规模访问入口真实存在，数量需分层
 

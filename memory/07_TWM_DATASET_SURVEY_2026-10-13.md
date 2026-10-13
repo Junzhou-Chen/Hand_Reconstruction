@@ -4,7 +4,7 @@
 
 **后续补充：本报告首轮检索偏学术，并非完整全景。** 用户指出产业数采覆盖不足后，已新增[产业手部数据调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，包含SynData、Lightwheel、EgoVerse、OOJU、OpenGraph、Daimon和UniHand。选择数据时两份一起读，尤其不要由这里的短名单推断“大规模公开人手数据只有这些”。
 
-**最新选择原则覆盖下面历史推荐顺序：** 用户随后明确优先无需申请、直接可下载且论文常用的数据；GRAB/ARCTIC/HOT3D等注册/登记路线不作为首批默认，参见[最新数据方案](03_DATA_AND_EVALUATION.md)。保留本报告的来源事实，不将旧推荐当新决定。
+**最新选择原则覆盖下面历史推荐顺序：** 用户随后明确优先无需申请、直接可下载且论文常用的数据；GRAB/ARCTIC与HOT3D full VRS的注册/登记路线不作为首批默认。**后续核验HOT3D-Clips官方train可HF直下，当前建议它与Re:InterHand 3D train建立首轮基线，不能排除所有HOT3D。** 详见[最新数据记忆](03_DATA_AND_EVALUATION.md)、[八库预训练方案](../docs/TWM_PRETRAIN_PLAN.md)。保留本报告的来源事实，不将旧推荐当新决定。
 
 **建议先用 GRAB 与 ARCTIC 建立可复现基线，再加入 OakInk2；HOT3D 的公开训练标签适合补充目标域，DexWild 和 HumanTouch 值得用于扩展真实手套数据。** 这是本次研究建议，不是用户已选定的训练组合。
 
@@ -59,7 +59,7 @@ HF 文件索引中 `anno_preview` 有 627 个 pickle，总约 36.65 GB；可先�
 
 **TWM 不需要 RGB，因此有标签的 Aria 与 Quest 3 轨迹都可考虑；仅后续 RGB paired correction 才需要挑 Aria。** 手部 annotation/模型、camera pose 和 timestamps 可按发布格式选取，避免先下全部视频；仍需实际验证对应下载分组。数据按 HOT3D agreement，MANO 另有要求。若用 HOT3D 做 OOD 目标集，则不应将它的 motion labels 偷放进预训练。
 
-轨迹文件包括 `mano_hand_pose_trajectory.jsonl`、`umetrack_hand_pose_trajectory.jsonl`、user profile 和 `headset_trajectory.csv`，视频在VRS中；完整数据需登记邮箱取得manifest。独立的[HOT3D-Clips](https://huggingface.co/datasets/bop-benchmark/hot3d)有3,832个5秒片段，其中2,804训练clips折算约3.89小时；它与全库重叠，不能重复统计。手部数据依[发布协议](https://huggingface.co/datasets/bop-benchmark/hot3d/resolve/main/hot3d_dataset_license_agreement.pdf)采用CC BY-NC-SA 4.0，代码Apache 2.0不等于数据许可。
+轨迹文件包括 `mano_hand_pose_trajectory.jsonl`、`umetrack_hand_pose_trajectory.jsonl`、user profile 和 `headset_trajectory.csv`，视频在VRS中；完整数据需登记邮箱取得manifest。独立的[HOT3D-Clips](https://huggingface.co/datasets/bop-benchmark/hot3d)官方HF可直下，不需该manifest；3,832个5秒片段中2,804为train，累计420,600帧/约3.89小时，非去重净时长。train tar有MANO/UmeTrack、shape、camera和原序列时间戳，图像与JSON混包，未确认官方pose-only轻包。Clips与full重叠，不能重复统计。手部数据依[发布协议](https://huggingface.co/datasets/bop-benchmark/hot3d/resolve/main/hot3d_dataset_license_agreement.pdf)采用CC BY-NC-SA 4.0，代码Apache 2.0不等于数据许可。
 
 ### DexWild
 

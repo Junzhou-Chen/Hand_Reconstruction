@@ -47,6 +47,8 @@ flowchart TD
 
 **表示仍是候选：** 下文展开69D坐标状态方案。[主流方法核验](../memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)表明MANO输出在接近本项目的重建方法中更常见，54D/99D MANO motion配合joint监督值得作为首轮对照。用户尚未选定最终编码；不因本节写得完整就把69D当行业标准或已验证最优。
 
+随后针对八库的[首轮预训练方案](TWM_PRETRAIN_PLAN.md)进一步建议99D MANO作为v0输出、69D作对照；β序列级另存，原生参数与joint-only采用不同监督mask。该提案具体化训练接口，尚未取代下文69D设计为用户已定规范。
+
 单手物理状态定义为：
 
 \[
@@ -208,7 +210,7 @@ Corrector学习如何结合观测、运动建议和图像支持，输出腕部/�
 
 ## 9. 数据选择：采用用户最新的免申请原则
 
-**2026-10-13用户已定：优先使用无需人工申请、已有直接下载入口的数据，并参考相关论文的实际数据用法。** 不以申请Lightwheel/商业合作为开工前置条件；GRAB/AMASS/ARCTIC/HOT3D等需注册/登记的路线暂从首批计划降级，除非已有合法本地副本或用户之后改变选择。普通登录/许可要求仍按实际入口分别记录，不绕过访问限制。
+**2026-10-13用户已定：优先使用无需人工申请、已有直接下载入口的数据，并参考相关论文的实际数据用法。** 不以申请Lightwheel/商业合作为开工前置条件；GRAB/AMASS/ARCTIC与HOT3D full VRS的注册/登记路线暂降级。**HOT3D-Clips官方train直接公开，是不同发布入口，不应一并降级。** 普通登录/许可要求按实际入口分别记录，不绕过访问限制。
 
 论文的不同训练职责应分开：
 
@@ -219,7 +221,7 @@ Corrector学习如何结合观测、运动建议和图像支持，输出腕部/�
 | [StableHand](https://arxiv.org/html/2605.18553v1) | 八库约10M帧用于quality network；生成模型按HOT3D/ARCTIC训练，含视觉条件 | 质量学习数据与生成恢复数据分开；不是纯轨迹TWM |
 | [PAD-Hand](https://arxiv.org/html/2603.26068v1) | DexYCB/HO3D训练评测，TACO为未参与训练的跨数据集测试 | 可参考直接可下载数据的恢复协议，保持TACO留出角色 |
 
-**当前建议，不是已定最终混合：** motion-only先检查直接公开的OakInk2、DexCap、DexWild；SynData待ITW映射/10fps验收，HumanTouch待许可明确。paired恢复优先参考DexYCB/HO3D的常用协议；这两者是视觉拟合reference，不能改写成独立glove GT，第三视角效果也不能直接代替头戴场景结论。头戴域paired资源的直接可用性仍需单独验收。
+**当前v0建议，不是已定最终混合：** motion-only先验收HOT3D-Clips官方train＋Re:InterHand 3D train，随后HOI4D/OakInk2扩操作、EgoDex扩规模，细节见[预训练方案](TWM_PRETRAIN_PLAN.md)。DexCap/DexWild继续保留手套来源；SynData待ITW映射/10fps验收，HumanTouch待许可明确。paired恢复参考DexYCB/HO3D，并可验收HOT3D Aria train；视觉拟合reference不能称独立glove GT，第三视角效果不能直接替代头戴结论。
 
 EgoDex、GigaHands、TACO等可作质量分层扩展/留出评测，具体角色在split确定时固定。聚合库不能用于规避原数据许可，重复轨迹与相邻窗口跨split要排除。数据访问与MANO/SMPL-X模型资产的获取条件分开核查。
 

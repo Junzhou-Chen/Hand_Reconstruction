@@ -18,6 +18,8 @@
 
 69D是本项目提出的坐标候选，尚非最终表示决定。[同日文献核验](10_MANO_REPRESENTATION_AND_ANNOTATION.md)记录了MANO参数/混合特征/直接坐标路线；建议比较MANO输出+joint监督与69D，而不是按维数或“主流”直接判定优劣。下面公式仍描述69D候选的几何语义。
 
+同日针对截图八库的[预训练提案](../docs/TWM_PRETRAIN_PLAN.md)建议99D MANO动态状态（p3＋root6＋15×finger6）作为v0，β序列级另存；固定raw包含joint观测、参数可用mask，native/joint-only分别监督。该提案尚未采纳/实现，不改下列69D几何为既定接口。
+
 \[
 S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 \]

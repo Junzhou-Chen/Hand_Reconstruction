@@ -4,7 +4,7 @@
 
 ## 两个数据池
 
-**用户最新决定D15：优先无需申请、可直接下载的数据，并参考论文实际使用。** 首轮建议GRAB/ARCTIC/HOT3D的路线涉及注册/登记，不再作为默认开工条件；Lightwheel等人工审批资源留在背景调查。直接公开的OakInk2/DexCap/DexWild可先验收，SynData需骨架映射、HumanTouch需许可核实；最终混合尚未决定。
+**用户最新决定D15：优先无需申请、可直接下载的数据，并参考论文实际使用。** GRAB/ARCTIC及HOT3D full VRS的注册/登记路线不作为默认开工条件；**HOT3D-Clips官方train直接公开，不能一并排除。** 当前v0建议HOT3D-Clips＋Re:InterHand 3D train，随后HOI4D/OakInk2、EgoDex；DexCap/DexWild等手套候选继续保留。SynData需骨架映射、HumanTouch需许可核实，最终混合尚未决定。[八库与预训练契约](../docs/TWM_PRETRAIN_PLAN.md)
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
 
@@ -18,7 +18,9 @@
 |---|---|---|
 | GRAB + ARCTIC | 文献对照/后备MoCap来源；不再默认首批 | Vicon→MANO/SMPL-X；需注册科研下载，与D15免申请偏好有获取成本。多视角不能重复计量 |
 | OakInk2 | 推荐扩展双手复杂操作 | OptiTrack→SMPL-X/MANO；627段annotations约36.65GB独立可下；需FK、单位、wrist映射验收 |
-| HOT3D | MoCap motion与头戴paired后备候选 | 完整版登记获取manifest，按D15暂非首批默认；纯motion可Aria/Quest3，RGB用Aria。TEST无公开GT |
+| HOT3D-Clips / full VRS | Clips train为v0主池建议；full为后备 | Clips官方HF直下，train 2,804×150帧，约3.89小时为片段累计、非去重净量；full另需manifest。纯motion可Aria/Quest，RGB用Aria；test手GT未公开 |
+| Re:InterHand 3D train | v0完整MANO姿态扩展建议 | 官方S3直下，7train/3test captures；scan/视觉拟合，不称MoCap。原帧索引需切gap，参数trans与PLY/camera单位分别处理 |
+| HOI4D / H2O | 完整MANO扩展 / 登记后备 | HOI4D公开分包、15Hz拟合标签，实际覆盖待验；H2O邮箱登记但未见人工审批，30Hz列表存在gap |
 | DexWild | 推荐扩展真实手套操作 | 公开human 7,917 episodes/2,924,588 transitions；MANUS手指+视觉/SLAM腕部。取原始human，不取LEAP action |
 | HumanTouch | 优先验收的新手套候选 | 25 joints/手、world腕部、统一60Hz；parquet与视频分开。已核验两个分区meta约30.40小时，非全库统计；具体许可尚未读到 |
 | DexCap | 小规模glove轨迹及adapter对照 | 公开30分钟wiping+60分钟packaging；Rokoko指关节、T265腕部；不能冒充论文全集或无漂移world GT |
@@ -37,7 +39,11 @@ GT 来源必须按 **joint articulation 与 wrist/global pose** 分开记录，�
 
 MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是直接仪器角度读数。HOT3D官方说明MANO由UmeTrack求解、精度稍低，推荐UmeTrack关键点监督；原始joint/marker与模型解码点应分开保存。joint标签也可经可微MANO loss训练参数输出，不必为每条样本生成MANO角度。详见[标注来源与表示调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)。
 
+**八库用途与规模（2026-10-13）：** StableHand Table10约10M用于quality-network，后三个joint-only库不拟合MANO；生成器另按HOT3D/ARCTIC训练。作者选用帧数不当全库或连续train量。EgoDex为公开规模扩展建议，EgoVerse先筛完整wrist/joints，Ego-Exo4D需审批暂不前置；EE4D当前官方4.3M自动3D、21M自动2D，不沿用论文21M3D口径。StableHand 399段缓存属于benchmark评测，不能作八库训练全集。[核验与来源](../docs/TWM_PRETRAIN_PLAN.md)
+
 ## 当前 schema 的状态
+
+本轮v0新增**99D MANO输出＋joint观测/监督**提案：p为实际wrist joint、R/Q为统一解码后的root/15个local旋转，β为序列条件。native参数loss与joint-only几何loss分mask；未知腕朝向、shape和角度不造GT。下列69D字段分析仍为对照路线，未成为运行实现。[具体输入、损失与shape评测边界](../docs/TWM_PRETRAIN_PLAN.md)
 
 **69D字段满足性（2026-10-13）：** HaWoR和数据不必原生输出69个数；只要能给一致参考系的wrist position/rotation、标准21点与时间信息，就可构造3+6+20×3。69是表示长度，非独立物理DoF。
 

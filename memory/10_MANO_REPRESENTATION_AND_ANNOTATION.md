@@ -101,6 +101,8 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 1. 若首轮紧接HaWoR、要求输出mesh，优先建立**MANO姿态输出 + joints输入/监督**baseline。候选动态编码为54D，或finger也用6D得到99D；shape10可序列级单独保留。root translation与实际wrist点仍需正确换算。
 2. 保留69D joint-state作为有意义的对照，验证跨glove骨架接入和局部当前状态恢复的收益；不能宣传它是行业通用标准。
 3. 两种输出用相同数据/splits/corruptions比较joint/wrist误差；mesh有reference时再比mesh误差。若69D要输出mesh，计入IK/拟合成本和误差。
+
+随后用户把重点转到预训练，具体的[八库数据/任务/输出提案](../docs/TWM_PRETRAIN_PLAN.md)建议99D v0并保留69D对照；Q需按源MANO hand mean完整解码，β另存且真实视觉评测不暗用GT shape。尚未由用户定案，也未进行表示消融。
 4. 不因表示变化而改变pure-trajectory TWM、current-state restoration、固定Z/变化candidate、独立图像取证、w/q或最终反馈的研究主线。
 
 ## HaWoR论文与代码的一个边界
