@@ -19,6 +19,8 @@
 | [OpenGraph MANUS](https://huggingface.co/datasets/OpenGraphLabs-Research/manus-egocentric-sample) | 每手25点、双手40个finger-angle通道 | 公开约54min、parquet可单取；未见独立world wrist SE3，做local部分监督/映射验收 |
 | TCDHands / HandX自采 | finger markers / OptiTrack skin markers | 手势与独立marker补充；前者小且需AMASS注册，后者须source筛自采与审canonical/world；SAMP精细手指覆盖较弱 |
 
+本轮完整适配判定：GRAB/ARCTIC/Oak/HOT/UmeTrack具备完整任务字段条件；HumanTouch/DexWild/DexCap保持高价值glove候选，需映射及腕链/质量验收；OpenGraph当前只确认局部监督，独立world腕待核。其它扩查条目仍按source/字段审查。**所有候选均未完成本项目adapter验收，不得将“能参与某项loss”写成“每个库完全适配”。** 完整任务训练池须有经过验收的腕＋五指连续参考，部分来源不能单独提供全部任务监督。[适配判定](../docs/TWM_PRETRAIN_PLAN.md#候选数据的完整适配判定)
+
 这里按监督来源、可审计性和覆盖筛选，**没有同一真值基准支持这些库的毫米级精度排序**。marker/glove输出也经过骨架解算和标定；传感器品牌、关节数量、名义fps不等于全部99D均有独立真值。
 
 ### UmeTrack与HOT3D需要保留native参考

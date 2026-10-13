@@ -71,6 +71,19 @@ HumanTouch本轮核实HF公开免申请、[ModelScope许可CC BY-NC4.0](https://
 - glove各source按subject/session/original recording切分；统一60Hz不当所有硬件原生60Hz，缺帧、插值、tracker reset与校准记录保留。
 - 质量先看native几何、标定、有效性/fit error和转换残差；骨长稳定与低抖动只筛异常，不能当独立真值精度证明。
 
+### 候选数据的完整适配判定
+
+2026-10-13用户追问此前选库是否都能完全适配当前TWM预训练。这里的完整任务指连续轨迹中的腕位置/朝向与五指状态恢复，而不是仅能向99D输出头提供某一项loss。**当前没有任何库完成本项目adapter/数值验收；“可参与训练”不能写成“全部完全适配”。**
+
+| 接入证据 | 候选 | 当前判断与训练职责 |
+|---|---|---|
+| 已发布完整任务所需的姿态、腕位姿与序列字段 | GRAB、ARCTIC、OakInk2、HOT3D、UmeTrack | 具备主训练来源的适配条件；源decoder、实际腕点、shape、时间、有效帧与split仍需验收。GRAB/ARCTIC访问条件保持不变 |
+| 高价值glove，需验骨架与腕链 | HumanTouch、DexWild、DexCap | 保持glove科学优先级。HumanTouch有world腕契约；DexWild需核tracker/camera/world变换；DexCap腕来自SLAM。标定与质量验收后判断完整几何监督，不能提前承诺全部完整参数标签 |
+| 只确认局部字段，独立world腕证据不足 | OpenGraph MANUS | 当前作为局部手指补充，不单独承担完整腕＋手指恢复；未核实不等于证明缺失 |
+| 其它扩查条目 | TCDHands、HandX自采、SAMP及产业扩展 | 保持逐source/字段候选状态，不随主清单批量升级为完整适配 |
+
+这不是按有无MANO对glove排科学优先级。现有候选池从字段与来源看具备组成完整任务训练池的条件，但首轮须包含至少一条通过验收的完整腕＋手指数据链；仅局部监督来源不能提供缺失global wrist的真值。主训练角色、参与部分loss与本项目验收通过分开记录，联合覆盖和性能仍未验证。
+
 ### 替代关系
 
 v0 HOT＋Re、v1 HOT＋Oak后优先Re/EgoDex的顺序主要便利参数接口与文献对照；用户本轮要求恢复glove/MoCap主导。保留Oak/HOT的质量价值，但将GRAB/ARCTIC恢复高优先科学候选，UmeTrack新增，HumanTouch/DexWild提升主要glove池。StableHand只借标注分层与故障任务，不拿其QN八库决定TWM参考质量。
