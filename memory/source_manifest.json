@@ -1,0 +1,50 @@
+{
+  "snapshot_date": "2026-10-13",
+  "timezone": "America/New_York",
+  "scope": "Original local project materials; external verification recorded separately in memory/05_WRITING_AND_REFERENCES.md",
+  "sources": [
+    {
+      "path": "HandLoop_Project/00_All_In_One_Research_Archive.md",
+      "bytes": 116094,
+      "sha256": "d0ddf0ff72f599ded81457bf26f96a5c59ba961f331e4812094ea4d3946b2252",
+      "lines": 1795
+    },
+    {
+      "path": "HandLoop_Project/01_Conversation_Research_Archive.md",
+      "bytes": 63426,
+      "sha256": "f15005b45c60289598517605393009e58ecb6ba63d591a388c262e7542c796d8",
+      "lines": 1254,
+      "exact_bundle_start_line": 267,
+      "exact_bundle_end_line": 1520
+    },
+    {
+      "path": "HandLoop_Project/02_Introduction_CN_EN.md",
+      "bytes": 24430,
+      "sha256": "97ddfd64676958f51cdf298b47d2d35bf7706299bee012d20f903e07891de962",
+      "lines": 81,
+      "exact_bundle_start_line": 1528,
+      "exact_bundle_end_line": 1608
+    },
+    {
+      "path": "HandLoop_Project/03_References_And_Implementation.md",
+      "bytes": 10541,
+      "sha256": "cd7d4321a1e9d700334917670a5aea4ef6a5434b34002afdc677145d94f16944",
+      "lines": 179,
+      "exact_bundle_start_line": 1616,
+      "exact_bundle_end_line": 1794
+    },
+    {
+      "path": "HandLoop_Project/04_Method_Overview.png",
+      "bytes": 1451930,
+      "sha256": "e019034c98422fda1cba84a19346cefce128a420a19e794c65a7497b2f0bf45e"
+    },
+    {
+      "path": "HandLoop_Project/START_HERE.md",
+      "bytes": 16446,
+      "sha256": "20a8447ed3acfe76c29e28f146a10eafd4cf81d0bfcb78997249f2d7253919ba",
+      "lines": 243,
+      "exact_bundle_start_line": 17,
+      "exact_bundle_end_line": 259
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+# HandLoop 进展与下一步
+
+更新日期：2026-10-13。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
+
+## 已有和未有的产物
+
+| 项目 | 当前状态 | 证据 |
+|---|---|---|
+| 原始研究资料 | 已有 | `HandLoop_Project/` 中 5 个 Markdown 文件与 1 张 PNG |
+| 核心 idea 与现行路线 | 已形成文字方案 | START_HERE 与对话归档 §15.23–16 |
+| 中文/英文 Introduction | 已有草稿与认可首段 | `02_Introduction_CN_EN.md` |
+| 方法图 | 已有早期概念图 | `04_Method_Overview.png`；TWM 仍是较早的 forecasting/prior 表达 |
+| 项目记忆库 | 本次建立 | 根目录 MEMORY/AGENTS 与 `memory/` |
+| 部分第三方论文/源码核验 | 本次完成只读核验 | [写作与外部核验](05_WRITING_AND_REFERENCES.md) |
+| TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
+| Git与远程工作方式 | 已初始化本地main，指定GitHub origin；已连通hongfei | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；最终push/checkout结果见该文件 |
+| 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
+| canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
+| 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
+
+## 第一项可反驳问题
+
+在统一时间戳、骨架、坐标与 GT 条件下，**独立轨迹预训练的 current-state restoration 能否改善真实 HaWoR errors，并超过 smoothing/Kalman/普通 temporal model？**
+
+若没有收益，先排查坐标与 GT 映射、噪声域差异、观测质量和 baseline 公平性，不立即增加网络复杂度。[依据：归档 §16](../HandLoop_Project/01_Conversation_Research_Archive.md)
+
+## 推荐执行顺序与交付条件
+
+以下是下一阶段计划，不是已经执行的任务。建库和首轮TWM数据调查已完成，随后用户明确GitHub同步与远程实验约定并要求扩查数采团队。尚未创建模型工程或启动完整数据下载、训练；所有后续实验在hongfei执行。
+
+纯轨迹工作可独立先行：先验收GRAB/ARCTIC各一条序列，确定69D骨架与腕部契约；再扩OakInk2/HOT3D和DexWild。HumanTouch优先补许可、完整发布量和一段parquet数值检查。最终来源混合及HOT3D作为训练域/OOD域的角色仍未定案。此建议不要求等HaWoR跑通才开始TWM数据适配。
+
+| 阶段 | 具体工作 | 可检查的交付/验收 |
+|---|---|---|
+| P0 可用性与契约 | 固定 HaWoR commit/配置；检查运行资源；选一段 HOT3D Aria 公开 reference 的序列；决定坐标、骨架、mask 与时间规范 | 有来源的数据样例与字段表；明确缺字段；不能仅有口头“数据可用” |
+| P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
+| P2 纯轨迹恢复 baseline | 统一 TWM 训练/部署输入；corruption + current restoration，辅短预测 | clean/noisy/missing 验证；与 last-value、interpolation、GRU/temporal model 对比 |
+| P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
+| P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
+| P5 时间反馈训练 | 最终状态与质量一次回灌，短序列自身输出 rollout | feedback/no-feedback 与 rollout/no-rollout；再可见恢复、突发动作、误差累积 |
+| P6 强基线与迁移 | 匹配 HMP/StableHand/PAD-Hand 等协议，做独立主体/场景/数据集验证 | 同条件对比和可复现结果；再决定论文贡献与可选下游验证 |
+
+优先级取自 [START_HERE §7](../HandLoop_Project/START_HERE.md)；详细阶段验收是本次整理的实施建议，数值达标阈值尚未约定。
+
+## 实现前需要做出的决定
+
+| ID | 未决问题 | 为什么会影响实现 |
+|---|---|---|
+| O01 | TWM pretrain 的四输入与 deploy 的五输入如何统一 | 第二阶段计划冻结 TWM，不能在冻结后临时引入从未训练的输入契约 |
+| O02 | 预训练 `q` 如何命名，与最终质量 `q_t` 如何区分 | 当前文字同名异义，容易误用监督或反馈 |
+| O03 | 具体骨架、wrist orientation、左右手/scale/bone length 规范 | 决定 69D 编解码及跨传感器可比性 |
+| O04 | mask 是 20、21 还是 22 个分量；root pos/rot/palm 如何分组 | 决定 token、quality head 和缺失监督；需分开 observation 与 GT availability |
+| O05 | `camera_T_world` 的方向、轴与 crop/feature 变换 | 字段名不足以保证正确投影 |
+| O06 | 旋转左/右复合、平移 residual frame、TWM 提议的编码 | wrist-local articulation 与 temporal anchor 不能混用 |
+| O07 | 首帧、空历史、整手漏检、离屏与重入、左右手关联/reset | 目前公式依赖上一帧有效 wrist，边界条件空缺 |
+| O08 | 只有手指无全局 wrist 的轨迹如何纳入 | 完整 69D 监督不能无依据补造；需部分监督或单独任务 |
+| O09 | 视觉 hook 层、feature shape、局部/全局读取和独立 evidence head | 决定是否真的有图像支持、是否引入未来信息以及吞吐量 |
+| O10 | `w/q` 的 target、损失、校准与评价定义 | 不能先把“可靠性”默认当成概率、方差或二值标签 |
+| O11 | corruption 分布、loss 权重、辅助预测 horizon、dt/padding | 合成错误与实际 HaWoR 错误可能分布不同 |
+| O12 | rollout 的 teacher forcing schedule、detach/截断反传和微调策略 | 决定模型是否适应自身误差及训练成本 |
+| O13 | split、指标聚合、序列/world 对齐、阈值、runtime 协议 | 防止指标不可比或 GT 泄漏 |
+| O14 | 远程实验的软件环境、可用GPU、分辨率、FPS及是否严格causal | 已明确hongfei和项目根路径，但未验训练环境；后端反馈不能证明系统在线 |
+| O15 | 最终预训练数据组合与目标评测保留 | 已有来源调研建议；仍需实际schema/质量检查、许可和split，HumanTouch完整上传量尚未核实 |
+
+这些是规格空缺，不是要求现在逐项询问用户。后续实现可先提出小而明确的契约，用数据和 sanity check 决定；会改变核心研究方向的选择应明确说明。
+
+## 已识别的主要风险与验证路径
+
+- **收益只是平滑。** 用 true geometric error、快速动作和准确点退化测量。
+- **自我确认。** 原始 `Z` 固定；取证必须来自图像；mask 不冒充可靠性。
+- **GT 质量混合。** joint/wrist 来源分开；辅助设备追踪不冒充独立高精度标签。
+- **HaWoR 工程接入失误。** `hawor_infiller()` 含 world 转换；去掉补全时单独保留转换。
+- **递归累积与合成噪声偏差。** 比较真实误差、自身历史 rollout 和再可见恢复。
+- **创新性不足。** 三个候选贡献需在强基线下分别证明作用，不能只换术语。
+
+## 下次会话可直接使用的任务说明
+
+> 先读 MEMORY.md、memory/01_METHOD.md、本文件和memory/07_TWM_DATASET_SURVEY_2026-10-13.md。项目已决定头戴RGB + HaWoR + 独立纯轨迹current-state-restoration TWM + evidence-guided Corrector + 最终状态质量反馈。按用户下一步指令推进：纯轨迹线先验收GRAB/ARCTIC样本与状态契约，再考虑OakInk2/DexWild等；视觉线从P0/P1核验HOT3D Aria配对序列和HaWoR，保留raw detection与camera-to-world conversion。不要自动下载TB级全部视频，不要把推荐数据混合当用户已定案；未跑出的性能、示例schema和超参不写成已验证实现。
