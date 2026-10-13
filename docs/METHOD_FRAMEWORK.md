@@ -60,6 +60,12 @@ S_t=(p_t^W,R_t^W,J_t^{\mathrm{wrist}}),\qquad J_t^{\mathrm{wrist}}\in\mathbb R^{
 
 世界系关节为 \(J_{t,j}^W=p_t^W+R_t^WJ_{t,j}^{\mathrm{wrist}}\)。输出首要是关节和腕运动；如果需要mesh，后续需额外拟合/解码，不能因69D输出而自动宣称得到完整准确mesh。
 
+**69D是状态编码长度，不是69个独立物理自由度。** 腕部物理位姿为6DoF，rotation6D用6个数编码具有3个自由度的SO(3)旋转；20×3关节位置还受骨长、连接关系和关节运动约束。66D也只是残差编码长度。后续写作应说“69维状态表示”，不说“69DoF手模型”。
+
+**HaWoR原生输出不是该69D。** [视频源码](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)逐手保存root rotation `(3,3)`、15个关节rotation `(15,3,3)`、translation `(3)`与MANO betas `(10)`，再经模型解码和camera-to-world得到关节；左右手都可处理，原有infiller还同时读取双手。我们的adapter从这些结果选取标准21点，把wrist单独作为p，20个非根点变为wrist-local，再编码R为6D。
+
+转换几何为 `p=J_world[0]`、`J_local=R_world.T @ (J_world[1:21]-p)`；MANO translation不直接等于J0，须解码。betas用于解码/骨长，可另存metadata，当前69D不单独拼接它。真实wrist frame与MANO root frame的对应、左右手和关节映射仍需统一。
+
 **建议契约：** 第一版左右手分别维护69D状态、历史和anchor，网络参数共享并提供handedness。双手联合attention/接触约束尚未决定；使用双手数据不代表模型已具备双手协同推理。
 
 ### 固定时序参考系

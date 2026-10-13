@@ -42,6 +42,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 未验证 feature hook 运行、权重下载、延迟和因果性；目前没有本地 pinned checkout。
 
+2026-10-13回答69D问题时进一步读[视频脚本](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)、[MANO wrapper](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/mano_wrapper.py)、[world转换](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/custom_utils.py)。原生按手保存root rotation、15个关节rotation、3D translation、10D shape；wrapper有21点映射（可另加extra regressor）。视频脚本分左右手track，原infiller用`2*(3+10+16*6)=218`维双手表示。故“HaWoR原生单手69D”或“整个HaWoR只处理单手”均不准确；69D是我们经adapter构建的每手状态。world转换显式处理MANO translation与wrist joint offset，直接复制trans为wrist位置不正确。均为源码核验，无数值复现。
+
 ### HMP
 
 [原论文](https://arxiv.org/abs/2312.16737)、[作者项目](https://hmp.is.tue.mpg.de/)和[官方代码](https://github.com/enesduran/HMP)对应 WACV 2024。项目说明以 AMASS 学习手部生成运动先验，通过 latent optimization 辅助视频手运动估计。它是“独立 MoCap prior + visual recovery”的已有工作，必须纳入 novelty 分析。未全面审查模型实现或复现效果。
@@ -77,6 +79,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 ### DexCap
 
 [原论文](https://arxiv.org/html/2403.07788v1)中手指局部位置来自 Rokoko glove，腕部 6DoF 来自 T265 SLAM，视觉为胸前 RGB-D。[官方仓库](https://github.com/j96w/DexCap)包含初始 SLAM 漂移修正工具。[官方仓库链接的数据卡](https://huggingface.co/datasets/chenwangj/DexCap-Data)仅列 30 分钟 wiping 和 60 分钟 packaging 的公开集。不能将公开集等同全部论文数据，也不能把腕轨迹视为无误差光学 MoCap。未验下载文件。
+
+同日进一步读取[glove采集源码](https://github.com/j96w/DexCap/blob/main/STEP1_collect_data/redis_glove_server.py)：每手明确21个关节名、`(21,3)`位置和`(21,4)`orientation。源码同时产生middle-proximal中心化/骨长归一化和raw字段；实际release保存哪种及恢复尺度/标定仍须检查，不能因采集代码完整而声称发布样本已验收。
 
 ### EgoDex
 

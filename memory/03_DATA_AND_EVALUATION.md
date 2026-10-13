@@ -37,6 +37,19 @@ GT 来源必须按 **joint articulation 与 wrist/global pose** 分开记录，�
 
 ## 当前 schema 的状态
 
+**69D字段满足性（2026-10-13）：** HaWoR和数据不必原生输出69个数；只要能给一致参考系的wrist position/rotation、标准21点与时间信息，就可构造3+6+20×3。69是表示长度，非独立物理DoF。
+
+| 来源 | 字段层面判断 | 尚需验证 |
+|---|---|---|
+| OakInk2 | MANO/SMPL-X位姿、shape、translation具备解码完整状态的信息 | FK、wrist点/root区别、单位/帧映射 |
+| DexYCB / HO3D | MANO参数及参考位姿可构建完整状态 | camera/world约定、PCA/axis-angle解码与缺失mask；标签为视觉拟合 |
+| DexCap raw | 采集代码21点+orientation，README双腕6DoF | release保存字段、palm/tracker→wrist标定、归一化尺度及SLAM质量 |
+| DexWild raw | MANUS full、tracker与timesteps有接入基础 | 原始关节schema及world腕部变换未数值验收，不能直接宣称已完整69D |
+| HumanTouch | 25点及wrist7D、world数据契约支持转换 | 25→21对应、tracker偏置与实际parquet；具体许可待核实 |
+| SynData / OpenGraph | 分别为ITW qpos/11点、25点但无独立world wrist SE3 | 前者需FK/人体映射；后者只先做局部或部分监督，不补造全局GT |
+
+结论是已有完整状态资源可支持方案，并非所有调研库均可直接提供同质量69D监督。只有21点而无独立腕旋转时，可定义几何掌frame，但须统一且标记为派生标签；纯TWM预训练不需相机，图像取证/paired阶段则需相机和视频。
+
 [03 文件 §4](../HandLoop_Project/03_References_And_Implementation.md) 有 `HandFrame` dataclass 示意和建议张量，不是运行实现：
 
 | 字段组 | 已有示意 | 必须补齐的约定 |

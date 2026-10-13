@@ -28,6 +28,8 @@ S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 | 完整输入 | 不重复 wrist root | 69D |
 | 更新量 | 平移增量、旋转切向量、关节增量 | 建议 3+3+60 = 66D |
 
+69D/66D指编码维数，不能写成69/66个独立物理DoF；腕部物理6DoF中的旋转有3DoF，6D只是冗余编码，关节点坐标受骨架约束。HaWoR原生为MANO root/15关节旋转、beta10和translation，经解码及坐标转换后才能得到我们的69D；其视频pipeline支持左右手，原infiller为双手输入。完整源码事实见[外部核验](05_WRITING_AND_REFERENCES.md)。
+
 几何含义是 `J_world = p_world + R_world @ J_local`，其中 wrist-local 关节和时序 canonical frame 是两层不同坐标概念。MANO 可用于从 HaWoR 解码 joints/mesh，不作为所有传感器必须共享的状态参数。
 
 时序建模参考系建议取上一帧最终腕部位姿 `A_t = T̂_(t−1)^W`。对历史和当前候选统一变换，例如：
