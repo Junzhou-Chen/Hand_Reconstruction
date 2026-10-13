@@ -20,7 +20,7 @@
 
 完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、用户已选单手99D、统一TWM输入、w/q分工和三阶段训练。统一槽位、51D切向残差、初始化和单手共享参数等仍是实现建议，尚未运行。
 
-**已选表示D16：** 用户明确“我们使用99D”。每手p3＋root rotation6D6＋15×finger rotation6D90，β10为人物/序列条件另存；69D只留历史/可选对照。MANO标签通常拟合得到，99是编码长度而非99个物理DoF；adapter未实现。[表示调查及后续决定](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
+**已选表示D16：** 用户明确“我们使用99D”，本轮再次要求TWM预测完整99D；部分关节点/手套标签不改变模型输出维数，也不自动成为完整99D真值。每手p3＋root rotation6D6＋15×finger rotation6D90，β10为人物/序列条件另存；69D只留历史/可选对照。MANO标签通常拟合得到，99是编码长度而非99个物理DoF；adapter未实现。[表示调查及后续决定](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 
 **v2证据与边界：** StableHand v1 QN读数值但标签仍需视觉prediction/reference误差，Enhanced另有depth cues；八库不决定pure-motion GT质量。HumanTouch许可已核实CC BY-NC4.0，十份meta累计约132.75h非QC净量，pose可单取；UmeTrack独立marker集补自由手势/pinch，real/synthetic motion需去重。native→99D误差与finger/wrist来源分别保存，不能只以平滑或品牌宣称精度。原HOT/Oak split约束保留，无训练。
 

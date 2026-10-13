@@ -57,7 +57,7 @@ summary页面`window.__detail_data__`转义JSON顶层字段为`Id=211198, Namesp
 
 ## 3. 99D输出不要求各库原生MANO
 
-保留两层数据：**source-native测量/骨架**与**canonical99D模型状态**。输出仍为wrist p3＋root6＋15×finger6，shape条件另存。
+保留两层数据：**source-native测量/骨架**与**canonical99D模型状态**。用户再次明确TWM主输出必须是每手完整99D，即wrist p3＋root6＋15×finger6，shape条件另存。所有这些候选可以按有效字段参与同一99D输出模型训练，但不能承诺处理后全部拥有完整99D真值；离线拟合仅产生带来源/残差的派生估计，缺world腕或未测twist仍是监督缺失。joint-only可以直接用MANO解码几何监督，不要求先拟合全库。
 
 1. 有经核验MANO参数：按源hand mean/rest frame解码，支持rotation监督；同时保留native几何reference，记录拟合来源。
 2. glove有原始joints：预测99D→可微MANO解码→有效joint几何loss；不能因拟合了MANO便将全部角度作为传感器直接GT。

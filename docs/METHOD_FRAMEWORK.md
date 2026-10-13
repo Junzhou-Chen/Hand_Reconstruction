@@ -62,6 +62,8 @@ S_t=(p_t^W,R_t^W,Q_{t,1:15}),\qquad Q_{t,i}\in SO(3),\quad\beta\in\mathbb R^{10}
 
 MANO解码得到腕中心化的 \(J_{t,j}^{\mathrm{wrist}}=f_j(Q_t,\beta)\)，世界关节为 \(J_{t,j}^W=p_t^W+R_t^WJ_{t,j}^{\mathrm{wrist}}\)。同一状态解码21点和778个vertices；关节点作为数值观测、几何监督及图像查询，而非独立60D动态输出。
 
+**TWM主状态输出固定每手完整99D，已由用户再次明确。** joint-only/glove样本可以通过MANO解码后的几何或部分旋转loss训练同一输出头，不因缺标签改变输出维数；统一99D预测不等于每个样本都有完整99D真值，缺失world腕和未测twist不能补造GT。详见[预训练输出与监督契约](TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)。
+
 **99D是编码长度，不是99个物理自由度。** root与15个finger旋转均用6个数编码3DoF的SO(3)。shape为人物/序列条件，同帧迭代固定；真实视觉评测使用HaWoR或序列估计shape，不暗用评测GT β。
 
 **HaWoR须经过adapter。** [视频源码](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)逐手保存root rotation `(3,3)`、15个joint rotations `(15,3,3)`、translation `(3)`与betas `(10)`；adapter统一左右手、hand mean与root frame，将实际腕点p及16个旋转编码为99D。视频支持左右手，原infiller同时读取双手。

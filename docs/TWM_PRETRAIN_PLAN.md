@@ -90,7 +90,19 @@ x_t=[p_t^A(3),\;\rho(R_t^A)(6),\;\rho(Q_{t,1})(6),\ldots,\rho(Q_{t,15})(6)]\in\m
 - 当源β/骨架不完整时记录shape mask；joint-only数据先做形态标定，不能给所有人默认β后把形状差异当姿态误差。GRAB个性化v_template另存参考，β10无法表达的残差单独记录，不据此把raw GT替换成拟合值。
 - native预训练可使用release的β条件；真实视觉评测采用HaWoR或训练好的序列估计shape，不能暗用评测GT shape。reference-shape诊断若运行，单独标明协议。
 
-**TWM主要输出当前恢复建议U_t，不替代后续Corrector的最终状态。** 辅助未来运动头只作训练任务；v0不要求TWM输出w/q，真实观测与最终质量头属于后续校正训练。
+**用户本轮再次明确：TWM必须预测每手完整99D。** 主输出是当前恢复建议U_t，不替代后续Corrector的最终状态；不能因某库只有joints而将主输出切成joint坐标或局部finger参数。辅助未来运动头只作训练任务；v0不要求TWM输出w/q，真实观测与最终质量头属于后续校正训练。
+
+### 统一99D输出与标签完整性
+
+统一模型输出不等于所有样本都有完整99D真值：
+
+| 源标签 | 处理后可用参考 | 对统一99D输出的监督 |
+|---|---|---|
+| 经核验的MANO＋腕位姿 | 源解码后统一的99D模型参考，保留fit来源与有效性 | 有效root/finger旋转、腕与解码几何 |
+| glove joints/orientations＋可用腕 | 保留native测量；标定后可选择拟合99D | native几何优先，可靠映射的方向/旋转与腕分别监督；拟合参数另标派生来源 |
+| 只有局部joints/角度，缺world腕 | 局部参考与availability mask，无法由此独立得到完整world状态真值 | 仍输出99D；只监督有效局部字段，缺失腕p/R与未测twist的直接loss关闭 |
+
+joint-only不必全库离线拟合：预测99D经可微MANO解码后，直接对原始有效点/方向计算几何loss。若离线IK产生99D，保存拟合残差及来源；它不能将未测扭转、shape或global wrist升级为独立GT。统一样本schema可以包含99D拟合/估计及mask，填充值或估计不能冒充真值。完整模型参考与部分几何参考共同训练同一输出头；缺腕样本贡献手指运动，可靠完整位姿来源提供腕部监督。
 
 54D（root p3＋root6＋finger axis-angle45）是同语义的另一编码，StableHand采用它；99D将所有旋转统一为6D。69D关节坐标只保留为历史/可选对照，不再作为首轮必做选型比较。状态编码已定，adapter和效果仍待验收。
 
@@ -110,7 +122,7 @@ candidate初始化有raw参数时从raw开始，缺失部分由历史/既有模�
 
 网络首版建议共享左右手参数、保留handedness、每手独立历史。候选随迭代改变，O/H/anchor同帧固定，保持与后续闭环语义一致。
 
-**v0模型与直接输出建议：** 先用小型temporal Transformer完成确定性条件恢复，输入token按腕/手指和时间组织，附mask、quality与dt；当前读出头直接预测99D的U，另有共享表示的短期forecast头。历史只到t−1，当前raw/candidate允许相互读取；当前恢复头不能读取未来target。先验收它与GRU/普通时序基线的收益，再检验结构编码的额外作用，不因StableHand使用flow就把flow预先定为必要。层数/width沿用框架起步候选，在远程资源验收后配置；这不代表完整HaWoR链已变成严格因果。
+**已定99D输出；v0架构仍为建议：** 先用小型temporal Transformer完成确定性条件恢复，输入token按腕/手指和时间组织，附mask、quality与dt；当前读出头直接预测99D的U，另有共享表示的短期forecast头。历史只到t−1，当前raw/candidate允许相互读取；当前恢复头不能读取未来target。先验收它与GRU/普通时序基线的收益，再检验结构编码的额外作用，不因StableHand使用flow就把flow预先定为必要。层数/width沿用框架起步候选，在远程资源验收后配置；这不代表完整HaWoR链已变成严格因果。
 
 ## 6. 主任务：当前状态条件恢复
 
