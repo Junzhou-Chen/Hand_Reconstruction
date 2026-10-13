@@ -16,7 +16,7 @@
 | Git与远程工作方式 | 本地main已推送GitHub；hongfei已clone项目并建忽略的存储目录 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
-| MANO/69D表示与标签来源 | 已核验代表性论文与源码 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；最终编码仍未定，未生成MANO fits |
+| MANO/69D表示与标签来源 | 已核验代表性论文与源码；按用户要求补充StableHand状态/flow velocity/四路观测质量/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；最终编码仍未定，未生成MANO fits |
 | 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |

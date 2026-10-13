@@ -16,7 +16,7 @@
 | WiLoR，CVPR2025 | MANO输出；论文pose48+shape10+camera，临时mesh支持图像对齐refinement | [论文](https://openaccess.thecvf.com/content/CVPR2025/papers/Potamias_WiLoR_End-to-end_3D_Hand_Localization_and_Reconstruction_in-the-wild_CVPR_2025_paper.pdf)、[代码](https://github.com/rolpotamias/WiLoR/blob/main/wilor/models/wilor.py) |
 | HaWoR，CVPR2025 | MANO姿态与世界位姿；pose attention处理16×6旋转，shape和camera另头 | [论文§3](https://arxiv.org/html/2501.02973v1)、[forward](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/hawor.py) |
 | HMP，WACV2024 | encoder同时含position、velocity、rotation6D、angular velocity；decoder输出旋转并FK，最终用MANO轨迹恢复视频 | [论文§3](https://openaccess.thecvf.com/content/WACV2024/papers/Duran_HMP_Hand_Motion_Priors_for_Pose_and_Shape_Estimation_From_WACV_2024_paper.pdf)、[generative.py](https://github.com/enesduran/HMP/blob/main/src/nemf/generative.py) |
-| StableHand，2026 | 每手54D：world translation3+wrist rotation6D6+finger axis-angle45；双手108D；shape不拼入动态state | [论文§3](https://arxiv.org/html/2605.18553v1)、[代码](https://github.com/huajian-zeng/stablehand) |
+| StableHand，2026 | flow head预测108D状态空间的velocity，经ODE积分得到双手运动；每手54D为world root translation3+wrist rotation6D6+finger axis-angle45；shape另存，QN另预测四路观测误差再转换quality | [论文§3](https://arxiv.org/html/2605.18553v1)、[代码](https://github.com/huajian-zeng/stablehand) |
 | PAD-Hand，CVPR2026 | 公开demo在16关节Euler48D姿态上扰动/恢复；MeshConv输入原始与当前MANO vertices，pose head预测16×6旋转并MANO解码 | [论文](https://arxiv.org/html/2603.26068v1)、[demo](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/demo.py)、[model](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/models/pad_hand.py) |
 | HandX，CVPR2026 | diffusion双手42joints，每点xyz+rotation scalar；AR288D包含相对腕位置、速度、rot6D、局部关节与旋转补充；数据另存MANO | [论文§5](https://openaccess.thecvf.com/content/CVPR2026/papers/Zhang_HandX_Scaling_Bimanual_Motion_and_Interaction_Generation_CVPR_2026_paper.pdf)、[README](https://github.com/handx-project/HandX) |
 | METRO，CVPR2021 | 直接回归21×3 joints及195×3低分辨率vertices，上采样778vertices；MANO用于模板/拓扑，非最终pose回归 | [官方实现](https://github.com/microsoft/MeshTransformer/blob/main/metro/modeling/bert/modeling_metro.py) |
@@ -33,6 +33,23 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 - 全部16个旋转都用6D时为96；加translation为99，加shape为109。
 
 这些是不同编码和字段范围，均不能直接解释成相应数量的独立人体物理自由度。我们的69D是腕位姿+局部关节坐标候选，而上述多种表示保留关节旋转。
+
+### StableHand专项输出对照（2026-10-13补充）
+
+用户明确要求将 *StableHand: Quality-Aware Flow Matching for World-Space Dual-Hand Motion Estimation from Egocentric Video* 加入对照。下面区分论文v1定义与增强版公开实现，不改变本项目尚未定案的状态表示。
+
+| 输出层级 | StableHand的设计 | 与其他输出的区别 |
+|---|---|---|
+| 最终动态状态 | 每手 `(p_world:3, R_root_6D:6, theta_finger_aa:45)`，共54D；双手序列为 `T×108` | 与HaMeR的 `96 pose+10 shape+3 camera` 统计范围不同，不能按维数比较表达能力 |
+| 单次flow网络输出 | `v_theta(x_tau,tau;conditions)`，与运动状态同维，经ODE积分生成最终状态 | 是生成过程的更新方向，不是一次前向直接输出最终MANO；也不是物理时间上的手部速度 |
+| 质量网络输出 | 每帧左右手wrist/fingers共4个预测几何误差，转换为 `q=exp(-e_hat/sigma_hat)` | wrist组同时涉及平移和旋转；每手所有finger共用一组，不是21个关节各自的confidence |
+| 形状与解码 | beta不在108D flow state内；增强版代码把左右手各10D beta另作条件并保存，MANO解码出mesh/joints | 最终mesh可用不等于flow同时估计了shape；缓存shape来源须在复现时登记 |
+
+论文[§3、Eq.8–11](https://arxiv.org/html/2605.18553v1#S3)中的 `tau` 是flow积分时间，`t` 才是视频帧。quality通过噪声路径、velocity target、AdaLN和初始化影响恢复。其监督目标是**初始观测误差**；不是最终恢复结果误差的重新估计，也不能直接作为本项目最终状态质量 `q` 使用。本项目命名中它更接近观测质量 `w`，粒度和监督仍不相同。论文生成器显式接入图像/场景/相机条件，因此不能把该flow误称为纯轨迹预训练TWM。
+
+固定实现 `0471a45e325ffa167cc6a8484d712a21befd3e47` 的[推理入口](https://github.com/huajian-zeng/stablehand/blob/0471a45e325ffa167cc6a8484d712a21befd3e47/sample/infer_clips.py)在ODE前预测quality并保持其条件，单手实际字段次序为 `root_rot6d, finger_aa45, trans3`。该次序与论文书写 `(p,r,theta)` 不同。该版还使用相对平滑腕轨迹的残差，不能把所有中间tensor都当成已还原的world state。
+
+平移原点也需转换：[tcanon.py](https://github.com/huajian-zeng/stablehand/blob/0471a45e325ffa167cc6a8484d712a21befd3e47/data_loaders/tcanon.py)明确该MANO约定下 `wrist = J0_rest(beta) + trans`，推理FK把trans传给MANO `transl`。因此这里的root translation不能直接复制为69D中的实际wrist xyz；需要按同一MANO实现和shape解码/换算。这也是“同为3D translation仍未形成统一输出接口”的具体例子。
 
 ## MANO模型本身与数据集MANO标签是两件事
 

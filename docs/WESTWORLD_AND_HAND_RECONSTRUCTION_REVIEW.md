@@ -86,6 +86,8 @@ U_t^{(k)}=W_\theta(\mathcal H_t,Z_t,S_t^{(k)},M_t,w_t^{(k)}).
 
 因此，StableHand 是质量引导恢复的直接竞争方法，不能称为纯轨迹生成器。HandLoop 的可检验差别应落到独立 motion-only pretraining、错误 quality 的再判断、变化候选的图像取证和最终状态反馈。
 
+**输出层级补充（用户2026-10-13要求加入对照）。** StableHand的DiT每步直接预测108D运动状态空间的flow velocity，经ODE积分得到最终双手状态；这里velocity是flow时间导数，不是人体在视频时间中的物理速度。QN则预测四路初始观测误差，再转换quality，不能直接解释成最终重建结果的可靠性。shape不在54D/手的动态状态中；增强版代码另读beta作为条件并保存。该实现的MANO translation与解码wrist xyz存在shape相关rest-root偏移，接入69D需正确转换。详见[表示专题中的输出对照与固定源码](../memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md#stablehand专项输出对照2026-10-13补充)。
+
 **StableHand 版本边界。** 官方 `0471a45e325ffa167cc6a8484d712a21befd3e47` 的 [Enhanced 说明](https://github.com/huajian-zeng/stablehand/blob/0471a45e325ffa167cc6a8484d712a21befd3e47/docs/enhanced_version.md)已改 geometry backbone 为 VGGT-Omega，加入 depth cues，预测相对平滑 wrist 轨迹的残差。[推理入口](https://github.com/huajian-zeng/stablehand/blob/0471a45e325ffa167cc6a8484d712a21befd3e47/sample/infer_clips.py)仍在 flow loop 前计算 quality。论文和增强版配置、指标不能混用；[README](https://github.com/huajian-zeng/stablehand/blob/0471a45e325ffa167cc6a8484d712a21befd3e47/README.md)记录 NeurIPS 2026 接收，同时保留训练/预处理发布待办。公开缓存评测路径不等于已复现 raw-video 全流程。
 
 **PAD-Hand，CVPR 2026。** 阅读 [v2 §3、附录 C/E](https://arxiv.org/html/2603.26068v2)，更新日期 2026-03-30。它以真实视觉估计序列为条件，让 forward diffusion 把 GT 移向该估计附近，reverse 恢复姿态；原始与当前候选经 MANO 成 mesh，再用 MeshCNN/Transformer 建模。它不在每步重读 RGB，也不是独立 glove-only 预训练。训练加入 Euler–Lagrange residual likelihood，LLLA 将姿态后验不确定性传播到物理残差；这种 variance 不能直接解释成几何误差可靠性。
