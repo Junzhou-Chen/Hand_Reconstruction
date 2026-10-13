@@ -6,6 +6,7 @@
 
 - [项目记忆入口](MEMORY.md)
 - [完整方法框架](docs/METHOD_FRAMEWORK.md)
+- [主流表示与MANO标注来源](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
 - [现行原始方案](HandLoop_Project/START_HERE.md)
 - [TWM数据集调研](memory/07_TWM_DATASET_SURVEY_2026-10-13.md)
 - [产业数采团队与大规模手部数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)

@@ -16,6 +16,7 @@
 | Git与远程工作方式 | 本地main已推送GitHub；hongfei已clone项目并建忽略的存储目录 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
+| MANO/69D表示与标签来源 | 已核验代表性论文与源码 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；最终编码仍未定，未生成MANO fits |
 | 模型源码、实验依赖、权重、训练数据 | 尚未建立 | 不因Git与SSH配置完成就视为实验已启动 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
@@ -63,6 +64,7 @@
 | O13 | split、指标聚合、序列/world 对齐、阈值、runtime 协议 | 防止指标不可比或 GT 泄漏 |
 | O14 | 远程实验的软件环境、可用GPU、分辨率、FPS及是否严格causal | 已明确hongfei和项目根路径，但未验训练环境；后端反馈不能证明系统在线 |
 | O15 | 最终预训练数据组合与目标评测保留 | 已有来源调研建议；仍需实际schema/质量检查、许可和split，HumanTouch完整上传量尚未核实 |
+| O16 | MANO参数输出与69D关节坐标输出如何取舍 | 文献核验后建议同数据/同corruption比较；mesh需求、骨架一致性、glove接入和拟合误差决定实际收益 |
 
 这些是规格空缺，不是要求现在逐项询问用户。后续实现可先提出小而明确的契约，用数据和 sanity check 决定；会改变核心研究方向的选择应明确说明。
 

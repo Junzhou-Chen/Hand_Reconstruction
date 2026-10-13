@@ -30,6 +30,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 ## 关键方法来源核验
 
+同日新增[表示与MANO标注调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)，核查HaMeR/WiLoR/HaWoR、HMP、StableHand54D、PAD-Hand公开源码及HandX/METRO坐标路线；同时记录DexYCB/HO3D/FreiHAND、marker库与HOT3D标签拟合链。本文较早的“未审实现/未核实”限定到当时范围，后续明确更新如下。
+
 ### HaWoR
 
 [HaWoR 论文](https://arxiv.org/abs/2501.02973)与[官方仓库](https://github.com/ThunderVVV/HaWoR)支持其 camera-space 手重建、camera SLAM/world-space 转换及 motion infilling 的分工。
@@ -44,6 +46,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 2026-10-13回答69D问题时进一步读[视频脚本](https://github.com/ThunderVVV/HaWoR/blob/main/scripts/scripts_test_video/hawor_video.py)、[MANO wrapper](https://github.com/ThunderVVV/HaWoR/blob/main/lib/models/mano_wrapper.py)、[world转换](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/custom_utils.py)。原生按手保存root rotation、15个关节rotation、3D translation、10D shape；wrapper有21点映射（可另加extra regressor）。视频脚本分左右手track，原infiller用`2*(3+10+16*6)=218`维双手表示。故“HaWoR原生单手69D”或“整个HaWoR只处理单手”均不准确；69D是我们经adapter构建的每手状态。world转换显式处理MANO translation与wrist joint offset，直接复制trans为wrist位置不正确。均为源码核验，无数值复现。
 
+进一步查[filling_preprocess](https://github.com/ThunderVVV/HaWoR/blob/main/lib/eval_utils/filling_utils.py)确认逐手canonicalize后拼接两手218输入；但[论文§9](https://arxiv.org/html/2501.02973v1)称各手独立、无交互/不穿透约束。拼接是当前实现事实，不等于证明已学到双手交互；main代码与发表版本事实分开，复现前pin版本。
+
 ### HMP
 
 [原论文](https://arxiv.org/abs/2312.16737)、[作者项目](https://hmp.is.tue.mpg.de/)和[官方代码](https://github.com/enesduran/HMP)对应 WACV 2024。项目说明以 AMASS 学习手部生成运动先验，通过 latent optimization 辅助视频手运动估计。它是“独立 MoCap prior + visual recovery”的已有工作，必须纳入 novelty 分析。未全面审查模型实现或复现效果。
@@ -56,11 +60,15 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 
 核验时仓库标注 NeurIPS 2026，并记录 2026-09-07 发布推理、评测、权重和缓存数据；训练及预处理仍列 TODO。这是 README 发布状态，未审模型源码或验证可运行性，也未据此证明本项目的新颖性。
 
+后续读取[论文§3](https://arxiv.org/html/2605.18553v1)确认每手54D=3trans+6wrist rotation+45finger axis-angle，双手108D；shape不含在该动态state中。未据此复现生成/质量模型。
+
 ### PAD-Hand
 
 准确题名为 **PAD-Hand: Physics-Aware Diffusion for Hand Motion Recovery**，作者 Elkhan Ismayilzada、Yufei Zhang、Zijun Cui。[arXiv 2603.26068](https://arxiv.org/abs/2603.26068)注明 Accepted to CVPR 2026；[论文正文](https://arxiv.org/html/2603.26068v1)描述条件 diffusion、Euler–Lagrange residual virtual observables 与 last-layer Laplace uncertainty。
 
 其 physics-consistency variance 不等同本项目按 GT 几何误差学习的 observation reliability。CVF 条目搜索可见但本次直接抓取失败；官方代码可用性尚未核实。不将题名中的 physics 当作本项目必须添加物理引擎的理由。
+
+后续已找到并审查[官方demo](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/demo.py)和[model](https://github.com/DominoAI-Lab/PAD-Hand-CVPR-2026/blob/main/models/pad_hand.py)：Euler姿态48D扰动、MANO vertices为MeshConv输入、16×6旋转输出；demo在refinement中沿用初始cam_t，不据此认为在恢复world wrist translation。源码存在已核验，模型未运行。
 
 ### WestWorld
 
@@ -75,6 +83,8 @@ Method 建议四节：State Representation and Visual Observations；Trajectory-
 ### HOT3D
 
 [官方项目](https://facebookresearch.github.io/hot3d/)说明 professional optical-marker MoCap 与 UmeTrack/MANO 标注。Aria 有 RGB 流，Quest 3 为双灰度流，所以本项目 RGB 首轮候选应选 Aria。[官方 README](https://github.com/facebookresearch/hot3d)明确其列出的 TEST 被试（P0004、P0005、P0006、P0008、P0016、P0020）没有公开 GT，MANO annotations 另有协议要求。未下载序列验证同步和映射。
+
+新增标注链核验：[官方hand toolkit](https://github.com/facebookresearch/hand_tracking_toolkit#important-notes)说明MANO从UmeTrack求解，整体精度略低，建议用UmeTrack keypoints监督；[论文附录C](https://arxiv.org/html/2411.19167)给出19手marker+personal scan拟合UmeTrack流程。
 
 ### DexCap
 

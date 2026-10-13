@@ -16,6 +16,8 @@
 
 ## 状态几何
 
+69D是本项目提出的坐标候选，尚非最终表示决定。[同日文献核验](10_MANO_REPRESENTATION_AND_ANNOTATION.md)记录了MANO参数/混合特征/直接坐标路线；建议比较MANO输出+joint监督与69D，而不是按维数或“主流”直接判定优劣。下面公式仍描述69D候选的几何语义。
+
 \[
 S_t=(p_t^W,R_t^W,J_t^{local}),\quad J_t^{local}\in\mathbb R^{20\times3}.
 \]

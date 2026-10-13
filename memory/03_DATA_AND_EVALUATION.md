@@ -35,6 +35,8 @@
 
 GT 来源必须按 **joint articulation 与 wrist/global pose** 分开记录，不能一个 `gt_source=glove` 字段掩盖腕部来自 SLAM。设备输出也可能有误差；对 GT 来源和可用性的描述，不等于估计出了传感器误差分布。
 
+MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是直接仪器角度读数。HOT3D官方说明MANO由UmeTrack求解、精度稍低，推荐UmeTrack关键点监督；原始joint/marker与模型解码点应分开保存。joint标签也可经可微MANO loss训练参数输出，不必为每条样本生成MANO角度。详见[标注来源与表示调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)。
+
 ## 当前 schema 的状态
 
 **69D字段满足性（2026-10-13）：** HaWoR和数据不必原生输出69个数；只要能给一致参考系的wrist position/rotation、标准21点与时间信息，就可构造3+6+20×3。69是表示长度，非独立物理DoF。

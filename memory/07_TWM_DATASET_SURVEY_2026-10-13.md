@@ -144,7 +144,7 @@ HUMOTO 的全库时长约 7,875 秒，经过 artist cleanup/retargeting；这支
 - [SHOW3D 数据卡](https://huggingface.co/datasets/facebook/show3d-dataset)与[官方 loader](https://github.com/facebookresearch/show3d)：2026-10-03 hand pose v3 提供 UmeTrack/MANO/MHR，公开训练姿态、test held back，CC BY-NC 4.0。可只取 `hand_pose`、profiles、索引；跨时间 moving frame 不能用一个常量旋转消掉。
 - [DexYCB 官网](https://dex-ycb.github.io/)与[工具字段](https://github.com/NVlabs/dex-ycb-toolkit)：CC BY-NC 4.0，公开119GB总包/按被试分包；`pose_m`为PCA MANO参数，`joint_3d`在camera frame，缺失有零/-1约定，需解码和选单一参考视角。
 - [InterHand 官方](https://mks0601.github.io/InterHand2.6M/)提醒部分序列因导出缺帧低于名义fps；[Re:InterHand](https://mks0601.github.io/ReInterHand/)可独立下载MANO和帧索引、按CC BY-NC 4.0使用。渲染相机或重光照变体不是新运动。
-- [HO-3D 官方仓库](https://github.com/shreyashampali/ho3d)给出下载与2024年发布评测GT的更新；本次未在该README核实明确数据许可，不能因repo公开而默认可任意使用。
+- [HO-3D 官方仓库](https://github.com/shreyashampali/ho3d)给出下载与2024年发布评测GT的更新；后续已核验[Terms of use](https://github.com/shreyashampali/ho3d#terms-of-use)为学术非商业用途并有再分发、修改及商业使用限制，不能因repo公开而默认任意用途。
 
 ## 聚合数据 HandX 的特殊情况
 

@@ -47,6 +47,8 @@
 
 69D/66D 是当前推荐表示，不代表 canonicalizer 已存在。`K=8`、6 层、`d=256`、4 heads、`N=2`、共享迭代权重和约 16 帧 unroll 是起步配置。HOT3D 首轮数据、evidence head 的具体结构、可靠性目标、训练配比和 loss 权重都未实验确定。
 
+用户随后要求检查主流表示与MANO标注。[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)明确69D非通用标准，新增建议为MANO输出+joint输入/监督baseline与69D对照。该建议尚未由用户采纳；最终状态编码仍未定案，主路线D03–D09不因此改变。
+
 HaWoR及本地/远程分工已选定，不再作为开放选型问题；首个数据源、接口规范、远程软件环境和GPU可用性仍需实际检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。

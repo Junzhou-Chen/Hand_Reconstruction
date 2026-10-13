@@ -20,6 +20,8 @@
 
 完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、单手69D、统一TWM输入提案、w/q分工和三阶段训练。统一槽位、残差坐标、初始化和单手共享参数等是明确标注的实现建议，尚未运行。
 
+**同日表示核验：** 69D是本项目坐标状态候选，非行业通用标准。HaMeR/WiLoR/HaWoR等常输出MANO，HMP内部混合运动学特征，StableHand每手54D，HandX/METRO有坐标路线。建议首轮同时考虑MANO输出+joint监督与69D对照，最终表示尚未定案；MANO标签通常拟合得到。[表示与标注调查](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)
+
 ## 快速恢复上下文
 
 | 需要做什么 | 阅读入口 |
@@ -33,6 +35,7 @@
 | 开始下一步工作、查接口缺口 | [进展与下一步](memory/04_STATUS_AND_NEXT_STEPS.md) |
 | GitHub同步、服务器和实验位置 | [开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md) |
 | 数采团队、商业厂商和大规模数据发布 | [产业手部数据补充调查](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md) |
+| 主流表示、MANO标签来源及69D比较 | [表示与标注核验](memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md) |
 | 写 Introduction、定位贡献、引用论文 | [写作与外部核验](memory/05_WRITING_AND_REFERENCES.md) |
 | 回溯原文、检查材料覆盖与版本 | [来源索引](memory/06_SOURCE_INDEX.md) |
 | 了解记忆发生了什么变化 | [变更记录](memory/CHANGELOG.md) |

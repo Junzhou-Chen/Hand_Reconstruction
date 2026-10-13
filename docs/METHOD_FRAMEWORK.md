@@ -45,6 +45,8 @@ flowchart TD
 
 ## 3. 任务输出与统一状态
 
+**表示仍是候选：** 下文展开69D坐标状态方案。[主流方法核验](../memory/10_MANO_REPRESENTATION_AND_ANNOTATION.md)表明MANO输出在接近本项目的重建方法中更常见，54D/99D MANO motion配合joint监督值得作为首轮对照。用户尚未选定最终编码；不因本节写得完整就把69D当行业标准或已验证最优。
+
 单手物理状态定义为：
 
 \[
