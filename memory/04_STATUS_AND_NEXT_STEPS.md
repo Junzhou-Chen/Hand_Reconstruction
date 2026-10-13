@@ -18,6 +18,7 @@
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
 | MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
 | 99D与论文职责核验 | 用户采纳99D；12项论文数据事实已核；v1选库顺序随后被D18/v2替代 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；混合未定，无训练 |
+| v2.1执行归纳 | 建议首轮目标Oak/HOT/UmeTrack/HumanTouch，DexWild可靠local可先接、world待核；授权GRAB/ARCTIC优先 | [当前归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)；不要求全库作为首checkpoint依赖，无固定配比/实现 |
 | 精度比较边界 | 已区分world腕、局部手指与MANO转换；建议更信外部MoCap完整位姿，保留主要glove候选 | [精度判断](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#精度判断工程建议与实测排名分开)；没有同基准8库实测排名 |
 | 八库采集与标注核验 | 已核官方论文/采集说明与固定源码，新增HumanTouch VIVE证据和DexWild world处理路径问题 | [来源报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)；未处理轨迹、未验证标签精度 |
 | 逐库完整适配判定 | 已区分完整字段主候选、待验映射/腕链的glove与局部补充 | [适配判定](../docs/TWM_PRETRAIN_PLAN.md#候选数据的完整适配判定)；没有库完成本项目数值验收 |
@@ -37,7 +38,7 @@
 
 以下是下一阶段计划，不是已经执行的任务。建库和首轮TWM数据调查已完成，随后用户明确GitHub同步与远程实验约定并要求扩查数采团队。尚未创建模型工程或启动完整数据下载、训练；所有后续实验在hongfei执行。
 
-按D18与已定99D，v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
+按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|

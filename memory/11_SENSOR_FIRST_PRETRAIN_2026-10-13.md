@@ -2,6 +2,8 @@
 
 日期：2026-10-13。用户纠正：TWM不需要视觉，选库应重视更准确的手姿态，初始glove/MoCap方向有价值；论文用库作参考，不主导训练池。**已定的是精度优先原则与99D输出；具体混合仍为建议。**
 
+**本轮执行归纳v2.1（建议）：** 首轮目标OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild同步重点验收，可靠local字段过验可早接，world处理版本核清前不当腕GT。GRAB/ARCTIC有授权高优先加入，DexCap小补充。至少一条完整腕＋五指链过验即可开始baseline，不等全部loader；比例仍待同预算验证。[当前归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+
 建议恢复GRAB/ARCTIC/OakInk2/HOT3D的高质量MoCap核心候选，将HumanTouch/DexWild提升为主要glove验收对象；新增公开UmeTrack补自由手势和pinch。按免申请偏好，实际先验收Oak/HOT/UmeTrack与HumanTouch/DexWild，GRAB/ARCTIC有既有授权再接入。没有下载完整数据、做数值标定或训练。
 
 ## 1. 选库依据与优先级

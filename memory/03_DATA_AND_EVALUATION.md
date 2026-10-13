@@ -6,6 +6,8 @@
 
 [八库采集与标注报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)按原测量、标定/拟合、人工/QC、发布参考分层。HumanTouch团队MANUS＋VIVE系统已核，公开episode配置待验；DexWild固定tracker处理代码未显式完成camera-world组合，发布版本需核；它仍是glove候选，不能凭world_abs名直接训练world腕GT。
 
+**当前首轮目标池（v2.1建议）：** OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild可靠local字段可先并入，world链核清前不做腕GT；GRAB/ARCTIC有授权优先加入，DexCap小型补充。首个checkpoint不要求所有库齐备，至少一条完整腕＋五指链通过验收。未固定配比、未实现转换。[归纳表](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+
 **精度工程判断（建议）：** 完整world腕＋手指参考更信校准/质检后的外部多相机MoCap；局部手指分别验marker拟合与EMF glove标定，不能由设备类别严格排序。原生→MANO残差独立报告；HumanTouch/DexWild继续主要候选。没有八库统一GT实测排名。[证据与指标边界](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#精度判断工程建议与实测排名分开)
 
 **已定D15–D18：免申请、每手99D、论文机制参考、传感器姿态精度优先。** 用户本轮纠正v1过度沿视觉论文选库，v2恢复GRAB/ARCTIC/Oak/HOT的MoCap核心候选，新增UmeTrack，HumanTouch/DexWild升主要glove。实际先可公开来源，注册有授权再接；Re/EgoDex降后续视觉标签扩展。混合未定。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)、[传感器精度核验](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)

@@ -58,6 +58,8 @@ HaWoR及本地/远程分工已选定，不再作为开放选型问题；首个�
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 
+**2026-10-13本轮执行归纳仍是建议：** 首轮目标OakInk2/HOT3D有效train/UmeTrack train/HumanTouch，DexWild继续主要候选并先验local/world链，GRAB/ARCTIC有授权优先、DexCap小补充；没有新增用户已定混合或比例。v2.1将采集/精度审计结果落实到接入职责，不更改D18。首个checkpoint不要求四库loader全部就绪。[归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+
 ## 对后续协作有用的偏好
 
 - 用户关心可实施、可解释的完整方法，反对为了概念完整堆叠模块。

@@ -16,6 +16,8 @@
 
 **最新数据原则D18（2026-10-13）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入，混合未定。主候选具备完整任务字段条件；glove需验映射/腕质量，OpenGraph只确认局部补充，尚无本项目适配验收，不将候选全称为“完全适配”。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 
+**当前执行归纳（建议）：** 首轮目标池为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；glove从首轮验收。DexWild仍重点glove候选，可先用经映射的local监督，world链未核清前不当腕GT；GRAB/ARCTIC有授权即优先加入，DexCap小规模补充。第一个checkpoint不等待所有库，至少一条完整腕＋五指链过验即可开始。无固定配比，无转换验收/训练。[v2.1归纳](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
 完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、用户已选单手99D、统一TWM输入、w/q分工和三阶段训练。统一槽位、51D切向残差、初始化和单手共享参数等仍是实现建议，尚未运行。

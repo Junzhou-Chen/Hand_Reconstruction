@@ -1,8 +1,34 @@
 # TWM首轮数据与预训练方案
 
-日期：2026-10-13，v2传感器精度优先。**用户强调TWM无视觉，应重视更准确的手姿态；99D已选，论文用库作参考。** 建议MoCap主候选GRAB/ARCTIC/OakInk2/HOT3D/UmeTrack，主要glove候选HumanTouch/DexWild，小样本DexCap/OpenGraph；访问按免申请偏好执行，具体混合仍建议。尚无完整数据验收、loader或训练。
+日期：2026-10-13，v2.1执行归纳；保留v2传感器精度优先原则。**用户强调TWM无视觉，应重视更准确的手姿态；99D已选，论文用库作参考。** 建议MoCap主候选GRAB/ARCTIC/OakInk2/HOT3D/UmeTrack，主要glove候选HumanTouch/DexWild，小样本DexCap/OpenGraph；访问按免申请偏好执行，具体混合仍建议。尚无完整数据验收、loader或训练。
 
 本次不再只由截图八库决定训练组合。12项相关论文的数据职责、版本与来源见[论文证据表](TWM_DATA_PAPER_EVIDENCE.md)。99D替代原69D默认接口；选定表示不代表已验证训练效果。
+
+## 0. 当前推荐的预训练组合
+
+用户本轮要求重新总结。以下是基于此前论文职责核验、八库采集审计及精度判断的**执行建议，不是新用户采纳的固定混合，也未通过实际adapter验收**。
+
+**首轮目标组合：OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch。** 前三者提供不同动作分布的光学参考，HumanTouch从首轮参与glove接入和混合验证。TWM始终输出每手完整99D，β另存，当前受损状态恢复为主，短预测辅助，不读取图像。
+
+| 层级 | 推荐数据 | 首轮职责与接入条件 |
+|---|---|---|
+| 首轮MoCap核心 | OakInk2 | 复杂双手操作与连续腕/手指参考；公开annotations，按原decoder统一99D，保留native/reference与拟合来源 |
+| 首轮MoCap核心 | HOT3D train | 真实手物操作及world腕；公开Clips可获取，native UmeTrack几何与MANO参数分存；排除benchmark原recordings |
+| 首轮MoCap核心 | UmeTrack独立train | 自由手势、双手互动、pinch；补非抓取运动，真实/合成共享motion去重，converted MANO失败保留mask |
+| 首轮主要glove | HumanTouch | 较大规模自然操作；只取原人体pose/meta，标定25点/rest frame/shape/腕偏移后监督99D。数据累计量不等于质量筛选后净量 |
+| 重点glove验收与扩展 | DexWild raw human | 保持主要glove候选。可靠local finger映射过验后可在首轮加入；camera/world链及发布版本核清前不作为world腕GT |
+| 有授权即高优先加入 | GRAB、ARCTIC | 高质量MoCap来源；已有授权数据即可接入。未取得时不以注册/申请阻塞首轮，不预设已有副本 |
+| 小规模补充 | DexCap raw | 五指glove adapter与姿态补充；SLAM腕单独质检，不使用舍弃小指的LEAP action |
+| 局部备选 | OpenGraph、TCDHands、HandX自采等 | 逐字段/来源验收后补局部或动作分布，不作为首轮全部必做loader |
+| 后续对照/扩展 | DexYCB、Re:InterHand、EgoDex等 | DexYCB可作DIP同数据恢复对照；其余验证视觉来源标签扩展收益，不按格式便利取代可靠sensor参考 |
+
+首轮目标池不要求第一个checkpoint等四库凑齐：至少一条完整腕＋五指连续参考链通过验收即可建立baseline；glove同步验收，过验即加入。DexWild没有被因非MANO降级，本轮约束来自已核到的world处理路径问题。尚不能把任何候选标为本项目完全适配。
+
+所有来源先按subject/session/original recording划分再切窗；沿后文HOT/Oak/UmeTrack约束，glove保留校准、插值、有效性和原始timestamp。已有MANO用参数＋几何监督；raw joints/方向用解码几何与可用旋转loss，缺world腕不补造GT。
+
+混合比例不预设：按来源和独立有效轨迹采样，避免HumanTouch累计帧量直接压倒其它参考。以匹配预算的marker-only、marker＋glove及适用字段下的glove-only比较joint/wrist误差和干净输入退化，再确定比例。以上仍是待验证训练方案。
+
+与v2关系：保留glove/MoCap主导与全部科学候选；将实际公开首轮目标明确为四库，并对DexWild world监督加验收门槛。v1按论文频率/参数便利优先视觉来源的顺序仍被D18替代。[采集/精度证据](DATASET_CAPTURE_AND_ANNOTATION.md)、[论文职责依据](TWM_DATA_PAPER_EVIDENCE.md)
 
 ## 1. 截图的数据用途先核对清楚
 
@@ -61,7 +87,7 @@
 
 **当前可执行的第一批应同时考虑marker和glove。** Oak/HOT/UmeTrack建立native→99D桥接，HumanTouch/DexWild建立raw人体骨架→MANO几何监督；DexCap/OpenGraph小样本辅助映射。通过哪条链就先训练，不等所有库；glove不再默认等native核心训练完才调查。matched-budget比较marker-only、marker＋glove与glove-only可监督范围。
 
-HumanTouch本轮核实HF公开免申请、[ModelScope许可CC BY-NC4.0](https://modelscope.cn/datasets/chuqiaoLyu/Xspark-HumanTouch/summary)，parquet/meta可单取；十份meta累计约132.75h是声明fps推算，非去重/QC净量。DexWild公开human 7,917episodes，包混装、world腕关系和已有平滑需验收；其局部手指与global腕分别赋监督mask/质量。没有同基准标签误差证据时不声称glove优于所有marker数据。
+HumanTouch本轮核实HF公开免申请、[ModelScope许可CC BY-NC4.0](https://modelscope.cn/datasets/chuqiaoLyu/Xspark-HumanTouch/summary)，parquet/meta可单取；十份meta累计约132.75h是声明fps推算，非去重/QC净量。DexWild公开human 7,917episodes，包混装、world腕关系和已有平滑需验收；固定代码路径未显式组合ZED world，发布版本核清前不作为world腕GT；其局部手指与global腕分别赋监督mask/质量。没有同基准标签误差证据时不声称glove优于所有marker数据。
 
 ### 获取与划分保持可审计
 
