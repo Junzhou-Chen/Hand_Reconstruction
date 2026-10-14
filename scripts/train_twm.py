@@ -275,12 +275,14 @@ def main():
     print(json.dumps({'step':start_step,'validation':initial}),flush=True)
     save(start_step)
     model.train(); iterator=iter(loader); start=time.monotonic(); rolling=[]; latest_val=initial
+    sampled_counts=torch.zeros(len(train.dataset_names),device=device,dtype=torch.long)
     step=start_step
     with (args.output/'metrics.jsonl').open('a',buffering=1) as stream:
         while step<config['steps'] and not stop['requested']:
             try: batch=next(iterator)
             except StopIteration: iterator=iter(loader); batch=next(iterator)
             batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
+            sampled_counts+=torch.bincount(batch['dataset_id'],minlength=len(train.dataset_names))
             history,raw,candidate,kwargs,target,future=sample_batch(batch,generator)
             step+=1
             if step<=config['warmup_steps']: multiplier=step/config['warmup_steps']
@@ -303,7 +305,8 @@ def main():
                        'grad_norm':float(grad),'lr':optimizer.param_groups[0]['lr'],
                        'elapsed_seconds':round(time.monotonic()-start,1),
                        'steps_per_second':(step-start_step)/max(1e-6,time.monotonic()-start),
-                       'gpu_memory_gb':torch.cuda.max_memory_allocated()/1e9}
+                       'gpu_memory_gb':torch.cuda.max_memory_allocated()/1e9,
+                       'samples_by_dataset':dict(zip(train.dataset_names,sampled_counts.cpu().tolist()))}
                 stream.write(json.dumps(event)+'\n'); print(json.dumps(event),flush=True)
                 atomic_json(args.output/'status.json',event); rolling=[]
             if step%config['eval_every']==0:
