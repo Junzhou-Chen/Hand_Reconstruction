@@ -14,26 +14,28 @@
 | 部分第三方论文/源码核验 | 本次完成只读核验 | [写作与外部核验](05_WRITING_AND_REFERENCES.md) |
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
 | Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；D23训练后由D24暂停 |
-| 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；随后Oak子集99D转换完成，其余未转换 |
+| 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；D26推进全量99D准备，不重下载 |
 | DexYCB / ARCTIC获取 | Dex13包127.61GB已complete，全verified/failed0；D22 ARCTIC暂缓 | [完成与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；ARCTIC保留清单、无数据包下载 |
-| 四库实际标注与TWM适用检查 | 样本字段可作为TWM监督来源；Meta PCA15、Dex PCA45、Oak quaternion16已核，时间/mask/split待统一 | [远程抽查](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)；代码056122f、3Oak/4HOT/4Ume/6Dex；无FK或训练结论 |
+| 四库实际标注与TWM适用检查 | 字段抽查后已完成Meta官方18帧decoder等价、Dex左右各6帧与bounded train/val FK对照、Oak full每序列32帧编码FK往返；真实四库3步smoke finite | [审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)、[adapter摘要](../reports/twm_four_source_adapters_20261014.json)；实现一致性不是独立GT精度，正式四库训练未启动 |
+| D26四库全量准备 | Oak已complete：431 train/39 val录制、940手序列，状态1,414,552/113,382；Dex当前8/10，HOT/Ume full_v3 NPZ进行中 | [四库协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)；完整collection统计与正式启动待核，不把pending manifest写成已完成 |
+| 合法MANO资产与shape约定 | 用户自行官网注册、确认许可并授权下载；原始/派生模型SHA与数值兼容通过。跨源左手shape约定审计已发现差异，本轮工程配置关闭β conditioning | [资产/adapter摘要](../reports/twm_four_source_adapters_20261014.json)；β及真实validity仍另存，99D动态状态不变，不是用户指定永久关闭 |
 | HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注；D23只实施纯轨迹部分 | [完整框架](../docs/METHOD_FRAMEWORK.md)；完整视觉闭环仍未实现 |
 | TWM直接校正架构讨论 | 按用户质疑独立C的瓶颈，形成统一99D恢复、真实误差适配及数值几何取证方案 | [讨论与对照](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)；待用户调整，未替代现行视觉架构；D23仅先跑pretrain |
 | TWM物理数学保证与验证 | 已核WestWorld/OneWorld与Hamiltonian/Lagrangian/硬约束论文，写出条件性证明及独立验证协议 | [数学与验证方案](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md)；未选定额外模块或实现/实测 |
-| MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
-| 99D与论文职责核验 | 用户采纳99D；12项论文数据事实已核；v1选库顺序随后被D18/v2替代 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；混合未定，无训练 |
-| v2.1执行归纳 | 建议首轮目标Oak/HOT/UmeTrack/HumanTouch，DexWild可靠local可先接、world待核；授权GRAB/ARCTIC优先 | [当前归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)；不要求全库作为首checkpoint依赖，无固定配比/实现 |
+| MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；D26源adapter已有有限范围验收，HaWoR adapter未验，未生成新fits |
+| 99D与论文职责核验 | 用户采纳99D；12项论文数据事实已核；v1选库顺序随后被D18/v2替代，D26已定本轮四库联合执行 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；采样比例为工程起点，非论文结论 |
+| v2.1后续数据建议 | 原建议Oak/HOT/UmeTrack/HumanTouch，DexWild可靠local可先接、world待核；当前执行已由D26选四库 | [历史归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)；glove优先原则保留，ARCTIC按D22暂缓 |
 | 精度比较边界 | 已区分world腕、局部手指与MANO转换；建议更信外部MoCap完整位姿，保留主要glove候选 | [精度判断](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#精度判断工程建议与实测排名分开)；没有同基准8库实测排名 |
 | 八库采集与标注核验 | 已核官方论文/采集说明与固定源码，新增HumanTouch VIVE证据和DexWild world处理路径问题 | [来源报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)；未处理轨迹、未验证标签精度 |
-| 逐库完整适配判定 | 已区分完整字段主候选、待验映射/腕链的glove与局部补充 | [适配判定](../docs/TWM_PRETRAIN_PLAN.md#候选数据的完整适配判定)；D23 Oak子集完成codec/SO(3)数值验收，完整FK与其它库未验 |
+| 逐库完整适配判定 | 已区分完整字段主候选、待验映射/腕链的glove与局部补充；当前full-state trainer只接完整17组参考mask | [适配判定](../docs/TWM_PRETRAIN_PLAN.md#候选数据的完整适配判定)；D26四库adapter/loader已有检查，全库最终验收与独立GT质量仍待补 |
 | TWM完整99D输出 | 用户再次明确每手完整99D主输出；已区分统一输出、完整模型参考与部分几何监督 | [输出契约](../docs/TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)；D23 Oak99D转换与首轮训练已实现 |
 | 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；D23已用zhou在GPU0训练TWM |
 | 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；旧run按D24暂停28,213步；D25新6.33M结构化Mamba实现并正常完成50k | [新模型最终记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)；新378deda/旧4cb1da8，checkpoint仅data10 |
 | anchor codec、HaWoR adapter、TWM、Corrector | Oak quaternion→99D、受损历史anchor与TWM已有pilot实现；HaWoR adapter/独立Corrector/视觉取证未实现 | [训练入口](../scripts/train_twm.py)、[模型](../src/handloop/models/twm.py)；不存在完整视觉闭环结果 |
-| 实验和性能、投稿和录用 | 已有Oak合成受损恢复中途实测，完整方法/论文尚未完成 | [记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)同时报告clean退化；不当真实HaWoR收益 |
+| 实验和性能、投稿和录用 | 已有D25 Oak合成受损恢复50k最终结果；D26只有3步工程smoke，完整方法/论文尚未完成 | [D25结果](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)同时报告clean退化；不当真实HaWoR或四库收益 |
 
 ## 第一项可反驳问题
 
@@ -43,15 +45,37 @@
 
 ## 推荐执行顺序与交付条件
 
-D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/腕/单位/名义时间与99D codec，在官方64train/8val录制子集完成准备，并以4cb1da8在ds现有Pod计划训练50,000步。09:05 UTC核实step7275存活，best/latest已保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，同时clean退化4.551mm/1.642°。09:10 UTC再次核实step17425 alive；step17000 noisy腕7.825mm/finger1.635°，clean3.753mm/1.073°，checkpoint持续保存。详见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。随后D24在09:16UTC主动暂停：进程退出，latest28,213/best27,500均可读；数学继续暂缓，先梳理WestWorld架构与参数理由且保持任务接口。D25随后明确授权按参考方案重做并跑起：新Mamba主干、独立兼容runtime、12项数值检查和3步真实数据smoke通过；378deda于09:47UTC后台启动新run，纽约08:57正常完成50k；latest50k/best49.5k可读且finite，最终noisy腕4.594mm/finger1.254°、clean1.276mm/0.500°，旧run不恢复。[新运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。这仅完成P0/P2部分工作，无MANO FK/真实视觉效果。四库原包complete、D22 ARCTIC暂缓；所有实验远程执行。
+D23先跑Oak64 train/8 val子集，D24主动暂停旧flat于28,213步，best27,500保留；D25结构化Mamba以378deda在纽约08:57正常完成50k，latest50k/best49.5k可读且finite。最终合成noisy腕4.594mm/finger1.254°、clean退化1.276mm/0.500°，仅参考历史＋合成错误恢复；旧run不恢复。[D25最终记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
 
-按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。目标混合仍未实施；D23先跑Oak单库子集，不改变该建议职责。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
+**当前执行是D26四库联合预训练。** 用户已明确Oak/HOT/Ume/Dex联合，并完成MANO官网注册/许可确认与下载授权。结构化Mamba、99D当前恢复主任务、β另存不变。最新已提交源码a9342a8；全量数据准备尚未全部完成，正式四库训练未启动。库间等概率、库内窗口均匀、分库固定验证与宏平均是工程起点，不能据此称最优混合。当前trainer要求完整17组参考GT，native/raw joints未补造成完整99D。
+
+已验收的事实与范围：
+
+- Meta官方decoder18个状态的mesh/joints/full pose等价，99D FK最大差1.19e-7 m；Dex左右各6帧、bounded train/val的21点检查通过，最大差约1.50e-7 m。它们验证PCA/mean/左右手资产/单位/腕位置的一致性，非native或独立MoCap精度。详见[adapter摘要](../reports/twm_four_source_adapters_20261014.json)。
+- loader 9项远程检查通过；collection叶manifest SHA正确时可读、改变leaf后拒绝。Pod `RLIMIT_NOFILE` soft/hard均1,048,576；当时两个Dataset cache各256序列×5 maps的实际FD probe为4→2,564→4。该probe不等于后续新缓存配置的完整性能验收。
+- 真实四库3步smoke代码2913f28，loss/梯度有限；24个训练样本Dex3/HOT6/Oak9/Ume6，仅证明混合数据流可运行，不作为精度结果。receipt位于下表路径。
+- Oak full已complete：431 train/39 val录制，共940单手序列；train/val状态1,414,552/113,382。每序列32帧共30,080帧，FK往返最大joint1.49e-7 m、mesh1.88e-7 m。源quat与保存99D经同一MANO实现对照，不是独立source decoder或独立传感器GT验证。
+- 本快照Dex进度8/10仍活跃，HOT/Ume正准备full_v3 NPZ；未记录它们全量完成。Meta NPY输出瓶颈后进行了lossless NPZ局部保存试验，约9.2×只限该局部测试，不代表全管线速度；Oak改8 workers另建full_v2，旧full_v1部分产物保留。
+
+远程共同根目录为 `/sciclone/data10/jchen57/Hand_Reconstruction`：
+
+| 产物 | 根目录下相对路径与状态 |
+|---|---|
+| Oak full | `prepared/oakink2_99d_full_v2/manifest.json`，已complete |
+| HOT/Ume full | `prepared/hot3d_99d_full_v3/manifest.json`、`prepared/umetrack_99d_full_v3/manifest.json`，目标路径，准备中 |
+| Dex full | `prepared/dexycb_99d_full_v1/manifest.json`，目标路径，准备中 |
+| 四库smoke | `runs/twm_four_sources_smoke_20261014`；`audits/four_source_smoke_20261014/receipt.json` |
+| β约定审计 | `audits/beta_convention_20261014/receipt.json` |
+
+**β conditioning的工程决定：** zero＋7组实际β，左右手/两种pose的审计显示同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm；right/zeroβ差0，full-pose旋转参数差0。Meta左shapedirs修复与Dex/Oak原始约定没有统一shape语义，root据此将本轮`condition_on_beta=false`，模型输入`beta_valid=false`；保存的源β及真实validity不改，99D动态GT不改。此为工程选择，不是用户要求永久移除shape条件；开启前须明确adapter并做消融，正式启动的最终配置/SHA另行记录。
+
+下一步是等待当前全量准备完成、验证四库collection/GT masks/划分与统计，然后以独立目录正式启动并核保存及训练步数；不得把3步smoke或D25的50k称为D26正式训练。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代当前单库执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
-| P0 传感器split与状态契约 | MoCap原录制/split，glove source/session与标定；ds Pod验native→99D及raw joint几何桥接 | 字段/形态/单位/dt、MANO转换残差、腕/finger质量来源与mask；不等全部loader |
+| P0 传感器split与状态契约 | 完成D26四库full转换/collection最终验收；后续glove source/session与native/raw joint几何桥接 | 分组split、单位/dt、源解码/FK残差、完整GT mask与provenance；不混淆roundtrip和独立精度 |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
-| P2 纯轨迹恢复 baseline | 旧pilot按D24暂停；D25新结构化Mamba已完成50k，current restoration主任务＋0.1s短预测；无真实前端误差/自身rollout | 已有固定clean/noisy/missing验证及candidate baseline；FK/完整val/GRU与temporal对照待补 |
+| P2 纯轨迹恢复 baseline | D25已完成50k；D26四库正式run待full验收后启动，current restoration主任务＋0.1s短预测 | 分库clean/noisy/missing、宏平均与candidate baseline；真实前端误差/自身rollout、GRU等公平对照待补 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
 | P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
 | P5 时间反馈训练 | 最终状态与质量一次回灌，短序列自身输出 rollout | feedback/no-feedback 与 rollout/no-rollout；再可见恢复、突发动作、误差累积 |
@@ -77,8 +101,8 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 | O12 | rollout 的 teacher forcing schedule、detach/截断反传和微调策略 | 决定模型是否适应自身误差及训练成本 |
 | O13 | split、指标聚合、序列/world 对齐、阈值、runtime 协议 | 防止指标不可比或 GT 泄漏 |
 | O14 | 远程实验的软件环境、可用GPU、分辨率、FPS及是否严格causal | ds Pod/zhou完整模型检查及持久checkpoint已落实；resume实测和未来Job续跑待验；pilot causal不证明整条视觉系统在线 |
-| O15 | 最终预训练数据组合与目标评测保留 | 已有来源调研建议；仍需实际schema/质量检查、许可和split，HumanTouch完整上传量尚未核实 |
-| O16 | 已选99D的adapter、β与异构监督契约 | 表示选择已关闭；Oak完整参数codec与51D内部更新已有实现；其它源mean/root offset、shape估计与native/joint-only部分监督尚待验收 |
+| O15 | D26四库联合的完整验收、目标评测保留与后续glove接入 | 本轮四库已定；等库比例为工程假设，跨库去重/独立质量、HumanTouch有效规模与映射仍待核 |
+| O16 | 已选99D的adapter、β与异构监督契约 | 四库源mean/root offset已有有限验收，root据shape差异关闭本轮β conditioning但保留源β；HaWoR adapter、统一shape与native/joint-only监督待验 |
 
 这些是规格空缺，不是要求现在逐项询问用户。后续实现可先提出小而明确的契约，用数据和 sanity check 决定；会改变核心研究方向的选择应明确说明。
 
@@ -86,7 +110,7 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 
 2026-10-13完成[WestWorld与视觉手重建方法精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)，含原论文方法/附录及关键源码。DIP补入直接条件恢复基线；DIR/WiLoR/GeoHand补入视觉迭代前作。确认HaWoR非因果及missing-only infiller、HMP局部prior、StableHand增强版差异和W/WA对齐口径。仅更新文献事实与实验约束，未改用户主线、运行模型或新增性能结果。
 
-2026-10-13已补充核验HaWoR原生MANO字段与双手infiller，澄清69D/66D为编码长度；字段层面有可转换的公开数据。下一步应做adapter roundtrip及实际样本检查，尚不能将所有数据标为“69D验收通过”。
+2026-10-13已核HaWoR原生MANO字段与双手infiller；D16后现行输出是99D。D26已有Oak/Meta/Dex源adapter与FK一致性检查；HaWoR adapter和跨源独立几何精度仍需验证，不能把本轮检查扩大为全部数据质量通过。
 
 - **收益只是平滑。** 用 true geometric error、快速动作和准确点退化测量。
 - **自我确认。** 原始 `Z` 固定；取证必须来自图像；mask 不冒充可靠性。
@@ -98,4 +122,4 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md和docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md。D25授权参考WestWorld架构重做并跑起；378deda的新6×256结构化Mamba主干、隔离Torch2.10/cu130环境、12项GPU检查与Oak3步smoke已通过，新run纽约08:57已正常完成50k，latest50k/best49.5k可读且finite。默认status指向新run，complete/进程退出属于正常完成，不自动重启；先查看final JSON和clean退化，再按用户任务做真实误差或rollout验证。旧flat run保持stopped28,213，权重保留且不恢复。四库不重下载，FK/真实HaWoR/自身rollout未验，数学暂后；代码/小摘要Git同步，权重/环境/raw logs仅data10。
+> 先读MEMORY.md、docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md与本文件D26快照。D25 Oak结构化Mamba50k已正常完成，旧flat stopped28,213，两个run/权重均保留且不自动重启。D26用户已授权Oak/HOT/Ume/Dex联合预训练，合法MANO已取得；adapter/loader/hash/FD与真实3步四库smoke通过，正式四库训练尚未启动。Oak full_v2已complete（431/39录制，940手序列），Dex8/10、HOT/Ume full_v3 NPZ仍在准备，先只读查现有任务，不重启。root因实际shape约定审计选择本轮关闭β conditioning，源β与99D不变；最终code/config/完整统计与启动须回查真实receipt。数据/资产/权重/raw logs仅远程data10，代码/小摘要同步Git；D18精度优先及D22 ARCTIC暂缓仍有效。

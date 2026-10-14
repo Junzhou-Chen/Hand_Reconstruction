@@ -24,9 +24,9 @@
 | 当前大数据目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/datasets`，D20已建立三库子目录；其他产物以后按用途分目录 |
 | 原hongfei checkout | `/data/hongfei/zhou/Hand_Reconstruction`保留备用，不再是当前唯一入口 |
 
-训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20已建立ds本项目checkout并启动数据获取；没有创建/删除Job、改旧项目、安装依赖或训练。
+训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20建立checkout与数据获取；之后D23/D25已运行模型，D26正在四库准备。本项目没有创建/删除用户Job或修改旧项目；新增依赖与数据均按下文隔离保存。
 
-用户home和data10为Pod持久NFS挂载，`/dev/shm`为64Gi临时内存盘；scr清理政策及个人存储配额未核，不当永久唯一存储。Pod默认Python不等于zhou：默认Torch2.6/cu126在Blackwell上tiny CUDA失败，现有zhou Torch2.12/cu130两卡均通过。正式TWM依赖仍待验；不改旧项目环境/数据。
+用户home和data10为Pod持久NFS挂载，`/dev/shm`为64Gi临时内存盘；scr清理政策及个人存储配额未核，不当永久唯一存储。Pod默认Python不等于zhou：默认Torch2.6/cu126在Blackwell上tiny CUDA失败，现有zhou Torch2.12/cu130两卡均通过；D25起项目官方Mamba使用独立Torch2.10/cu130 runtime且已验。不改旧项目环境/数据。
 
 当前Job从2026-10-12 16:37:28 UTC起最多3天，按配置约10-15 16:37 UTC到期，需checkpoint持久化与续跑；退出exec不释放GPU。本轮复用用户现有Job，不按旧模板自动删除它。未来另建本项目Job时使用独立名称、label与本项目配置。
 
@@ -82,3 +82,29 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 378deda47b123d64546404bf9780c19bcc48bb31于09:47:50UTC在既有Pod/GPU0启动新run PID1276，默认helper已指向新config/Python/output，旧run查询需显式output。新run数据路径与checkpoint细节见[运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
 
 D25完成核验：12:57:17UTC（纽约08:57）phase=complete50000，进程正常退出，耗时约3h9m。latest50k/best49.5k只读加载成功，SHA378deda、权重finite，100次val/2000training日志未发现非有限或OOM/Traceback。completion_audit.json保存在新run目录，Git仅同步curated final JSON和文档；未重启、延长训练或删除用户Job。
+
+## D26 四库准备、合法资产与独立smoke
+
+2026-10-14用户授权OakInk2/HOT3D/UmeTrack/DexYCB联合预训练，保留结构化Mamba与纯轨迹99D当前恢复。用户自行完成MANO官网注册、登录和非商业研究许可确认后授权下载；官方ZIP SHA256为`50976831790ea9657d8110e0c94e50e90eaf35cd76169f0b27e5d32f3fcd951f`，传到Pod后核一致。原始左右模型/三份license保留，NumPy/SciPy派生转换保持9个必要数值字段值与dtype不变；新进程验证无需Chumpy。受许可模型不进Git。资产及有限adapter来源见[报告](../reports/twm_four_source_adapters_20261014.json)。
+
+沿用现有Pod和项目runtime `/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python`。新增smplx0.1.28、SciPy1.17.1、Chumpy0.70、six1.17.0均在项目runtime；Chumpy仅旧pickle转换兼容桥使用，未修改zhou。当前已提交源码a9342a8；后续β/config工程变更和正式启动须记录最终实际SHA，不能将它追溯写入早期smoke。
+
+远程共同根目录为 `/sciclone/data10/jchen57/Hand_Reconstruction`，源码仍在 `/sciclone/home/jchen57/project/Hand_Reconstruction`。以下相对路径均在该data10项目根下：
+
+| 产物 | 路径/当前状态 |
+|---|---|
+| 合法原始ZIP | `model_assets/mano_v1_2/mano_v1_2.zip` |
+| 原始/派生MANO与provenance | `model_assets/mano_v1_2/prepared_v1/{raw,derived}`、`model_assets/mano_v1_2/prepared_v1/provenance.json` |
+| Oak full | `prepared/oakink2_99d_full_v2/manifest.json`；已complete，full_v1部分产物保留 |
+| HOT/Ume full | `prepared/hot3d_99d_full_v3/manifest.json`、`prepared/umetrack_99d_full_v3/manifest.json`；NPZ准备中，目标manifest未当已完成 |
+| Dex full | `prepared/dexycb_99d_full_v1/manifest.json`；进度8/10活跃，manifest尚pending |
+| 真实四库smoke | `runs/twm_four_sources_smoke_20261014`、`audits/four_source_smoke_20261014/receipt.json`；2913f28，3步已通过 |
+| β convention审计 | `audits/beta_convention_20261014/receipt.json`；已通过约定差异检查 |
+
+已完成Meta官方decoder18帧等价、Dex左右各6帧及bounded train/val几何一致性检查；9项loader验收也通过。13ba665补collection叶manifest SHA防变更、resume config/manifest一致性与未知sampling拒绝。远程临时CPU检查确认leaf hash正确可读、改变leaf即拒绝；`RLIMIT_NOFILE` soft/hard均1,048,576，两个Dataset cache各256序列×5 mmap的实测FD为4→2,564→4。这是当时缓存上限的资源探针，新缓存配置/NPZ实际吞吐另验；没有运行模型或触碰真实数据来做该探针。
+
+2913f28的真实四库3步GPU smoke loss/梯度有限，24个训练样本Dex3/HOT6/Oak9/Ume6；不是正式50k run或精度结论。Oak full改为8 workers重建full_v2，已完成431 train/39 val录制、940手序列，状态1,414,552/113,382；32帧/序列共30,080帧FK往返joint最大1.49e-7 m、mesh1.88e-7 m，只是同源实现/codec一致性。Meta原NPY写入出现性能瓶颈，改做lossless NPZ的full_v3；局部保存约9.2×不推断为全量端到端加速。
+
+β审计使用zero＋7组实际β、左右手和两种pose：同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm；right/zeroβ及full-pose旋转参数差均0。root选择本轮`condition_on_beta=false`（输入`beta_valid=false`），原始β及真实validity继续保存；未统一shape语义，99D动态状态不变。此是工程配置选择而非用户永久架构决定，未来开启需额外适配和消融。
+
+**本快照正式四库训练尚未启动。** 先完成现有准备进程与四库collection最终统计/验收，再记录真实启动SHA/config/PID、首批训练与checkpoint；不重启已有转换、不覆盖v1/旧pilot，不把D25的50k挪作D26结果。D22 ARCTIC继续暂缓，D18 glove/MoCap优先不变。resume保存主要RNG/optimizer等状态且核协议/manifest一致，但sampler预取chunk/loader游标未完整保存，不宣称逐样本精确续跑。详见[四库协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)。

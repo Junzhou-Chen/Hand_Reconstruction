@@ -221,6 +221,17 @@
 - 末步合成noisy腕49.090→4.594mm、finger15.421→1.254°；missing腕37.637→4.411mm；clean退化1.276mm/0.440°/0.500°同报。腕20k后趋稳；仅固定相关val窗口/参考历史恢复，不称真实HaWoR或架构优越。
 - 新增[小型final JSON](../reports/twm_structured_mamba_20261014_final.json)，更新运行记录/入口/README/数据/状态/开发；best49.5k结果与末步区分，原completion_audit与权重只在data10。
 
+## 2026-10-14 D26四库联合授权、合法MANO与准备验收
+
+- 用户要求将已下载OakInk2/HOT3D/UmeTrack/DexYCB统一预训练，登记D26；替代单库作为当前执行范围，保留D25已完成50k和D24旧flat暂停记录，不覆盖原始档案。D18 glove/MoCap精度优先、99D＋β另存与D22 ARCTIC暂缓不变。
+- 用户自行官网注册、登录并确认MANO非商业研究许可后授权下载；官方v1.2 ZIP本机/远程SHA一致。原始模型与license保留，派生NumPy/SciPy转换数值/dtype与无Chumpy加载检查通过。资产/数据不进Git，[有限adapter摘要](../reports/twm_four_source_adapters_20261014.json)仅记录可审计小型结果。
+- Meta官方decoder18帧mesh/joints/full pose等价、99D FK最大差1.19e-7 m；Dex左右各6帧及bounded train/val检查通过（21点最大约1.50e-7 m）。这些是源实现、PCA/mean/腕中心/单位与编码一致性，不是独立native/MoCap精度；真实缺标签未补作完整GT。
+- lazy loader、source-balanced sampler、分库固定验证、完整GT fail-closed等9项远程检查通过。13ba665增加resume config/manifest一致性、未知sampling拒绝和leaf hash核验；临时远程测试hash正确pass、修改leaf后fail。FD probe 4→2,564→4，Pod soft/hard限制均1,048,576；范围是当时双cache各256序列×5 maps，不替代新配置吞吐测试。
+- 真实四库3步smoke源码2913f28，loss/梯度有限，样本Dex3/HOT6/Oak9/Ume6；receipt位于data10项目根`audits/four_source_smoke_20261014/receipt.json`，run为`runs/twm_four_sources_smoke_20261014`。仅为工程smoke，未正式启动四库训练，最新已提交源码a9342a8。
+- Oak改8 workers另建`prepared/oakink2_99d_full_v2`，旧v1部分保留；full_v2已complete431 train/39 val录制、940手序列，状态1,414,552/113,382。每序列32帧共30,080帧FK往返最大joint1.49e-7 m/mesh1.88e-7 m，同一MANO实现对照，非独立source验证。Dex full_v1当前8/10活跃；Meta HOT/Ume full_v3 NPZ进行中，全量统计/collection和正式启动待后续记录。
+- 记录Meta NPY保存性能瓶颈与lossless NPZ局部约9.2×结果，明确非端到端吞吐。实际β审计zero＋7组源β/两侧两pose显示左手同腕joint差3.74–19.81mm、mesh差5.60–24.28mm，right/zeroβ与full-pose旋转参数差0；root工程选择本轮`condition_on_beta=false`，输入mask关闭，源β及真实validity仍存。未统一shape语义，未来开启需适配/消融，不升级为用户永久架构决定。
+- 本次只更新MEMORY及决定、进展、变更、开发五份记忆；正式启动、最终源码SHA和四库完整统计由后续真实记录补充。没有重启转换或新增模型实验。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。
