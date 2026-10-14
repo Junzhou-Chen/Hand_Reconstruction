@@ -80,6 +80,7 @@ secrets*.json
 *.7z
 *.rar
 *.part_*
+*.part
 *.partial
 *.corrupt-*
 *.mp4
