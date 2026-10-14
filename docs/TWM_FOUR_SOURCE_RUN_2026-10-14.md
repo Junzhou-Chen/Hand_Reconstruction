@@ -1,6 +1,6 @@
 # 四库联合 TWM 预训练
 
-日期：2026-10-14。用户要求把已经下载的 OakInk2、HOT3D、UmeTrack、DexYCB 统一训练；这是 D25 单库结构化 Mamba pilot 之后的新实验。当前本文先记录执行协议，实际验收和启动状态将在远程检查后补充。
+日期：2026-10-14。用户要求把已经下载的 OakInk2、HOT3D、UmeTrack、DexYCB 统一训练；这是 D25 单库结构化 Mamba pilot 之后的新实验。四库真实样本适配与混合 smoke 已通过；全量准备仍在进行，正式启动状态将在远程检查后补充。
 
 保留纯轨迹输入、当前受损状态恢复主任务、0.1 秒预测辅助和每手 99D＋独立 beta10。结构沿用 6 blocks、d256、同帧关节 attention/FFN、逐关节官方 Mamba，以及 MANO 树 embedding。联合 run 从头初始化，旧 Oak 两次 pilot 与 checkpoint 保留。代码入口为 [train_twm.py](../scripts/train_twm.py)，配置 [twm_four_sources_structured_mamba.json](../config/twm_four_sources_structured_mamba.json)。
 
@@ -15,7 +15,9 @@
 
 HOT/Ume 的内部验证划分是本轮工程选择，并非官方测试集。分组在任何 bounded sample 截断前建立；seed20261014。跨库原始动作去重尚未建立，不宣称各库之间完全独立。每个训练样本使用上一已完成腕状态构建固定局部 anchor，从各源固定参考系转换；这不恢复 SLAM gauge 或未知相机运动。
 
-转换入口：[Oak](../scripts/prepare_oakink2_twm.py)、[Meta](../scripts/prepare_meta_twm.py)、[Dex](../scripts/prepare_dexycb_twm.py)、[collection](../scripts/prepare_twm_collection.py)。状态以 NPY 目录存储，实现真实 mmap；loader 按序列 lazy 加载、检查 recording split、保留时间 gap。完整 17 组 MANO GT 才进入本轮 full-state trainer；raw joints 和不完整标签没有被拟合/补造为完整 99D。
+转换入口：[Oak](../scripts/prepare_oakink2_twm.py)、[Meta](../scripts/prepare_meta_twm.py)、[Dex](../scripts/prepare_dexycb_twm.py)、[collection](../scripts/prepare_twm_collection.py)。Oak/Dex 用 NPY 目录、真实 mmap；HOT/Ume 改用每手一个未压缩 NPZ，按需加载到有限 LRU。NPZ 不冒称 mmap。loader 按序列 lazy 加载、检查 recording split、保留时间 gap。完整 17 组 MANO GT 才进入本轮 full-state trainer；raw joints 和不完整标签没有被拟合/补造为完整 99D。
+
+**Shape conditioning 的本轮工程处理：** 源 beta10/有效性/decoder provenance 全部保留；`condition_on_beta=false` 仅将模型 kwargs 的 beta_valid 设 false，旧单库配置默认仍 true。Meta 会翻转左 shapedirs 的 x 分量，原 Dex/Oak 路径不作同一修正。实际 zero＋7 个源 beta、左右手两种相同姿态、对齐实际腕后，非零 beta 左手 joints 最大点差3.74–19.81mm、mesh5.60–24.28mm，右手及零 beta 差0；full pose 旋转参数差0。这说明 shape 的共同语义尚未统一，不影响实际 wrist＋rotation 的99D动态监督。暂不将这些 beta 当共同条件是隔离混杂的工程选择；不是物理必要性证明，也未解决统一FK。以后重新启用 beta 须适配训练，joint/mesh loss须按源decoder或先统一shape。回执在 data10 `audits/beta_convention_20261014/receipt.json`。
 
 ## MANO 资产
 
@@ -25,10 +27,16 @@ HOT/Ume 的内部验证划分是本轮工程选择，并非官方测试集。分
 
 ## 训练与验收
 
-初始配置沿用 batch64、50,000 steps、lr2e-4、warmup500、weight decay0.01、BF16 网络、FP32 几何、forecast weight0.1；每500步保存，每1000步分库验证。库间等概率采样，库内按窗口均匀采样；不是按总帧数采样，也不宣称这是最优混合比例。每库每模式最多固定1024 validation windows，分别报告 noisy/missing/clean；checkpoint score 为四库等权 noisy/missing 当前恢复 loss。指标仍是 source wrist mm、root/finger geodesic degrees；没有将其写成 MPJPE、真实 HaWoR 收益或物理保证。
+初始配置沿用 batch64、50,000 steps、lr2e-4、warmup500、weight decay0.01、BF16 网络、FP32 几何、forecast weight0.1；每500步保存，每1000步分库验证。库间等概率采样，库内按窗口均匀采样；不是按总帧数采样，也不宣称这是最优混合比例。每库每模式最多固定1024 validation windows，分别报告 noisy/missing/clean；checkpoint score 为四库等权 noisy/missing 当前恢复 loss。指标仍是 source wrist mm、root/finger geodesic degrees；没有将其写成 MPJPE、真实 HaWoR 收益或物理保证。训练和验证各自缓存至多8192序列/4GiB，仍lazy且有明确上限；NPZ只加载训练所需数组。
 
-远程继续复用 `jchen57-debug-mpd5p`、项目独立 Torch2.10/cu130 runtime，不修改 zhou。新增准备依赖 smplx0.1.28、SciPy1.17.1、chumpy0.70、six1.17.0；chumpy 初次 PEP517 build isolation 因缺 pip 失败，`--no-build-isolation` 后安装成功。所有预处理、数值与网络运行均在 Pod。
+远程继续复用 `jchen57-debug-mpd5p`、项目独立 Torch2.10/cu130 runtime，不修改 zhou。新增准备依赖 smplx0.1.28、SciPy1.17.1、chumpy0.70、six1.17.0、requests2.34.2；chumpy 初次 PEP517 build isolation 因缺 pip 失败，`--no-build-isolation` 后安装成功。Oak 首次导入因 requests 缺失退出，安装后重启；失败记录保留。所有预处理、数值与网络运行均在 Pod。
 
 已完成的远程 loader 验收：旧输出/缺帧窗口一致、lazy 初始化、mmap/LRU、tensor/mask schema、分库固定验证、20k 等库抽样及 RNG、partial GT fail-closed、recording 跨 split/重复路径拒绝、raw-joints-only 拒绝。人工数据的两来源抽样为 10002/9998；这是采样程序验收，不是训练精度。Dex 单遍 gzip TAR 的元数据排序、s0、固定 view、NPY/NPZ 写入也通过 bounded 工程检查。
 
-完整 PCA/FK 来源对照、四库全量转换、真实四库 smoke 和正式启动状态仍待下一次远程验收补充。中断恢复保存主要 RNG/optimizer/checkpoint，但不保证 sampler chunk/loader 游标逐样本精确复现。
+真实适配验收见 [四库摘要](../reports/twm_four_source_adapters_20261014.json)。`2913f28` 的真实4库3步smoke在GPU1正常complete，24个样本为Dex3/HOT6/Oak9/Ume6；loss/梯度finite，latest/best step3权重finite，四库各自验证输出。产物 `runs/twm_four_sources_smoke_20261014`，回执 `audits/four_source_smoke_20261014/receipt.json`。这是功能检查，不是质量结果；正式run从头开始，不resume smoke。
+
+全量 Oak 于16:31:57UTC complete：431train/39val，940手序列，1,414,552/113,382手帧；每序列最多32帧共30,080帧共享smplx FK roundtrip，joint max1.49e-7m、mesh1.88e-7m，非独立源GT精度。产物 `prepared/oakink2_99d_full_v2`，源码13ba665；2worker旧v1部分输出保留，依据CPU占用改8worker新v2。Dex/HOT/Ume全量仍pending。
+
+I/O修正有实测依据：暖源HOT样本NPY保存占1.400/1.571秒；同数组未压缩NPZ保存0.155秒，相比NPY1.427秒约9.2倍，仅指该保存阶段。HOT/Ume各2TAR、86数组bitwise一致，12个loader窗口所有字段一致。冷TAR首次direct5.813秒（索引5.692秒），约93MB整包冷读＋RAM解析3.683秒，表明source NFS seek仍有耗时；没有把局部速度写成全库端到端提升。当前Meta新full_v3使用NPZ，旧NPY v2进程已核身份后替换，旧部分文件保留。初次v1因launcher日志位于fresh-output目录被拒绝，之后日志移到audits；不删除/更换用户Job。
+
+中断恢复限制：同config/manifest SHA协议才可resume，不能把完成的单Oak50k当四库初始化；保存主要RNG/optimizer/checkpoint，但不保证sampler chunk/loader游标逐样本精确复现。

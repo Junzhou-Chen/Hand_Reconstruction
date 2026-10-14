@@ -38,7 +38,7 @@ def atomic_json(path,value):
     tmp.replace(path)
 
 
-def sample_batch(batch, generator, mode='mixed'):
+def sample_batch(batch, generator, mode='mixed', *, condition_on_beta=True):
     # This trainer supervises all 99D groups. Partial labels require a separate
     # masked/geometric objective; never use their finite placeholders as GT.
     for key in ('past_current_gt_mask','future_gt_mask'):
@@ -114,6 +114,11 @@ def sample_batch(batch, generator, mode='mixed'):
             'dt':batch['dt'],'beta':batch['beta'],'handedness':batch['handedness'],
             'quality':quality,'history_quality':None,'forecast_dt':batch['forecast_dt']}
     if 'beta_valid' in batch: kwargs['beta_valid']=batch['beta_valid']
+    if not condition_on_beta:
+        # Meta corrects left shapedirs whereas original Dex/Oak decoders do
+        # not. Preserve source beta in storage, but do not present differently
+        # defined shape coefficients as one canonical conditioning space.
+        kwargs['beta_valid']=torch.zeros(b,device=device,dtype=torch.bool)
     return history,raw,candidate,kwargs,target,future
 
 
@@ -142,7 +147,8 @@ def evaluate(model,loader,device,config):
         for index,batch in enumerate(loader):
             if index>=config['eval_batches']: break
             batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
-            history,raw,candidate,kwargs,target,future=sample_batch(batch,generator,mode)
+            history,raw,candidate,kwargs,target,future=sample_batch(batch,generator,mode,
+                condition_on_beta=config.get('condition_on_beta',True))
             with torch.autocast('cuda',dtype=torch.bfloat16):
                 output=model(history,raw,candidate,**kwargs)
             n=len(target)
@@ -254,6 +260,8 @@ def main():
          'val_sequences_by_dataset':val.sequence_counts_by_dataset,'source_sampling':config.get('source_sampling','window_uniform'),
          'validation_aggregation':'equal source mean; independent fixed window subset per source',
          'initialization':'from scratch' if args.resume is None else 'resume '+str(args.resume),
+         'beta_conditioning':config.get('condition_on_beta',True),
+         'beta_policy':'source beta retained separately; mixed source shape conventions not canonicalized',
          'resume_limit':'sampler RNG saved; prefetched/chunked sampler indices and loader cursor are not exact replay'}
     if model.config.backbone=='structured_mamba':
         import importlib.metadata
@@ -283,7 +291,8 @@ def main():
             except StopIteration: iterator=iter(loader); batch=next(iterator)
             batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
             sampled_counts+=torch.bincount(batch['dataset_id'],minlength=len(train.dataset_names))
-            history,raw,candidate,kwargs,target,future=sample_batch(batch,generator)
+            history,raw,candidate,kwargs,target,future=sample_batch(batch,generator,
+                condition_on_beta=config.get('condition_on_beta',True))
             step+=1
             if step<=config['warmup_steps']: multiplier=step/config['warmup_steps']
             else: multiplier=0.1+0.9*0.5*(1+math.cos(math.pi*(step-config['warmup_steps'])/max(1,config['steps']-config['warmup_steps'])))

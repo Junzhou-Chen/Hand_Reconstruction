@@ -36,5 +36,6 @@
   ],
   "source_sampling": "equal_source",
   "cache_sequences": 8192,
-  "cache_bytes": 4294967296
+  "cache_bytes": 4294967296,
+  "condition_on_beta": false
 }
