@@ -20,6 +20,7 @@
 | HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
+| TWM直接校正架构讨论 | 按用户质疑独立C的瓶颈，形成统一99D恢复、真实误差适配及数值几何取证方案 | [讨论与对照](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)；待用户调整，未替代现行架构或启动实验 |
 | MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
 | 99D与论文职责核验 | 用户采纳99D；12项论文数据事实已核；v1选库顺序随后被D18/v2替代 | [预训练方案](../docs/TWM_PRETRAIN_PLAN.md)、[论文依据](../docs/TWM_DATA_PAPER_EVIDENCE.md)；混合未定，无训练 |
 | v2.1执行归纳 | 建议首轮目标Oak/HOT/UmeTrack/HumanTouch，DexWild可靠local可先接、world待核；授权GRAB/ARCTIC优先 | [当前归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)；不要求全库作为首checkpoint依赖，无固定配比/实现 |

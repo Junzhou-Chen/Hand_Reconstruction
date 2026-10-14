@@ -141,3 +141,11 @@ Corrector 的概念损失为 state + image evidence + velocity，各轮有 state
 - 后端递归不证明整个 HaWoR 视频处理链严格 causal 或 real time；需记录 lookahead、chunk、延迟。
 
 详细未决项与验收条件见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
+
+## 2026-10-14 统一TWM直接恢复的架构讨论
+
+用户质疑独立Corrector成为瓶颈，要求评估TWM直接修正HaWoR输出，并通过多样样例和真实前端误差联合微调。助手建议优先验证统一恢复模型；这是讨论方案，尚未最终替代上文架构。[具体方案及前作证据](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)
+
+TWM可直接返回下一候选完整99D，状态head与融合职责移入同一模型；内部SO(3)残差仍可作为实现方式。先冻结HaWoR验证数值恢复及真实预测/reference适配，保留干净输入和原motion能力检查。删除独立C不自动删除必要的图像信息路径：若保留候选重取证，建议轻量图像头输出2D坐标/创新量、相机与mask/不确定性，由同一TWM更新；仅quality通常缺少校正方向，不能把任意RGB features改名数值证据。
+
+维持Z/S/H、原观测w/最终q、同帧anchor/β固定及仅最终历史反馈。轨迹先验与增广微调能学习运动统计，不能保证力学定律；MANO合法旋转不等于关节限位、物体接触或动力学正确。是否正式删除C、几何输入schema与解冻范围待后续讨论，不能当作用户已采纳决定。
