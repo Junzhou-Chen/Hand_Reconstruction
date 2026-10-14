@@ -64,3 +64,18 @@ MANO模型资产/PCA basis/mean、左右手shape修正和FK需在adapter验收�
 - Dex下载了全10 subject，所以s0/s1等train/val/test均在包中。用于TWM时先固定评测setup，只训练对应train；若与HaWoR默认s0_test比较，s0_test绝不进入预训练、Corrector训练或调参。8view是同一运动，不计8倍独立轨迹。
 
 本轮建议为“现有三个MoCap库核心＋Dex train补充、分别消融”，没有固定混合比、loss权重或全量训练启动。保留D18传感器精度原则、glove后续候选与已有方法框架；不是把Dex采集精度提升到MoCap，也不因为已有RGB就给TWM输入图像。当前恢复主任务与短期预测辅助不变。
+
+## 同日新增：MANO资产与Meta/Dex小样本适配验收
+
+以下为2026-10-14 16:02 UTC后新增事实，前文保留为较早的字段审计记录。小型汇总见[适配验收JSON](../reports/twm_four_source_adapters_20261014.json)，其中记录实际远程路径、源码hash、split、时间和原始receipt的hash。适配器代码为`1c002606d2ef325ca0f471d6d9e11490eb26e3d4`；资产转换脚本的实际执行内容与随后提交的`13ba665`完全一致。全部在ds Pod以CPU执行，专属runtime为Python3.11.15、NumPy2.4.6、Torch2.10.0+cu130、smplx0.1.28、SciPy1.17.1；没有在本机预处理或运行网络。
+
+用户从官网提供的MANO v1.2 ZIP通过指定SHA256校验，原始左右模型及3份license保留，另存NumPy/SciPy派生模型；9个必要数值字段的值与dtype完全不变。Chumpy0.70兼容桥仅在转换子进程使用；禁止导入Chumpy的新进程中，左右smplx加载、mean与平移检查均通过（mean误差0，平移最大误差`1.86e-9 m`）。Meta遵循官方decoder的左手shapedirs修复，Dex不额外套用该修复。每手99D均使用实际解剖腕位置，beta10另存，不能把MANO translation直接当wrist。
+
+| 本次范围 | 已验证结果 | 边界 |
+|---|---|---|
+| HOT3D 2个TAR，4条单手轨迹 | train/val各300个有效MANO状态；native也有600个有效字段状态；实际`ref_timestamp_ns`；mmap loader各60窗 | 官方train内部按原录制分组，排除27个HaWoR评测来源；此val不是官方validation |
+| UmeTrack 2个real train TAR，2条单手轨迹 | train/val各450个有效MANO状态；native只有891帧有效，9帧MANO有而native缺独立保留；名义frame_id/30；loader各105窗 | 官方train内部按subject分组；native有效仅表示字段存在且有限，本次未消费native几何监督 |
+| Meta上述6条手轨迹的首/中/末共18个状态 | 与固定官方Meta decoder的vertices、16 joints和full pose最大差均0；99D旋转解码后FK最大差`1.19e-7 m` | 这是官方实现与编码一致性，未测native→MANO独立几何精度 |
+| DexYCB左右手各6帧几何抽查，另subject01官方s0各1条train/val | 双侧21 joints最大差`1.36e-7 m`以内；正式bounded产物最大差`1.50e-7 m`以内；固定单view；60帧上限得到51/57连续有效帧，history30＋forecast3、stride4得到5/6窗，全部真实mmap | 40帧上限的v1训练轨迹因前9帧空标注仅31帧，不满足该窗口；保留v1并另建v2。21 joints与MANO来自同一拟合标注，不能当独立MoCap精度 |
+
+Meta/Dex均通过完整MANO状态mask、beta及99D loader契约检查，真实缺标注没有补成GT。Meta的native-invalid计数包含native-absent，Ume的9帧不能重复计为18帧。这里仅更新资产兼容、有限范围转换和几何一致性事实；不据此声明四库全量已验收、跨库运动已去重、native标注绝对准确或训练已完成，Oak本轮状态与正式启动记录另行维护。

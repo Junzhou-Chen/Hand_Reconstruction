@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "report_date": "2026-10-14",
+  "timezone": "UTC",
+  "compiled_utc": "2026-10-14T16:15:20.277054+00:00",
+  "scope": "Completed remote CPU bounded adapter and storage checks for licensed MANO assets, HOT3D, UmeTrack and DexYCB. OakInk2 is not newly revalidated here. No full-dataset acceptance, network inference, training outcome, native-to-MANO accuracy or independent GT accuracy is claimed.",
+  "execution": {
+    "host": "ds",
+    "namespace": "jchen57",
+    "pod": "jchen57-debug-mpd5p",
+    "device": "CPU",
+    "runtime": {
+      "executable": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "numpy": "2.4.6",
+      "python": "3.11.15 | packaged by conda-forge | (main, Mar  5 2026, 16:45:40) [GCC 14.3.0]",
+      "scipy": "1.17.1",
+      "smplx": "0.1.28",
+      "torch": "2.10.0+cu130"
+    },
+    "chumpy_conversion_version": "0.70",
+    "zhou_environment_modified": false
+  },
+  "code": {
+    "adapter_preparation_commit": "1c002606d2ef325ca0f471d6d9e11490eb26e3d4",
+    "adapter_commit_evidence": "Meta bounded_commands.json records this commit; Dex used the same deployed scripts, whose hashes match this commit and 13ba665.",
+    "asset_script_exact_content_commit": "13ba66564e859ae038ed2f57957180df5e620cbe",
+    "asset_script_execution_note": "Executed from the independent audit directory before commit; its exact SHA256 matches the subsequently committed file.",
+    "asset_script_sha256": "db79c8eec7ec6edc84b521da0684dbfa93c2bf4a1338dc83db673c3be3d2062a",
+    "adapter_file_sha256": {
+      "scripts/prepare_dexycb_twm.py": "90bc3b9ea0c40dabfca3f4e678a6e72edabb9a24e7508b32da942fdf00efe31b",
+      "scripts/prepare_meta_twm.py": "4b632ea74ecb71f2254def0eec35df82df5eb52683830ecb1f8731a44aaee25d",
+      "src/handloop/data/meta_mano.py": "635b5668376b79e375a9f491e62c9126e787301fd4d3ad2fcf44d82bf0792ceb"
+    },
+    "loader_version_limit": "A launch-time loader SHA was not recorded in the receipts. At evidence collection its SHA below matches 13ba665; this is not retroactively asserted for every earlier check.",
+    "loader_sha256_at_evidence_collection": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe"
+  },
+  "state_contract": {
+    "state": "99D = actual anatomical wrist p3 + root rotation6D6 + 15 finger rotation6D90",
+    "rotation6d": "first two matrix columns, c0xyz then c1xyz",
+    "shape": "beta10 stored separately; static in the prepared bounded sequences",
+    "units": "metres",
+    "storage": "per-sequence NPY files, actually memory-mapped by the trajectory loader",
+    "gt_scope": "Complete MANO fitted-state reference masks, not an assertion of independent measurement accuracy"
+  },
+  "mano_assets": {
+    "status": "complete",
+    "source_zip": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/mano_v1_2.zip",
+    "source_zip_sha256": "50976831790ea9657d8110e0c94e50e90eaf35cd76169f0b27e5d32f3fcd951f",
+    "raw_dir": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/raw",
+    "derived_dir": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+    "provenance": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/provenance.json",
+      "sha256": "9026b574259d93829151878607af78c2a38767c6679958b6e672be58b24ab08f"
+    },
+    "source_and_raw_models_preserved": true,
+    "license_members": [
+      "mano_v1_2/LICENSE.txt",
+      "mano_v1_2/models/LICENSE.txt",
+      "mano_v1_2/webuser/LICENSE.txt"
+    ],
+    "timing": {
+      "started_utc": "2026-10-14T16:02:56.770586+00:00",
+      "completed_utc": "2026-10-14T16:03:02.722614+00:00",
+      "elapsed_seconds_from_report": 5.952028
+    },
+    "conversion": "Only model.shapedirs was Chumpy in each official model. Required numeric arrays retain exact values and dtype; no official webuser code was executed. Compatibility aliases/getargspec bridge exist only in the conversion child.",
+    "models": {
+      "left": {
+        "raw_sha256": "c4022f7083f2ca7c78b2b3d595abbab52debd32b09d372b16923a801f0ea6a30",
+        "derived_sha256": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+        "chumpy_objects_replaced": [
+          "model.shapedirs"
+        ]
+      },
+      "right": {
+        "raw_sha256": "45d60aa3b27ef9107a7afd4e00808f307fd91111e1cfa35afd5c4a62de264767",
+        "derived_sha256": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732",
+        "chumpy_objects_replaced": [
+          "model.shapedirs"
+        ]
+      }
+    },
+    "required_numeric_fields_exactly_equal": [
+      "J_regressor",
+      "f",
+      "hands_components",
+      "hands_mean",
+      "kintree_table",
+      "posedirs",
+      "shapedirs",
+      "v_template",
+      "weights"
+    ],
+    "fresh_verification": {
+      "passed": true,
+      "chumpy_imports_blocked": true,
+      "checks": {
+        "left": {
+          "joints_shape": [
+            2,
+            16,
+            3
+          ],
+          "translation_max_abs_m": 1.862645149230957e-09,
+          "vertices_shape": [
+            2,
+            778,
+            3
+          ],
+          "zero_offset_mean_max_abs": 0.0
+        },
+        "right": {
+          "joints_shape": [
+            2,
+            16,
+            3
+          ],
+          "translation_max_abs_m": 1.862645149230957e-09,
+          "vertices_shape": [
+            2,
+            778,
+            3
+          ],
+          "zero_offset_mean_max_abs": 0.0
+        }
+      },
+      "scope": "model loading/mean/translation only; no dataset FK agreement is claimed"
+    }
+  },
+  "meta_common": {
+    "official_decoder_revision": "bc628e9286c18444b47a0971a89d075ea6f00747",
+    "official_decoder_source_sha256": "1a9c49ee35fb009fcf0ca6c4d8c86e3c4bd23e1ed32392120ceac97819d23eb9",
+    "pca_components": 15,
+    "mean_added_once": true,
+    "left_shapedirs_fix_applied": true,
+    "fix_scope": "Follows the official Meta decoder. DexYCB uses the original side-specific model without this fix.",
+    "frame": "source_recording_world; source transforms preserved, no extrinsic/inversion/reflection introduced",
+    "availability_meaning": "native_valid checks presence/schema/finite values only, not native accuracy. MANO and native masks are separate; native missing does not erase otherwise valid MANO.",
+    "native_geometry_supervision_used": false,
+    "native_data_location": "Immutable original TAR profiles/poses retained; this preparation consumes MANO references only.",
+    "official_equivalence_check": {
+      "status": "passed",
+      "sample_count": 18,
+      "sampling": "first, middle and last of each of six prepared hand sequences",
+      "max_errors": {
+        "adapter_vs_official_vertices_max_m": 0.0,
+        "adapter_vs_official_joints16_max_m": 0.0,
+        "adapter_vs_official_fullpose_max": 0.0,
+        "saved_state_vs_adapter_max": 1.1920928955078125e-07,
+        "wrist_relation_transl_plus_J0_max_m": 2.9802322387695312e-08,
+        "state6d_fk_vs_official_vertices_max_m": 1.1920928955078125e-07,
+        "state6d_fk_vs_official_joints16_max_m": 1.1920928955078125e-07,
+        "state6d_orthogonality_max": 3.5762786865234375e-07,
+        "state6d_determinant_error_max": 3.5762786865234375e-07
+      },
+      "started_utc": "2026-10-14T16:05:45.592125+00:00",
+      "finished_utc": "2026-10-14T16:05:46.508552+00:00",
+      "elapsed_seconds": 0.9161490080878139,
+      "scope": "sampled first/middle/last frames from every prepared hand sequence; official Meta PCA15 and state-matrix FK equivalence, not native GT accuracy",
+      "receipt": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/meta_bounded_20261014_v1/official_fk_receipt.json",
+        "sha256": "c5a055f78628dff8a35bd4a1026b690f6484ae37a4c7e3d628800605a017e4f3"
+      }
+    },
+    "receipt_files": [
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/meta_bounded_20261014_v1/bounded_commands.json",
+        "sha256": "8814ed99ec1d58a26eb2c64fbf7fec2c15bdcd0634c5cf6c2edc70ca56bc9e7e"
+      },
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/meta_bounded_20261014_v1/bounded_timing.json",
+        "sha256": "22cf0b1279ae06e3ebde7527386c8fd7547b0961aa798375137dc4152809582a"
+      },
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/meta_bounded_20261014_v1/loader_receipt.json",
+        "sha256": "6158c893c4980d71f5426b18e544d25669c1decd53d71e3e08be2b1aa40cadf7"
+      }
+    ],
+    "native_accuracy_measured": false,
+    "cross_dataset_motion_deduplication_established": false
+  },
+  "datasets": {
+    "hot3d": {
+      "status": "bounded_preparation_and_official_decoder_equivalence_passed",
+      "manifest": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/processed/meta_bounded_20261014_v1/hot3d/manifest.json",
+        "sha256": "8b535e523ec2de7362d24c67119c4ba0aeee2662cb71cf15e9a24e428590f620"
+      },
+      "source_revision": "30fe9674782f32e1e5edba98476b6ff4300132c5",
+      "source_role": "Meta marker-based native trajectory fitted to MANO; not direct MANO sensor measurements",
+      "selected_tars": 2,
+      "selected_tars_by_split": {
+        "train": 1,
+        "val": 1
+      },
+      "prepared_hand_sequences": 4,
+      "valid_mano_hand_frames_by_split": {
+        "train": 300,
+        "val": 300
+      },
+      "source_time_frames": 300,
+      "split": {
+        "rule": "engineering split of official train; not official validation",
+        "group_key": "source sequence_id",
+        "seed": 20261014,
+        "requested_val_fraction": 0.1
+      },
+      "hawor_excluded_recording_count": 27,
+      "availability_counts": {
+        "mano_present": 600,
+        "mano_valid": 600,
+        "native_present": 600,
+        "native_valid": 600,
+        "mano_valid_native_absent": 0,
+        "mano_valid_native_invalid": 0,
+        "source_hand_frames": 600
+      },
+      "native_invalid_count_includes_absent": true,
+      "timestamps": "actual ref_timestamp_ns",
+      "timing": {
+        "dataset": "hot3d",
+        "exit_code": 0,
+        "started_utc": "2026-10-14T16:04:33.578822+00:00",
+        "elapsed_seconds_including_process_startup": 8.11370438709855,
+        "finished_utc": "2026-10-14T16:04:41.692524+00:00"
+      },
+      "sequences": [
+        {
+          "path": "train/clip-001849__left",
+          "split": "train",
+          "split_group": "P0001_23fa0ee8",
+          "recording": "P0001_23fa0ee8",
+          "handedness": 0,
+          "frames": 150,
+          "source_path": "train_aria/clip-001849.tar",
+          "frame_id_minmax": [
+            0,
+            149
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        },
+        {
+          "path": "train/clip-001849__right",
+          "split": "train",
+          "split_group": "P0001_23fa0ee8",
+          "recording": "P0001_23fa0ee8",
+          "handedness": 1,
+          "frames": 150,
+          "source_path": "train_aria/clip-001849.tar",
+          "frame_id_minmax": [
+            0,
+            149
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        },
+        {
+          "path": "val/clip-002135__left",
+          "split": "val",
+          "split_group": "P0003_e3a74169",
+          "recording": "P0003_e3a74169",
+          "handedness": 0,
+          "frames": 150,
+          "source_path": "train_aria/clip-002135.tar",
+          "frame_id_minmax": [
+            0,
+            149
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        },
+        {
+          "path": "val/clip-002135__right",
+          "split": "val",
+          "split_group": "P0003_e3a74169",
+          "recording": "P0003_e3a74169",
+          "handedness": 1,
+          "frames": 150,
+          "source_path": "train_aria/clip-002135.tar",
+          "frame_id_minmax": [
+            0,
+            149
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        }
+      ],
+      "sampled_official_equivalence_max_errors": {
+        "adapter_vs_official_vertices_max_m": 0.0,
+        "adapter_vs_official_joints16_max_m": 0.0,
+        "adapter_vs_official_fullpose_max": 0.0,
+        "saved_state_vs_adapter_max": 1.1920928955078125e-07,
+        "wrist_relation_transl_plus_J0_max_m": 2.9802322387695312e-08,
+        "state6d_fk_vs_official_vertices_max_m": 7.450580596923828e-08,
+        "state6d_fk_vs_official_joints16_max_m": 5.960464477539063e-08,
+        "state6d_orthogonality_max": 2.384185791015625e-07,
+        "state6d_determinant_error_max": 3.5762786865234375e-07
+      },
+      "loader_checks": [
+        {
+          "dataset": "hot3d",
+          "split": "train",
+          "windows": 60,
+          "sequences": 2,
+          "mmap": true,
+          "state_shape": [
+            31,
+            99
+          ],
+          "forecast_dt_seconds": 0.09998651593923569,
+          "all_gt_groups_available": true
+        },
+        {
+          "dataset": "hot3d",
+          "split": "val",
+          "windows": 60,
+          "sequences": 2,
+          "mmap": true,
+          "state_shape": [
+            31,
+            99
+          ],
+          "forecast_dt_seconds": 0.09998618811368942,
+          "all_gt_groups_available": true
+        }
+      ],
+      "scope": "Two source TARs only. Official decoder/rotation encoding equivalence and NPY loader contract, not native geometry accuracy or full-pool acceptance."
+    },
+    "umetrack": {
+      "status": "bounded_preparation_and_official_decoder_equivalence_passed",
+      "manifest": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/processed/meta_bounded_20261014_v1/umetrack/manifest.json",
+        "sha256": "e27d9adcd271c72a82d2f3c0b76af8bbde9ce1ab649029105890a5e1eb431c21"
+      },
+      "source_revision": "19f6b2cad9eb17be4ebedfe4503203980a25e016",
+      "source_role": "Meta marker-based native trajectory fitted to MANO; not direct MANO sensor measurements",
+      "selected_tars": 2,
+      "selected_tars_by_split": {
+        "train": 1,
+        "val": 1
+      },
+      "prepared_hand_sequences": 2,
+      "valid_mano_hand_frames_by_split": {
+        "train": 450,
+        "val": 450
+      },
+      "source_time_frames": 900,
+      "split": {
+        "rule": "engineering split of official train; not official validation",
+        "group_key": "subject prefix",
+        "seed": 20261014,
+        "requested_val_fraction": 0.1
+      },
+      "hawor_excluded_recording_count": 0,
+      "availability_counts": {
+        "mano_present": 900,
+        "mano_valid": 900,
+        "native_present": 891,
+        "native_valid": 891,
+        "mano_valid_native_absent": 9,
+        "mano_valid_native_invalid": 9,
+        "source_hand_frames": 1800
+      },
+      "native_invalid_count_includes_absent": true,
+      "timestamps": "original frame_id/30, nominal relative seconds; not measured absolute time",
+      "timing": {
+        "dataset": "umetrack",
+        "exit_code": 0,
+        "started_utc": "2026-10-14T16:04:33.579202+00:00",
+        "elapsed_seconds_including_process_startup": 5.801219454035163,
+        "finished_utc": "2026-10-14T16:04:39.380421+00:00"
+      },
+      "sequences": [
+        {
+          "path": "train/subject_000_separate_hand_000000__left",
+          "split": "train",
+          "split_group": "subject_000",
+          "recording": "subject_000_separate_hand_000000",
+          "handedness": 0,
+          "frames": 450,
+          "source_path": "train/subject_000_separate_hand_000000.tar",
+          "frame_id_minmax": [
+            0,
+            449
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        },
+        {
+          "path": "val/subject_023_separate_hand_000674__right",
+          "split": "val",
+          "split_group": "subject_023",
+          "recording": "subject_023_separate_hand_000674",
+          "handedness": 1,
+          "frames": 450,
+          "source_path": "train/subject_023_separate_hand_000674.tar",
+          "frame_id_minmax": [
+            0,
+            449
+          ],
+          "frame_gaps": 0,
+          "time_gaps_over_1_5_nominal_dt": 0,
+          "beta_span": 0.0
+        }
+      ],
+      "sampled_official_equivalence_max_errors": {
+        "adapter_vs_official_vertices_max_m": 0.0,
+        "adapter_vs_official_joints16_max_m": 0.0,
+        "adapter_vs_official_fullpose_max": 0.0,
+        "saved_state_vs_adapter_max": 1.1920928955078125e-07,
+        "wrist_relation_transl_plus_J0_max_m": 2.9802322387695312e-08,
+        "state6d_fk_vs_official_vertices_max_m": 1.1920928955078125e-07,
+        "state6d_fk_vs_official_joints16_max_m": 1.1920928955078125e-07,
+        "state6d_orthogonality_max": 3.5762786865234375e-07,
+        "state6d_determinant_error_max": 3.5762786865234375e-07
+      },
+      "loader_checks": [
+        {
+          "dataset": "umetrack",
+          "split": "train",
+          "windows": 105,
+          "sequences": 1,
+          "mmap": true,
+          "state_shape": [
+            31,
+            99
+          ],
+          "forecast_dt_seconds": 0.10000000149011612,
+          "all_gt_groups_available": true
+        },
+        {
+          "dataset": "umetrack",
+          "split": "val",
+          "windows": 105,
+          "sequences": 1,
+          "mmap": true,
+          "state_shape": [
+            31,
+            99
+          ],
+          "forecast_dt_seconds": 0.10000000149011612,
+          "all_gt_groups_available": true
+        }
+      ],
+      "scope": "Two source TARs only. Official decoder/rotation encoding equivalence and NPY loader contract, not native geometry accuracy or full-pool acceptance."
+    },
+    "dexycb": {
+      "status": "bilateral_geometry_and_bounded_official_s0_loader_passed",
+      "source_revision": "64551b001d360ad83bc383157a559ec248fb9100",
+      "source_role": "official multiview RGB-D fitted MANO annotations; not independent MoCap",
+      "manifest": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/processed/dex_bounded_20261014_v2/manifest.json",
+        "sha256": "d48c9e5e020f485d55dc3879e12d13c890474fefd5a6a7cf972d6e38aa91d10a"
+      },
+      "setup": "official s0",
+      "split_rule": "sorted 100 sequences/subject: i%5!=4 train; remaining subject01/02 val, subject03-10 test",
+      "bounded_subject": [
+        "20200709-subject-01"
+      ],
+      "bounded_limits": {
+        "max_sequences_per_split_per_subject": 1,
+        "max_frames_per_sequence": 60
+      },
+      "camera_serial": "836212060125",
+      "coordinate_frame": "fixed_camera_836212060125",
+      "timestamps": "numeric label frame index / nominal 30Hz; not measured timestamp",
+      "pca_components": 45,
+      "mean_added_once": true,
+      "left_shapedirs_fix_applied": false,
+      "position": "Source joint_3d[:,0] after agreement with decoded actual wrist; never raw pose_m translation.",
+      "single_view_per_motion": true,
+      "heldout_test_labels_decoded": false,
+      "betas": "static mano.yml calibration beta10",
+      "fk_failure_threshold_m": 0.001,
+      "native_independent_reference_available": false,
+      "short_bilateral_geometry": {
+        "receipt": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/dex_fk_20261014/report.json",
+          "sha256": "e09fe6512687cb981855ad5d2105566ceeeb377630985f402220b5e5720d9e85"
+        },
+        "reports": [
+          {
+            "subject": "20200709-subject-01",
+            "recording": "20200709_150906",
+            "serial": "932122060861",
+            "side": "right",
+            "frame_ids": [
+              3,
+              45,
+              31,
+              5,
+              19,
+              27
+            ],
+            "count": 6,
+            "max_joint21_error_m": 1.3514129193481494e-07,
+            "mean_joint21_error_m": 5.564134042401747e-08,
+            "max_wrist_error_m": 8.43142728967905e-08,
+            "pca_plus_mean_axisangle_max_abs": 2.2384638431738324e-07,
+            "wrist_minus_mano_translation_mean_m": [
+              0.09327741712331772,
+              0.006196523550897837,
+              0.006084958557039499
+            ],
+            "wrist_minus_mano_translation_span_m": [
+              8.940696716308594e-08,
+              7.450580596923828e-09,
+              5.960464477539063e-08
+            ],
+            "vertex_shape": [
+              6,
+              778,
+              3
+            ],
+            "finite_vertices": true,
+            "elapsed_seconds": 0.03663945198059082,
+            "scope": "first six valid labels for geometry audit only; no split/training claim"
+          },
+          {
+            "subject": "20200813-subject-02",
+            "recording": "20200813_154103",
+            "serial": "932122060861",
+            "side": "left",
+            "frame_ids": [
+              3,
+              45,
+              31,
+              5,
+              19,
+              27
+            ],
+            "count": 6,
+            "max_joint21_error_m": 1.2377833513710357e-07,
+            "mean_joint21_error_m": 5.884255926957849e-08,
+            "max_wrist_error_m": 6.919419348605516e-08,
+            "pca_plus_mean_axisangle_max_abs": 1.0336209949057817e-07,
+            "wrist_minus_mano_translation_mean_m": [
+              -0.0891571044921875,
+              0.006858058273792267,
+              0.0067436895333230495
+            ],
+            "wrist_minus_mano_translation_span_m": [
+              0.0,
+              2.9802322387695312e-08,
+              5.960464477539063e-08
+            ],
+            "vertex_shape": [
+              6,
+              778,
+              3
+            ],
+            "finite_vertices": true,
+            "elapsed_seconds": 0.009641885757446289,
+            "scope": "first six valid labels for geometry audit only; no split/training claim"
+          }
+        ],
+        "scope": "First six valid labels in each of two subjects, right and left. Frame IDs are nonsequential TAR encounter order; these are geometry samples, not a training split or temporal window."
+      },
+      "bounded_v1": {
+        "manifest": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/processed/dex_bounded_20261014_v1/manifest.json",
+          "sha256": "bbe9005af9e789a0b2457b6d4cbf8148fdeecb19315eee9618c0fe7bc5ca412a"
+        },
+        "frame_cap": 40,
+        "frames_by_split": {
+          "train": 31,
+          "val": 37
+        },
+        "accepted_for_history30_forecast3": false,
+        "reason": "Train begins with nine all-zero pose labels; only 31 valid consecutive frames remain. Val has 37. No missing label was promoted to GT.",
+        "timing": {
+          "started_utc": "2026-10-14T16:06:06.218374+00:00",
+          "completed_utc": "2026-10-14T16:06:56.960060+00:00",
+          "elapsed_seconds_from_manifest": 50.741686
+        }
+      },
+      "bounded_v2": {
+        "frames_by_split": {
+          "train": 51,
+          "val": 57
+        },
+        "history": 30,
+        "forecast_offset": 3,
+        "window_stride": 4,
+        "loader_receipt": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/dex_fk_20261014/bounded_loader_report.json",
+          "sha256": "080db53711671eb7e8901b0b910de540b00f7689dad3bdc5588ec18951df014c"
+        },
+        "checks": [
+          {
+            "split": "train",
+            "recording": "20200709-subject-01/20200709_141754",
+            "sequence_index": 0,
+            "frames": 51,
+            "frame_id_minmax": [
+              9,
+              59
+            ],
+            "max_contiguous_frames": 51,
+            "loader_windows": 5,
+            "arrays_all_mmap": true,
+            "dt_minmax_s": [
+              0.03333333507180214,
+              0.03333333507180214
+            ],
+            "forecast_dt_s": 0.10000000149011612,
+            "fk_joints_max_m": 1.4901161193847656e-07,
+            "fk_joints_mean_m": 5.498312132792052e-08,
+            "fk_wrist_max_m": 1.2287812012345967e-07,
+            "rotation_orthogonality_error": 9.5367431640625e-07
+          },
+          {
+            "split": "val",
+            "recording": "20200709-subject-01/20200709_142123",
+            "sequence_index": 4,
+            "frames": 57,
+            "frame_id_minmax": [
+              3,
+              59
+            ],
+            "max_contiguous_frames": 57,
+            "loader_windows": 6,
+            "arrays_all_mmap": true,
+            "dt_minmax_s": [
+              0.03333333507180214,
+              0.03333333507180214
+            ],
+            "forecast_dt_s": 0.10000000149011612,
+            "fk_joints_max_m": 1.497548112183722e-07,
+            "fk_joints_mean_m": 5.949102128567774e-08,
+            "fk_wrist_max_m": 1.2377833513710357e-07,
+            "rotation_orthogonality_error": 1.3113021850585938e-06
+          }
+        ],
+        "state_history_current_shape": [
+          31,
+          99
+        ],
+        "future_shape": [
+          99
+        ],
+        "beta_shape": [
+          10
+        ],
+        "all_gt_groups_available": true,
+        "beta_valid": true,
+        "timing": {
+          "started_utc": "2026-10-14T16:08:01.355316+00:00",
+          "completed_utc": "2026-10-14T16:08:55.318764+00:00",
+          "elapsed_seconds_from_manifest": 53.963448
+        }
+      },
+      "scope": "Provided Dex 21 joints and MANO parameters are fitted annotations from the same source. Their agreement checks PCA/mean/assets/units/joint order, not accuracy against independent MoCap or unseen test data. One train and one val recording only."
+    }
+  },
+  "oakink2_scope": {
+    "new_asset_fk_or_adapter_validation_in_this_report": false,
+    "existing_pilot_record": "docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md",
+    "note": "Oak preparation and four-source launch progress are tracked separately; no full-pool or training status is inferred here."
+  }
+}

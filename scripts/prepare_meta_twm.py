@@ -4,7 +4,8 @@
 Read only JSON labels/shape/info from plain TARs; image payloads are never
 decoded or extracted. Meta PCA15 is decoded using licensed MANO assets and
 official smplx through MANOReferenceDecoder. Write immutable per-hand NPY
-directories suitable for mmap. Missing MANO rows are omitted while their
+directories suitable for mmap, or one uncompressed NPZ per hand to reduce
+small-file metadata traffic. Missing MANO rows are omitted while their
 original times and independent native/MANO availability remain auditable.
 
 The internal train/val split is an engineering choice, NOT an official split:
@@ -218,6 +219,31 @@ def save_arrays(directory: Path, arrays):
     return checksums
 
 
+def save_npz(destination: Path, arrays):
+    """Atomically save every array, with distinct content and container hashes."""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        raise FileExistsError(destination)
+    checksums = {}
+    for name, value in arrays.items():
+        value = np.asarray(value)
+        if value.dtype.hasobject:
+            raise ValueError(f"Object arrays are forbidden: {name}")
+        checksums[name] = {
+            "npz_member": name + ".npy",
+            "content_sha256": hashlib.sha256(value.tobytes(order="C")).hexdigest(),
+            "content_hash_encoding": "C-order ndarray data bytes; dtype and shape recorded separately",
+            "nbytes": value.nbytes, "shape": list(value.shape), "dtype": str(value.dtype)}
+    temporary = destination.with_name(destination.name + ".tmp")
+    with temporary.open("xb") as stream:
+        np.savez(stream, **arrays)
+    temporary.replace(destination)
+    artifact = {"sha256": file_hash(destination), "bytes": destination.stat().st_size,
+                "format": "npz", "compression": "ZIP_STORED",
+                "members": [name + ".npy" for name in arrays]}
+    return checksums, artifact
+
+
 def convert(job):
     if _DECODER is None:
         raise RuntimeError("Worker decoder was not initialized")
@@ -351,8 +377,16 @@ def convert(job):
         if absolute_ns:
             arrays["source_ref_timestamps_ns"] = np.asarray(absolute_ns, dtype=np.int64)
             arrays["ref_timestamps_ns"] = arrays["source_ref_timestamps_ns"][selected]
-        hashes = save_arrays(output / relative, arrays)
-        entries.append({"path": relative, "storage": "npy_directory", "dataset": job["dataset"],
+        storage = job.get("storage", "npy")
+        artifact = None
+        if storage == "npz":
+            relative += ".npz"
+            hashes, artifact = save_npz(output / relative, arrays)
+        elif storage == "npy":
+            hashes = save_arrays(output / relative, arrays)
+        else:
+            raise ValueError(f"Unknown storage format: {storage}")
+        entries.append({"path": relative, "storage": "npz" if storage == "npz" else "npy_directory", "dataset": job["dataset"],
                         "source": "Meta marker-based native trajectory fitted to MANO",
                         "split": job["split"], "split_group": job["split_group"],
                         "recording": job["recording"], "subject": job["subject"],
@@ -370,6 +404,8 @@ def convert(job):
                         "rotation_orthogonality_error": orthogonality_error,
                         "rotation_determinant_error": determinant_error,
                         "wrist_minus_mano_transl_norm_range_m": [wrist_offset_min, wrist_offset_max]})
+        if artifact is not None:
+            entries[-1]["storage_artifact"] = artifact
         audit["prepared"] = True
     return {"source_path": job["source_path"], "sequences": entries, "hands": audits,
             "source_frames": len(ids), "source_frame_id_gaps": int(np.count_nonzero(np.diff(all_ids) != 1)),
@@ -386,6 +422,8 @@ def main():
     parser.add_argument("--mano-asset-version", default=None)
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--storage", choices=("npy", "npz"), default="npy",
+                        help="npy: per-array mmap files; npz: one uncompressed file per hand")
     parser.add_argument("--seed", type=int, default=20261014)
     parser.add_argument("--val-fraction", type=float, default=0.1)
     parser.add_argument("--limit", type=int, default=0, help="total TARs after full split; 2 selects one train and one val; 0=all")
@@ -418,6 +456,10 @@ def main():
                 "availability_policy": "source_* arrays cover all discovered frame IDs; native_valid tests schema/finite values only, not accuracy",
                 "native_supervision": "not consumed by this MANO-only preparation; source profiles/poses remain in immutable original TAR",
                 "split": split, "bounded_limit": args.limit,
+                "storage": args.storage,
+                "storage_policy": ("immutable per-hand NPY directory; per-file SHA256"
+                                   if args.storage == "npy" else
+                                   "immutable per-hand uncompressed NPZ; all arrays retained; container SHA256 plus per-array C-order content SHA256"),
                 "decoder_provenance": provenance, "full_fk_executed": False,
                 "independent_fk_equivalence_verified": False,
                 "validation_boundary": "official smplx FK and numerical rotations; no native/MANO error-equivalence or empirical model accuracy claim",
@@ -430,7 +472,8 @@ def main():
                 "sequences": [], "clips": []}
     save_json(args.output / "preparation_plan.json", manifest)
     for job in jobs:
-        job.update(root=str(args.root), output=str(args.output), batch_size=args.batch_size)
+        job.update(root=str(args.root), output=str(args.output), batch_size=args.batch_size,
+                   storage=args.storage)
     started, last_report = time.monotonic(), 0.0
     try:
         with ProcessPoolExecutor(max_workers=args.workers,
