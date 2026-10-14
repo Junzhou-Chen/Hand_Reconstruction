@@ -3,7 +3,7 @@
   "history_frames": 30,
   "forecast_offset_frames": 3,
   "window_stride": 4,
-  "batch_size": 2048,
+  "batch_size": 1024,
   "steps": 50000,
   "learning_rate": 0.0002,
   "weight_decay": 0.01,
