@@ -1,12 +1,12 @@
 # HandLoop 数据与评测记忆
 
-更新日期：2026-10-14。Oak/HOT有效train/Ume real/Dex原包均完成，531.87GB；已有限字段抽查，尚无canonical loader、99D/FK验收或模型实验。[实际字段审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)。设计依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据来源见[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)，方法引用见[写作核验](05_WRITING_AND_REFERENCES.md)。
+更新日期：2026-10-14。Oak/HOT有效train/Ume real/Dex原包均完成，531.87GB；已有限字段抽查；D23现已完成Oak子集99D准备、window loader与TWM首轮训练，完整FK和其余库仍未验。[实际字段审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)。设计依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据来源见[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)，方法引用见[写作核验](05_WRITING_AND_REFERENCES.md)。
 
 ## 两个数据池
 
 [八库采集与标注报告](../docs/DATASET_CAPTURE_AND_ANNOTATION.md)按原测量、标定/拟合、人工/QC、发布参考分层。HumanTouch团队MANUS＋VIVE系统已核，公开episode配置待验；DexWild固定tracker处理代码未显式完成camera-world组合，发布版本需核；它仍是glove候选，不能凭world_abs名直接训练world腕GT。
 
-**当前首轮目标池（v2.1建议）：** OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild可靠local字段可先并入，world链核清前不做腕GT；GRAB/ARCTIC有授权优先加入，DexCap小型补充。首个checkpoint不要求所有库齐备，至少一条完整腕＋五指链通过验收。未固定配比、未实现转换。[归纳表](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+**当前首轮目标池（v2.1建议）：** OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild可靠local字段可先并入，world链核清前不做腕GT；GRAB/ARCTIC有授权优先加入，DexCap小型补充。首个checkpoint不要求所有库齐备，至少一条完整腕＋五指链通过验收。未固定最终配比；D23先实现Oak单库pilot，其余仍待转换。[归纳表](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
 
 **精度工程判断（建议）：** 完整world腕＋手指参考更信校准/质检后的外部多相机MoCap；局部手指分别验marker拟合与EMF glove标定，不能由设备类别严格排序。原生→MANO残差独立报告；HumanTouch/DexWild继续主要候选。没有八库统一GT实测排名。[证据与指标边界](../docs/DATASET_CAPTURE_AND_ANNOTATION.md#精度判断工程建议与实测排名分开)
 
@@ -149,4 +149,8 @@ PA-MPJPE 可作补充，不能代替 world-space accuracy。指标具体聚合�
 
 每次实验记录日期、run ID、问题、代码/第三方 commit、配置、随机种子、数据 split/hash、GT 来源与字段、输入模态、坐标/对齐协议、训练预算、指标定义、结果路径和失败原因。真实日志与产物优先于文字印象。
 
-所有结果目前为**未运行**。旧讨论的 30/12/5 mm 等只是示意，不进入结果表。旧版 `GapClosed=(E_camera−E_ours)/(E_camera−E_sensor)` 是可选概念指标；若 sensor 本身作标签而取 `E_sensor=0`，只表示相对该标签的误差下降，不意味着传感器物理误差为零。[历史出处 §11.4](../HandLoop_Project/01_Conversation_Research_Archive.md)
+完整视觉方法结果仍为**未运行**；2026-10-14新增Oak合成恢复pilot中途实测，见[单库运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。旧讨论的 30/12/5 mm 等只是示意，不进入结果表。旧版 `GapClosed=(E_camera−E_ours)/(E_camera−E_sensor)` 是可选概念指标；若 sensor 本身作标签而取 `E_sensor=0`，只表示相对该标签的误差下降，不意味着传感器物理误差为零。[历史出处 §11.4](../HandLoop_Project/01_Conversation_Research_Archive.md)
+
+## 2026-10-14 Oak 单库 pilot 实测
+
+D23在ds将官方64train/8val原录制转换99D（128/16单手轨迹、204502/18032单手帧），seed20261014、30Hz、H30、future3、窗口stride4；test标注不读，subject-disjoint未宣称。来源为MoCap拟合MANO，实际world腕以center_idx0＋tsl规则确定；无完整MANO FK/mesh验收。代码4cb1da8训练50,000步，09:05 UTC step7275仍在运行。固定1024val窗口/模式，step7000 noisy wrist49.090→8.657mm、root22.538→2.252°、finger15.421→2.259°；clean被改成4.551mm/0.932°/1.642°，不能只报收益。不是MPJPE或真实HaWoR结果；自身历史、真实前端错误、其它库与动力学未测。完整配置、原始产物位置、smoke provenance勘误及恢复限制见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。

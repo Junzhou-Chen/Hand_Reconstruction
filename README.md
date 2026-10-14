@@ -2,8 +2,9 @@
 
 从高质量手部轨迹学习运动先验，用于纠正头戴RGB的手部重建。当前路线是冻结HaWoR、独立训练纯轨迹TWM、通过真实图像证据迭代校正当前状态，并反馈最终状态与可靠性。
 
-当前仓库处于研究设计、数据调研与论文草稿阶段；尚无模型实现或实验结果。
+已实现第一版纯轨迹99D TWM，并在ds后台运行OakInk2单库预训练 pilot；已有合成受损验证与checkpoint，尚无完整视觉闭环或真实HaWoR纠错结果。
 
+- [OakInk2首轮预训练：运行、检查点与中途结果](docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)
 - [项目记忆入口](MEMORY.md)
 - [完整方法框架](docs/METHOD_FRAMEWORK.md)
 - [TWM首轮数据、训练与输出方案](docs/TWM_PRETRAIN_PLAN.md)

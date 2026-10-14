@@ -1,6 +1,6 @@
 # HandLoop 方法与接口记忆
 
-更新日期：2026-10-13。本文整理现行设计，所有模块尚待代码和实验验证。主依据：[START_HERE §2–4](../HandLoop_Project/START_HERE.md) 和[讨论 §15.23、§16](../HandLoop_Project/01_Conversation_Research_Archive.md)。
+更新日期：2026-10-14。本文整理现行设计，完整视觉闭环尚待验证；D23首轮纯轨迹TWM已有实现与合成恢复训练。主依据：[START_HERE §2–4](../HandLoop_Project/START_HERE.md) 和[讨论 §15.23、§16](../HandLoop_Project/01_Conversation_Research_Archive.md)。
 
 完整叙述见[docs/METHOD_FRAMEWORK.md](../docs/METHOD_FRAMEWORK.md)。本次新增的统一预训练槽位、anchor残差、初始化与单手实例化均为建议契约；用户最新免申请数据偏好已单独登记，不把旧的注册数据开工建议视为当前要求。
 
@@ -16,7 +16,7 @@
 
 ## 状态几何
 
-**2026-10-13用户已选每手99D（D16）**，替代原69D坐标状态候选。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)给出固定raw、参数/joint mask和混合监督；实现与效果尚未验证。
+**2026-10-13用户已选每手99D（D16）**，替代原69D坐标状态候选。[预训练方案](../docs/TWM_PRETRAIN_PLAN.md)给出固定raw、参数/joint mask和混合监督；Oak完整参数pilot已实现，异构部分监督和真实视觉效果尚未验证。
 
 \[
 S_t=(p_t^W,R_t^W,Q_{t,1:15}),\quad Q_{t,i}\in SO(3),\quad\beta\in\mathbb R^{10}\text{另存}.
@@ -155,3 +155,7 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 用户进一步要求参考world model，从数学上证明/验证物理合理性并考虑修改。已整理[条件性命题与验证方案](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md)：SO(3)合法解码/增量、固定beta的内部FK结构、明确解剖范围映射、anchor的全局SE(3)等变性；可选固定重建目标的下降验收。输出仍99D，硬解码可在统一TWM内部，不要求恢复独立learned Corrector。
 
 关节范围、下降规则与辅助动力学均未采纳/实现。骨长保证限定16个内部FK中心，非全部21点/mesh；旋转6D须处理退化，生理角度不直接截断6D。每轮改quality/测量可能改变评价目标，下降证明须固定目标；代价下降不证明GT误差下降。物理速度沿timestamps计算，不沿帧内迭代。主动手不能套用无输入能量守恒，真实动力学需要有意义的驱动/惯性/外力与独立验证。
+
+## 2026-10-14 D23 首轮代码事实
+
+用户要求先单库跑起pretrain。4cb1da8的纯轨迹TWM是4层/d128/16 tokens/821,516参数，H30、17组mask，beta与左右手条件；raw/candidate/history分开，上一受损历史anchor，内部51D左乘更新输出完整99D，0.1s预测辅助。不是完整Corrector/取证/可靠性/rollout系统，也不等于用户定案删除C。[源码、配置、验证与限制](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。

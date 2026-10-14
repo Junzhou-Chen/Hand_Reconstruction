@@ -119,3 +119,7 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 GRAB/ARCTIC等注册资源仅在本报告解释标注流程，不自动回到首批数据计划。免申请数据原则仍有效，数据下载与MANO模型asset许可独立。
 
 HO3D的[Terms of use](https://github.com/shreyashampali/ho3d#terms-of-use)已核验为学术非商业用途，含禁止再分发、修改及商业使用的原文。本报告只登记发布条款，不解释其衍生使用边界；之前“未找到明确许可”的记录应更新。eval GT虽已发布，仍应遵守训练/test分割。
+
+## 2026-10-14 已实现的 Oak 编码
+
+D23单库pilot实际实现Oak wxyz quaternion16→旋转矩阵前两列6D、p=源腕中心化规则的tsl、beta10另存；identity6D为[1,0,0,0,1,0]。17输入availability组不改变完整99D输出，51D只是内部切向更新。所选64train/8val完成SO(3)/有限性与静态beta检查，远程数值roundtrip最大误差4.17e-7；无完整MANO FK、HaWoR/Meta/Dex adapter或部分GT loss实现。[事实与边界](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。

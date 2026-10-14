@@ -33,7 +33,8 @@
 | D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；该运维核验阶段未迁移/训练，后续下载见D20。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
 | D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已在12CPU Pod运行，后续用户报告完成且远程status全verified/failed0。scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
 | D21 | 在HaWoR数据复核后，再下载DexYCB与ARCTIC | 2026-10-13用户明确指令；ARCTIC虽需注册，用户本轮已选取，不能仅因旧免申请优先偏好拒绝处理。Dex13分包已后台运行；ARCTIC待实际官方账号，未绕注册。cropped+标注是本轮获取默认选择，非用户已定唯一图像版本或训练混合。[下载实况](../docs/COMPARISON_DATA_DOWNLOADS.md) |
-| D22 | 尚未注册ARCTIC，当前先下载DexYCB；ARCTIC暂缓 | 2026-10-14用户回复账号问题“尚未注册，先下载DexYCB”；替代D21当前推进ARCTIC的安排，保留官方清单，不继续索要凭据、自动注册或启动。Dex已启动的下载继续；未授权新库、预处理或训练。 |
+| D22 | 尚未注册ARCTIC，当前先下载DexYCB；ARCTIC暂缓 | 2026-10-14用户回复账号问题“尚未注册，先下载DexYCB”；替代D21当前推进ARCTIC的安排，保留官方清单，不继续索要凭据、自动注册或启动。Dex已启动的下载继续；当时未授权新库、预处理或训练，随后D23已授权单库pretrain。 |
+| D23 | 从已经下载的四库选一库，先实现并启动pretrain，争取睡前跑起来；数学讨论暂缓 | 2026-10-14用户直接指令，授权必要的模型、单库转换和远程训练。助手选OakInk2官方64 train/8 val子集，保持99D/纯轨迹/当前恢复主任务；4cb1da8正式run后台存活并保存checkpoint。单库、网络规模与噪声超参是本次pilot工程选择，不是最终混合或物理架构定案。[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md) |
 
 ## 已替代的历史路线
 
@@ -58,11 +59,11 @@
 
 **99D状态已按D16选定**，69D/66D是被替代的原框架候选；Corrector的51D切向残差仍为实现建议，canonicalizer不存在。`K=8`、6层、`d=256`、4heads、`N=2`和16帧unroll是历史起步配置。数据、evidence head、可靠性目标、配比和loss权重未实验确定。
 
-用户先要求核验主流表示与MANO标注，[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)提出MANO输出＋joint监督；随后D16采纳99D。状态选择不改变D03–D09，参数转换和joint-only监督仍需验收。
+用户先要求核验主流表示与MANO标注，[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)提出MANO输出＋joint监督；随后D16采纳99D。状态选择不改变D03–D09，Oak参数转换已有子集数值验收；joint-only监督和完整FK仍未实现验收。
 
 数据建议演进：v0 HOT＋Re→v1 HOT＋Oak及Re/EgoDex扩展→D18用户纠正为传感器精度主导。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)恢复GRAB/ARCTIC/Oak/HOT高优先，新增UmeTrack、提升HumanTouch/DexWild主要glove；Re/EgoDex后续单列。**精度优先原则已定，具体库/比例仍建议**；免申请资源先验，未新增用户采纳的混合。[专题证据](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
-HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。GPU和zhou基础CUDA已核；下载脚本有实际文件验收，数据native→99D、完整训练依赖与后续Job续跑仍需检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
+HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。GPU和zhou基础CUDA已核；下载脚本有实际文件验收，D23的Oak99D转换、zhou模型数值检查与首轮训练已落实；其它库、完整FK、实测resume与后续Job续跑仍需检查。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 

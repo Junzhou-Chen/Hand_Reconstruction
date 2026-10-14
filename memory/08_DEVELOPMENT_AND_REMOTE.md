@@ -1,6 +1,6 @@
 # 开发、GitHub同步和远程实验约定
 
-记录日期：2026-10-13。D13/D14为原GitHub与远程分工约定；最新D19因hongfei GPU占用改用ssh ds，并明确授权复用用户预申请Pod。已定约定与下文建议路径分别标注。
+更新日期：2026-10-14。D13/D14为原GitHub与远程分工约定；最新D19因hongfei GPU占用改用ssh ds，并明确授权复用用户预申请Pod。已定约定与下文建议路径分别标注。
 
 ## GitHub与版本管理
 
@@ -32,7 +32,7 @@
 
 ## 运行与复现
 
-每次实验记录本地已推送commit、远程实际commit、配置、数据版本/split、命令、设备、随机种子与产物路径。当前通过Kubernetes Job/Pod运行，长期任务在持久挂载保存checkpoint/日志，并考虑Job时限；基础GPU/CUDA已核，完整训练依赖、恢复和数据路径仍在首次实验前检查。用户现有两卡已申请，不再为本轮学习新申请资源。
+每次实验记录本地已推送commit、远程实际commit、配置、数据版本/split、命令、设备、随机种子与产物路径。当前通过Kubernetes Job/Pod运行，长期任务在持久挂载保存checkpoint/日志，并考虑Job时限；D23已在zhou通过完整TWM数值检查并启动Oak训练；checkpoint持久保存，实测中断恢复尚未验。用户现有两卡已申请，不再为本轮学习新申请资源。
 
 常规同步流程：本机整理并提交→push `origin/main`→远程确认工作区状态→fast-forward更新→远程运行。若远程修改了代码，先保存并提交这些改动，不用reset或rsync覆盖。
 
@@ -64,3 +64,9 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 纽约2026-10-14用户回复尚未注册ARCTIC，先DexYCB；不继续要求凭据或启动ARCTIC，清单保留。Dex只读快照04:00:17 UTC：PID329 alive/running，85.51/127.61GB已写含partial，verified7/checking2/downloading1/pending3/failed0。本轮前两次SSH返回UNKNOWN port65535连接关闭，后续显式ControlMaster=no/ControlPath=none的重试成功；有效配置本就没启用复用，不能据此认定stale socket，具体原因未知。未改SSH文件、任务、Job或数据。
 
 随后核验Dex于04:15:58 UTC正常complete，13包全verified/failed0；四库合531.87GB，均不重启。用户要求检查四库能否TWM训练，06:08:55 UTC在Pod/zhou以CPU运行056122f标注审计：3Oak×20帧、4HOT、4Ume、6Dex与calibration；完整JSON存data10/Hand_Reconstruction/audits/twm_four_datasets_20261014.json，Git只同步脚本和摘要。未下载MANO资产、读取图像、全量预处理、运行网络或训练。[字段记录与边界](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)
+
+## D23 纯轨迹首轮预训练已启动
+
+2026-10-14用户授权从已下载四库先选一库pretrain，数学暂缓。本机只编辑/AST，Oak准备、数值8项检查、3步smoke和正式训练均在既有Pod的zhou中执行。正式源码4cb1da83cc86732b36cea76673bb1e703eae4102已同步，PID805自09:01:01UTC在GPU0后台运行，09:05 UTC step7275存活。数据在data10/prepared/oakink2_99d_pilot_v1，正式产物在data10/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014；best/latest每500步保存持久盘，不需SSH不断线。50k自然完成，不自动重复启动、新建或续期Job。
+
+运行状态由scripts/ds_train_twm.py status读取；只有进程停止且确需继续才start --resume。checkpoint保存主要训练状态，但DataLoader shuffle游标未存，实测中断重启尚未验。Smoke误写版本b04de13已在远程provenance_correction.json记录实际8593fcb，正式run自动捕获4cb1da8正确。所有大产物/原始日志留远程，Git仅源码与小摘要。[完整运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
