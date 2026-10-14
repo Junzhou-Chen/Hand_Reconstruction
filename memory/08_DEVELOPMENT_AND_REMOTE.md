@@ -58,3 +58,7 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 ## D21追加DexYCB与ARCTIC
 
 用户随后明确请求新两库。代码20c64c2于UTC10-14 03:33（纽约10-13 23:33）在现有Pod启动；DexPID329/3workers，127.61GB官方13分包，03:36快照约10.66GB已写含partial，verified3/failed0。ARCTICPID330正常退出、waiting_credentials，343包仅manifest准备，无数据包获取；已问用户私有配置路径。gdown6.4.2在data10/download_runtime隔离安装，不修改zhou；校验脚本8f5d9f1的7项HTTP/CRC测试在Pod通过。源码/小文档同步Git，数据及receipts/原始日志只在data10。[详细检查与启动](../docs/COMPARISON_DATA_DOWNLOADS.md)
+
+## D22先DexYCB，ARCTIC暂缓
+
+纽约2026-10-14用户回复尚未注册ARCTIC，先DexYCB；不继续要求凭据或启动ARCTIC，清单保留。Dex只读快照04:00:17 UTC：PID329 alive/running，85.51/127.61GB已写含partial，verified7/checking2/downloading1/pending3/failed0。本轮前两次SSH返回UNKNOWN port65535连接关闭，后续显式ControlMaster=no/ControlPath=none的重试成功；有效配置本就没启用复用，不能据此认定stale socket，具体原因未知。未改SSH文件、任务、Job或数据。

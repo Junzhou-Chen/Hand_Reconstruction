@@ -1,6 +1,6 @@
 # HandLoop 项目记忆入口
 
-更新日期：2026-10-13。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
+更新日期：2026-10-14。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
 
 **核心 idea：将高精度 glove/MoCap 轨迹中学到的手部结构和运动知识，转移到头戴 RGB 的当前状态估计中。让当前可信的局部视觉观测帮助修复不可见或错误的关节，并通过帧内取证和跨帧反馈持续校正。**
 
@@ -18,7 +18,7 @@
 
 **HaWoR对比数据复核：** 用户希望在其训练/测试库比较。其视觉训练HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller只HOT；主定量为HOT3D Aria27 validation与DexYCB test，EPIC定性。建议主HOT＋补Dex，不把四库全部写成原测试。发布HOT evaluator有GT crop/visibility、右手、100帧/含scale对齐且未调infiller；Dex fork默认s0_test但专用推理/依赖尚待补。当前HOT预训练包不含349个评测来源clips，完整27VRS需另准备。[数据与对比协议](docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
-**最新D21获取任务：** 用户已明确再下载DexYCB与ARCTIC。Dex13个官方分包127.61GB已在同Pod后台启动，3workers，已验证首批包、failed0；ARCTIC343包（cropped图像＋标注）清单与官方SHA已准备，但缺ARCTIC账号，状态waiting_credentials，没有数据下载。已向用户询问服务器私有配置路径，不在聊天传密码。7项远程续传/压缩包检查通过，未解压/训练。[新两库下载与账号配置](docs/COMPARISON_DATA_DOWNLOADS.md)
+**D21获取与最新D22安排：** Dex13个官方分包127.61GB已在Pod后台启动，3workers；7项远程下载检查通过。用户已回复尚未注册ARCTIC，本轮先下载DexYCB，ARCTIC暂缓，不继续索要凭据或自动注册/启动。ARCTIC343包清单与SHA保留，无数据包下载。最新04:00:17 UTC（纽约10-14 00:00）Dex alive/running，已写85.51GB含partial，verified7/checking2/failed0，未完成。未解压/训练。[下载与安排](docs/COMPARISON_DATA_DOWNLOADS.md)
 
 **最新数据原则D18（2026-10-13）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入，混合未定。主候选具备完整任务字段条件；glove需验映射/腕质量，OpenGraph只确认局部补充，尚无本项目适配验收，不将候选全称为“完全适配”。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 

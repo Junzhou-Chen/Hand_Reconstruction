@@ -33,6 +33,7 @@
 | D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；该运维核验阶段未迁移/训练，后续下载见D20。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
 | D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已在12CPU Pod运行，后续用户报告完成且远程status全verified/failed0。scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
 | D21 | 在HaWoR数据复核后，再下载DexYCB与ARCTIC | 2026-10-13用户明确指令；ARCTIC虽需注册，用户本轮已选取，不能仅因旧免申请优先偏好拒绝处理。Dex13分包已后台运行；ARCTIC待实际官方账号，未绕注册。cropped+标注是本轮获取默认选择，非用户已定唯一图像版本或训练混合。[下载实况](../docs/COMPARISON_DATA_DOWNLOADS.md) |
+| D22 | 尚未注册ARCTIC，当前先下载DexYCB；ARCTIC暂缓 | 2026-10-14用户回复账号问题“尚未注册，先下载DexYCB”；替代D21当前推进ARCTIC的安排，保留官方清单，不继续索要凭据、自动注册或启动。Dex已启动的下载继续；未授权新库、预处理或训练。 |
 
 ## 已替代的历史路线
 

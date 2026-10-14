@@ -1,5 +1,12 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-14 ARCTIC暂缓与DexYCB优先
+
+- 用户回复尚未注册ARCTIC，当前先下载DexYCB，登记D22，替代D21本轮推进ARCTIC的安排；保留清单但不继续索要凭据、注册或启动ARCTIC。
+- Dex已启动进程不做重启或终止；本轮只读查询最新状态，未运行预处理/训练。进度以真实远程记录为准，不把旧约30GB快照当当前完成状态。
+- 两次SSH关闭后只读重试成功，04:00:17 UTC快照Dex仍alive/running，已写85.51/127.61GB含partial，verified7/checking2/failed0。连接原因未定，未改配置或进程；未宣称下载完成。
+- 更新入口、决定、进展与下载操作说明，维持数据/日志仅在远程的约定。
+
 ## 2026-10-13 追加DexYCB与ARCTIC获取
 
 - D21用户明确下载两库；继续计算Pod执行，不在登录节点传输大数据。Dex13个官方Drive分包127611176595B后台启动，3workers；03:36 UTC快照约10.66GB含partial、verified3/failed0。

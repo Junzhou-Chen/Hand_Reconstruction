@@ -1,6 +1,6 @@
 # HandLoop 进展与下一步
 
-更新日期：2026-10-13。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
+更新日期：2026-10-14。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
 
 ## 已有和未有的产物
 
@@ -15,7 +15,7 @@
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
 | Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
 | 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；没有解压/99D转换 |
-| DexYCB / ARCTIC获取 | D21用户要求；Dex13包127.61GB在Pod3workers后台下载；ARCTIC343包计划完成，缺官方账号，waiting_credentials | [状态与配置](../docs/COMPARISON_DATA_DOWNLOADS.md)；7项远程检查通过，ARCTIC无真实登录/数据下载验收 |
+| DexYCB / ARCTIC获取 | Dex13包127.61GB已在Pod后台启动；D22用户尚未注册ARCTIC，明确当前先Dex，ARCTIC暂缓 | [状态与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；7项远程检查通过，ARCTIC保留清单、无数据包下载 |
 | HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
@@ -40,7 +40,7 @@
 
 ## 推荐执行顺序与交付条件
 
-建库和首轮TWM数据调查已完成，D20三库在ds完成下载与校验。随后已核HaWoR训练/测试库，用户D21再要求Dex/ARCTIC获取：Dex已后台运行，ARCTIC缺账号待用户配置；未预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程或训练；所有后续实验远程执行。
+建库和首轮TWM数据调查已完成，D20三库在ds完成下载与校验。D21启动Dex并准备ARCTIC；D22用户明确尚未注册，当前先Dex，ARCTIC暂缓。未预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程或训练；所有后续实验远程执行。
 
 按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
@@ -95,4 +95,4 @@
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。三库complete不重复下载，Dex已后台运行，先查实时status；ARCTIC已准备清单，但需服务器私有账号配置，见docs/COMPARISON_DATA_DOWNLOADS.md。用户要做HaWoR对比，HOT27 full eval仍缺，官方GT crop与部署检测/infiller实验分开。本轮没有预处理/训练；后续按具体指令在ds落实，保持raw reference、可用性和坐标来源，不把传输校验当几何验收或方法收益。
+> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。三库complete不重复下载，Dex已启动，先查实际status。D22用户尚未注册ARCTIC且当前先Dex，不继续要求账号或自动注册/启动，清单保留。用户要做HaWoR对比，HOT27 full eval仍缺，官方GT crop与部署检测/infiller实验分开。本轮没有预处理/训练，后续按具体指令在ds落实；传输校验不等于几何验收或方法收益。
