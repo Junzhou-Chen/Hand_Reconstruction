@@ -22,12 +22,15 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import multiprocessing
+import os
 from pathlib import Path, PurePosixPath
 import re
+import shutil
 import sys
 import tarfile
 import time
 import traceback
+import zipfile
 
 import numpy as np
 
@@ -219,10 +222,11 @@ def save_arrays(directory: Path, arrays):
     return checksums
 
 
-def save_npz(destination: Path, arrays):
-    """Atomically save every array, with distinct content and container hashes."""
+def save_npz(destination: Path, arrays, *, reuse_equivalent_files=False):
+    """Save all arrays, or retain an existing file only after exact verification."""
     destination.parent.mkdir(parents=True, exist_ok=True)
-    if destination.exists():
+    exists = destination.exists()
+    if exists and not reuse_equivalent_files:
         raise FileExistsError(destination)
     checksums = {}
     for name, value in arrays.items():
@@ -234,13 +238,27 @@ def save_npz(destination: Path, arrays):
             "content_sha256": hashlib.sha256(value.tobytes(order="C")).hexdigest(),
             "content_hash_encoding": "C-order ndarray data bytes; dtype and shape recorded separately",
             "nbytes": value.nbytes, "shape": list(value.shape), "dtype": str(value.dtype)}
-    temporary = destination.with_name(destination.name + ".tmp")
-    with temporary.open("xb") as stream:
-        np.savez(stream, **arrays)
-    temporary.replace(destination)
+    if exists:
+        with np.load(destination, allow_pickle=False) as stored:
+            if len(stored.files) != len(arrays) or set(stored.files) != set(arrays):
+                raise ValueError(f"Existing NPZ keys differ: {destination}")
+            for name, value in arrays.items():
+                value, previous = np.asarray(value), stored[name]
+                if (previous.dtype != value.dtype or previous.shape != value.shape
+                        or previous.tobytes(order="C") != value.tobytes(order="C")):
+                    raise ValueError(f"Existing NPZ array differs: {destination}:{name}")
+        with zipfile.ZipFile(destination) as archive:
+            if any(member.compress_type != zipfile.ZIP_STORED for member in archive.infolist()):
+                raise ValueError(f"Existing NPZ is not uncompressed: {destination}")
+    else:
+        temporary = destination.with_name(destination.name + f".tmp.{os.getpid()}")
+        with temporary.open("xb") as stream:
+            np.savez(stream, **arrays)
+        temporary.replace(destination)
     artifact = {"sha256": file_hash(destination), "bytes": destination.stat().st_size,
                 "format": "npz", "compression": "ZIP_STORED",
-                "members": [name + ".npy" for name in arrays]}
+                "members": [name + ".npy" for name in arrays],
+                "reused_existing_equivalent": exists}
     return checksums, artifact
 
 
@@ -381,7 +399,8 @@ def convert(job):
         artifact = None
         if storage == "npz":
             relative += ".npz"
-            hashes, artifact = save_npz(output / relative, arrays)
+            hashes, artifact = save_npz(output / relative, arrays,
+                                       reuse_equivalent_files=job.get("reuse_equivalent_files", False))
         elif storage == "npy":
             hashes = save_arrays(output / relative, arrays)
         else:
@@ -424,6 +443,8 @@ def main():
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--storage", choices=("npy", "npz"), default="npy",
                         help="npy: per-array mmap files; npz: one uncompressed file per hand")
+    parser.add_argument("--reuse-equivalent-files", action="store_true",
+                        help="NPZ only: recompute every TAR/FK and retain existing files only when every array is bitwise identical")
     parser.add_argument("--seed", type=int, default=20261014)
     parser.add_argument("--val-fraction", type=float, default=0.1)
     parser.add_argument("--limit", type=int, default=0, help="total TARs after full split; 2 selects one train and one val; 0=all")
@@ -432,9 +453,12 @@ def main():
         parser.error("Data preparation runs on the existing remote ds Pod, not the local machine")
     if args.workers < 1 or args.batch_size < 1 or args.limit < 0 or not 0 < args.val_fraction < 1:
         parser.error("positive workers/batch-size, limit>=0 and 0<val-fraction<1 required")
+    if args.reuse_equivalent_files and args.storage != "npz":
+        parser.error("--reuse-equivalent-files requires --storage npz")
     args.root, args.output = args.root.resolve(), args.output.resolve()
     args.mano_models = args.mano_models.resolve()
-    if args.output.exists() and any(args.output.iterdir()):
+    output_nonempty = args.output.exists() and any(args.output.iterdir())
+    if output_nonempty and not args.reuse_equivalent_files:
         parser.error("Choose a fresh output directory to preserve immutable preparation provenance")
     source, receipt, jobs, split = make_plan(args.root, args.dataset, args.seed, args.val_fraction, args.limit)
     # Fail before creating outputs or workers when assets/runtime are missing.
@@ -456,6 +480,9 @@ def main():
                 "availability_policy": "source_* arrays cover all discovered frame IDs; native_valid tests schema/finite values only, not accuracy",
                 "native_supervision": "not consumed by this MANO-only preparation; source profiles/poses remain in immutable original TAR",
                 "split": split, "bounded_limit": args.limit,
+                "reuse_equivalent_files": args.reuse_equivalent_files,
+                "reuse_policy": "Every selected source TAR is reread and full FK/arrays recomputed; existing NPZ reused only after exact key/dtype/shape/C-order-byte comparison; mismatch fails",
+                "workers": args.workers, "batch_size": args.batch_size,
                 "storage": args.storage,
                 "storage_policy": ("immutable per-hand NPY directory; per-file SHA256"
                                    if args.storage == "npy" else
@@ -470,10 +497,32 @@ def main():
                 "decoder_script_sha256": file_hash(Path(sys.modules[MANOReferenceDecoder.__module__].__file__)),
                 "preparation_python": sys.version, "preparation_numpy": np.__version__,
                 "sequences": [], "clips": []}
+    if output_nonempty:
+        previous_plan = args.output / "preparation_plan.json"
+        if not previous_plan.is_file():
+            raise ValueError("Reuse requires the previous preparation_plan.json provenance")
+        previous = json.loads(previous_plan.read_text())
+        for key in ("dataset", "source_repo", "source_revision", "source_manifest_sha256", "split",
+                    "storage", "decoder_provenance", "decoder_script_sha256"):
+            if previous.get(key) != manifest[key]:
+                raise ValueError(f"Reuse provenance differs for {key}; choose a fresh output directory")
+        # Retain prior plan/status/complete manifest before publishing this run.
+        # A preparation-script change is recorded, never a reason to skip FK.
+        history = args.output / "previous_preparations" / f"{time.time_ns()}_{os.getpid()}"
+        history.mkdir(parents=True, exist_ok=False)
+        snapshots = {}
+        for name in ("preparation_plan.json", "preparation_status.json", "manifest.json"):
+            original = args.output / name
+            if original.is_file():
+                destination = history / name
+                shutil.copyfile(original, destination)
+                snapshots[name] = {"path": str(destination.relative_to(args.output)),
+                                   "sha256": file_hash(destination)}
+        manifest["previous_metadata_snapshots"] = snapshots
     save_json(args.output / "preparation_plan.json", manifest)
     for job in jobs:
         job.update(root=str(args.root), output=str(args.output), batch_size=args.batch_size,
-                   storage=args.storage)
+                   storage=args.storage, reuse_equivalent_files=args.reuse_equivalent_files)
     started, last_report = time.monotonic(), 0.0
     try:
         with ProcessPoolExecutor(max_workers=args.workers,
@@ -516,6 +565,14 @@ def main():
         raise RuntimeError("Prepared group leakage")
     manifest["phase"], manifest["completed_utc"] = "complete", now()
     manifest["full_fk_executed"] = True
+    reused = sum(entry.get("storage_artifact", {}).get("reused_existing_equivalent", False)
+                 for entry in manifest["sequences"])
+    manifest["revalidation_counts"] = {
+        "source_tars_reread_and_fully_decoded": len(manifest["clips"]),
+        "hand_sequences_recomputed": len(manifest["sequences"]),
+        "arrays_recomputed": sum(len(entry["arrays"]) for entry in manifest["sequences"]),
+        "existing_npz_sequences_verified_and_retained": reused,
+        "new_hand_sequence_artifacts_written": len(manifest["sequences"]) - reused}
     manifest["frames_by_split"] = {s: sum(entry["frames"] for entry in manifest["sequences"] if entry["split"] == s)
                                    for s in ("train", "val")}
     all_audits = [audit for clip in manifest["clips"] for audit in clip["hands"]]
