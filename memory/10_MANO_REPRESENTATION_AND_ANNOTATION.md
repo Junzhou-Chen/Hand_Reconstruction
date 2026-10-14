@@ -98,6 +98,8 @@ HandX的rotation scalar补充也说明，关節位置不能唯一描述所有骨
 
 ## 后续已定99D与实现边界
 
+**2026-10-14实际release勘误：** HOT3D-Clips与独立UmeTrack HF样本的MANO thetas只有15维，官方Meta decoder使用PCA15，不能当15×3的完整轴角；native joint_angles样本为22项。Dex pose_m51中的finger45亦为PCA45，官方flat_hand_mean=False。Oak sampled raw_mano为16×wxyz quaternion、tsl3、beta10。99D输出仍固定；均先按source PCA/mean或quat完整解码，MANO transl与解剖wrist分开。源版本、样本及缺失mask见[实物审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)，不是99D roundtrip通过。
+
 早先调查建议MANO输出＋joint监督；2026-10-13用户明确“我们使用99D”，现按D16采纳，取代69D默认候选。主线不变，转换/监督/效果仍待验收。
 
 1. **已选99D动态MANO状态**：实际wrist p3＋root6＋15×finger6；shape10人物/序列条件另存。root translation与腕点正确换算，源45D先完整解码hand mean后统一旋转。

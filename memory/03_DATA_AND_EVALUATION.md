@@ -1,6 +1,6 @@
 # HandLoop 数据与评测记忆
 
-更新日期：2026-10-13。以下是数据角色、评测设计和待落地约定；Oak/HOT有效train/Ume real原包已在ds完成下载及hash校验，尚无canonical loader、99D转换或实验结果。[获取记录](../docs/TWM_DATA_DOWNLOADS.md)。设计依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据来源见[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)，方法引用见[写作核验](05_WRITING_AND_REFERENCES.md)。
+更新日期：2026-10-14。Oak/HOT有效train/Ume real/Dex原包均完成，531.87GB；已有限字段抽查，尚无canonical loader、99D/FK验收或模型实验。[实际字段审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)。设计依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据来源见[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)，方法引用见[写作核验](05_WRITING_AND_REFERENCES.md)。
 
 ## 两个数据池
 
@@ -15,6 +15,8 @@
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
 
 **HaWoR对比复核：** 视觉训练四库HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller单HOT；主定量HOT Aria27 validation/world＋Dex test/camera，EPIC定性。建议首轮主HOT补Dex，ARCTIC/HO3D另加则标为扩展。当前官方HOT evaluator为GT crop/visibility、右手、GT-valid交集、100帧含scale对齐，未调用infiller；部署detector/双手/不可见恢复另报。Dex作者fork默认s0_test，缺预测ID会跳过，须锁定共同覆盖。本轮只核资料，没有运行baseline。[完整协议与资源缺口](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
+
+**四个已下载来源的后续审计：** 字段条件允许用于pure-motion TWM，建议MoCap三库核心＋Dex train补充，不按四库等精度/等权监督。Oak raw_mano有16 quaternion/tsl/beta；HOT/Ume MANO为PCA15＋root axis-angle/transl，Dex为PCA45＋非flat mean的51D，需源模型展开后编码99D。Ume样本native与MANO可独立缺失；HOT有真实ref timestamps，Ume抽查包仅frame IDs；Dex TAR顺序乱序且多view共享motion。固定train后排序、mask、时间与腕原点/FK验收仍待做，不能把全包含val/test都用于训练。[代码与样本范围](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)
 
 v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验收可用MoCap及glove，按质量和字段能力训练；99D不要求源原生MANO。DexYCB仍可纯轨迹恢复对照，固定第三视角不是排除条件；它的论文用频率不使其GT优先于独立sensor参考。
 

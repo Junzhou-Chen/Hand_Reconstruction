@@ -15,7 +15,8 @@
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
 | Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
 | 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；没有解压/99D转换 |
-| DexYCB / ARCTIC获取 | Dex13包127.61GB已在Pod后台启动；D22用户尚未注册ARCTIC，明确当前先Dex，ARCTIC暂缓 | [状态与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；7项远程检查通过，ARCTIC保留清单、无数据包下载 |
+| DexYCB / ARCTIC获取 | Dex13包127.61GB已complete，全verified/failed0；D22 ARCTIC暂缓 | [完成与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；ARCTIC保留清单、无数据包下载 |
+| 四库实际标注与TWM适用检查 | 样本字段可作为TWM监督来源；Meta PCA15、Dex PCA45、Oak quaternion16已核，时间/mask/split待统一 | [远程抽查](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)；代码056122f、3Oak/4HOT/4Ume/6Dex；无FK或训练结论 |
 | HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
@@ -28,7 +29,7 @@
 | TWM完整99D输出 | 用户再次明确每手完整99D主输出；已区分统一输出、完整模型参考与部分几何监督 | [输出契约](../docs/TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)；未实现转换或训练 |
 | 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；无模型训练 |
-| 模型源码、完整训练依赖、权重、训练就绪数据 | 尚未建立；现有源码仅数据获取/检查脚本，原包下载已完成 | ds基础CUDA与传输hash验证不等于99D转换/TWM实验已完成 |
+| 模型源码、完整训练依赖、权重、训练就绪数据 | 尚未建立；现有源码为获取/检查/字段审计，四库原包已完成 | 传输和样本字段检查不等于99D/FK/TWM实验验收 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
 
@@ -40,7 +41,7 @@
 
 ## 推荐执行顺序与交付条件
 
-建库和首轮TWM数据调查已完成，D20三库在ds完成下载与校验。D21启动Dex并准备ARCTIC；D22用户明确尚未注册，当前先Dex，ARCTIC暂缓。未预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程或训练；所有后续实验远程执行。
+建库和首轮TWM数据调查已完成，四库原包现已全部完成；D22 ARCTIC暂缓。已在Pod做有限字段审计，下一步仍需源PCA/mean/quat解码、实际wrist、单位/time/mask与split的adapter验收；没有全量预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程；所有实验远程执行。
 
 按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
@@ -95,4 +96,4 @@
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。三库complete不重复下载，Dex已启动，先查实际status。D22用户尚未注册ARCTIC且当前先Dex，不继续要求账号或自动注册/启动，清单保留。用户要做HaWoR对比，HOT27 full eval仍缺，官方GT crop与部署检测/infiller实验分开。本轮没有预处理/训练，后续按具体指令在ds落实；传输校验不等于几何验收或方法收益。
+> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。四库complete不重复下载；当前已做有界字段审计，按docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md处理Meta PCA15/Dex PCA45与shape、wrist、时间、独立mask，尚无99D/FK验收。D22 ARCTIC暂缓，HOT27 full eval仍缺，官方GT crop与部署检测/infiller实验分开。后续按具体指令在ds实现adapter/训练，传输或字段检查不是几何精度与方法收益。

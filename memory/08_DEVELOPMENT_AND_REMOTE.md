@@ -62,3 +62,5 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 ## D22先DexYCB，ARCTIC暂缓
 
 纽约2026-10-14用户回复尚未注册ARCTIC，先DexYCB；不继续要求凭据或启动ARCTIC，清单保留。Dex只读快照04:00:17 UTC：PID329 alive/running，85.51/127.61GB已写含partial，verified7/checking2/downloading1/pending3/failed0。本轮前两次SSH返回UNKNOWN port65535连接关闭，后续显式ControlMaster=no/ControlPath=none的重试成功；有效配置本就没启用复用，不能据此认定stale socket，具体原因未知。未改SSH文件、任务、Job或数据。
+
+随后核验Dex于04:15:58 UTC正常complete，13包全verified/failed0；四库合531.87GB，均不重启。用户要求检查四库能否TWM训练，06:08:55 UTC在Pod/zhou以CPU运行056122f标注审计：3Oak×20帧、4HOT、4Ume、6Dex与calibration；完整JSON存data10/Hand_Reconstruction/audits/twm_four_datasets_20261014.json，Git只同步脚本和摘要。未下载MANO资产、读取图像、全量预处理、运行网络或训练。[字段记录与边界](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)

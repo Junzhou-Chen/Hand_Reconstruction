@@ -4,6 +4,8 @@
 
 本次不再只由截图八库决定训练组合。12项相关论文的数据职责、版本与来源见[论文证据表](TWM_DATA_PAPER_EVIDENCE.md)。99D替代原69D默认接口；选定表示不代表已验证训练效果。
 
+**2026-10-14工程核验更新：** Oak/HOT/Ume/Dex四库原包均已完成，实际有限标注审计见[四库适用性](TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)。Meta MANO为15 PCA coefficients，Dex finger为45 PCA coefficients，按源basis/mean展开；目前仅字段/有限性/索引确认，尚无99D/FK验收。当前已下载池建议前三MoCap核心＋Dex train补充，保留本计划glove方向与候选职责，不固定混合或自动启动训练。
+
 ## 0. 当前推荐的预训练组合
 
 用户本轮要求重新总结。以下是基于此前论文职责核验、八库采集审计及精度判断的**执行建议，不是新用户采纳的固定混合，也未通过实际adapter验收**。

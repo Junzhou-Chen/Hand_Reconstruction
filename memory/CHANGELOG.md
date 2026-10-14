@@ -1,5 +1,12 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-14 四库完成与实际字段审计
+
+- 用户要求查看是否下载完、四库是否均适合TWM。核所有remote status complete，634/2461/1021/13文件全verified/failed0，531865069350B；Dex完成于04:15:58 UTC。ARCTIC继续D22暂缓。
+- 新增远程-only样本审计源码056122f，06:08:55 UTC在Pod/zhou CPU读取3Oak×20帧、4HOT clips、4Ume real序列、6Dex labels与calibration；详细JSON仅留data10/audits，小型摘要见[四库记录](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)。未读图像/跑网络/训练。
+- 核实际Meta PCA15、Dex PCA45+hand mean、Oak quaternion16；Ume native与MANO独立缺标签、序列非固定帧数，无绝对info timestamps；HOT真实dt有jitter；Dex TAR迭代乱序。更新99D解码/时间/mask/split注意事项，不宣称FK、真值精度或全库质量通过。
+- 建议三MoCap来源核心＋Dex train补充/目标域适配，维持sensor优先与glove候选，未固定混合比；train/test严格分开。更新入口、状态、数据、表示专题及下载完成记忆，正常同步GitHub。
+
 ## 2026-10-14 ARCTIC暂缓与DexYCB优先
 
 - 用户回复尚未注册ARCTIC，当前先下载DexYCB，登记D22，替代D21本轮推进ARCTIC的安排；保留清单但不继续索要凭据、注册或启动ARCTIC。
