@@ -1,0 +1,40 @@
+{
+  "seed": 20261014,
+  "history_frames": 30,
+  "forecast_offset_frames": 3,
+  "window_stride": 4,
+  "batch_size": 64,
+  "steps": 50000,
+  "learning_rate": 0.0002,
+  "weight_decay": 0.01,
+  "warmup_steps": 500,
+  "eval_every": 1000,
+  "save_every": 500,
+  "log_every": 25,
+  "eval_batches": 16,
+  "forecast_weight": 0.1,
+  "model": {
+    "backbone": "structured_mamba",
+    "d_model": 256,
+    "num_layers": 6,
+    "nhead": 4,
+    "dim_feedforward": 512,
+    "dropout": 0.1,
+    "forecast_horizon": 1,
+    "translation_scale": 0.1,
+    "rotation_scale": 0.5,
+    "check_finite": false,
+    "mamba_state_size": 64,
+    "mamba_conv": 4,
+    "mamba_expand": 2
+  },
+  "required_datasets": [
+    "oakink2",
+    "hot3d",
+    "umetrack",
+    "dexycb"
+  ],
+  "source_sampling": "equal_source",
+  "cache_sequences": 256,
+  "cache_bytes": 1073741824
+}

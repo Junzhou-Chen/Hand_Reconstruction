@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remote-only OakInk2 pilot: current restoration plus short forecast.
+"""Remote-only trajectory pretraining: current restoration plus short forecast.
 
 Metrics are wrist xyz (mm) and root/finger SO(3) error (degrees), against
 source fitted MANO reference. No joint MPJPE/mesh result without MANO assets.
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import math
 import os
@@ -24,7 +25,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Subset
 from handloop import geometry as g
-from handloop.data.trajectory import TrajectoryWindows
+from handloop.data.trajectory import TrajectoryWindows, SourceBalancedSampler
 from handloop.models import TWM, TWMConfig
 
 
@@ -38,6 +39,11 @@ def atomic_json(path,value):
 
 
 def sample_batch(batch, generator, mode='mixed'):
+    # This trainer supervises all 99D groups. Partial labels require a separate
+    # masked/geometric objective; never use their finite placeholders as GT.
+    for key in ('past_current_gt_mask','future_gt_mask'):
+        if key in batch and not bool(batch[key].all()):
+            raise ValueError('This full-state trainer requires complete MANO GT')
     clean=batch['past_current'].float()
     b,h1,_=clean.shape
     h=h1-1
@@ -107,6 +113,7 @@ def sample_batch(batch, generator, mode='mixed'):
             'availability':available,'candidate_availability':torch.ones_like(available),
             'dt':batch['dt'],'beta':batch['beta'],'handedness':batch['handedness'],
             'quality':quality,'history_quality':None,'forecast_dt':batch['forecast_dt']}
+    if 'beta_valid' in batch: kwargs['beta_valid']=batch['beta_valid']
     return history,raw,candidate,kwargs,target,future
 
 
@@ -151,6 +158,19 @@ def evaluate(model,loader,device,config):
     return result
 
 
+def evaluate_sources(model,loaders,device,config):
+    """Keep each source visible; aggregate metrics give each source equal weight."""
+    by_dataset={name:evaluate(model,loader,device,config) for name,loader in loaders.items()}
+    result={}
+    for mode in ('noisy','missing','clean'):
+        result[mode]={key:sum(values[mode][key] for values in by_dataset.values())/len(by_dataset)
+                      for key in next(iter(by_dataset.values()))[mode] if key!='samples'}
+        result[mode]['samples']=sum(values[mode]['samples'] for values in by_dataset.values())
+    result['by_dataset']=by_dataset
+    result['aggregation']='equal source mean; samples is total evaluated windows'
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest',type=Path,required=True)
@@ -181,12 +201,22 @@ def main():
         ],lr=config['learning_rate'])
     else:
         optimizer=torch.optim.AdamW(model.parameters(),lr=config['learning_rate'],weight_decay=config['weight_decay'])
-    train=TrajectoryWindows(args.manifest,'train',config['history_frames'],config['forecast_offset_frames'],config['window_stride'])
-    val=TrajectoryWindows(args.manifest,'val',config['history_frames'],config['forecast_offset_frames'],config['window_stride'])
-    loader=DataLoader(train,batch_size=config['batch_size'],shuffle=True,num_workers=0,pin_memory=True,drop_last=True,
+    data_options={key:config[key] for key in ('cache_sequences','cache_bytes') if key in config}
+    train=TrajectoryWindows(args.manifest,'train',config['history_frames'],config['forecast_offset_frames'],config['window_stride'],**data_options)
+    val=TrajectoryWindows(args.manifest,'val',config['history_frames'],config['forecast_offset_frames'],config['window_stride'],**data_options)
+    required=tuple(config.get('required_datasets',train.dataset_names))
+    if set(required)!=set(train.dataset_names) or set(required)!=set(val.dataset_names):
+        raise ValueError(f'Required sources {required} differ from train/val manifests')
+    for name in required:
+        if not train.windows_by_dataset[name] or not val.windows_by_dataset[name]:
+            raise ValueError(f'Required source {name} has no train/val windows')
+    balanced=config.get('source_sampling','window_uniform')=='equal_source'
+    sampler=SourceBalancedSampler(train,num_samples=config['steps']*config['batch_size'],seed=config['seed']) if balanced else None
+    loader=DataLoader(train,batch_size=config['batch_size'],shuffle=not balanced,sampler=sampler,num_workers=0,pin_memory=True,drop_last=True,
                       generator=torch.Generator().manual_seed(config['seed']))
-    val_ids=np.linspace(0,len(val)-1,min(len(val),config['batch_size']*config['eval_batches']),dtype=int).tolist()
-    val_loader=DataLoader(Subset(val,val_ids),batch_size=config['batch_size'],num_workers=0,pin_memory=True)
+    val_indices=val.fixed_indices_by_dataset(config['batch_size']*config['eval_batches'])
+    val_loaders={name:DataLoader(Subset(val,indices),batch_size=config['batch_size'],num_workers=0,pin_memory=True)
+                 for name,indices in val_indices.items()}
     if not len(loader): raise RuntimeError('Training dataset smaller than one batch')
     stop={'requested':False}
     def request_stop(signum,frame): stop['requested']=True
@@ -194,13 +224,21 @@ def main():
     start_step=0; best=float('inf')
     if args.resume:
         checkpoint=torch.load(args.resume,map_location=device,weights_only=False)
+        previous=checkpoint.get('run',{})
+        if checkpoint['config']!=config or previous.get('manifest')!=str(args.manifest):
+            raise ValueError('Resume requires the same data/config protocol; use a fresh run for four-source pretraining')
+        manifest_hash=hashlib.sha256(args.manifest.read_bytes()).hexdigest()
+        if previous.get('manifest_sha256',manifest_hash)!=manifest_hash:
+            raise ValueError('Prepared manifest changed since the checkpoint was saved')
         model.load_state_dict(checkpoint['model']); optimizer.load_state_dict(checkpoint['optimizer'])
         start_step=checkpoint['step']; best=checkpoint.get('best_validation_loss',best)
         if 'rng_state' in checkpoint: generator.set_state(checkpoint['rng_state'].cpu())
         if 'torch_rng_state' in checkpoint: torch.set_rng_state(checkpoint['torch_rng_state'].cpu())
         if 'cuda_rng_states' in checkpoint: torch.cuda.set_rng_state_all([v.cpu() for v in checkpoint['cuda_rng_states']])
+        if sampler is not None and 'sampler_state' in checkpoint: sampler.load_state_dict(checkpoint['sampler_state'])
     run={'started_utc':utc(),'phase':'starting','pid':os.getpid(),'code_version':args.code_version,
-         'config':config,'manifest':str(args.manifest),'dataset_revision':train.metadata['source_revision'],
+         'config':config,'manifest':str(args.manifest),'dataset_revision':train.source_revisions,
+         'manifest_sha256':hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
          'train_windows':len(train),'val_windows':len(val),'train_trajectories':len(train.sequences),'val_trajectories':len(val.sequences),
          'parameters':sum(p.numel() for p in model.parameters()),'torch':torch.__version__,
          'backbone':model.config.backbone,
@@ -208,7 +246,13 @@ def main():
          'python':sys.executable,
          'gpu':torch.cuda.get_device_name(device),'rotation6d':g.ROTATION_6D_CONVENTION,
          'metrics':'source wrist xyz mm; root/finger geodesic degrees; NO MPJPE/mesh; fitted MANO reference',
-         'scope':'OakInk2 recording-disjoint pilot; synthetic corruption only; no RGB, no real HaWoR adaptation'}
+         'scope':'complete-MANO trajectory current restoration; synthetic corruption only; no RGB, no real HaWoR adaptation',
+         'dataset_names':train.dataset_names,'train_windows_by_dataset':train.windows_by_dataset,
+         'val_windows_by_dataset':val.windows_by_dataset,'train_sequences_by_dataset':train.sequence_counts_by_dataset,
+         'val_sequences_by_dataset':val.sequence_counts_by_dataset,'source_sampling':config.get('source_sampling','window_uniform'),
+         'validation_aggregation':'equal source mean; independent fixed window subset per source',
+         'initialization':'from scratch' if args.resume is None else 'resume '+str(args.resume),
+         'resume_limit':'sampler RNG saved; prefetched/chunked sampler indices and loader cursor are not exact replay'}
     if model.config.backbone=='structured_mamba':
         import importlib.metadata
         run['mamba_ssm']=importlib.metadata.version('mamba_ssm')
@@ -220,10 +264,11 @@ def main():
                     'config':config,'code_version':args.code_version,'best_validation_loss':best,
                     'rng_state':generator.get_state(),'torch_rng_state':torch.get_rng_state(),
                     'cuda_rng_states':torch.cuda.get_rng_state_all(),'run':run}
+        if sampler is not None: checkpoint['sampler_state']=sampler.state_dict()
         path=args.output/('best.pt' if best_checkpoint else 'latest.pt')
         tmp=path.with_suffix('.pt.tmp'); torch.save(checkpoint,tmp); tmp.replace(path)
     print(json.dumps(run),flush=True)
-    initial=evaluate(model,val_loader,device,config)
+    initial=evaluate_sources(model,val_loaders,device,config)
     atomic_json(args.output/'initial_validation.json',initial)
     print(json.dumps({'step':start_step,'validation':initial}),flush=True)
     save(start_step)
@@ -260,7 +305,7 @@ def main():
                 stream.write(json.dumps(event)+'\n'); print(json.dumps(event),flush=True)
                 atomic_json(args.output/'status.json',event); rolling=[]
             if step%config['eval_every']==0:
-                latest_val=evaluate(model,val_loader,device,config)
+                latest_val=evaluate_sources(model,val_loaders,device,config)
                 score=(latest_val['noisy']['loss']+latest_val['missing']['loss'])/2
                 if score<best: best=score; save(step,True)
                 event={'utc':utc(),'step':step,'validation':latest_val,'best_validation_loss':best}
