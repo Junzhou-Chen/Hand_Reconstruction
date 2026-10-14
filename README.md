@@ -2,8 +2,9 @@
 
 从高质量手部轨迹学习运动先验，用于纠正头戴RGB的手部重建。当前路线是冻结HaWoR、独立训练纯轨迹TWM、通过真实图像证据迭代校正当前状态，并反馈最终状态与可靠性。
 
-已实现第一版纯轨迹99D TWM，并在ds完成OakInk2单库预训练 pilot 的28,213步，现按用户指令暂停。已有合成受损验证与checkpoint，尚无完整视觉闭环或真实HaWoR纠错结果。
+已实现参考WestWorld时空分工的结构化Mamba TWM，在ds启动OakInk2单库99D预训练。旧flat pilot保留在28,213步；新模型GPU数值检查与真实数据smoke通过，尚无完整视觉闭环或真实HaWoR纠错结果。
 
+- [结构化Mamba新模型：环境、检查与运行](docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)
 - [参考WestWorld的架构与任务适配讨论](docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)
 - [OakInk2首轮预训练：运行、检查点与中途结果](docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)
 - [项目记忆入口](MEMORY.md)

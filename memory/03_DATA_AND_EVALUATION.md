@@ -156,3 +156,7 @@ PA-MPJPE 可作补充，不能代替 world-space accuracy。指标具体聚合�
 D23在ds将官方64train/8val原录制转换99D（128/16单手轨迹、204502/18032单手帧），seed20261014、30Hz、H30、future3、窗口stride4；test标注不读，subject-disjoint未宣称。来源为MoCap拟合MANO，实际world腕以center_idx0＋tsl规则确定；无完整MANO FK/mesh验收。代码4cb1da8训练50,000步，09:05 UTC step7275仍在运行。固定1024val窗口/模式，step7000 noisy wrist49.090→8.657mm、root22.538→2.252°、finger15.421→2.259°；clean被改成4.551mm/0.932°/1.642°，不能只报收益。不是MPJPE或真实HaWoR结果；自身历史、真实前端错误、其它库与动力学未测。完整配置、原始产物位置、smoke provenance勘误及恢复限制见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
 
 D24后续：用户主动暂停于28,213步，latest/best保存且可读，最后固定验证step28,000 noisy腕5.980mm/finger1.601°、missing腕5.903mm/finger1.759°、clean退化3.626mm/0.998°；非best.pt重新评价。下一结构对照参考WestWorld架构与参数理由，输入输出按99D当前恢复任务适配，尚未启动新run。[暂停及方向](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)。
+
+D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption协议，从头训练新6.33M结构化Mamba。相比旧pilot架构/容量/lr及Mamba指定optimizer分组均改变，不称严格单因素消融。12项GPU数值检查＋3步真实数据smoke通过，09:47UTC启动正式run，非MPJPE/真实HaWoR或物理实测。[完整配置与产物](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
+
+09:50UTC新run核step650存活，step500验证noisy腕49.090→49.204mm/root22.538→3.981°/finger15.421→5.413°；clean退化5.270mm/2.727°/3.393°，腕尚未改善。该早期结果不判最终架构优劣，best/latest已存。[准确口径](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。

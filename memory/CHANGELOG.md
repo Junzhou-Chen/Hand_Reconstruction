@@ -208,6 +208,13 @@
 - 复查WestWorld v2 §4/§5.2/附录D及官方固定源码，新增[任务适配与配置依据](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)；旧pilot保留作对照，新架构/超参是建议，不将其写成用户逐项采纳或验证性能。
 - 更新入口/README/运行记录/方法/决策/状态/开发记忆，清除仍在训练和追50k的当前安排。
 
+## 2026-10-14 D25 结构化Mamba重做并启动
+
+- 用户明确采纳刚才结构参考方向并要求跑起后再结束；旧flat checkpoint保留，新模型从头训练、输出99D当前状态。登记D25，替代D24不另启训练的安排。
+- 新增MANO树embedding与同帧attention/FFN→逐关节官方Mamba，6/256/4＋SSM64/4/2，6330892参数；preserve特殊初始化及no-weight-decay、padding/dt隔离。359b88e模型＋378deda环境复现脚本已同步，配置lr2e-4，其余数据/噪声沿旧pilot，不称单因素消融。
+- 建完全隔离Torch2.10/cu130环境、官方wheel核SHA，pip check及GPU fused FP32/BF16通过；完整主干12项数值检查（因果/压缩误差0.0）与真实Oak3步smoke通过。包装器Pod缺git的记录问题已补真实SHA，SSH瞬断重试成功。
+- 09:47UTC在既有Pod/GPU0后台启动PID1276、独立正式run目录；09:50UTC核step650持续运行、loss有限、500步best/latest约76MB已存，约4.48steps/s。早期旋转收益与腕未改善/clean退化同报；旧run不恢复。新增[模型/环境/检查/运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)，数据/环境/权重/原始日志仅data10。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

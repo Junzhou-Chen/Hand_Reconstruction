@@ -74,3 +74,9 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 ## D24 用户主动暂停
 
 2026-10-14纽约05:16，已核PID805身份后SIGTERM，训练保存退出，phase=stopped。latest.pt可读step28,213、best.pt可读step27,500，代码均4cb1da8；原Job/Pod保留，没有新建/删除。pause_request.json/pause_verification.json在正式run目录。不能当故障自动resume，也不自动启动新架构run；用户后续要更充分参考WestWorld架构与参数依据且保持任务输入输出。[记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
+
+## D25 新主干与独立runtime
+
+用户随后明确重新构造并跑起，旧D24暂停只保留旧run，不再禁止新run。新src主干359b88e及runtime源码378deda已同步。zhou Python建立完全隔离data10/runtime/twm_mamba_torch210_v1，Torch2.10.0+cu130/Triton3.6/Mamba2.3.2.post1/causal1.7，官方cp311 cu13 ABI TRUE两wheel核SHA，pip check/fused GPU/完整model12项数值检查/真实3步smoke均通过；不修改zhou、不新建Job。Pod无git导致初次数值记录包装器失败，实际checker已pass，后用登录节点核SHA补JSON；一次SSHUNKNOWN65535重试成功。
+
+378deda47b123d64546404bf9780c19bcc48bb31于09:47:50UTC在既有Pod/GPU0启动新run PID1276，默认helper已指向新config/Python/output，旧run查询需显式output。新run数据路径与checkpoint细节见[运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。

@@ -163,3 +163,7 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 ## 2026-10-14 D24 架构参考方向
 
 用户主动暂停tiny pilot，明确不是完整照搬WestWorld，而是参考架构与配置理由，输入输出配合手部当前恢复。已保留checkpoint，不自动恢复/另启。[结构、容量、归一化和训练适配建议](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)区分源码事实、论文证据和待验证配置；不把6blocks/d256/4heads或Mamba视为已选最优。
+
+## 2026-10-14 D25 新主干代码事实
+
+用户按参考方案授权重做并跑起。新增StructuredMambaEncoder，6/256/4、同帧关节attention/FFN→逐关节官方Mamba64/4/2，无MoE/action；MANO parent/finger/depth embedding，padding全主干前压缩且无效dt置0，真实漏观测保留时间槽。6330892参数，99D接口/51D内部旋转更新及β条件保持。Mamba特殊初始化及A/D no-weight-decay标志保留；旧flat分支可加载旧权重。完整数值与smoke已通过，PID1276新run启动；完整视觉循环仍未实现。[实测与路径](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
