@@ -18,6 +18,8 @@
 
 **HaWoR对比数据复核：** 用户希望在其训练/测试库比较。其视觉训练HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller只HOT；主定量为HOT3D Aria27 validation与DexYCB test，EPIC定性。建议主HOT＋补Dex，不把四库全部写成原测试。发布HOT evaluator有GT crop/visibility、右手、100帧/含scale对齐且未调infiller；Dex fork默认s0_test但专用推理/依赖尚待补。当前HOT预训练包不含349个评测来源clips，完整27VRS需另准备。[数据与对比协议](docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
+**最新D21获取任务：** 用户已明确再下载DexYCB与ARCTIC。Dex13个官方分包127.61GB已在同Pod后台启动，3workers，已验证首批包、failed0；ARCTIC343包（cropped图像＋标注）清单与官方SHA已准备，但缺ARCTIC账号，状态waiting_credentials，没有数据下载。已向用户询问服务器私有配置路径，不在聊天传密码。7项远程续传/压缩包检查通过，未解压/训练。[新两库下载与账号配置](docs/COMPARISON_DATA_DOWNLOADS.md)
+
 **最新数据原则D18（2026-10-13）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入，混合未定。主候选具备完整任务字段条件；glove需验映射/腕质量，OpenGraph只确认局部补充，尚无本项目适配验收，不将候选全称为“完全适配”。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 
 **当前执行归纳（建议）：** 首轮目标池为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；glove从首轮验收。DexWild仍重点glove候选，可先用经映射的local监督，world链未核清前不当腕GT；GRAB/ARCTIC有授权即优先加入，DexCap小规模补充。第一个checkpoint不等待所有库，至少一条完整腕＋五指链过验即可开始。无固定配比，无转换验收/训练。[v2.1归纳](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
@@ -49,6 +51,7 @@
 | 开始下一步工作、查接口缺口 | [进展与下一步](memory/04_STATUS_AND_NEXT_STEPS.md) |
 | 使用ds登录入口、现有GPU Pod、环境及持久存储 | [ds服务器操作](docs/DS_SERVER_OPERATIONS.md) |
 | 查询三库后台下载、实际范围、路径与续传 | [数据下载与检查](docs/TWM_DATA_DOWNLOADS.md) |
+| 查询DexYCB下载、配置ARCTIC官方账号与启动 | [对比数据下载](docs/COMPARISON_DATA_DOWNLOADS.md) |
 | 复现HaWoR训练/测试数据角色、HOT/Dex评测入口 | [HaWoR数据与对比协议](docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md) |
 | GitHub同步、服务器和实验位置 | [开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md) |
 | 数采团队、商业厂商和大规模数据发布 | [产业手部数据补充调查](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md) |

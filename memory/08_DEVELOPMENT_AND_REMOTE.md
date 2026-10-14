@@ -54,3 +54,7 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 用户要求OakInk2/HOT3D train/UmeTrack下载在计算Pod内，确认可运行后后台启动并结束，由他后续检查。脚本代码`853d2da`已推送并远程同步，Pod内4项HTTP续传/校验检查通过；22:57 UTC启动三库进程，各4workers。22:58:42 UTC快照均alive/failed=0，Oak约1.43GB、HOT约1.70GB、Ume约1.36GB已写，包含partial；不代表已校验/完成总量。实际范围约404.25GB、status/start命令与官方split约束见[下载检查](../docs/TWM_DATA_DOWNLOADS.md)。没有预处理、99D转换或训练结果。
 
 后续完成核验：三个remote status均complete，4116文件全部verified、failed=0、字节等于manifest，进程已退出。Oak/Ume/HOT分别在纽约10月13日19:35/20:20/21:22完成；完整UTC时间见下载记录。本轮只是读取现有验收记录，没有全量再次hash或跑模型。用户最新任务是HaWoR对比数据核验，eval349 HOT clips/full27、DexYCB仍未下载。
+
+## D21追加DexYCB与ARCTIC
+
+用户随后明确请求新两库。代码20c64c2于UTC10-14 03:33（纽约10-13 23:33）在现有Pod启动；DexPID329/3workers，127.61GB官方13分包，03:36快照约10.66GB已写含partial，verified3/failed0。ARCTICPID330正常退出、waiting_credentials，343包仅manifest准备，无数据包获取；已问用户私有配置路径。gdown6.4.2在data10/download_runtime隔离安装，不修改zhou；校验脚本8f5d9f1的7项HTTP/CRC测试在Pod通过。源码/小文档同步Git，数据及receipts/原始日志只在data10。[详细检查与启动](../docs/COMPARISON_DATA_DOWNLOADS.md)

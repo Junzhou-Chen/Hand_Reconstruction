@@ -4,6 +4,8 @@
 
 **完成更新：** 用户报告完成后，已只读核验远程三个`download_status.json`：phase均为complete，全部4116个文件verified、failed=0，字节数与清单一致，进程正常退出。Oak完成于2026-10-13 23:35:43 UTC（纽约19:35），Ume于10-14 00:20:58 UTC（纽约10-13 20:20），HOT于10-14 01:22:17 UTC（纽约10-13 21:22）。这是下载器完成时的hash验收记录，本轮没有重新读取404GB做全量hash，也未解压/转换。
 
+随后用户D21追加DexYCB/ARCTIC；新两库需`--datasets dexycb arctic`查询，账号与实际状态见[对比数据下载](COMPARISON_DATA_DOWNLOADS.md)。本页默认三库均已完成，不再重复启动。
+
 ## 运行位置与范围
 
 登录入口`ssh ds`仅调用kubectl；下载和校验在`jchen57-debug-mpd5p`（namespace `jchen57`，12CPU/128Gi）执行。当时三个独立后台进程各4个下载worker，不使用GPU；当前三库已正常完成，无需重新启动。若以后另有下载，退出SSH不停止进程，Pod终止会停止进程。

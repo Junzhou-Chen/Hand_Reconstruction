@@ -32,6 +32,7 @@
 | D18 | TWM不需要视觉；选库优先更准确的手姿态，恢复glove/MoCap导向；论文用库作参考，不必照搬 | 2026-10-13用户直接纠正；已采纳，限定D17用法并替代v1 glove支线/Re-EgoDex优先扩展建议；99D与免申请偏好未撤销 |
 | D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；该运维核验阶段未迁移/训练，后续下载见D20。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
 | D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已在12CPU Pod运行，后续用户报告完成且远程status全verified/failed0。scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
+| D21 | 在HaWoR数据复核后，再下载DexYCB与ARCTIC | 2026-10-13用户明确指令；ARCTIC虽需注册，用户本轮已选取，不能仅因旧免申请优先偏好拒绝处理。Dex13分包已后台运行；ARCTIC待实际官方账号，未绕注册。cropped+标注是本轮获取默认选择，非用户已定唯一图像版本或训练混合。[下载实况](../docs/COMPARISON_DATA_DOWNLOADS.md) |
 
 ## 已替代的历史路线
 
@@ -63,6 +64,8 @@ HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取
 **2026-10-13本轮执行归纳仍是建议：** 首轮目标OakInk2/HOT3D有效train/UmeTrack train/HumanTouch，DexWild继续主要候选并先验local/world链，GRAB/ARCTIC有授权优先、DexCap小补充；没有新增用户已定混合或比例。v2.1将采集/精度审计结果落实到接入职责，不更改D18。首个checkpoint不要求四库loader全部就绪。[归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
 
 **后续用户任务：** 已要求核HaWoR论文训练/测试数据，以便在其上做对比。核验主定量HOT/Dex及代码协议后，建议HOT27原录制作world主、Dex test作camera补充；这不是用户已定全套实验split，也未授权自动重训HaWoR或下载其所有视觉训练库。GT crop、真实detector、双手、infiller与对齐需分别命名。[复核](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
+
+该复核之后D21用户又明确下载DexYCB/ARCTIC，已据此推进新两库获取；没有同时授权HO3D等其他训练库、重训HaWoR或运行完整实验。
 
 ## 对后续协作有用的偏好
 

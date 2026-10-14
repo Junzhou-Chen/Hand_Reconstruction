@@ -45,6 +45,8 @@ HaWoR官方链接的作者fork版本`ad97815f946f220f91fd70b1e75191d422ab85bf`�
 
 该fork未提供HaWoR专用的DexYCB序列推理入口，且引用的根`freihand`依赖目录不在当前tree；需补齐依赖和预测格式后验收，不能称一键复现已完成。官方全包标称119G，Google Drive直接下载，也可分subject下载；本轮没有启动新数据下载。[官方包](https://dex-ycb.github.io/#data)
 
+后续D21用户明确要求DexYCB与ARCTIC，Dex官方13分包已在ds后台启动；ARCTIC已准备官方清单，待用户账号。具体获取状态见[下载记录](COMPARISON_DATA_DOWNLOADS.md)，不代表baseline推理或新评测协议已实施。
+
 ## HandLoop对比安排建议
 
 1. **主量化用HOT3D27录制，补充用DexYCB。** 先沿发布源码的crop/帧mask/右手/对齐条件复核baseline，再在相同条件下比较HaWoR与HandLoop；算法新增数据来源单独披露。

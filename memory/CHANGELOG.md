@@ -1,5 +1,12 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-13 追加DexYCB与ARCTIC获取
+
+- D21用户明确下载两库；继续计算Pod执行，不在登录节点传输大数据。Dex13个官方Drive分包127611176595B后台启动，3workers；03:36 UTC快照约10.66GB含partial、verified3/failed0。
+- ARCTIC官方343包（cropped＋4个标注/元数据）清单与SHA固定repo49f3eb4b；匿名返回登录HTML，现有服务器配置无账号，已问用户私有路径。状态waiting_credentials，没有真实数据下载或认证成功记录；不通过第三方包绕注册。
+- 新增下载器、无secret配置模板、7项远程检查；扩展ds helper的--datasets/--credentials，不重跑已完成三库。Dex按Drive大小/gzip CRC/TAR格式＋自算SHA验收，不声称作者SHA匹配；ARCTIC按官方SHA。
+- gdown6.4.2隔离安装于data10，calibration14464B实测成功；7项HTTP续传/HTML拒绝/gzip完整性检查在Pod通过。维护.part忽略；新增[状态与配置文档](../docs/COMPARISON_DATA_DOWNLOADS.md)，更新入口/决定/进展/运维。无解压、99D转换、模型推理或训练。
+
 ## 2026-10-13 下载完成与HaWoR对比数据复核
 
 - 用户报告三库完成后，只读核远程status：Oak634/HOT2461/Ume1021文件全部verified、failed0，合计404.25GB；原下载进程正常退出。保存完成时间，不重复hash404GB、解压或训练。
