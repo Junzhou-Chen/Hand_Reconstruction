@@ -54,6 +54,8 @@
 
 **2026-10-14用户发起架构重新评估：** 提出能否取消独立Corrector，让TWM直接校正视觉状态，并通过真实前端错误及增广样例联合微调，要求有依据地赞同或反驳。助手建议优先验证统一恢复TWM，保留数值几何证据入口与先验保持对照；[讨论方案](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)。本轮不是用户已决定删除C或解冻HaWoR，D02/现行框架尚未被正式替代；D04无RGB/features、D16完整99D及D18传感器精度优先保持有效。
 
+**同日用户要求数学物理依据：** 要求参考WestWorld/其他world model，找证明/验证及更符合物理的修改方式。助手提出分层的几何可行、参考系一致、固定目标下降和独立运动验证，真实动力学为有额外变量时的条件分支；[完整推导](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md)。此为研究讨论，未决定加入HNN、DeLaN、关节硬限位、物体物理或自动启动实验，99D与当前恢复主任务未改变。
+
 **99D状态已按D16选定**，69D/66D是被替代的原框架候选；Corrector的51D切向残差仍为实现建议，canonicalizer不存在。`K=8`、6层、`d=256`、4heads、`N=2`和16帧unroll是历史起步配置。数据、evidence head、可靠性目标、配比和loss权重未实验确定。
 
 用户先要求核验主流表示与MANO标注，[调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)提出MANO输出＋joint监督；随后D16采纳99D。状态选择不改变D03–D09，参数转换和joint-only监督仍需验收。

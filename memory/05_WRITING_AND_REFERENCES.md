@@ -15,6 +15,8 @@
 
 ## 标题与叙事
 
+**2026-10-14物理主张补充：** 用户要求物理证明/验证。新增[论文性质、数学推导与可用措辞](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md)，核WestWorld、OneWorld、HNN/LNN/DeLaN/SymODEN、BMC、Πnet及Physion++。可按声明假设主张合法旋转/指定约束/参考系一致；独立GT验证当前恢复。不能将结构embedding、自身physics loss小、固定优化目标下降或learned energy守恒改写成真实人手动力学正确。OneWorld实际评分与理想Bayes结果分开；PAD-Hand reference伪力监督不等于直接测量力，也不等于用预测自身自由力自证。本次仅研究讨论，无物理模块或实验结果。
+
 “HandLoop”是工作名，尚未做正式命名排重。标题偏好是 **Are Gloves Necessary? + 简洁的技术表达**；候选包括：
 
 - Are Gloves Necessary? Learning Motion Priors for Visual Hand Correction
