@@ -34,7 +34,8 @@
 | D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已在12CPU Pod运行，后续用户报告完成且远程status全verified/failed0。scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
 | D21 | 在HaWoR数据复核后，再下载DexYCB与ARCTIC | 2026-10-13用户明确指令；ARCTIC虽需注册，用户本轮已选取，不能仅因旧免申请优先偏好拒绝处理。Dex13分包已后台运行；ARCTIC待实际官方账号，未绕注册。cropped+标注是本轮获取默认选择，非用户已定唯一图像版本或训练混合。[下载实况](../docs/COMPARISON_DATA_DOWNLOADS.md) |
 | D22 | 尚未注册ARCTIC，当前先下载DexYCB；ARCTIC暂缓 | 2026-10-14用户回复账号问题“尚未注册，先下载DexYCB”；替代D21当前推进ARCTIC的安排，保留官方清单，不继续索要凭据、自动注册或启动。Dex已启动的下载继续；当时未授权新库、预处理或训练，随后D23已授权单库pretrain。 |
-| D23 | 从已经下载的四库选一库，先实现并启动pretrain，争取睡前跑起来；数学讨论暂缓 | 2026-10-14用户直接指令，授权必要的模型、单库转换和远程训练。助手选OakInk2官方64 train/8 val子集，保持99D/纯轨迹/当前恢复主任务；4cb1da8正式run后台存活并保存checkpoint。单库、网络规模与噪声超参是本次pilot工程选择，不是最终混合或物理架构定案。[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md) |
+| D23 | 从已经下载的四库选一库，先实现并启动pretrain，争取睡前跑起来；数学讨论暂缓 | 2026-10-14用户直接指令，授权必要的模型、单库转换和远程训练。助手选OakInk2官方64 train/8 val子集，保持99D/纯轨迹/当前恢复主任务；4cb1da8正式run曾后台运行并保存checkpoint，随后D24暂停。单库、网络规模与噪声超参是本次pilot工程选择，不是最终混合或物理架构定案。[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md) |
+| D24 | 暂停当前tiny Transformer pilot；训练与模型构造要更充分参考WestWorld的架构和参数理由，输入输出仍按本项目任务设计 | 2026-10-14用户直接指令及后续澄清“不是完全参考”。替代D23继续本次run的执行安排；已SIGTERM保存退出，latest28,213/best27,500可读。99D、纯轨迹、当前恢复主任务不变；具体结构/超参待验证，不自动恢复或启动新run。[参考方案](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md) |
 
 ## 已替代的历史路线
 

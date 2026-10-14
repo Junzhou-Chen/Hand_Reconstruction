@@ -201,6 +201,13 @@
 - 09:01UTC在既有Pod/GPU0后台启动50,000步，09:05UTC step7275 alive，best/latest持久保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，clean退化4.551mm/1.642°同报。不是MPJPE、真实HaWoR、闭环或物理结果。
 - 新增[运行配置与快照](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)，同步入口/README/方法/数据/表示/开发/状态记忆；原始日志、数据和权重留远程，不提交Git。
 
+## 2026-10-14 D24 暂停首轮，重审WestWorld架构参考
+
+- 用户要求暂停tiny pilot，并澄清不是完整复刻WestWorld，重点借鉴架构与参数理由，输入输出配合手部99D当前恢复任务。登记D24，替代继续D23 run的安排。
+- 09:16UTC核PID/cmdline/output后SIGTERM，进程保存退出；torch.load只读验latest28,213/best27,500可读、SHA4cb1da8。末次step28,000验证与clean退化保留，权重和原始日志不上传。没有新Job、自动续训或新模型训练。
+- 复查WestWorld v2 §4/§5.2/附录D及官方固定源码，新增[任务适配与配置依据](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)；旧pilot保留作对照，新架构/超参是建议，不将其写成用户逐项采纳或验证性能。
+- 更新入口/README/运行记录/方法/决策/状态/开发记忆，清除仍在训练和追50k的当前安排。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

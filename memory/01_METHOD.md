@@ -159,3 +159,7 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 ## 2026-10-14 D23 首轮代码事实
 
 用户要求先单库跑起pretrain。4cb1da8的纯轨迹TWM是4层/d128/16 tokens/821,516参数，H30、17组mask，beta与左右手条件；raw/candidate/history分开，上一受损历史anchor，内部51D左乘更新输出完整99D，0.1s预测辅助。不是完整Corrector/取证/可靠性/rollout系统，也不等于用户定案删除C。[源码、配置、验证与限制](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
+
+## 2026-10-14 D24 架构参考方向
+
+用户主动暂停tiny pilot，明确不是完整照搬WestWorld，而是参考架构与配置理由，输入输出配合手部当前恢复。已保留checkpoint，不自动恢复/另启。[结构、容量、归一化和训练适配建议](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)区分源码事实、论文证据和待验证配置；不把6blocks/d256/4heads或Mamba视为已选最优。

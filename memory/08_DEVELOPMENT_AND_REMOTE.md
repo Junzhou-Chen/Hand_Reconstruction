@@ -70,3 +70,7 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 2026-10-14用户授权从已下载四库先选一库pretrain，数学暂缓。本机只编辑/AST，Oak准备、数值8项检查、3步smoke和正式训练均在既有Pod的zhou中执行。正式源码4cb1da83cc86732b36cea76673bb1e703eae4102已同步，PID805自09:01:01UTC在GPU0后台运行，09:05 UTC step7275存活。数据在data10/prepared/oakink2_99d_pilot_v1，正式产物在data10/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014；best/latest每500步保存持久盘，不需SSH不断线。50k自然完成，不自动重复启动、新建或续期Job。
 
 运行状态由scripts/ds_train_twm.py status读取；只有进程停止且确需继续才start --resume。checkpoint保存主要训练状态，但DataLoader shuffle游标未存，实测中断重启尚未验。Smoke误写版本b04de13已在远程provenance_correction.json记录实际8593fcb，正式run自动捕获4cb1da8正确。所有大产物/原始日志留远程，Git仅源码与小摘要。[完整运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
+
+## D24 用户主动暂停
+
+2026-10-14纽约05:16，已核PID805身份后SIGTERM，训练保存退出，phase=stopped。latest.pt可读step28,213、best.pt可读step27,500，代码均4cb1da8；原Job/Pod保留，没有新建/删除。pause_request.json/pause_verification.json在正式run目录。不能当故障自动resume，也不自动启动新架构run；用户后续要更充分参考WestWorld架构与参数依据且保持任务输入输出。[记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。

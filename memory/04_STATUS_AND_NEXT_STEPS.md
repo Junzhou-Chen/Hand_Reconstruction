@@ -13,7 +13,7 @@
 | 项目记忆库 | 本次建立 | 根目录 MEMORY/AGENTS 与 `memory/` |
 | 部分第三方论文/源码核验 | 本次完成只读核验 | [写作与外部核验](05_WRITING_AND_REFERENCES.md) |
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
-| Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；D23已启动Oak单库pilot |
+| Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；D23训练后由D24暂停 |
 | 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；随后Oak子集99D转换完成，其余未转换 |
 | DexYCB / ARCTIC获取 | Dex13包127.61GB已complete，全verified/failed0；D22 ARCTIC暂缓 | [完成与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；ARCTIC保留清单、无数据包下载 |
 | 四库实际标注与TWM适用检查 | 样本字段可作为TWM监督来源；Meta PCA15、Dex PCA45、Oak quaternion16已核，时间/mask/split待统一 | [远程抽查](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)；代码056122f、3Oak/4HOT/4Ume/6Dex；无FK或训练结论 |
@@ -31,7 +31,7 @@
 | TWM完整99D输出 | 用户再次明确每手完整99D主输出；已区分统一输出、完整模型参考与部分几何监督 | [输出契约](../docs/TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)；D23 Oak99D转换与首轮训练已实现 |
 | 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；D23已用zhou在GPU0训练TWM |
-| 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；正式run运行中 | [运行与中途指标](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)；代码4cb1da8，checkpoint仅data10 |
+| 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；正式run按D24暂停于28,213步 | [运行与中途指标](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)；代码4cb1da8，checkpoint仅data10 |
 | anchor codec、HaWoR adapter、TWM、Corrector | Oak quaternion→99D、受损历史anchor与TWM已有pilot实现；HaWoR adapter/独立Corrector/视觉取证未实现 | [训练入口](../scripts/train_twm.py)、[模型](../src/handloop/models/twm.py)；不存在完整视觉闭环结果 |
 | 实验和性能、投稿和录用 | 已有Oak合成受损恢复中途实测，完整方法/论文尚未完成 | [记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)同时报告clean退化；不当真实HaWoR收益 |
 
@@ -43,7 +43,7 @@
 
 ## 推荐执行顺序与交付条件
 
-D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/腕/单位/名义时间与99D codec，在官方64train/8val录制子集完成准备，并以4cb1da8在ds现有Pod后台启动50,000步。09:05 UTC核实step7275存活，best/latest已保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，同时clean退化4.551mm/1.642°。09:10 UTC再次核实step17425 alive；step17000 noisy腕7.825mm/finger1.635°，clean3.753mm/1.073°，checkpoint持续保存。详见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。这仅完成P0/P2部分工作，无MANO FK/真实视觉效果。四库原包complete、D22 ARCTIC暂缓；所有实验远程执行。
+D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/腕/单位/名义时间与99D codec，在官方64train/8val录制子集完成准备，并以4cb1da8在ds现有Pod计划训练50,000步。09:05 UTC核实step7275存活，best/latest已保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，同时clean退化4.551mm/1.642°。09:10 UTC再次核实step17425 alive；step17000 noisy腕7.825mm/finger1.635°，clean3.753mm/1.073°，checkpoint持续保存。详见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。随后D24在09:16UTC主动暂停：进程退出，latest28,213/best27,500均可读；数学继续暂缓，先梳理WestWorld架构与参数理由且保持任务接口。禁止自动续训或另启。这仅完成P0/P2部分工作，无MANO FK/真实视觉效果。四库原包complete、D22 ARCTIC暂缓；所有实验远程执行。
 
 按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。目标混合仍未实施；D23先跑Oak单库子集，不改变该建议职责。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
@@ -51,7 +51,7 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 |---|---|---|
 | P0 传感器split与状态契约 | MoCap原录制/split，glove source/session与标定；ds Pod验native→99D及raw joint几何桥接 | 字段/形态/单位/dt、MANO转换残差、腕/finger质量来源与mask；不等全部loader |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
-| P2 纯轨迹恢复 baseline | Oak pilot已在运行，current restoration主任务＋0.1s短预测；无真实前端误差/自身rollout | 已有固定clean/noisy/missing验证及candidate baseline；FK/完整val/GRU与temporal对照待补 |
+| P2 纯轨迹恢复 baseline | Oak pilot已训练28,213步并按D24暂停，current restoration主任务＋0.1s短预测；无真实前端误差/自身rollout | 已有固定clean/noisy/missing验证及candidate baseline；FK/完整val/GRU与temporal对照待补 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
 | P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
 | P5 时间反馈训练 | 最终状态与质量一次回灌，短序列自身输出 rollout | feedback/no-feedback 与 rollout/no-rollout；再可见恢复、突发动作、误差累积 |
@@ -98,4 +98,4 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md与docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md。D23 Oak单库TWM已后台运行，先用ds_train_twm.py status检查是否达到50,000步、best/latest与clean退化；活进程不要重复启动。代码4cb1da8，数据/权重/raw logs只在data10。四库complete不重下载，其余Meta PCA15/Dex PCA45尚待adapter，FK/真实HaWoR/自身rollout未验；D22 ARCTIC暂缓。数学后续考虑，不自动加新模块或新Job。
+> 先读MEMORY.md与docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md。D24用户主动暂停原pilot，已stopped step28,213，best27,500保存可读；不要因stopped自动恢复或另启训练。用户希望参考WestWorld架构与参数理由，输入输出按手部99D当前恢复任务适配，不是完整复刻。具体新架构/超参仍建议。四库complete不重下载，原代码4cb1da8与数据/权重/raw logs保留在data10，FK/真实HaWoR/自身rollout未验，数学暂后。

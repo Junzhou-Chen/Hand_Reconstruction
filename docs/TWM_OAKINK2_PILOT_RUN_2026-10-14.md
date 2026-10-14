@@ -1,6 +1,6 @@
 # OakInk2 单库 TWM 首轮预训练运行记录
 
-2026-10-14。用户要求先从已下载的四库选一库跑起 pretrain，数学讨论暂缓。已实现纯轨迹当前状态恢复模型，在用户既有 ds Pod 后台训练；本记录是首轮 pilot 的配置与中途结果，不是完整 HandLoop 或真实视觉纠错结果。
+2026-10-14。用户要求先从已下载的四库选一库跑起 pretrain，数学讨论暂缓。已实现纯轨迹当前状态恢复模型，在用户既有 ds Pod 后台训练；本记录是首轮 pilot 的配置与中途结果，不是完整 HandLoop 或真实视觉纠错结果。**用户随后要求暂停，已在纽约05:16（09:16 UTC）停止；不得自动恢复或另启训练。**
 
 ## 运行与产物
 
@@ -10,13 +10,13 @@
 | 环境 | `jchen57-debug-mpd5p` / namespace `jchen57`；现有 `zhou` Python，Torch 2.12.0+cu130 |
 | GPU | GPU 0，RTX PRO 6000 Blackwell Max-Q；单卡 BF16 模型计算，几何和 loss 使用 float32 |
 | 开始 | 2026-10-14 09:01:01 UTC（纽约 05:01） |
-| 计划 | 50,000 步，batch 64；每 500 步验证、保存；每 25 步写状态 |
-| 已核快照 | 09:10:26 UTC，PID 805 存活，step 17,425，约 31.1 steps/s，loss 有限；模型峰值 allocated 显存约 1.62 GB |
+| 原计划 / 当前状态 | 原50,000步，batch64；每500步验证保存。用户在step28,213暂停，未完成原计划 |
+| 最新核验 | 09:16:13 UTC，PID805已退出，phase=stopped，latest.pt可读且step28,213；best.pt可读且step27,500 |
 | 代码目录 | `/sciclone/home/jchen57/project/Hand_Reconstruction` |
 | 预处理目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_pilot_v1` |
 | 正式运行目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014` |
 
-后台进程独立于 SSH 会话。本轮没有创建、删除或续期 Kubernetes Job。现有 Job 配置到期约为 2026-10-15 16:37:28 UTC；checkpoint 在持久 data10，不在容器临时盘。50,000 步达到后训练自然结束并保存；不自动重复启动。按当前吞吐，首轮约需半小时，具体以状态为准。
+后台进程独立于 SSH 会话。本轮没有创建、删除或续期 Kubernetes Job。现有 Job 配置到期约为 2026-10-15 16:37:28 UTC；checkpoint 在持久 data10，不在容器临时盘。原先预计50,000步自然结束，现已按用户指令提前停止；不自动重复启动或恢复。
 
 在本机检查：
 
@@ -24,7 +24,7 @@
 ssh ds 'python3 /sciclone/home/jchen57/project/Hand_Reconstruction/scripts/ds_train_twm.py status'
 ```
 
-`status.json` 是训练进度，`latest_validation.json` 是最新固定验证，`metrics.jsonl` 与 `train.log` 保留原始过程；`latest.pt` 为最近可恢复状态，`best.pt` 按 noisy/missing 恢复 loss 均值选取。数据、权重、缓存和原始日志不提交 Git。若未来进程停止且确需续跑，可显式使用同一 helper 的 `start --resume`；当前存活进程无需再启动。
+`status.json` 是训练进度，`latest_validation.json` 是最新固定验证，`metrics.jsonl` 与 `train.log` 保留原始过程；`latest.pt` 为最近可恢复状态，`best.pt` 按 noisy/missing 恢复 loss 均值选取。数据、权重、缓存和原始日志不提交 Git。技术上可用同一 helper 的 `start --resume`，但本次是用户主动暂停，必须待用户后续恢复指令；不要把stopped视为故障而重启。
 
 ## 数据、划分与 99D 编码
 
@@ -78,6 +78,12 @@ Checkpoint 含 model、optimizer、step、配置、代码版本及 corruption/to
 
 `best.pt` 的选择没有约束 clean 退化。当前 history 槽位全部有效，没有连续多帧漏检、时间相关偏差或左右手身份错误训练；也没有 SLAM/world 漂移测试。当前 trainer 使用完整99D参考，尚无 partial-GT loss mask，不能直接称已支持 glove/raw-joints 部分监督。
 
-接下来先看 50,000 步结束状态、best/latest、clean/noisy/missing 的趋势及数据覆盖；再接 MANO FK 的真实 joint 几何指标和合理基线、真实 HaWoR 误差与自身历史反馈验证。合成噪声收益不能证明实际视觉重建改善、物理正确或跨数据集泛化。其它三库暂未做统一转换/训练，数学模块暂缓。
+当前按用户要求先核WestWorld架构与参数依据、适配当前恢复任务，暂停原pilot。已保存的checkpoint可供以后对照；不继续追50,000步。后续训练再补MANO FK的真实joint几何指标和合理基线、真实HaWoR误差与自身历史反馈验证。合成噪声收益不能证明实际视觉重建改善、物理正确或跨数据集泛化。其它三库暂未做统一转换/训练，数学模块暂缓。
 
 源码入口：[Oak 预处理](../scripts/prepare_oakink2_twm.py)、[模型](../src/handloop/models/twm.py)、[几何](../src/handloop/geometry.py)、[轨迹切窗](../src/handloop/data/trajectory.py)、[训练](../scripts/train_twm.py)、[数值检查](../scripts/check_twm_numerics.py)、[Pod 启动/状态](../scripts/ds_train_twm.py)、[配置](../config/twm_oakink2_pilot.json)。
+
+## 用户暂停与保存结果：2026-10-14 纽约05:16
+
+用户要求暂停，并澄清更充分参考WestWorld的架构与参数理由，而非完整复刻；输入输出仍适配手部任务。09:16:13 UTC核验目标PID/cmdline/output后发送SIGTERM，进程保存并退出，phase=stopped。CPU只读torch.load验证latest.pt step28,213、best.pt step27,500，二者code_version均为4cb1da8；best noisy/missing loss历史最低0.0086143。用户Pod/Job保留，数据和已有结果保留。远程pause_request.json / pause_verification.json记录动作，不上传原始记录。
+
+最后一次固定验证是step28,000，而非最新checkpoint重新评测：noisy恢复腕5.980mm/root1.724°/finger1.601°，missing为5.903mm/1.689°/1.759°，clean退化3.626mm/0.903°/0.998°。baseline、子集、GT与指标定义同上；不得把这组中途验证标成best.pt评价。

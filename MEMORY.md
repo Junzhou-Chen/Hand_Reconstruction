@@ -8,15 +8,17 @@
 
 ## 当前真实进展
 
-工作区原有材料为5份Markdown研究文档和1张早期PNG方法图；当前已增加研究记忆、数据获取/转换与模型训练源码，进入**首轮纯轨迹恢复 pilot**。OakInk2 子集已转换99D，TWM在ds后台训练并保存权重，已有合成受损验证快照；尚无MANO FK/mesh或真实HaWoR纠错结果。GitHub为`origin/main`：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；同步状态见[开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md)。
+工作区原有材料为5份Markdown研究文档和1张早期PNG方法图；当前已增加研究记忆、数据获取/转换与模型训练源码，进入**首轮纯轨迹恢复 pilot**。OakInk2 子集已转换99D，TWM曾在ds训练并保存权重，现按用户D24主动暂停于28,213步，已有合成受损验证快照；尚无MANO FK/mesh或真实HaWoR纠错结果。GitHub为`origin/main`：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；同步状态见[开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md)。
 
 **已定工作分工：本机写代码、论文和文档，实验全部远程。最新D19改用`ssh ds`的SciClone Kubernetes，用户已授权复用Pod `jchen57-debug-mpd5p`；hongfei原checkout保留备用。** 代码、论文、记忆和小型结果同步GitHub，数据集、权重与大文件依`.gitignore`排除。
 
 已完成项目理解、来源核对、文件化记忆，以及TWM公开数据专项调研。Oak/HOT/Ume/Dex四库原包已完成，634/2461/1021/13文件全部verified、failed0，合计531.87GB。已在Pod做四库小样本字段抽查，随后按D23完成Oak64 train/8 val子集99D转换与首轮训练启动；其余三库未转换，完整FK仍未验。原有材料完整保留。
 
-**ds实测与数据获取：** namespace jchen57；现有Pod分配12CPU/128Gi/2×约96GiB Blackwell。默认Torch2.6/cu126运行CUDA失败，现有zhou环境Torch2.12/cu130两卡极小计算通过；新exec须明确选环境。Pod约10月15日16:37 UTC到期。ds代码checkout在home/project/Hand_Reconstruction，数据在data10/jchen57/Hand_Reconstruction/datasets。四库下载已结束，进程退出且phase=complete属正常完成，不要重复启动下载；不自动申请新Job。D23已授权并启动首轮TWM训练。[下载记录](docs/TWM_DATA_DOWNLOADS.md)、[服务器操作](docs/DS_SERVER_OPERATIONS.md)
+**ds实测与数据获取：** namespace jchen57；现有Pod分配12CPU/128Gi/2×约96GiB Blackwell。默认Torch2.6/cu126运行CUDA失败，现有zhou环境Torch2.12/cu130两卡极小计算通过；新exec须明确选环境。Pod约10月15日16:37 UTC到期。ds代码checkout在home/project/Hand_Reconstruction，数据在data10/jchen57/Hand_Reconstruction/datasets。四库下载已结束，进程退出且phase=complete属正常完成，不要重复启动下载；不自动申请新Job。D23曾授权首轮TWM训练；D24现要求暂停，已保存退出，不得自动恢复或另启。[下载记录](docs/TWM_DATA_DOWNLOADS.md)、[服务器操作](docs/DS_SERVER_OPERATIONS.md)
 
-**D23首轮预训练（2026-10-14）：** 用户要求从已下四库选一库睡前跑起，数学暂缓。已选OakInk2官方64 train/8 val录制，204,502/18,032单手状态，99D＋β另存；821,516参数纯轨迹TWM，当前恢复主任务＋0.1s预测辅助，计划50,000步。09:05 UTC核实PID805存活、step7275、best/latest已保存；step7000合成noisy腕49.090→8.657mm、finger15.421→2.259°，clean退化4.551mm/1.642°。这不是MPJPE、真实HaWoR或物理保证。代码4cb1da8，checkpoint/data仅远程；[单库运行记录](docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
+**D23首轮预训练（2026-10-14）：** 用户要求从已下四库选一库睡前跑起，数学暂缓。已选OakInk2官方64 train/8 val录制，204,502/18,032单手状态，99D＋β另存；821,516参数纯轨迹TWM，当前恢复主任务＋0.1s预测辅助，计划50,000步。D24于09:16UTC要求暂停，PID805已退出，latest.pt=28,213步、best.pt=27,500步均可读；末次step28,000 noisy腕49.090→5.980mm、finger15.421→1.601°，clean退化3.626mm/0.998°。这不是MPJPE、真实HaWoR或物理保证。代码4cb1da8，checkpoint/data仅远程；[单库运行记录](docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。
+
+**D24暂停与架构方向（2026-10-14）：** 用户暂停原tiny pilot，随后澄清“不是完全参考”，要认真借鉴WestWorld架构与参数理由，输入输出仍配合手部当前恢复任务。原模型/数据/权重保留作对照；不自动续训或另启。新结构与超参尚非用户逐项定案，方向记录见[参考方案](docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md)。
 
 **HaWoR对比数据复核：** 用户希望在其训练/测试库比较。其视觉训练HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller只HOT；主定量为HOT3D Aria27 validation与DexYCB test，EPIC定性。建议主HOT＋补Dex，不把四库全部写成原测试。发布HOT evaluator有GT crop/visibility、右手、100帧/含scale对齐且未调infiller；Dex fork默认s0_test但专用推理/依赖尚待补。当前HOT预训练包不含349个评测来源clips，完整27VRS需另准备。[数据与对比协议](docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
@@ -127,7 +129,7 @@ flowchart TD
 
 **在统一时间戳、骨架、坐标和 GT 条件下，纯轨迹条件恢复能否降低真实 HaWoR 输出的几何误差，并优于 smoothing/Kalman/普通 temporal model？**
 
-Oak可审计子集与最小TWM已在D23启动；先检查合成恢复与clean退化，再补FK、真实误差及自身历史验证，后续增加独立视觉取证与反馈。完整步骤和阻塞项见[下一步](memory/04_STATUS_AND_NEXT_STEPS.md)。`K=8`、6 层、`d=256`、4 heads、`N=2`、约 16 帧 rollout 都是起始建议，不是实验结论。
+Oak可审计子集与最小TWM在D23训练后由D24暂停；先梳理WestWorld架构与参数理由及任务适配，保留合成恢复与clean退化对照，再补FK、真实误差及自身历史验证，后续增加独立视觉取证与反馈。完整步骤和阻塞项见[下一步](memory/04_STATUS_AND_NEXT_STEPS.md)。`K=8`、6 层、`d=256`、4 heads、`N=2`、约 16 帧 rollout 都是起始建议，不是实验结论。
 
 ## 记忆的效力与维护
 
