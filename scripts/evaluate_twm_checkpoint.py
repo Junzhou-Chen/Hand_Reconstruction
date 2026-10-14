@@ -26,7 +26,7 @@ def evaluate_source(model, loader, config, device, output, protocol, source):
     model.eval()
     for mode in ('noisy', 'missing', 'clean'):
         generator = torch.Generator(device=device).manual_seed(config['seed']+123)
-        totals, count = {}, 0
+        totals, count, wrist_errors = {}, 0, []
         for index, batch in enumerate(loader):
             batch = {k:v.to(device, non_blocking=True) for k,v in batch.items()}
             history,raw,candidate,kwargs,target,future = sample_batch(batch, generator, mode,
@@ -38,6 +38,9 @@ def evaluate_source(model, loader, config, device, output, protocol, source):
                                 ('restored',prediction['state'])):
                 values.update({label+'_'+k:v for k,v in metrics(value,target).items()})
             values.update({'forecast_'+k:v for k,v in metrics(prediction['forecast'][:,0],future).items()})
+            wrist_errors.append(torch.stack([
+                (x[:,:3]-target[:,:3]).norm(dim=-1)*1000
+                for x in (candidate,history[:,-1],prediction['state'])],dim=-1).cpu())
             if not all(math.isfinite(v) for v in values.values()):
                 raise FloatingPointError(f'Nonfinite evaluation at {protocol}/{source}/{mode}/{index}')
             n = len(target); count += n
@@ -49,6 +52,11 @@ def evaluate_source(model, loader, config, device, output, protocol, source):
         if count != len(loader.dataset): raise RuntimeError('Validation coverage mismatch')
         result[mode] = {k:v/count for k,v in totals.items()}
         result[mode]['samples'] = count
+        errors = torch.cat(wrist_errors)
+        result[mode].update(restored_wrist_median_mm=float(errors[:,2].median()),
+                            restored_wrist_p95_mm=float(torch.quantile(errors[:,2],0.95)),
+                            restored_wrist_worse_than_input_by_1mm_percent=float((errors[:,2]>errors[:,0]+1).float().mean()*100),
+                            restored_wrist_better_than_hold_by_1mm_percent=float((errors[:,2]+1<errors[:,1]).float().mean()*100))
         print(json.dumps({'protocol':protocol, 'dataset':source, 'mode':mode,
                           'metrics':result[mode]}), flush=True)
     return result
@@ -90,7 +98,8 @@ def main():
                             'Source-fitted MANO state reference, not independent native sensor/MPJPE/mesh or physical correctness.',
                             'Overlapping held-out windows; full validation is not an independent test or confidence interval.',
                             'Fixed and full window sets differ; their corruption samples have the same distribution, not per-frame identical assignments.',
-                            'Last-history hold uses only past input, with the same synthetic history noise as the model.'],
+                            'Last-history hold uses only past input, with the same synthetic history noise as the model.',
+                            'Source medians/p95 are within-source window statistics; their equal-source aggregate is a mean of source quantiles, not a pooled quantile.'],
               'protocols':{}}
     del checkpoint
     data_options = {k:config[k] for k in ('cache_sequences','cache_bytes') if k in config}
