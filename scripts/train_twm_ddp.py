@@ -267,7 +267,10 @@ def main():
                 atomic_json(args.output/'status.json', event); print(json.dumps(event), flush=True)
             rolling = []
         if step % config['eval_every'] == 0: latest_val = validate(step)
-        if step % config['save_every'] == 0: save(step)
+        # Persist the first real updated checkpoint of a migrated/resumed
+        # stage, then retain the configured periodic checkpoint interval.
+        first_log_step = (start_step//config['log_every']+1)*config['log_every']
+        if step % config['save_every'] == 0 or step == first_log_step: save(step)
     save(step)
     if rank == 0:
         phase = 'stopped' if stop['requested'] else ('smoke_complete' if args.stop_after_updates else 'complete')
