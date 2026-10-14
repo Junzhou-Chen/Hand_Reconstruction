@@ -170,7 +170,17 @@ def main():
     device=torch.device('cuda:0')
     generator=torch.Generator(device=device).manual_seed(config['seed'])
     model=TWM(TWMConfig(**config['model'])).to(device)
-    optimizer=torch.optim.AdamW(model.parameters(),lr=config['learning_rate'],weight_decay=config['weight_decay'])
+    if model.config.backbone=='structured_mamba':
+        # Mamba marks its continuous-time A/D parameters as no-weight-decay.
+        # Honor the implementation contract without altering the old pilot.
+        decay=[p for p in model.parameters() if not getattr(p,'_no_weight_decay',False)]
+        no_decay=[p for p in model.parameters() if getattr(p,'_no_weight_decay',False)]
+        optimizer=torch.optim.AdamW([
+            {'params':decay,'weight_decay':config['weight_decay']},
+            {'params':no_decay,'weight_decay':0.0},
+        ],lr=config['learning_rate'])
+    else:
+        optimizer=torch.optim.AdamW(model.parameters(),lr=config['learning_rate'],weight_decay=config['weight_decay'])
     train=TrajectoryWindows(args.manifest,'train',config['history_frames'],config['forecast_offset_frames'],config['window_stride'])
     val=TrajectoryWindows(args.manifest,'val',config['history_frames'],config['forecast_offset_frames'],config['window_stride'])
     loader=DataLoader(train,batch_size=config['batch_size'],shuffle=True,num_workers=0,pin_memory=True,drop_last=True,
@@ -193,9 +203,17 @@ def main():
          'config':config,'manifest':str(args.manifest),'dataset_revision':train.metadata['source_revision'],
          'train_windows':len(train),'val_windows':len(val),'train_trajectories':len(train.sequences),'val_trajectories':len(val.sequences),
          'parameters':sum(p.numel() for p in model.parameters()),'torch':torch.__version__,
+         'backbone':model.config.backbone,
+         'encoder_class':type(model.encoder).__module__+'.'+type(model.encoder).__name__,
+         'python':sys.executable,
          'gpu':torch.cuda.get_device_name(device),'rotation6d':g.ROTATION_6D_CONVENTION,
          'metrics':'source wrist xyz mm; root/finger geodesic degrees; NO MPJPE/mesh; fitted MANO reference',
          'scope':'OakInk2 recording-disjoint pilot; synthetic corruption only; no RGB, no real HaWoR adaptation'}
+    if model.config.backbone=='structured_mamba':
+        import importlib.metadata
+        run['mamba_ssm']=importlib.metadata.version('mamba_ssm')
+        run['causal_conv1d']=importlib.metadata.version('causal_conv1d')
+        run['architecture']='MANO parent/finger/depth embeddings; per-frame joint attention + FFN; per-joint causal Mamba; dense, no action or MoE'
     atomic_json(args.output/'run_metadata.json',run)
     def save(step,best_checkpoint=False):
         checkpoint={'step':step,'model':model.state_dict(),'optimizer':optimizer.state_dict(),

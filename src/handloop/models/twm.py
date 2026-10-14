@@ -1,4 +1,4 @@
-"""Minimal motion-only TWM for CURRENT 99D restoration and auxiliary forecasting.
+"""Motion-only TWM for CURRENT 99D restoration and auxiliary forecasting.
 
 There are no RGB/features, camera features, contact assumptions or force heads.
 The caller supplies one common coordinate frame for history/raw/candidate; this
@@ -7,6 +7,8 @@ Each frame has sixteen anatomical tokens (root + fifteen MANO local joints).
 The root token additionally contains wrist J0 translation. A null context token
 prevents all-masked attention for padded history; it contains no measurement.
 Attention sees past/current frames only. Same-frame joints attend each other.
+The structured_mamba option keeps joint and time axes separate and adds the
+MANO tree encoding. The original flat_transformer remains for saved pilots.
 
 Availability/quality use SEVENTEEN groups: translation, root rotation, then the
 15 finger rotations. Availability is separate from confidence and history
@@ -27,6 +29,7 @@ from handloop.geometry import normalize_state, state_apply_delta
 
 @dataclass
 class TWMConfig:
+    backbone: str = "flat_transformer"
     d_model: int = 128
     num_layers: int = 4
     nhead: int = 4
@@ -36,6 +39,9 @@ class TWMConfig:
     translation_scale: float = 0.1  # metres per unit restoration head output
     rotation_scale: float = 0.5     # radians per unit restoration head output
     check_finite: bool = True
+    mamba_state_size: int = 64
+    mamba_conv: int = 4
+    mamba_expand: int = 2
 
 
 class TWM(nn.Module):
@@ -60,6 +66,8 @@ class TWM(nn.Module):
             raise ValueError("d_model must be positive and divisible by nhead")
         if c.num_layers < 1 or c.forecast_horizon < 0:
             raise ValueError("num_layers >= 1 and forecast_horizon >= 0 required")
+        if c.backbone not in ("flat_transformer", "structured_mamba"):
+            raise ValueError(f"Unknown backbone: {c.backbone}")
         # Geometry9 + availability2 + quality2 + quality-known2.
         self.history_projection = nn.Linear(15, c.d_model)
         # raw9 + candidate9 + raw-mask2 + candidate-mask2 + quality2 + known2.
@@ -69,25 +77,35 @@ class TWM(nn.Module):
         self.shape_projection = nn.Linear(11, c.d_model)  # beta10 + known flag
         self.time_projection = nn.Sequential(nn.Linear(3, c.d_model), nn.SiLU(),
                                              nn.Linear(c.d_model, c.d_model))
-        self.null_token = nn.Parameter(torch.zeros(1, 1, c.d_model))
-        layer = nn.TransformerEncoderLayer(
-            d_model=c.d_model, nhead=c.nhead, dim_feedforward=c.dim_feedforward,
-            dropout=c.dropout, activation="gelu", batch_first=True, norm_first=True,
-        )
-        self.encoder = nn.TransformerEncoder(layer, c.num_layers,
-                                             norm=nn.LayerNorm(c.d_model),
-                                             enable_nested_tensor=False)
+        if c.backbone == "structured_mamba":
+            from .structured_mamba import StructuredMambaEncoder
+            self.encoder = StructuredMambaEncoder(
+                d_model=c.d_model, num_layers=c.num_layers, nhead=c.nhead,
+                dim_feedforward=c.dim_feedforward, dropout=c.dropout,
+                d_state=c.mamba_state_size, d_conv=c.mamba_conv,
+                expand=c.mamba_expand,
+            )
+        else:
+            self.null_token = nn.Parameter(torch.zeros(1, 1, c.d_model))
+            layer = nn.TransformerEncoderLayer(
+                d_model=c.d_model, nhead=c.nhead, dim_feedforward=c.dim_feedforward,
+                dropout=c.dropout, activation="gelu", batch_first=True, norm_first=True,
+            )
+            self.encoder = nn.TransformerEncoder(layer, c.num_layers,
+                                                 norm=nn.LayerNorm(c.d_model),
+                                                 enable_nested_tensor=False)
         self.translation_head = nn.Linear(c.d_model, 3)
         self.rotation_head = nn.Linear(c.d_model, 3)
         self.forecast_translation_head = nn.Linear(c.d_model, 3)
         self.forecast_rotation_head = nn.Linear(c.d_model, 3)
         # TransformerEncoder clones its template with identical initial values;
         # initialize each attention/FF block independently.
-        for block in self.encoder.layers:
-            nn.init.xavier_uniform_(block.self_attn.in_proj_weight)
-            nn.init.xavier_uniform_(block.self_attn.out_proj.weight)
-            nn.init.xavier_uniform_(block.linear1.weight)
-            nn.init.xavier_uniform_(block.linear2.weight)
+        if c.backbone == "flat_transformer":
+            for block in self.encoder.layers:
+                nn.init.xavier_uniform_(block.self_attn.in_proj_weight)
+                nn.init.xavier_uniform_(block.self_attn.out_proj.weight)
+                nn.init.xavier_uniform_(block.linear1.weight)
+                nn.init.xavier_uniform_(block.linear2.weight)
         for head in (self.translation_head, self.rotation_head,
                      self.forecast_translation_head, self.forecast_rotation_head):
             nn.init.zeros_(head.weight)
@@ -163,7 +181,9 @@ class TWM(nn.Module):
 
         dt (B,H+1), seconds: dt[:,i] is elapsed time into frame i. dt[:,0]
         does not affect relative timestamps, but remains a sample-rate feature.
-        Current dt must be positive. Padding intervals must be finite >=0.
+        Current dt must be positive. Padding intervals must be finite >=0;
+        structured_mamba ignores their intervals by setting them to zero. Real
+        missed observations retain valid time slots with availability masks.
         beta (B,10) is sequence/person shape, or None when unknown. beta_valid
         (B,) distinguishes an actual zero shape from missing shape.
         forecast_dt (B,F) contains positive offsets AFTER current; these are
@@ -215,21 +235,29 @@ class TWM(nn.Module):
             shape_condition = torch.cat((beta_value, beta_valid.float()[:, None]), dim=-1)
         condition = (self.shape_projection(shape_condition)
                      + self.handedness_embedding(handedness.long()))
+        if self.config.backbone == "structured_mamba":
+            dt = torch.cat((torch.where(history_valid, dt[:, :h], 0.0), dt[:, h:]), dim=1)
         times = dt.cumsum(-1)
         times = times - times[:, -1:]
         temporal = self.time_projection(torch.stack((times, dt, torch.log1p(dt)), -1))
         joints = self.joint_embedding(torch.arange(16, device=raw.device))
         tokens = tokens + temporal[:, :, None] + joints[None, None] + condition[:, None, None]
-        tokens = tokens.flatten(1, 2)
-        tokens = torch.cat((self.null_token.expand(b, -1, -1), tokens), dim=1)
-        frame_ids = torch.cat((torch.tensor([-1], device=raw.device),
-                               torch.arange(h+1, device=raw.device).repeat_interleave(16)))
-        causal_mask = frame_ids[None, :] > frame_ids[:, None]
-        padding = torch.cat((torch.zeros(b, 1, device=raw.device, dtype=torch.bool),
-                             (~history_valid).repeat_interleave(16, dim=1),
-                             torch.zeros(b, 16, device=raw.device, dtype=torch.bool)), dim=1)
-        encoded = self.encoder(tokens, mask=causal_mask, src_key_padding_mask=padding)
-        features = encoded[:, -16:]
+        if self.config.backbone == "structured_mamba":
+            frame_valid = torch.cat((history_valid,
+                                     torch.ones(b, 1, device=raw.device, dtype=torch.bool)), dim=1)
+            encoded = self.encoder(tokens, frame_valid)
+            features = encoded[:, -1]
+        else:
+            tokens = tokens.flatten(1, 2)
+            tokens = torch.cat((self.null_token.expand(b, -1, -1), tokens), dim=1)
+            frame_ids = torch.cat((torch.tensor([-1], device=raw.device),
+                                   torch.arange(h+1, device=raw.device).repeat_interleave(16)))
+            causal_mask = frame_ids[None, :] > frame_ids[:, None]
+            padding = torch.cat((torch.zeros(b, 1, device=raw.device, dtype=torch.bool),
+                                 (~history_valid).repeat_interleave(16, dim=1),
+                                 torch.zeros(b, 16, device=raw.device, dtype=torch.bool)), dim=1)
+            encoded = self.encoder(tokens, mask=causal_mask, src_key_padding_mask=padding)
+            features = encoded[:, -16:]
         dp = self.translation_head(features[:, 0]).float() * self.config.translation_scale
         dr = self.rotation_head(features).float() * self.config.rotation_scale
         delta = torch.cat((dp, dr.flatten(-2)), dim=-1)

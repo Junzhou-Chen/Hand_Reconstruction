@@ -21,7 +21,7 @@
 在本机检查：
 
 ```sh
-ssh ds 'python3 /sciclone/home/jchen57/project/Hand_Reconstruction/scripts/ds_train_twm.py status'
+ssh ds 'python3 /sciclone/home/jchen57/project/Hand_Reconstruction/scripts/ds_train_twm.py status --output /sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014'
 ```
 
 `status.json` 是训练进度，`latest_validation.json` 是最新固定验证，`metrics.jsonl` 与 `train.log` 保留原始过程；`latest.pt` 为最近可恢复状态，`best.pt` 按 noisy/missing 恢复 loss 均值选取。数据、权重、缓存和原始日志不提交 Git。技术上可用同一 helper 的 `start --resume`，但本次是用户主动暂停，必须待用户后续恢复指令；不要把stopped视为故障而重启。
