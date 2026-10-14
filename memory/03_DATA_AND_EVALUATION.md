@@ -1,6 +1,6 @@
 # HandLoop 数据与评测记忆
 
-更新日期：2026-10-13。以下是数据角色、评测设计和待落地约定；本工作区尚无完整训练数据、已运行 loader 或实验结果。依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据资源以[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)的公开文件、schema、规模及来源核验为准；方法引用见[写作与外部核验](05_WRITING_AND_REFERENCES.md)。
+更新日期：2026-10-13。以下是数据角色、评测设计和待落地约定；Oak/HOT有效train/Ume real原包已在ds完成下载及hash校验，尚无canonical loader、99D转换或实验结果。[获取记录](../docs/TWM_DATA_DOWNLOADS.md)。设计依据：[START_HERE §5、§7](../HandLoop_Project/START_HERE.md)、[实现清单 §2、§4、§6–8](../HandLoop_Project/03_References_And_Implementation.md)。数据来源见[专项调研](07_TWM_DATASET_SURVEY_2026-10-13.md)，方法引用见[写作核验](05_WRITING_AND_REFERENCES.md)。
 
 ## 两个数据池
 
@@ -13,6 +13,8 @@
 **已定D15–D18：免申请、每手99D、论文机制参考、传感器姿态精度优先。** 用户本轮纠正v1过度沿视觉论文选库，v2恢复GRAB/ARCTIC/Oak/HOT的MoCap核心候选，新增UmeTrack，HumanTouch/DexWild升主要glove。实际先可公开来源，注册有授权再接；Re/EgoDex降后续视觉标签扩展。混合未定。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)、[传感器精度核验](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
 论文用法已经分角色整理在[完整方法框架§9](../docs/METHOD_FRAMEWORK.md#9-数据选择采用用户最新的免申请原则)：HMP独立motion prior；HaWoR视觉估计数据与HOT3D infiller不同；StableHand八库主要服务quality network；PAD-Hand用DexYCB/HO3D训练评测、TACO跨域留出。DexYCB/HO3D有直接入口，适合参考paired恢复协议，但视觉拟合标签和第三视角不能替代头戴独立MoCap结论。
+
+**HaWoR对比复核：** 视觉训练四库HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller单HOT；主定量HOT Aria27 validation/world＋Dex test/camera，EPIC定性。建议首轮主HOT补Dex，ARCTIC/HO3D另加则标为扩展。当前官方HOT evaluator为GT crop/visibility、右手、GT-valid交集、100帧含scale对齐，未调用infiller；部署detector/双手/不可见恢复另报。Dex作者fork默认s0_test，缺预测ID会跳过，须锁定共同覆盖。本轮只核资料，没有运行baseline。[完整协议与资源缺口](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
 v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验收可用MoCap及glove，按质量和字段能力训练；99D不要求源原生MANO。DexYCB仍可纯轨迹恢复对照，固定第三视角不是排除条件；它的论文用频率不使其GT优先于独立sensor参考。
 
@@ -86,6 +88,8 @@ MANO标签通常由视觉/depth、marker或其他手模型拟合得到，不是�
 在训练前记录 train/validation/test 划分及主体、序列、场景标识；避免同一轨迹相邻片段跨划分造成泄漏。先定义 OOD 是跨被试、场景、数据集还是视觉 backbone，不将同域随机切分叫跨域泛化。
 
 **v1新增split契约：** HOT官方train包含HaWoR27个held-out Aria原录制的公开GT，Clips/full/HandX聚合/StableHand缓存共享原ID+timestamp排除表；若27作最终比较，另从110 train划内部val调参。Oak沿431train/39val/157test清单但不宣称subject-disjoint；验父recording重复。DexYCB训练的同数据对照独立命名，HOI4D初版不训练/调参、只GT-valid评价；HO3D仅TWM未见，HaWoR本身见过。
+
+**后续已落实：** 下载manifest及脚本已固定27个HaWoR ID，并从BOP官方train排349段/25源录制；另外2个ID整版缺席。2455个train TAR已完整下载，评测349段没有下载，full27记录待准备。官方export_gt会生成val.json，静态名单文件未在tree发布不等于无法生成split。该排除完成不代表其他benchmark/subject-disjoint验收已完成。
 
 相机世界坐标和参考世界坐标需有可复现的固定对齐协议。不能逐帧用评测 GT 优化对齐后，再声称获得绝对世界精度。是否允许一次序列级 gauge 对齐、尺度对齐及其数据来源仍需定案并单独报告。
 

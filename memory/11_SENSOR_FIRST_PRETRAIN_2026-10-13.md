@@ -6,6 +6,8 @@
 
 建议恢复GRAB/ARCTIC/OakInk2/HOT3D的高质量MoCap核心候选，将HumanTouch/DexWild提升为主要glove验收对象；新增公开UmeTrack补自由手势和pinch。按免申请偏好，实际先验收Oak/HOT/UmeTrack与HumanTouch/DexWild，GRAB/ARCTIC有既有授权再接入。没有下载完整数据、做数值标定或训练。
 
+后续工程更新：上句“没有下载”描述调研时状态；D20三库原包已在ds完成下载/hash校验，native→99D与精度验收仍未实施。当前获取范围和HaWoR27源录制排除见[下载记录](../docs/TWM_DATA_DOWNLOADS.md)。
+
 ## 1. 选库依据与优先级
 
 | 数据 | 手指与腕部来源 | 纯轨迹适合程度与接入条件 |

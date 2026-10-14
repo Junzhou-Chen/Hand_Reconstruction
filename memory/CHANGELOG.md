@@ -1,5 +1,13 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-13 下载完成与HaWoR对比数据复核
+
+- 用户报告三库完成后，只读核远程status：Oak634/HOT2461/Ume1021文件全部verified、failed0，合计404.25GB；原下载进程正常退出。保存完成时间，不重复hash404GB、解压或训练。
+- 核HaWoR论文§4/6–8与官方main固定SHA66c7d410：视觉训练四库973K取整帧、infiller单HOT；量化主HOT Aria27val/world与Dex test/camera，ARCTIC/HO3D不作原论文主测试，EPIC定性。
+- 新建[HaWoR数据与对比协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)：HOT full27与BOP349clips/25recordings区别、官方GT crop/右手/valid/100帧含scale对齐、不调infiller；Dex作者fork默认s0_test、遮挡evaluator及缺预测跳过、推理/依赖缺口。
+- 勘误：HaWoR export_gt生成val.json，无需另找未发布静态split；官方HO3D已公开evaluation几何GT。建议HOT主＋Dex补，未把建议升级为用户已选split，未改变pure-motion pool、启动新数据下载或模型实验。
+- 更新入口、数据专题、状态、决定注记与运维；代码/文档正常同步GitHub，数据和日志留远程，原始档案不改。
+
 ## 2026-10-13 三库远程后台下载
 
 - D20用户要求下载OakInk2/HOT3D train/UmeTrack，澄清ds登录入口CPU少，需进入现有计算Pod；脚本确认正常后启动并结束对话，由用户后续检查。

@@ -2,9 +2,11 @@
 
 日期：2026-10-13。用户要求下载OakInk2、HOT3D train、UmeTrack，并明确进入其计算Pod下载；脚本检查通过、后台任务跑起来后结束对话，由用户后续检查。本轮只做数据获取，没有解码轨迹、生成99D或训练。
 
+**完成更新：** 用户报告完成后，已只读核验远程三个`download_status.json`：phase均为complete，全部4116个文件verified、failed=0，字节数与清单一致，进程正常退出。Oak完成于2026-10-13 23:35:43 UTC（纽约19:35），Ume于10-14 00:20:58 UTC（纽约10-13 20:20），HOT于10-14 01:22:17 UTC（纽约10-13 21:22）。这是下载器完成时的hash验收记录，本轮没有重新读取404GB做全量hash，也未解压/转换。
+
 ## 运行位置与范围
 
-登录入口`ssh ds`仅调用kubectl；下载和校验在`jchen57-debug-mpd5p`（namespace `jchen57`，12CPU/128Gi）执行。三个独立后台进程各4个下载worker，不使用GPU；退出SSH或聊天后继续运行，Pod终止时进程会停止。
+登录入口`ssh ds`仅调用kubectl；下载和校验在`jchen57-debug-mpd5p`（namespace `jchen57`，12CPU/128Gi）执行。当时三个独立后台进程各4个下载worker，不使用GPU；当前三库已正常完成，无需重新启动。若以后另有下载，退出SSH不停止进程，Pod终止会停止进程。
 
 - 代码：`/sciclone/home/jchen57/project/Hand_Reconstruction`。
 - 数据根：`/sciclone/data10/jchen57/Hand_Reconstruction/datasets`，下设`oakink2/`、`hot3d/`、`umetrack/`。

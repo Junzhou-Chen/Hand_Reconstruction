@@ -14,7 +14,8 @@
 | 部分第三方论文/源码核验 | 本次完成只读核验 | [写作与外部核验](05_WRITING_AND_REFERENCES.md) |
 | TWM公开数据集调研 | 已完成来源、获取、字段及部分release元数据核验 | [专项报告](07_TWM_DATASET_SURVEY_2026-10-13.md)；尚未做实际轨迹质量验收 |
 | Git与远程工作方式 | main已推送GitHub；ds持久checkout已建立，数据在data10，hongfei旧checkout保留 | [.gitignore](../.gitignore)、[开发与远程约定](08_DEVELOPMENT_AND_REMOTE.md)；未启动实验 |
-| 三库数据获取 | Oak姿态/HOT有效train/Ume real train三进程在12CPU Pod后台下载，约404.25GB；首批文件已验hash，未宣称全量完成 | [下载与检查](../docs/TWM_DATA_DOWNLOADS.md)；4项远程续传/校验检查通过，用户后续检查 |
+| 三库数据获取 | 用户报告后已核远程phase均complete；634/2461/1021文件全verified、failed0，合计404.25GB；进程正常结束 | [下载完成记录](../docs/TWM_DATA_DOWNLOADS.md)；没有解压/99D转换 |
+| HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
 | 完整方法框架 | 已整理，新增接口建议明确标注 | [完整框架](../docs/METHOD_FRAMEWORK.md)；无模型实现/结果 |
 | MANO/69D表示与标签来源 | 已核验代表性论文与源码，用户随后采纳99D；含StableHand输出/quality/shape对照 | [专题调查](10_MANO_REPRESENTATION_AND_ANNOTATION.md)；adapter与效果未验，未生成fits |
@@ -26,7 +27,7 @@
 | TWM完整99D输出 | 用户再次明确每手完整99D主输出；已区分统一输出、完整模型参考与部分几何监督 | [输出契约](../docs/TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)；未实现转换或训练 |
 | 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；无模型训练 |
-| 模型源码、完整训练依赖、权重、训练就绪数据 | 尚未建立；现有源码仅数据获取/检查脚本，原包下载中 | ds基础CUDA与传输hash验证不等于99D转换/TWM实验已完成 |
+| 模型源码、完整训练依赖、权重、训练就绪数据 | 尚未建立；现有源码仅数据获取/检查脚本，原包下载已完成 | ds基础CUDA与传输hash验证不等于99D转换/TWM实验已完成 |
 | canonicalizer、HaWoR adapter、TWM、Corrector | 尚无实现 | 原 `03` 中仅有 schema/目录建议 |
 | 实验和性能、投稿和录用 | 没有可核验完成证据 | 不将草稿贡献或历史示意当结果 |
 
@@ -38,7 +39,7 @@
 
 ## 推荐执行顺序与交付条件
 
-建库和首轮TWM数据调查已完成，D20已在ds授权Pod启动三库数据下载，具体范围/进程/续跑见[记录](../docs/TWM_DATA_DOWNLOADS.md)。用户明确本轮跑起来后结束、由他后续检查；不要自动继续预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程或训练；所有后续实验远程执行。
+建库和首轮TWM数据调查已完成，D20三库在ds完成下载与校验，具体范围见[记录](../docs/TWM_DATA_DOWNLOADS.md)。用户最新要求重新核HaWoR训练/测试库以做对比，本轮已完成论文/代码复核，并建议HOT主、Dex补；未授权或启动新下载、预处理或训练。以下方法阶段仍是下一阶段计划，尚未创建模型工程或训练；所有后续实验远程执行。
 
 按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。以上尚未实施。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
@@ -93,4 +94,4 @@
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。项目已决定头戴RGB+HaWoR+独立纯轨迹current-state-restoration TWM+evidence-guided Corrector+最终状态质量反馈。D20三库后台获取已启动，先通过docs/TWM_DATA_DOWNLOADS.md查实际status，不重复启动/全量重下；用户后续检查。本轮未授权自动训练。按后续任务在ds验收native→99D，保留raw reference、可用性与camera-to-world conversion。完整框架接口补充仍是建议；不把下载校验当几何质量验收或实验收益。
+> 先读MEMORY.md、docs/METHOD_FRAMEWORK.md与本文件。项目已决定头戴RGB+HaWoR+独立纯轨迹current-state-restoration TWM+evidence-guided Corrector+最终状态质量反馈。三库下载已complete，不重复启动；原包质量/99D尚未验收。用户要做HaWoR对比，先读docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md：HOT27 full eval尚缺、Dex还未获取，官方GT crop与部署检测/infiller实验分开。本轮未启动新下载或训练；后续按具体指令在ds落实，保持raw reference、可用性和坐标来源，不把传输hash当几何验收或方法收益。

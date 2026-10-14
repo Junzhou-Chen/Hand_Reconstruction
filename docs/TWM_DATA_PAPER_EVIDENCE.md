@@ -10,7 +10,7 @@
 |---|---|---|---|
 | [HMP，WACV2024，§4.1](https://arxiv.org/html/2312.16737v1) | GRAB/TCDHands/SAMP训练motion prior；当前代码train GRAB/ARCTIC、valid SAMP、test TCDHands，与原论文分开 | HO3D/DexYCB恢复评测 | 高质量运动先验与视觉恢复分离；主要局部手先验，不能当完整world腕部99D方案 |
 | [TaMF/OakInk2，CVPR2024](https://github.com/oakink/OakInk2-TaMF) | OakInk2的运动参数做任务/物体轨迹条件扩散生成 | 官方431/39/157段train/val/test；未证实subject-disjoint | OakInk2确有运动建模训练先例；只借运动数据/解码/split，不添加物体与任务条件 |
-| [HaWoR，CVPR2025，§8](https://arxiv.org/html/2501.02973v1#S8) | 视觉网络用HOT3D/ARCTIC/DexYCB/HO3D；**infiller只用HOT3D** | HOT3D原录制110train/27val及DexYCB等 | 目标域轨迹与连续缺测；infiller两端条件/120帧不能等同past-only当前恢复 |
+| [HaWoR，CVPR2025，§8](https://arxiv.org/html/2501.02973v1#S8) | 视觉网络HOT573K/ARCTIC165K/Dex169K/HO3D66K；**infiller只HOT** | HOT Aria110train/27val世界主评测，DexYCB test相机评测；EPIC定性 | 目标域轨迹与连续缺测；GT crop/右手/100帧评价及infiller路径分开，详见[复现协议](HAWOR_DATA_AND_COMPARISON_PROTOCOL.md) |
 | [DIP，ICCV2025，§3.4/4.1](https://arxiv.org/html/2508.01835v1) | DexYCB train GT合成扰动训练纯运动恢复；另有真实HaMeR配对的model-specific版本 | HO3Dv2 zero-shot | 最直接的当前受损恢复先例；先合成、再真实前端适配；16帧与序列内反馈需公平对照 |
 | [PAD-Hand，CVPR2026，v2](https://arxiv.org/html/2603.26068v2) | DexYCB/HO3D官方train，真实WiLoR估计作为恢复条件 | 两库eval，TACO未训练跨域 | 数值恢复也需真实上游错误分布；不是独立glove-only预训练；16帧 |
 | [UniHand，ICLR2026，B.1](https://arxiv.org/html/2602.21631v1#A2.SS1) | DexYCB＋HOT3D train训练联合VAE/条件扩散；单checkpoint，含视觉/结构条件，48帧 | HO3D域外；HOT3D Aria 1272train/244test由官方train再分 | 支持MANO与不同结构条件；不能称纯轨迹TWM。此Sun等UniHand与BeingBeyond同名聚合/VLA资源不同 |
@@ -35,7 +35,7 @@
 
 官方Clips train 2,804段只是发布分区。[JoHan A.4](https://arxiv.org/html/2610.10512v1#A1.S4)明确其公开GT评测沿用HaWoR从官方train留出的27个Aria原recordings；StableHand/UniHand公开GT benchmark也不是官方无GT test。各论文使用clips、stride与过滤不同，不能用官方train全量预训练后沿用这些留出评价。
 
-本项目建议以HaWoR原recording划分为主协议，核对StableHand/UniHand/JoHan衍生clips；在full、Clips、HandX聚合和缓存之间共享`source + original_recording_id + timestamp`排除表。精确清单尚未在本仓库取得/实现；取得并固定后才统计可用train量，不能先声明42万条全部可训练。
+本项目建议以HaWoR原recording划分为主协议，核对StableHand/UniHand/JoHan衍生clips；在full、Clips、HandX聚合和缓存之间共享`source + original_recording_id + timestamp`排除表。**后续D20已取得并在下载脚本实现27个ID排除**：BOP train移除349段/25个源录制，2个ID整版缺席，下载2455 train TAR；不能声明官方42万条全部可训练。评测full27仍未获取。[实况与源版本](TWM_DATA_DOWNLOADS.md)
 
 HaWoR的110/27是Aria协议，Quest motion扩展沿官方train并单独留val/披露；subject-disjoint评测同时排同subject的Quest。增加来源时各基线同训练池，或把数据收益与方法收益分开报告。
 

@@ -31,7 +31,7 @@
 | D17 | 以后plan广泛对照当前最新相关论文实际做法，适当参考后再规划，避免凭直觉 | 2026-10-13用户直接指令；已采纳；任务角色/GT/split/时间上下文分开比较，工作约定写入AGENTS |
 | D18 | TWM不需要视觉；选库优先更准确的手姿态，恢复glove/MoCap导向；论文用库作参考，不必照搬 | 2026-10-13用户直接纠正；已采纳，限定D17用法并替代v1 glove支线/Re-EgoDex优先扩展建议；99D与免申请偏好未撤销 |
 | D19 | hongfei GPU占用，当前改用ssh ds的Kubernetes资源；授权进入/使用用户预申请Pod jchen57-debug-mpd5p，先了解运维 | 2026-10-13用户直接指令及Pod具体授权；替代D14的当前计算位置，不改变方法。已进入、完成轻量CUDA验证；该运维核验阶段未迁移/训练，后续下载见D20。[操作记录](../docs/DS_SERVER_OPERATIONS.md) |
-| D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已实现续传/校验与查询脚本并在12CPU Pod启动。具体scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；属于本轮获取实施选择，不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
+| D20 | 下载OakInk2、HOT3D train、UmeTrack；下载在用户计算Pod内而非ds登录入口，脚本确认正常后后台启动并结束对话，由用户后续检查 | 2026-10-13用户直接指令，最后纠正为登录入口CPU少。已在12CPU Pod运行，后续用户报告完成且远程status全verified/failed0。scope为Oak全标注保留split、HOT train先排HaWoR评测录制、HF Ume real train跳过synthetic；不固定最终训练混合/比例。[下载记录](../docs/TWM_DATA_DOWNLOADS.md) |
 
 ## 已替代的历史路线
 
@@ -61,6 +61,8 @@ HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 
 **2026-10-13本轮执行归纳仍是建议：** 首轮目标OakInk2/HOT3D有效train/UmeTrack train/HumanTouch，DexWild继续主要候选并先验local/world链，GRAB/ARCTIC有授权优先、DexCap小补充；没有新增用户已定混合或比例。v2.1将采集/精度审计结果落实到接入职责，不更改D18。首个checkpoint不要求四库loader全部就绪。[归纳](../docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+
+**后续用户任务：** 已要求核HaWoR论文训练/测试数据，以便在其上做对比。核验主定量HOT/Dex及代码协议后，建议HOT27原录制作world主、Dex test作camera补充；这不是用户已定全套实验split，也未授权自动重训HaWoR或下载其所有视觉训练库。GT crop、真实detector、双手、infiller与对齐需分别命名。[复核](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
 ## 对后续协作有用的偏好
 
