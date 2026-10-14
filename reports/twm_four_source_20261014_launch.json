@@ -1,0 +1,841 @@
+{
+  "title": "Four-source structured Mamba TWM launch and bounded progress audit",
+  "date": "2026-10-14",
+  "evidence": "Read-only remote manifests, run metadata/status/validation and finite-event scan; CPU checkpoint read by independent recovery_review agent.",
+  "observed_utc": "2026-10-14T19:07:33.448211+00:00",
+  "collection_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "collection": {
+    "phase": "complete",
+    "prepared_utc": "2026-10-14T17:46:11.863094+00:00",
+    "code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+    "rotation6d": "columns_c0xyz_c1xyz",
+    "manifests": [
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+        "dataset": "oakink2",
+        "manifest_sha256": "570e423e28ae36a9e03bef087f00a053a9bb93e2c6d81feaf8c96ff818b64291"
+      },
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+        "dataset": "hot3d",
+        "manifest_sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0"
+      },
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+        "dataset": "umetrack",
+        "manifest_sha256": "77623ccab62e733f64196201720d22219f62341cac07ae2724da2fb67cae8a24"
+      },
+      {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+        "dataset": "dexycb",
+        "manifest_sha256": "b36f171ad3af1951d08db25cab5876db92bf703378fa54e9e6bc1208f289a911"
+      }
+    ],
+    "required_datasets": [
+      "oakink2",
+      "hot3d",
+      "umetrack",
+      "dexycb"
+    ],
+    "scope": "four-source full-MANO train/validation; source splits and coordinates retained",
+    "sampling_hypothesis": "equal source probability, uniform windows within source; not validated as optimal",
+    "position": "actual wrist J0 in metres; source world or fixed camera coordinates, anchored per sample",
+    "partial_gt_policy": "not fitted or imputed; this trainer requires full MANO supervision",
+    "loader_inspection": {
+      "train": {
+        "windows": {
+          "dexycb": 6352,
+          "hot3d": 132008,
+          "oakink2": 346860,
+          "umetrack": 151390
+        },
+        "sequences": {
+          "dexycb": 798,
+          "hot3d": 4402,
+          "oakink2": 862,
+          "umetrack": 1546
+        },
+        "source_revisions": {
+          "dexycb": [
+            "64551b001d360ad83bc383157a559ec248fb9100"
+          ],
+          "hot3d": [
+            "30fe9674782f32e1e5edba98476b6ff4300132c5"
+          ],
+          "oakink2": [
+            "21705616140d726607027e70d58b7837f442ffd8"
+          ],
+          "umetrack": [
+            "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+          ]
+        }
+      },
+      "val": {
+        "windows": {
+          "dexycb": 394,
+          "hot3d": 15240,
+          "oakink2": 27728,
+          "umetrack": 18008
+        },
+        "sequences": {
+          "dexycb": 40,
+          "hot3d": 508,
+          "oakink2": 78,
+          "umetrack": 182
+        },
+        "source_revisions": {
+          "dexycb": [
+            "64551b001d360ad83bc383157a559ec248fb9100"
+          ],
+          "hot3d": [
+            "30fe9674782f32e1e5edba98476b6ff4300132c5"
+          ],
+          "oakink2": [
+            "21705616140d726607027e70d58b7837f442ffd8"
+          ],
+          "umetrack": [
+            "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+          ]
+        }
+      }
+    }
+  },
+  "sources": {
+    "oakink2": {
+      "phase": "complete",
+      "completed_utc": "2026-10-14T16:31:56.768940+00:00",
+      "source_revision": "21705616140d726607027e70d58b7837f442ffd8",
+      "source": "OakInk2 official annotations / fitted MANO from MoCap",
+      "coordinate_frame": "world",
+      "nominal_dt": 0.03333333333333333,
+      "source_fps": 120,
+      "effective_fps": 30,
+      "storage": "npy",
+      "rotation6d": "columns_c0xyz_c1xyz",
+      "position": "actual world wrist xyz in metres; source centered MANO + tsl",
+      "shape": "static beta10 separately stored",
+      "full_fk_verified": false,
+      "fk_roundtrip_summary": {
+        "sequences_checked": 940,
+        "frames_checked": 30080,
+        "joint_max_m": 1.4901161193847656e-7,
+        "vertex_max_m": 1.884864389012364e-7,
+        "independent_source_fk_verified": false
+      },
+      "frames_by_split": {
+        "train": 1414552,
+        "val": 113382
+      },
+      "official_split_counts": {
+        "train": 431,
+        "val": 39,
+        "test": 157
+      },
+      "full_official_selection": {
+        "train": true,
+        "val": true
+      },
+      "scope": "full official train+val recording selection; no test labels read",
+      "sequence_counts_by_split": {
+        "train": 862,
+        "val": 78
+      },
+      "manifest_sha256_matches_collection": true,
+      "rotation_orthogonality_error": 2.3314683517128287e-15
+    },
+    "hot3d": {
+      "phase": "complete",
+      "completed_utc": "2026-10-14T17:45:25.817142+00:00",
+      "source_revision": "30fe9674782f32e1e5edba98476b6ff4300132c5",
+      "source": "Meta marker-based native trajectory fitted to MANO; not direct MANO sensor measurements",
+      "coordinate_frame": "source_recording_world",
+      "nominal_dt": 0.03333333333333333,
+      "storage": "npz",
+      "rotation6d": "columns_c0xyz_c1xyz",
+      "position": "actual MANO wrist joints[:,0] in source world metres",
+      "shape": "beta10 per TAR, shared by both sides and frames, separately stored",
+      "timestamp_policy": "HOT actual ref_timestamp_ns; Ume original frame_id/30 nominal relative time; missing frames do not compress clock",
+      "gt_mask_policy": "17 true groups only for finite complete MANO labels; native validity independent; no imputed GT",
+      "full_fk_executed": true,
+      "independent_fk_equivalence_verified": false,
+      "validation_boundary": "official smplx FK and numerical rotations; no native/MANO error-equivalence or empirical model accuracy claim",
+      "availability_counts": {
+        "mano_present": 736500,
+        "mano_valid": 736500,
+        "native_present": 736500,
+        "native_valid": 736500,
+        "mano_valid_native_absent": 0,
+        "mano_valid_native_invalid": 0,
+        "source_hand_frames": 736500
+      },
+      "revalidation_counts": {
+        "source_tars_reread_and_fully_decoded": 2455,
+        "hand_sequences_recomputed": 4910,
+        "arrays_recomputed": 73650,
+        "existing_npz_sequences_verified_and_retained": 1809,
+        "new_hand_sequence_artifacts_written": 3101
+      },
+      "frames_by_split": {
+        "train": 660300,
+        "val": 76200
+      },
+      "decoder_provenance": {
+        "decoder": "MANOReferenceDecoder",
+        "meta_toolkit_revision": "bc628e9286c18444b47a0971a89d075ea6f00747",
+        "smplx_audited_revision": "1265df7ba545e8b00f72e7c557c766e15c71632f",
+        "smplx_installed_version": "0.1.28",
+        "asset_version": "official MANO_v1_2 clean numpy same values",
+        "assets": {
+          "left": {
+            "filename": "MANO_LEFT.pkl",
+            "sha256": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+            "bytes": 3447748
+          },
+          "right": {
+            "filename": "MANO_RIGHT.pkl",
+            "sha256": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732",
+            "bytes": 3447714
+          }
+        },
+        "left_shapedirs_fix_requested": true,
+        "left_shapedirs_fix_applied": true,
+        "left_right_shapedirs_difference_before_fix": 0.00036682788049802184,
+        "pca_expansion": "coefficients @ hand_specific_components[:K] + hand_mean",
+        "position": "official smplx MANO output joints[:,0], metres",
+        "rotation6d": "columns_c0xyz_c1xyz",
+        "source_frame": "preserved; no inversion, reflection or extrinsic applied"
+      },
+      "bounded_limit": 0,
+      "sequence_counts_by_split": {
+        "train": 4402,
+        "val": 508
+      },
+      "manifest_sha256_matches_collection": true,
+      "split_summary": {
+        "rule": "engineering split of official train; not official validation",
+        "group_key": "source sequence_id",
+        "seed": 20261014,
+        "requested_val_fraction": 0.1,
+        "train_groups": 209,
+        "val_groups": 23,
+        "all_train_tars": 2455,
+        "all_tars_by_split": {
+          "train": 2201,
+          "val": 254
+        },
+        "hawor_excluded_recordings": 27,
+        "hot_unique_reference_frames": 368250,
+        "cross_dataset_motion_deduplication": "not established; no cross-dataset disjointness claim",
+        "selected_tars": 2455,
+        "selected_tars_by_split": {
+          "train": 2201,
+          "val": 254
+        }
+      },
+      "rotation_orthogonality_error": 0.0000015497207641601562
+    },
+    "umetrack": {
+      "phase": "complete",
+      "completed_utc": "2026-10-14T17:31:36.074666+00:00",
+      "source_revision": "19f6b2cad9eb17be4ebedfe4503203980a25e016",
+      "source": "Meta marker-based native trajectory fitted to MANO; not direct MANO sensor measurements",
+      "coordinate_frame": "source_recording_world",
+      "nominal_dt": 0.03333333333333333,
+      "storage": "npz",
+      "rotation6d": "columns_c0xyz_c1xyz",
+      "position": "actual MANO wrist joints[:,0] in source world metres",
+      "shape": "beta10 per TAR, shared by both sides and frames, separately stored",
+      "timestamp_policy": "HOT actual ref_timestamp_ns; Ume original frame_id/30 nominal relative time; missing frames do not compress clock",
+      "gt_mask_policy": "17 true groups only for finite complete MANO labels; native validity independent; no imputed GT",
+      "full_fk_executed": true,
+      "independent_fk_equivalence_verified": false,
+      "validation_boundary": "official smplx FK and numerical rotations; no native/MANO error-equivalence or empirical model accuracy claim",
+      "availability_counts": {
+        "mano_present": 741099,
+        "mano_valid": 741099,
+        "native_present": 731416,
+        "native_valid": 731416,
+        "mano_valid_native_absent": 9725,
+        "mano_valid_native_invalid": 9725,
+        "source_hand_frames": 884964
+      },
+      "revalidation_counts": {
+        "source_tars_reread_and_fully_decoded": 1020,
+        "hand_sequences_recomputed": 1728,
+        "arrays_recomputed": 22464,
+        "existing_npz_sequences_verified_and_retained": 1481,
+        "new_hand_sequence_artifacts_written": 247
+      },
+      "frames_by_split": {
+        "train": 662422,
+        "val": 78677
+      },
+      "decoder_provenance": {
+        "decoder": "MANOReferenceDecoder",
+        "meta_toolkit_revision": "bc628e9286c18444b47a0971a89d075ea6f00747",
+        "smplx_audited_revision": "1265df7ba545e8b00f72e7c557c766e15c71632f",
+        "smplx_installed_version": "0.1.28",
+        "asset_version": "official MANO_v1_2 clean numpy same values",
+        "assets": {
+          "left": {
+            "filename": "MANO_LEFT.pkl",
+            "sha256": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+            "bytes": 3447748
+          },
+          "right": {
+            "filename": "MANO_RIGHT.pkl",
+            "sha256": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732",
+            "bytes": 3447714
+          }
+        },
+        "left_shapedirs_fix_requested": true,
+        "left_shapedirs_fix_applied": true,
+        "left_right_shapedirs_difference_before_fix": 0.00036682788049802184,
+        "pca_expansion": "coefficients @ hand_specific_components[:K] + hand_mean",
+        "position": "official smplx MANO output joints[:,0], metres",
+        "rotation6d": "columns_c0xyz_c1xyz",
+        "source_frame": "preserved; no inversion, reflection or extrinsic applied"
+      },
+      "bounded_limit": 0,
+      "sequence_counts_by_split": {
+        "train": 1546,
+        "val": 182
+      },
+      "manifest_sha256_matches_collection": true,
+      "split_summary": {
+        "rule": "engineering split of official train; not official validation",
+        "group_key": "subject prefix",
+        "seed": 20261014,
+        "requested_val_fraction": 0.1,
+        "train_groups": 37,
+        "val_groups": 4,
+        "all_train_tars": 1020,
+        "all_tars_by_split": {
+          "train": 916,
+          "val": 104
+        },
+        "hawor_excluded_recordings": 0,
+        "hot_unique_reference_frames": null,
+        "cross_dataset_motion_deduplication": "not established; no cross-dataset disjointness claim",
+        "selected_tars": 1020,
+        "selected_tars_by_split": {
+          "train": 916,
+          "val": 104
+        }
+      },
+      "rotation_orthogonality_error": 0.0000016689300537109375
+    },
+    "dexycb": {
+      "phase": "complete",
+      "completed_utc": "2026-10-14T16:37:30.337711+00:00",
+      "source_revision": "64551b001d360ad83bc383157a559ec248fb9100",
+      "source": "official multiview RGB-D fitted MANO annotations; not independent MoCap",
+      "nominal_fps": 30,
+      "storage": "npy",
+      "rotation6d": "columns_c0xyz_c1xyz",
+      "position": "actual anatomical wrist J0 in metres in one fixed camera frame",
+      "shape": "static subject/calibration beta10; original side-specific MANO without extra shape fixes",
+      "timestamp_source": "numeric label frame index / nominal 30Hz; not measured timestamp",
+      "full_fk_verified": true,
+      "frames_by_split": {
+        "train": 50861,
+        "val": 2841
+      },
+      "decoder_provenance": {
+        "decoder": "MANOReferenceDecoder",
+        "meta_toolkit_revision": "bc628e9286c18444b47a0971a89d075ea6f00747",
+        "smplx_audited_revision": "1265df7ba545e8b00f72e7c557c766e15c71632f",
+        "smplx_installed_version": "0.1.28",
+        "asset_version": "official MANO_v1_2 clean numpy same values",
+        "assets": {
+          "left": {
+            "filename": "MANO_LEFT.pkl",
+            "sha256": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+            "bytes": 3447748
+          },
+          "right": {
+            "filename": "MANO_RIGHT.pkl",
+            "sha256": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732",
+            "bytes": 3447714
+          }
+        },
+        "left_shapedirs_fix_requested": false,
+        "left_shapedirs_fix_applied": false,
+        "left_right_shapedirs_difference_before_fix": 0.00036682788049802184,
+        "pca_expansion": "coefficients @ hand_specific_components[:K] + hand_mean",
+        "position": "official smplx MANO output joints[:,0], metres",
+        "rotation6d": "columns_c0xyz_c1xyz",
+        "source_frame": "preserved; no inversion, reflection or extrinsic applied"
+      },
+      "official_full_sequence_counts": {
+        "train": 800,
+        "val": 40,
+        "test": 160
+      },
+      "bounded_limits": {
+        "max_sequences_per_split_per_subject": 0,
+        "max_frames_per_sequence": 0
+      },
+      "scope": "s0 train/val only; test labels never decoded; one camera per motion",
+      "sequence_counts_by_split": {
+        "train": 800,
+        "val": 40
+      },
+      "manifest_sha256_matches_collection": true,
+      "fk_joints_max_m": 2.6281125542482187e-7,
+      "fk_wrist_max_m": 1.365714012990793e-7,
+      "rotation_orthogonality_error": 0.0000015497207641601562
+    }
+  },
+  "run_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014",
+  "run_metadata": {
+    "started_utc": "2026-10-14T17:53:41.698574+00:00",
+    "phase": "starting",
+    "pid": 2599,
+    "code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+    "config": {
+      "seed": 20261014,
+      "history_frames": 30,
+      "forecast_offset_frames": 3,
+      "window_stride": 4,
+      "batch_size": 64,
+      "steps": 50000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 1000,
+      "save_every": 500,
+      "log_every": 25,
+      "eval_batches": 16,
+      "forecast_weight": 0.1,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 1,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false
+    },
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+    "dataset_revision": {
+      "dexycb": [
+        "64551b001d360ad83bc383157a559ec248fb9100"
+      ],
+      "hot3d": [
+        "30fe9674782f32e1e5edba98476b6ff4300132c5"
+      ],
+      "oakink2": [
+        "21705616140d726607027e70d58b7837f442ffd8"
+      ],
+      "umetrack": [
+        "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+      ]
+    },
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "train_windows": 636610,
+    "val_windows": 61370,
+    "train_trajectories": 7608,
+    "val_trajectories": 808,
+    "parameters": 6330892,
+    "torch": "2.10.0+cu130",
+    "backbone": "structured_mamba",
+    "encoder_class": "handloop.models.structured_mamba.StructuredMambaEncoder",
+    "python": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+    "rotation6d": "columns_c0xyz_c1xyz",
+    "metrics": "source wrist xyz mm; root/finger geodesic degrees; NO MPJPE/mesh; fitted MANO reference",
+    "scope": "complete-MANO trajectory current restoration; synthetic corruption only; no RGB, no real HaWoR adaptation",
+    "dataset_names": [
+      "dexycb",
+      "hot3d",
+      "oakink2",
+      "umetrack"
+    ],
+    "train_windows_by_dataset": {
+      "dexycb": 6352,
+      "hot3d": 132008,
+      "oakink2": 346860,
+      "umetrack": 151390
+    },
+    "val_windows_by_dataset": {
+      "dexycb": 394,
+      "hot3d": 15240,
+      "oakink2": 27728,
+      "umetrack": 18008
+    },
+    "train_sequences_by_dataset": {
+      "dexycb": 798,
+      "hot3d": 4402,
+      "oakink2": 862,
+      "umetrack": 1546
+    },
+    "val_sequences_by_dataset": {
+      "dexycb": 40,
+      "hot3d": 508,
+      "oakink2": 78,
+      "umetrack": 182
+    },
+    "source_sampling": "equal_source",
+    "validation_aggregation": "equal source mean; independent fixed window subset per source",
+    "initialization": "from scratch",
+    "beta_conditioning": false,
+    "beta_policy": "source beta retained separately; mixed source shape conventions not canonicalized",
+    "resume_limit": "sampler RNG saved; prefetched/chunked sampler indices and loader cursor are not exact replay",
+    "mamba_ssm": "2.3.2.post1",
+    "causal_conv1d": "1.7.0",
+    "architecture": "MANO parent/finger/depth embeddings; per-frame joint attention + FFN; per-joint causal Mamba; dense, no action or MoE"
+  },
+  "process": {
+    "pid": 2599,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-u",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/train_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_four_sources_structured_mamba.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014",
+      "--code-version",
+      "2b40aa9790c1d18651d6ac810d23a72d3c7a5922"
+    ],
+    "code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+    "gpu": 0,
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-14T17:51:39.719429+00:00",
+    "coordinator": "one-shot train_when_prepared.py"
+  },
+  "status": {
+    "utc": "2026-10-14T19:07:32.279259+00:00",
+    "step": 18550,
+    "phase": "training",
+    "loss": 0.0240394090116024,
+    "restoration_loss": 0.01510811597108841,
+    "forecast_loss": 0.1085316464304924,
+    "grad_norm": 0.9156718254089355,
+    "lr": 0.000147127373070708,
+    "elapsed_seconds": 4407.5,
+    "steps_per_second": 4.20871416506694,
+    "gpu_memory_gb": 4.733106176,
+    "samples_by_dataset": {
+      "dexycb": 297154,
+      "hot3d": 296754,
+      "oakink2": 295896,
+      "umetrack": 297396
+    }
+  },
+  "latest_validation": {
+    "utc": "2026-10-14T19:05:29.916147+00:00",
+    "step": 18000,
+    "validation": {
+      "noisy": {
+        "loss": 0.01465039851749966,
+        "baseline_wrist_mm": 49.54248159125372,
+        "baseline_root_deg": 22.746584753699715,
+        "baseline_finger_deg": 15.481458291335759,
+        "restored_wrist_mm": 6.155232005312963,
+        "restored_root_deg": 2.511520081677186,
+        "restored_finger_deg": 2.1532230473827894,
+        "forecast_wrist_mm": 13.194927299877412,
+        "forecast_root_deg": 5.294288046071825,
+        "forecast_finger_deg": 3.7312513214966216,
+        "samples": 3466
+      },
+      "missing": {
+        "loss": 0.014410894969352675,
+        "baseline_wrist_mm": 37.89744737880484,
+        "baseline_root_deg": 16.775727884115906,
+        "baseline_finger_deg": 11.06986544413615,
+        "restored_wrist_mm": 6.065828348439054,
+        "restored_root_deg": 2.4713930002399507,
+        "restored_finger_deg": 2.1756641492531235,
+        "forecast_wrist_mm": 13.154813697268516,
+        "forecast_root_deg": 5.287834414597695,
+        "forecast_finger_deg": 3.759040700460827,
+        "samples": 3466
+      },
+      "clean": {
+        "loss": 0.005427620674565915,
+        "baseline_wrist_mm": 0,
+        "baseline_root_deg": 9.855867521357231e-9,
+        "baseline_finger_deg": 7.189264877634998e-8,
+        "restored_wrist_mm": 2.9247537346055665,
+        "restored_root_deg": 1.455879244844661,
+        "restored_finger_deg": 1.38774577567004,
+        "forecast_wrist_mm": 9.552713949214382,
+        "forecast_root_deg": 4.291707416258866,
+        "forecast_finger_deg": 3.1357951841132743,
+        "samples": 3466
+      },
+      "by_dataset": {
+        "dexycb": {
+          "noisy": {
+            "loss": 0.019319788150980993,
+            "baseline_wrist_mm": 50.89970131694968,
+            "baseline_root_deg": 23.37129775884793,
+            "baseline_finger_deg": 15.662536441977254,
+            "restored_wrist_mm": 6.330219479381736,
+            "restored_root_deg": 2.9315558653797593,
+            "restored_finger_deg": 2.5924378572986817,
+            "forecast_wrist_mm": 12.673025915465379,
+            "forecast_root_deg": 5.7184503502047,
+            "forecast_finger_deg": 4.307853735037867,
+            "samples": 394
+          },
+          "missing": {
+            "loss": 0.01899417152694488,
+            "baseline_wrist_mm": 37.93763864584986,
+            "baseline_root_deg": 17.397077386149295,
+            "baseline_finger_deg": 11.306969439317733,
+            "restored_wrist_mm": 6.177650700970955,
+            "restored_root_deg": 2.8914542343410745,
+            "restored_finger_deg": 2.642861910277817,
+            "forecast_wrist_mm": 12.609010836799738,
+            "forecast_root_deg": 5.695875739083072,
+            "forecast_finger_deg": 4.347909183066508,
+            "samples": 394
+          },
+          "clean": {
+            "loss": 0.009772551780197826,
+            "baseline_wrist_mm": 0,
+            "baseline_root_deg": 1.1931981367982923e-8,
+            "baseline_finger_deg": 6.297971920852039e-8,
+            "restored_wrist_mm": 3.1767259007177984,
+            "restored_root_deg": 1.9952410864951042,
+            "restored_finger_deg": 1.8701071382174033,
+            "forecast_wrist_mm": 9.086703494115529,
+            "forecast_root_deg": 4.8830088794533975,
+            "forecast_finger_deg": 3.8317980270095284,
+            "samples": 394
+          }
+        },
+        "hot3d": {
+          "noisy": {
+            "loss": 0.01593343896092847,
+            "baseline_wrist_mm": 49.09007501602173,
+            "baseline_root_deg": 22.538347005844116,
+            "baseline_finger_deg": 15.421098947525024,
+            "restored_wrist_mm": 6.797859877347946,
+            "restored_root_deg": 2.737062245607376,
+            "restored_finger_deg": 2.0657337829470634,
+            "forecast_wrist_mm": 16.381240963935852,
+            "forecast_root_deg": 6.8273541033267975,
+            "forecast_finger_deg": 3.7314200401306152,
+            "samples": 1024
+          },
+          "missing": {
+            "loss": 0.01573789957910776,
+            "baseline_wrist_mm": 38.06683111190796,
+            "baseline_root_deg": 16.69899606704712,
+            "baseline_finger_deg": 10.97451764345169,
+            "restored_wrist_mm": 6.756018549203873,
+            "restored_root_deg": 2.707722023129463,
+            "restored_finger_deg": 2.0685602873563766,
+            "forecast_wrist_mm": 16.348145127296448,
+            "forecast_root_deg": 6.834099650382996,
+            "forecast_finger_deg": 3.742487609386444,
+            "samples": 1024
+          },
+          "clean": {
+            "loss": 0.004995808340026997,
+            "baseline_wrist_mm": 0,
+            "baseline_root_deg": 1.4567657080633012e-8,
+            "baseline_finger_deg": 7.798473267150996e-8,
+            "restored_wrist_mm": 3.272526741027832,
+            "restored_root_deg": 1.5317269936203957,
+            "restored_finger_deg": 1.2551169395446777,
+            "forecast_wrist_mm": 12.253781944513321,
+            "forecast_root_deg": 5.683146685361862,
+            "forecast_finger_deg": 3.099093973636627,
+            "samples": 1024
+          }
+        },
+        "oakink2": {
+          "noisy": {
+            "loss": 0.008290658181067556,
+            "baseline_wrist_mm": 49.09007525444031,
+            "baseline_root_deg": 22.538347244262695,
+            "baseline_finger_deg": 15.421098947525024,
+            "restored_wrist_mm": 4.972997963428497,
+            "restored_root_deg": 1.8756453022360802,
+            "restored_finger_deg": 1.7237639352679253,
+            "forecast_wrist_mm": 8.764743059873581,
+            "forecast_root_deg": 3.0554786920547485,
+            "forecast_finger_deg": 2.309919871389866,
+            "samples": 1024
+          },
+          "missing": {
+            "loss": 0.008017160667805001,
+            "baseline_wrist_mm": 37.649723291397095,
+            "baseline_root_deg": 16.38110762834549,
+            "baseline_finger_deg": 10.915666580200195,
+            "restored_wrist_mm": 4.884268343448639,
+            "restored_root_deg": 1.8254921063780785,
+            "restored_finger_deg": 1.741237223148346,
+            "forecast_wrist_mm": 8.740200877189636,
+            "forecast_root_deg": 3.053591787815094,
+            "forecast_finger_deg": 2.328192852437496,
+            "samples": 1024
+          },
+          "clean": {
+            "loss": 0.0021846352028660476,
+            "baseline_wrist_mm": 0,
+            "baseline_root_deg": 2.6811812978144722e-9,
+            "baseline_finger_deg": 6.982769562569047e-8,
+            "restored_wrist_mm": 2.2130553126335144,
+            "restored_root_deg": 0.937896266579628,
+            "restored_finger_deg": 1.0555387139320374,
+            "forecast_wrist_mm": 5.822709172964096,
+            "forecast_root_deg": 2.1265205666422844,
+            "forecast_finger_deg": 1.7023333683609962,
+            "samples": 1024
+          }
+        },
+        "umetrack": {
+          "noisy": {
+            "loss": 0.015057708777021617,
+            "baseline_wrist_mm": 49.09007477760315,
+            "baseline_root_deg": 22.538347005844116,
+            "baseline_finger_deg": 15.421098828315735,
+            "restored_wrist_mm": 6.519850701093674,
+            "restored_root_deg": 2.501816913485527,
+            "restored_finger_deg": 2.2309566140174866,
+            "forecast_wrist_mm": 14.960699260234833,
+            "forecast_root_deg": 5.575869038701057,
+            "forecast_finger_deg": 4.575811639428139,
+            "samples": 1024
+          },
+          "missing": {
+            "loss": 0.014894348103553057,
+            "baseline_wrist_mm": 37.93559646606445,
+            "baseline_root_deg": 16.625730454921722,
+            "baseline_finger_deg": 11.082308113574982,
+            "restored_wrist_mm": 6.4453758001327515,
+            "restored_root_deg": 2.460903637111187,
+            "restored_finger_deg": 2.2499971762299538,
+            "forecast_wrist_mm": 14.921897947788239,
+            "forecast_root_deg": 5.567770481109619,
+            "forecast_finger_deg": 4.617573156952858,
+            "samples": 1024
+          },
+          "clean": {
+            "loss": 0.004757487375172786,
+            "baseline_wrist_mm": 0,
+            "baseline_root_deg": 1.0242650338998516e-8,
+            "baseline_finger_deg": 7.677844759967911e-8,
+            "restored_wrist_mm": 3.0367069840431213,
+            "restored_root_deg": 1.3586526326835155,
+            "restored_finger_deg": 1.370220310986042,
+            "forecast_wrist_mm": 11.047661185264587,
+            "forecast_root_deg": 4.474153533577919,
+            "forecast_finger_deg": 3.9099553674459457,
+            "samples": 1024
+          }
+        }
+      },
+      "aggregation": "equal source mean; samples is total evaluated windows"
+    },
+    "best_validation_loss": 0.014530646743426167
+  },
+  "process_alive": true,
+  "events": {
+    "first_training": {
+      "utc": "2026-10-14T17:54:37.782114+00:00",
+      "step": 25,
+      "phase": "training",
+      "loss": 0.6880732345581054,
+      "restoration_loss": 0.5371662378311157,
+      "forecast_loss": 0.6685229539871216,
+      "grad_norm": 2.2407736778259277,
+      "lr": 0.00001,
+      "elapsed_seconds": 33,
+      "steps_per_second": 0.7570067330489725,
+      "gpu_memory_gb": 4.733106176,
+      "samples_by_dataset": {
+        "dexycb": 389,
+        "hot3d": 421,
+        "oakink2": 389,
+        "umetrack": 401
+      }
+    },
+    "last_training": {
+      "utc": "2026-10-14T19:07:32.279259+00:00",
+      "step": 18550,
+      "phase": "training",
+      "loss": 0.0240394090116024,
+      "restoration_loss": 0.01510811597108841,
+      "forecast_loss": 0.1085316464304924,
+      "grad_norm": 0.9156718254089355,
+      "lr": 0.000147127373070708,
+      "elapsed_seconds": 4407.5,
+      "steps_per_second": 4.20871416506694,
+      "gpu_memory_gb": 4.733106176,
+      "samples_by_dataset": {
+        "dexycb": 297154,
+        "hot3d": 296754,
+        "oakink2": 295896,
+        "umetrack": 297396
+      }
+    },
+    "training_count": 742,
+    "validation_count": 18,
+    "nonfinite_training_events": 0
+  },
+  "checkpoint_readability_audit": {
+    "observed_utc": "2026-10-14T19:02:30+00:00",
+    "method": "torch.load on CPU; no model forward; no process/config changes",
+    "latest_step": 17000,
+    "best_step": 16000,
+    "code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+    "initialization": "from scratch",
+    "condition_on_beta": false,
+    "floating_model_tensors_per_checkpoint": 163,
+    "all_floating_model_tensors_finite": true,
+    "receipt": "Read-only tool output, not a separately saved remote receipt; later checkpoint files may have advanced."
+  },
+  "configuration_hashes": {
+    "config_sha256": "939260a27ef6a212dbc7ee85cafc6528ae7ab7c9b825e1452072d2e9e0c95302",
+    "trainer_sha256": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317"
+  },
+  "mano_zip_sha256": "50976831790ea9657d8110e0c94e50e90eaf35cd76169f0b27e5d32f3fcd951f",
+  "totals": {
+    "prepared_hand_sequences": 8418,
+    "prepared_train_states": 2788135,
+    "prepared_val_states": 271100,
+    "train_usable_sequences": 7608,
+    "val_usable_sequences": 808,
+    "train_windows": 636610,
+    "val_windows": 61370
+  },
+  "interpretation_limits": [
+    "Training active at snapshot; 50,000 planned steps not yet completed.",
+    "Source MANO references include model fits, with different measurement origins; adapter/FK consistency is not independent sensor accuracy.",
+    "99D is actual wrist p3, root rotation6D6, and 15 local finger rotation6D90; beta10 retained separately.",
+    "Source beta conventions not canonicalized; condition_on_beta=false is an engineering choice for this joint run, not a permanent user architecture decision.",
+    "Synthetic corruption validation with fixed source-specific held-out subsets, at most 1024 windows per source/mode; Dex has 394 available.",
+    "No independent MPJPE/mesh model result, real HaWoR improvement, or physical/dynamical guarantee.",
+    "HOT internal recording split and Ume internal subject split are not official evaluation splits; cross-dataset motion deduplication not established.",
+    "Ume mano_valid_native_invalid includes mano_valid_native_absent; do not sum the two 9725 counts.",
+    "Prepared Dex train sequences 800, usable contiguous-window train sequences 798; two short/gapped sequences do not generate windows.",
+    "run_metadata phase=starting is initial static provenance; current status phase=training is the live state."
+  ]
+}

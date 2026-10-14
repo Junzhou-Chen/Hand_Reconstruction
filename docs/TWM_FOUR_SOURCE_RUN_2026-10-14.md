@@ -1,6 +1,6 @@
 # 四库联合 TWM 预训练
 
-日期：2026-10-14。用户要求把已经下载的 OakInk2、HOT3D、UmeTrack、DexYCB 统一训练；这是 D25 单库结构化 Mamba pilot 之后的新实验。四库真实样本适配与混合 smoke 已通过；全量准备仍在进行，正式启动状态将在远程检查后补充。
+日期：2026-10-14。用户要求把已经下载的 OakInk2、HOT3D、UmeTrack、DexYCB 统一训练；这是 D25 单库结构化 Mamba pilot 之后的新实验。四库全量准备、collection 验收和真实混合 smoke 已通过，正式 run 于17:51:39 UTC（纽约13:51）启动。19:07:32 UTC只读快照为 **18,550 / 50,000步、phase=training**；计划尚未完成。可复现的小型摘要见 [正式启动与运行验收](../reports/twm_four_source_20261014_launch.json)。
 
 保留纯轨迹输入、当前受损状态恢复主任务、0.1 秒预测辅助和每手 99D＋独立 beta10。结构沿用 6 blocks、d256、同帧关节 attention/FFN、逐关节官方 Mamba，以及 MANO 树 embedding。联合 run 从头初始化，旧 Oak 两次 pilot 与 checkpoint 保留。代码入口为 [train_twm.py](../scripts/train_twm.py)，配置 [twm_four_sources_structured_mamba.json](../config/twm_four_sources_structured_mamba.json)。
 
@@ -13,7 +13,7 @@
 | UmeTrack | 已下载 real train，按 subject 约 10% 内部 val；不纳入 synthetic/test | PCA15，MANO 与 native availability 分开；wrist 为实际 FK J0 | 原 frame_id/30 名义相对时间；保留缺帧 |
 | DexYCB | 官方 s0：800 train / 40 val / 160 test；固定 serial836212060125 单视角去重；不解析 test labels | PCA45 手别投影＋mean；FK 21 点与 joint_3d 对照，逐帧最大误差须≤1mm；state p3 为已验证的真实腕 | frame_id/30 名义相对时间；固定 camera frame，未冒称 world |
 
-HOT/Ume 的内部验证划分是本轮工程选择，并非官方测试集。分组在任何 bounded sample 截断前建立；seed20261014。跨库原始动作去重尚未建立，不宣称各库之间完全独立。每个训练样本使用上一已完成腕状态构建固定局部 anchor，从各源固定参考系转换；这不恢复 SLAM gauge 或未知相机运动。
+HOT/Ume 的内部验证划分是本轮工程选择，并非官方测试集。分组在任何 bounded sample 截断前建立；seed20261014。跨库原始动作去重尚未建立，不宣称各库之间完全独立。每个训练样本使用上一历史参考状态构建固定局部 anchor，从各源固定参考系转换；训练时历史来自源GT加合成噪声，尚未验自身预测历史回灌。这不恢复 SLAM gauge 或未知相机运动。
 
 转换入口：[Oak](../scripts/prepare_oakink2_twm.py)、[Meta](../scripts/prepare_meta_twm.py)、[Dex](../scripts/prepare_dexycb_twm.py)、[collection](../scripts/prepare_twm_collection.py)。Oak/Dex 用 NPY 目录、真实 mmap；HOT/Ume 改用每手一个未压缩 NPZ，按需加载到有限 LRU。NPZ 不冒称 mmap。loader 按序列 lazy 加载、检查 recording split、保留时间 gap。完整 17 组 MANO GT 才进入本轮 full-state trainer；raw joints 和不完整标签没有被拟合/补造为完整 99D。
 
@@ -35,8 +35,54 @@ HOT/Ume 的内部验证划分是本轮工程选择，并非官方测试集。分
 
 真实适配验收见 [四库摘要](../reports/twm_four_source_adapters_20261014.json)。`2913f28` 的真实4库3步smoke在GPU1正常complete，24个样本为Dex3/HOT6/Oak9/Ume6；loss/梯度finite，latest/best step3权重finite，四库各自验证输出。产物 `runs/twm_four_sources_smoke_20261014`，回执 `audits/four_source_smoke_20261014/receipt.json`。这是功能检查，不是质量结果；正式run从头开始，不resume smoke。
 
-全量 Oak 于16:31:57UTC complete：431train/39val，940手序列，1,414,552/113,382手帧；每序列最多32帧共30,080帧共享smplx FK roundtrip，joint max1.49e-7m、mesh1.88e-7m，非独立源GT精度。产物 `prepared/oakink2_99d_full_v2`，源码13ba665；2worker旧v1部分输出保留，依据CPU占用改8worker新v2。Dex/HOT/Ume全量仍pending。
+全量 Oak 于16:31:57UTC complete：431train/39val，940手序列，1,414,552/113,382手帧；每序列最多32帧共30,080帧共享smplx FK roundtrip，joint max1.49e-7m、mesh1.88e-7m，非独立源GT精度。产物 `prepared/oakink2_99d_full_v2`，源码13ba665；2worker旧v1部分输出保留，依据CPU占用改8worker新v2。Dex于16:37:30、Ume于17:31:36、HOT于17:45:26 UTC manifest complete（各status写入可稍晚）。
 
 I/O修正有实测依据：暖源HOT样本NPY保存占1.400/1.571秒；同数组未压缩NPZ保存0.155秒，相比NPY1.427秒约9.2倍，仅指该保存阶段。HOT/Ume各2TAR、86数组bitwise一致，12个loader窗口所有字段一致。冷TAR首次direct5.813秒（索引5.692秒），约93MB整包冷读＋RAM解析3.683秒，表明source NFS seek仍有耗时；没有把局部速度写成全库端到端提升。当前Meta新full_v3使用NPZ，旧NPY v2进程已核身份后替换，旧部分文件保留。初次v1因launcher日志位于fresh-output目录被拒绝，之后日志移到audits；不删除/更换用户Job。
+
+提高Meta并发后使用`3e9b039`的`--reuse-equivalent-files`：HOT 12workers、Ume 8workers，重新读取全部TAR并完整重算FK与数组；现存NPZ须keys/dtype/shape/C-order bytes完全一致才能保留，包含正负零差异检查，不以文件存在代替验收。bounded 6文件86数组一致，6种改动拒绝；默认fresh和NPY路径仍不允许此复用。全量HOT重新解码2,455 TAR、重算4,910手序列/73,650数组，严格验后保留1,809旧NPZ、新写3,101；Ume重新解码1,020 TAR、重算1,728手序列/22,464数组，保留1,481、新写247。原进程经身份核对后退出，旧元数据/hash与失败记录保留，用户Job不变。
+
+## 完整数据与实际启动
+
+以下为每手状态数和可用连续窗口数；窗口长30帧历史、3帧后预测，stride4。训练mask为完整17组MANO参考，不将native标签有效性当作MANO精度。
+
+| 来源 | prepared手序列 | train / val状态 | train / val可用窗口 |
+|---|---:|---:|---:|
+| OakInk2 | 940 | 1,414,552 / 113,382 | 346,860 / 27,728 |
+| HOT3D | 4,910 | 660,300 / 76,200 | 132,008 / 15,240 |
+| UmeTrack | 1,728 | 662,422 / 78,677 | 151,390 / 18,008 |
+| DexYCB | 840 | 50,861 / 2,841 | 6,352 / 394 |
+| 合计 | **8,418** | **2,788,135 / 271,100** | **636,610 / 61,370** |
+
+HOT按232个父录制分209train/23val，13participants、2,201/254 TAR；27个HaWoR评测来源在解码前排除。Ume 41subjects分37train/4val、916/104 TAR；保留741,099个有效MANO状态。Ume的`mano_valid_native_invalid`包含`mano_valid_native_absent`，两者各9,725，不能相加；这仅说明availability不同，不证明两种标签误差等价。Dex固定一个view、全10subjects，逐个有效帧对照提供的21 fitted joints，实际最大差2.6281e-7m；这是source拟合/FK一致性。Dex prepared train800条中仅798条产生连续窗口，因此loader总计7,608train/808val可用序列，而非8,418条全部都有窗口。
+
+四个叶manifest hash与collection逐一匹配，collection SHA256为`f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f`。精确叶hash、源revision、decoder/assets、split统计与train/val窗口数保存在上述JSON。collection以17:46:11 UTC为开始时间，完成loader检查后由一次性协调器启动；不是以部分准备结果先训练。
+
+所有远程路径以下列共同根目录为基准：`/sciclone/data10/jchen57/Hand_Reconstruction`。
+
+| 产物 | 路径 |
+|---|---|
+| Oak全量 | `prepared/oakink2_99d_full_v2/manifest.json` |
+| HOT全量 | `prepared/hot3d_99d_full_v3/manifest.json` |
+| Ume全量 | `prepared/umetrack_99d_full_v3/manifest.json` |
+| Dex全量 | `prepared/dexycb_99d_full_v1/manifest.json` |
+| 四库collection | `prepared/twm_four_sources_99d_v1/manifest.json` |
+| 正式run与checkpoint | `runs/twm_four_sources_structured_mamba_20261014/{run_metadata.json,status.json,metrics.jsonl,latest.pt,best.pt}` |
+| 一次性协调器记录 | `audits/four_source_training_coordinator_20261014/{process.json,status.json,coordinator.log}` |
+
+正式run源码`2b40aa9790c1d18651d6ac810d23a72d3c7a5922`，GPU0、PID2599，从头初始化，无resume旧pilot或smoke。协调器启动前核trainer/config SHA，完整命令在正式run的`process.json`及小型摘要。trainer配置SHA为`939260a27ef6a212dbc7ee85cafc6528ae7ab7c9b825e1452072d2e9e0c95302`。训练后文档提交不改变本次run的源码provenance。`run_metadata.phase=starting`是初始静态记录，运行状态读`status.json`。
+
+首条真实训练事件17:54:37 UTC step25、loss0.688073、grad2.24077，样本Dex389/HOT421/Oak389/Ume401；四库已经实际参与梯度训练。19:07:32 UTC step18,550、loss0.024039、grad0.915672、约4.21step/s、峰值torch allocated4.73GB；累计样本Dex297,154/HOT296,754/Oak295,896/Ume297,396。已记录742条training事件和18次分库validation，训练日志中上述loss/grad字段均finite。19:02:30 UTC一次CPU只读checkpoint验收：latest17,000/best16,000可读，每份163个浮点model tensor全finite，code/从头初始化/beta=false符合协议；这是只读tool输出验收，未伪造额外receipt。checkpoint随后继续推进。
+
+## 中途合成验证快照
+
+19:05:29 UTC **step18,000**固定val子集，每模式Oak/HOT/Ume各1,024窗口、Dex394，共3,466；表为四库等权均值。仅评价人工noisy/missing和clean输入下的当前恢复，不是完整val全窗口评测。
+
+| 模式 | wrist mm：输入→恢复 | root deg：输入→恢复 | finger deg：输入→恢复 |
+|---|---:|---:|---:|
+| noisy | 49.542→6.155 | 22.747→2.512 | 15.481→2.153 |
+| missing | 37.897→6.066 | 16.776→2.471 | 11.070→2.176 |
+| clean | 0→2.925 | 约0→1.456 | 约0→1.388 |
+
+noisy/missing损失等权score0.01453065；分库和辅助forecast数值均在JSON中。clean输入仍出现退化，必须保留此结果，不能仅用受损输入的改善宣称质量保证。指标是source实际腕距离和MANO旋转测地角；没有独立模型joint/mesh GT指标，也未验证真实HaWoR误差或物理规律。
 
 中断恢复限制：同config/manifest SHA协议才可resume，不能把完成的单Oak50k当四库初始化；保存主要RNG/optimizer/checkpoint，但不保证sampler chunk/loader游标逐样本精确复现。

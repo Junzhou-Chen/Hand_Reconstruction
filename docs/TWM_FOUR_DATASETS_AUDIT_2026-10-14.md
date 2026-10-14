@@ -79,3 +79,9 @@ MANO模型资产/PCA basis/mean、左右手shape修正和FK需在adapter验收�
 | DexYCB左右手各6帧几何抽查，另subject01官方s0各1条train/val | 双侧21 joints最大差`1.36e-7 m`以内；正式bounded产物最大差`1.50e-7 m`以内；固定单view；60帧上限得到51/57连续有效帧，history30＋forecast3、stride4得到5/6窗，全部真实mmap | 40帧上限的v1训练轨迹因前9帧空标注仅31帧，不满足该窗口；保留v1并另建v2。21 joints与MANO来自同一拟合标注，不能当独立MoCap精度 |
 
 Meta/Dex均通过完整MANO状态mask、beta及99D loader契约检查，真实缺标注没有补成GT。Meta的native-invalid计数包含native-absent，Ume的9帧不能重复计为18帧。这里仅更新资产兼容、有限范围转换和几何一致性事实；不据此声明四库全量已验收、跨库运动已去重、native标注绝对准确或训练已完成，Oak本轮状态与正式启动记录另行维护。
+
+## 同日后续：四库全量准备与正式run
+
+截至19:07 UTC，四库完整train/val准备和collection工程验收已完成，正式训练从头运行到18,550步；精确统计、分库split/窗口、源revision、manifest hash及中途结果见[正式启动摘要](../reports/twm_four_source_20261014_launch.json)与[运行记录](TWM_FOUR_SOURCE_RUN_2026-10-14.md)。prepared train/val状态合计2,788,135/271,100，可用窗口636,610/61,370；Dex固定一个camera view，未解析test labels。全量Dex source-fitted 21 joints/FK最大差2.6281e-7m，Oak30,080帧共享实现往返及Meta全部TAR解码仍属于实现/编码一致性，不能升级为独立传感器精度结论。
+
+用户自行注册、登录并明确确认MANO许可后，agent通过官方Chrome下载取得v1.2 ZIP，非未经许可第三方模型。跨源beta约定的左手shapedirs差异尚未统一，本轮`condition_on_beta=false`仅是工程隔离；源beta/有效性继续保存、实际wrist与完整旋转99D监督不变。上述较早字段审计和bounded验收范围保留，当前执行范围由D26四库决定取代当时三核心＋Dex补充的建议；无跨库去重、真实HaWoR收益或物理正确性保证。

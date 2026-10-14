@@ -227,10 +227,10 @@
 - 用户自行官网注册、登录并确认MANO非商业研究许可后授权下载；官方v1.2 ZIP本机/远程SHA一致。原始模型与license保留，派生NumPy/SciPy转换数值/dtype与无Chumpy加载检查通过。资产/数据不进Git，[有限adapter摘要](../reports/twm_four_source_adapters_20261014.json)仅记录可审计小型结果。
 - Meta官方decoder18帧mesh/joints/full pose等价、99D FK最大差1.19e-7 m；Dex左右各6帧及bounded train/val检查通过（21点最大约1.50e-7 m）。这些是源实现、PCA/mean/腕中心/单位与编码一致性，不是独立native/MoCap精度；真实缺标签未补作完整GT。
 - lazy loader、source-balanced sampler、分库固定验证、完整GT fail-closed等9项远程检查通过。13ba665增加resume config/manifest一致性、未知sampling拒绝和leaf hash核验；临时远程测试hash正确pass、修改leaf后fail。FD probe 4→2,564→4，Pod soft/hard限制均1,048,576；范围是当时双cache各256序列×5 maps，不替代新配置吞吐测试。
-- 真实四库3步smoke源码2913f28，loss/梯度有限，样本Dex3/HOT6/Oak9/Ume6；receipt位于data10项目根`audits/four_source_smoke_20261014/receipt.json`，run为`runs/twm_four_sources_smoke_20261014`。仅为工程smoke，未正式启动四库训练，最新已提交源码a9342a8。
-- Oak改8 workers另建`prepared/oakink2_99d_full_v2`，旧v1部分保留；full_v2已complete431 train/39 val录制、940手序列，状态1,414,552/113,382。每序列32帧共30,080帧FK往返最大joint1.49e-7 m/mesh1.88e-7 m，同一MANO实现对照，非独立source验证。Dex full_v1当前8/10活跃；Meta HOT/Ume full_v3 NPZ进行中，全量统计/collection和正式启动待后续记录。
+- 真实四库3步smoke源码2913f28，loss/梯度有限，样本Dex3/HOT6/Oak9/Ume6；receipt位于data10项目根`audits/four_source_smoke_20261014/receipt.json`，run为`runs/twm_four_sources_smoke_20261014`。仅为工程smoke；随后正式训练以2b40aa9单独启动，见下方启动验收条目。
+- Oak改8 workers另建`prepared/oakink2_99d_full_v2`，旧v1部分保留；full_v2已complete431 train/39 val录制、940手序列，状态1,414,552/113,382。每序列32帧共30,080帧FK往返最大joint1.49e-7 m/mesh1.88e-7 m，同一MANO实现对照，非独立source验证。之后Dex full_v1与Meta HOT/Ume full_v3均complete，完整统计/collection与正式启动验收见下项；准备中间版本与部分产物保留作历史，不再当当前状态。
 - 记录Meta NPY保存性能瓶颈与lossless NPZ局部约9.2×结果，明确非端到端吞吐。实际β审计zero＋7组源β/两侧两pose显示左手同腕joint差3.74–19.81mm、mesh差5.60–24.28mm，right/zeroβ与full-pose旋转参数差0；root工程选择本轮`condition_on_beta=false`，输入mask关闭，源β及真实validity仍存。未统一shape语义，未来开启需适配/消融，不升级为用户永久架构决定。
-- 本次只更新MEMORY及决定、进展、变更、开发五份记忆；正式启动、最终源码SHA和四库完整统计由后续真实记录补充。没有重启转换或新增模型实验。
+- 该准备阶段只更新MEMORY及决定、进展、变更、开发五份记忆，未由记忆任务重启转换或新增模型实验；后续正式启动与统计已据实际记录补入下项。
 
 ## 2026-10-14 当前Mamba物理与数学证明复核
 
@@ -239,6 +239,17 @@
 - 推导任意损失理想条件风险不增、局部MSE信息收益/网络误差分解、高斯隐藏状态posterior协方差减少，区分标准理论与当前实际网络结果。
 - 核实际drive ΔBu，避免套完整ZOH凸组合门控；pre-LN＋冻结有限参数的SSM内部有界不代表完整反馈收缩。保存常数head bias漂移反例、K30小增益条件及不可观测误差下界。
 - 更新方法、决定和进展记忆；未修改训练源码/config、启动模型实验、采纳额外物理模块或新增性能数字。
+
+## 2026-10-14 D26全量准备完成与正式训练启动验收
+
+- Oak full_v2、HOT/Ume full_v3及Dex full_v1全部complete；共8,418手序列，train/val状态2,788,135/271,100。有效窗口636,610/61,370；Dex两条train序列无足够连续窗口，loader实际7,608 train/808 val序列，与manifest总数分别记录。
+- HOT于17:45:27 UTC最后完成2455 TAR/4910手序列，Ume1020 TAR/1728手序列也已完成；Meta全部TAR严格重解码、全部状态重算。旧NPZ只有等价验证后保留，不能将文件存在当复用验收；Ume native-invalid包含native-absent，各9,725不可相加。
+- 一次性coordinator验四个complete manifest与collection后，于17:51:39 UTC以2b40aa9790c1d18651d6ac810d23a72d3c7a5922在既有Pod/GPU0/PID2599从头启动。正式输出为data10项目根`runs/twm_four_sources_structured_mamba_20261014`。四leaf SHA与collection全部匹配，完整路径/配置/来源见[正式启动摘要](../reports/twm_four_source_20261014_launch.json)及[运行记录](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)。
+- 首条训练日志17:54:37 UTC step25，loss/梯度有限，四源Dex389/HOT421/Oak389/Ume401；首验证保存step1000。19:02:32 UTC验收快照step17,250；root后续19:05:47 UTC核step18,075、loss0.0269482/梯度1.10944、四源累计289582/289120/288354/289744。它是运行中快照，不是50k完成或正式最终效果。
+- 19:02:30 UTC一次CPU只读加载latest17,000/best16,000，各163个浮点模型张量全finite，code/from-scratch/β关闭/manifest一致。没有运行网络、额外训练或重启；检查只经tool返回，未单独保存远程receipt，不与后续更晚步数混用。
+- D26四库范围是用户授权；库间等概率与β conditioning关闭是本轮工程临时选择，源β/真实validity和99D不变。β输入实际GPU forward/backward验证通过，模型shape projection输入4×11全零、梯度有限。D25已完成50k仍单独保留，D18 glove/MoCap优先与D22 ARCTIC暂缓有效。
+- 更新限定五份记忆的过时准备状态；保留历史attempt、源实现一致性非独立GT精度、synthetic恢复非真实HaWoR收益等边界，并保留同日数学文档复核内容。
+- root随后保存[启动JSON](../reports/twm_four_source_20261014_launch.json)和完整运行记录：19:07:32 UTC step18,550、742条training事件finite、四库实际采样；step18,000合成noisy等库均值腕49.542→6.155mm、finger15.481→2.153°，同时记录clean退化2.925mm/1.388°。补充审计后续全量事实，不改模型、配置或在跑进程。
 
 ## 后续记录要求
 

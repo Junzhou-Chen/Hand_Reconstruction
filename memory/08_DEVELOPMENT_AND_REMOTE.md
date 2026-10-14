@@ -24,7 +24,7 @@
 | 当前大数据目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/datasets`，D20已建立三库子目录；其他产物以后按用途分目录 |
 | 原hongfei checkout | `/data/hongfei/zhou/Hand_Reconstruction`保留备用，不再是当前唯一入口 |
 
-训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20建立checkout与数据获取；之后D23/D25已运行模型，D26正在四库准备。本项目没有创建/删除用户Job或修改旧项目；新增依赖与数据均按下文隔离保存。
+训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20建立checkout与数据获取；之后D23/D25已运行模型，D26四库准备已完成，正式训练已启动。本项目没有创建/删除用户Job或修改旧项目；新增依赖与数据均按下文隔离保存。
 
 用户home和data10为Pod持久NFS挂载，`/dev/shm`为64Gi临时内存盘；scr清理政策及个人存储配额未核，不当永久唯一存储。Pod默认Python不等于zhou：默认Torch2.6/cu126在Blackwell上tiny CUDA失败，现有zhou Torch2.12/cu130两卡均通过；D25起项目官方Mamba使用独立Torch2.10/cu130 runtime且已验。不改旧项目环境/数据。
 
@@ -83,11 +83,11 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 
 D25完成核验：12:57:17UTC（纽约08:57）phase=complete50000，进程正常退出，耗时约3h9m。latest50k/best49.5k只读加载成功，SHA378deda、权重finite，100次val/2000training日志未发现非有限或OOM/Traceback。completion_audit.json保存在新run目录，Git仅同步curated final JSON和文档；未重启、延长训练或删除用户Job。
 
-## D26 四库准备、合法资产与独立smoke
+## D26 四库完整准备、合法资产与正式训练
 
 2026-10-14用户授权OakInk2/HOT3D/UmeTrack/DexYCB联合预训练，保留结构化Mamba与纯轨迹99D当前恢复。用户自行完成MANO官网注册、登录和非商业研究许可确认后授权下载；官方ZIP SHA256为`50976831790ea9657d8110e0c94e50e90eaf35cd76169f0b27e5d32f3fcd951f`，传到Pod后核一致。原始左右模型/三份license保留，NumPy/SciPy派生转换保持9个必要数值字段值与dtype不变；新进程验证无需Chumpy。受许可模型不进Git。资产及有限adapter来源见[报告](../reports/twm_four_source_adapters_20261014.json)。
 
-沿用现有Pod和项目runtime `/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python`。新增smplx0.1.28、SciPy1.17.1、Chumpy0.70、six1.17.0均在项目runtime；Chumpy仅旧pickle转换兼容桥使用，未修改zhou。当前已提交源码a9342a8；后续β/config工程变更和正式启动须记录最终实际SHA，不能将它追溯写入早期smoke。
+沿用现有Pod和项目runtime `/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python`。新增smplx0.1.28、SciPy1.17.1、Chumpy0.70、six1.17.0均在项目runtime；Chumpy仅旧pickle转换兼容桥使用，未修改zhou。正式run固定源码2b40aa9790c1d18651d6ac810d23a72d3c7a5922；后续数学/文档提交不追溯改变run provenance，早期2913f28 smoke仍单独记录。
 
 远程共同根目录为 `/sciclone/data10/jchen57/Hand_Reconstruction`，源码仍在 `/sciclone/home/jchen57/project/Hand_Reconstruction`。以下相对路径均在该data10项目根下：
 
@@ -96,15 +96,20 @@ D25完成核验：12:57:17UTC（纽约08:57）phase=complete50000，进程正常
 | 合法原始ZIP | `model_assets/mano_v1_2/mano_v1_2.zip` |
 | 原始/派生MANO与provenance | `model_assets/mano_v1_2/prepared_v1/{raw,derived}`、`model_assets/mano_v1_2/prepared_v1/provenance.json` |
 | Oak full | `prepared/oakink2_99d_full_v2/manifest.json`；已complete，full_v1部分产物保留 |
-| HOT/Ume full | `prepared/hot3d_99d_full_v3/manifest.json`、`prepared/umetrack_99d_full_v3/manifest.json`；NPZ准备中，目标manifest未当已完成 |
-| Dex full | `prepared/dexycb_99d_full_v1/manifest.json`；进度8/10活跃，manifest尚pending |
+| HOT/Ume full | `prepared/hot3d_99d_full_v3/manifest.json`、`prepared/umetrack_99d_full_v3/manifest.json`；NPZ，均complete |
+| Dex full | `prepared/dexycb_99d_full_v1/manifest.json`；NPY，10subjects/840手序列complete |
 | 真实四库smoke | `runs/twm_four_sources_smoke_20261014`、`audits/four_source_smoke_20261014/receipt.json`；2913f28，3步已通过 |
-| β convention审计 | `audits/beta_convention_20261014/receipt.json`；已通过约定差异检查 |
+| β convention/输入审计 | `audits/beta_convention_20261014/receipt.json`及同目录`model_conditioning_receipt.json`；几何差异与实际GPU输入检查通过 |
+| 四库collection | `prepared/twm_four_sources_99d_v1/manifest.json`；完整loader检查通过，四leaf SHA均匹配 |
+| 正式run | `runs/twm_four_sources_structured_mamba_20261014`；2b40aa9，GPU0/PID2599，从头初始化 |
+| 一次性coordinator | `audits/four_source_training_coordinator_20261014/status.json`；已完成检查并launch，不是循环重启器 |
 
 已完成Meta官方decoder18帧等价、Dex左右各6帧及bounded train/val几何一致性检查；9项loader验收也通过。13ba665补collection叶manifest SHA防变更、resume config/manifest一致性与未知sampling拒绝。远程临时CPU检查确认leaf hash正确可读、改变leaf即拒绝；`RLIMIT_NOFILE` soft/hard均1,048,576，两个Dataset cache各256序列×5 mmap的实测FD为4→2,564→4。这是当时缓存上限的资源探针，新缓存配置/NPZ实际吞吐另验；没有运行模型或触碰真实数据来做该探针。
 
-2913f28的真实四库3步GPU smoke loss/梯度有限，24个训练样本Dex3/HOT6/Oak9/Ume6；不是正式50k run或精度结论。Oak full改为8 workers重建full_v2，已完成431 train/39 val录制、940手序列，状态1,414,552/113,382；32帧/序列共30,080帧FK往返joint最大1.49e-7 m、mesh1.88e-7 m，只是同源实现/codec一致性。Meta原NPY写入出现性能瓶颈，改做lossless NPZ的full_v3；局部保存约9.2×不推断为全量端到端加速。
+2913f28的真实四库3步GPU smoke loss/梯度有限，24个训练样本Dex3/HOT6/Oak9/Ume6；不是正式50k run或精度结论。Oak full改为8 workers重建full_v2，已完成431 train/39 val录制、940手序列，状态1,414,552/113,382；32帧/序列共30,080帧FK往返joint最大1.49e-7 m、mesh1.88e-7 m，只是同源实现/codec一致性。Meta原NPY写入出现性能瓶颈，改做lossless NPZ的full_v3；局部保存约9.2×不推断为全量端到端加速。随后Dex full_v1、Ume/HOT full_v3均完成，完整train/val状态合计2,788,135/271,100，可用窗口636,610/61,370。Meta最终严格重读HOT2455/Ume1020个TAR并重算全部状态，等价旧NPZ仅在核验后保留；HOT最后于17:45:27 UTC完成，详细分库统计见[启动摘要](../reports/twm_four_source_20261014_launch.json)。
 
-β审计使用zero＋7组实际β、左右手和两种pose：同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm；right/zeroβ及full-pose旋转参数差均0。root选择本轮`condition_on_beta=false`（输入`beta_valid=false`），原始β及真实validity继续保存；未统一shape语义，99D动态状态不变。此是工程配置选择而非用户永久架构决定，未来开启需额外适配和消融。
+β审计使用zero＋7组实际β、左右手和两种pose：同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm；right/zeroβ及full-pose旋转参数差均0。root选择本轮`condition_on_beta=false`（输入`beta_valid=false`），原始β及真实validity继续保存；未统一shape语义，99D动态状态不变。此是工程临时配置选择而非用户永久架构决定，未来开启需额外适配和消融。GPU1实际forward/backward检查也通过（3c0c）：源mask true4、模型mask false4、shape projection输入4×11全零、梯度有限，原始receipt保留在上述审计目录。
 
-**本快照正式四库训练尚未启动。** 先完成现有准备进程与四库collection最终统计/验收，再记录真实启动SHA/config/PID、首批训练与checkpoint；不重启已有转换、不覆盖v1/旧pilot，不把D25的50k挪作D26结果。D22 ARCTIC继续暂缓，D18 glove/MoCap优先不变。resume保存主要RNG/optimizer等状态且核协议/manifest一致，但sampler预取chunk/loader游标未完整保存，不宣称逐样本精确续跑。详见[四库协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)。
+**正式训练启动与验收：** coordinator检查四个complete manifest及collection后，于17:51:39 UTC在GPU0从头启动PID2599，代码2b40aa9。首条training事件17:54:37 UTC step25，loss0.688073/梯度2.24077有限，四源样本Dex389/HOT421/Oak389/Ume401；首个保存验证step1000。19:02:30 UTC一次CPU只读检查latest17,000/best16,000可读，各163个浮点模型张量全finite，code/from-scratch/β关闭与manifest SHA一致；没有执行模型，也未另存远程验收receipt，事实来自只读tool返回。19:02:32状态step17,250；root后续19:05:47 UTC核step18,075，loss0.0269482、梯度1.10944，四源累计Dex289582/HOT289120/Oak288354/Ume289744。checkpoint验收时刻与后续步数分开，**未宣称50k完成**。
+
+collection SHA256为`f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f`，四个leaf hash逐一匹配；config SHA为`939260a27ef6a212dbc7ee85cafc6528ae7ab7c9b825e1452072d2e9e0c95302`。run_metadata记录6,330,892参数、equal_source、from scratch及β关闭。正式输出/旧smoke/旧pilot均独立，不覆盖旧产物、不重启已完成准备；D22 ARCTIC暂缓与D18 glove/MoCap优先不变。resume保存主要RNG/optimizer并核协议/manifest，但sampler预取chunk/loader游标未完整保存，不宣称逐样本精确续跑。[四库协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)、[正式启动摘要](../reports/twm_four_source_20261014_launch.json)。
