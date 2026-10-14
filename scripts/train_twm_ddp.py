@@ -85,6 +85,8 @@ def main():
         args.output.mkdir(parents=True, exist_ok=True)
         if (args.output/'run_metadata.json').exists() and not args.resume:
             raise ValueError('Fresh migration/smoke requires a new output directory')
+        if (args.output/'STOP').exists():
+            raise ValueError('Archive the previous STOP request before resume; ds launcher does this explicitly')
         atomic_json(args.output/'status.json', {'utc':utc(), 'phase':'initializing_ddp', 'world_size':world})
     dist.barrier()
     model = TWM(TWMConfig(**config['model'])).to(device)
@@ -165,12 +167,22 @@ def main():
         print(json.dumps(run), flush=True)
 
     def save(step, best_checkpoint=False):
+        digest = hashlib.sha256()
+        for name, tensor in model.state_dict().items():
+            digest.update((name+str(tensor.dtype)+str(tuple(tensor.shape))).encode())
+            digest.update(tensor.detach().cpu().contiguous().reshape(-1).view(torch.uint8).numpy().tobytes())
         state = {'rank':rank, 'corruption_rng':generator.get_state().cpu(),
                  'torch_rng':torch.get_rng_state(), 'cuda_rng':torch.cuda.get_rng_state(device).cpu(),
-                 'python_rng':random.getstate(), 'numpy_rng':np.random.get_state(), 'sampler':sampler.state_dict()}
+                 'python_rng':random.getstate(), 'numpy_rng':np.random.get_state(), 'sampler':sampler.state_dict(),
+                 'model_state_sha256':digest.hexdigest()}
         rank_states = [None]*world
         dist.all_gather_object(rank_states, state)
+        if len({state['model_state_sha256'] for state in rank_states}) != 1:
+            raise RuntimeError('DDP model replicas differ byte-for-byte at checkpoint boundary')
         if rank == 0:
+            atomic_json(args.output/'replica_checkpoint_audit.json', {'utc':utc(), 'step':step,
+                        'world_size':world, 'all_model_replicas_byte_equal':True,
+                        'model_state_sha256':digest.hexdigest()})
             value = {'step':step, 'model':model.state_dict(), 'optimizer':optimizer.state_dict(),
                      'config':config, 'code_version':args.code_version, 'best_validation_loss':best,
                      'rank_states':rank_states, 'run':run}
