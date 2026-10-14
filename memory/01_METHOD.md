@@ -167,3 +167,11 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 ## 2026-10-14 D25 新主干代码事实
 
 用户按参考方案授权重做并跑起。新增StructuredMambaEncoder，6/256/4、同帧关节attention/FFN→逐关节官方Mamba64/4/2，无MoE/action；MANO parent/finger/depth embedding，padding全主干前压缩且无效dt置0，真实漏观测保留时间槽。6330892参数，99D接口/51D内部旋转更新及β条件保持。Mamba特殊初始化及A/D no-weight-decay标志保留；旧flat分支可加载旧权重。完整数值与smoke已通过，PID1276新run启动；完整视觉循环仍未实现。[实测与路径](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
+
+## 2026-10-14 当前Mamba数学证明复核
+
+用户重新要求认真证明物理约束与数学性质，讨论恢复；本轮仅源码/官方原文与数学推导，不修改训练主干或运行实验。[详细证明§8–12](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md#8-2026-10-14当前mamba-twm的证明范围复核)按2b40aa9复核：SO(3)合法性为已实现结构；固定源decoder/β的16内部FK骨长是解码性质；SE(3)等变要求外部anchor规范化与逆变换，完整部署wrapper未验。
+
+条件信息不增加理想最优恢复风险；局部MSE及高斯条件协方差可解释可信部分帮助隐藏部分，但现SmoothL1/chordal有限训练网络不等于MMSE或校准posterior。chordal与平方角误差有常数界，同β内部FK可导出腕/旋转到joint误差上界，不能替代MPJPE。
+
+官方Mamba实际drive为ΔBu；pre-LN＋冻结有限参数可在精确运算下证明内部SSM有界/初始状态遗忘，不能推出完整head/candidate/anchor反馈收缩。允许常数translation bias的漂移反例；K30小增益条件尚未认证。关节限位、迭代下降与真实动力学仍未采纳/实现。

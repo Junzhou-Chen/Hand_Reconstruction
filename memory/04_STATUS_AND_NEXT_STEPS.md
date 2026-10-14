@@ -122,4 +122,6 @@ D23先跑Oak64 train/8 val子集，D24主动暂停旧flat于28,213步，best27,5
 
 ## 下次会话可直接使用的任务说明
 
+**2026-10-14数学讨论新增：** 用户再次要求证明当前Mamba的物理/数学性质。已完成源码2b40aa9与官方Mamba scan核查及条件性推导，见[物理证明§8–12](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md#8-2026-10-14当前mamba-twm的证明范围复核)。SO(3)更新已实现；固定β内部FK与anchor-wrapper等变各有限定；条件恢复理想风险、旋转→内部joint误差界和pre-LN Mamba内部boundedness可推导。完整反馈收缩、真实HaWoR收益与独立物理正确性未证明。本轮没有远程数值实验或训练修改，四库执行状态仍以其真实运行记录为准。
+
 > 先读MEMORY.md、docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md与本文件D26快照。D25 Oak结构化Mamba50k已正常完成，旧flat stopped28,213，两个run/权重均保留且不自动重启。D26用户已授权Oak/HOT/Ume/Dex联合预训练，合法MANO已取得；adapter/loader/hash/FD与真实3步四库smoke通过，正式四库训练尚未启动。Oak full_v2已complete（431/39录制，940手序列），Dex8/10、HOT/Ume full_v3 NPZ仍在准备，先只读查现有任务，不重启。root因实际shape约定审计选择本轮关闭β conditioning，源β与99D不变；最终code/config/完整统计与启动须回查真实receipt。数据/资产/权重/raw logs仅远程data10，代码/小摘要同步Git；D18精度优先及D22 ARCTIC暂缓仍有效。

@@ -68,7 +68,7 @@ HNN令相空间状态x包含canonical位置和动量，定义
 
 ## 4. 当前99D可以采用的可证明解码
 
-以下命题是数学推导与候选实现条件，不是本项目已实现定理。
+以下保留此前方案阶段的数学推导与候选实现条件。D25之后的实际SO(3)实现、Mamba内部稳定性与条件恢复理论，按本次源码复核另见§8–12；不能将所有候选约束都称为已实现。
 
 ### 4.1 合法旋转
 
@@ -193,3 +193,179 @@ b须包含观测噪声、模型误差及外部输入误差。对K帧历史，若
 若以后要声称真实动力学，可保留99D恢复主输出，另研究带明确输入、正定惯量和耗散结构的辅助动力学分支；先在物理量已知的受控系统验证，再讨论自然手的不可辨识部分。当前姿态库不能因此自动升级为力/质量真值。
 
 完成相应实现和数值验收后，首轮拟主张的是：**在声明的解码和约束假设下保证几何可行性与参考系一致性，并以独立reference验证当前运动恢复。** 增加约束是否改善真实误差、是否值得引入下降规则，仍由消融决定。
+
+## 8. 2026-10-14：当前Mamba TWM的证明范围复核
+
+用户再次要求认真推导物理约束与数学性质，数学讨论恢复；没有要求本轮修改训练架构或启动新实验。本节按本地源码快照2b40aa9复核geometry.py、twm.py、structured_mamba.py与train_twm.py，并对照官方Mamba v2.3.2 source。以下是声明假设下的数学推导与静态代码事实，没有新增远程数值实验、模型性能或全域数值证书。
+
+| 性质 | 可证明的精确范围 | 当前实现状态 |
+|---|---|---|
+| SO(3)旋转合法 | 合法基础旋转经Exp左乘，精确实数成立 | 已实现；浮点按容差及无溢出域验收 |
+| 固定内部骨长 | 同handedness、同decoder、固定β的16内部FK关节 | 解码器性质；trainer没有骨长/joint loss |
+| 全局SE(3)等变 | 同步变换全部输入与anchor，规范化后推理再逆变换 | trainer有to_anchor，完整部署wrapper仍未验 |
+| 条件信息降低最优风险 | 同一真实分布、损失与允许输出集合下的理想决策类 | 任务理论；不是实际有限训练网络的性能证书 |
+| Mamba内部有界 | 冻结有限参数、pre-LN、正epsilon、精确计算 | 可从当前结构推导；未量化实际常数 |
+| 完整反馈误差收缩 | 全部历史路径满足小增益条件 | 未认证，当前未自身历史rollout |
+| 解剖限位/固定目标下降 | 另加明确hard映射/接受规则 | 未采纳或实现 |
+| 真实受控动力学 | 惯性、速度、驱动与外力的明确来源及辨识条件 | 当前轨迹监督不能普遍保证 |
+
+当前几何实现的退化6D回退有更明确的保证：单位第一轴为b1时，选择最不平行的坐标轴e_k，至少有|b1_k|≤1/sqrt(3)，故其正交投影长度≥sqrt(2/3)>0，可构造合法第二轴。state_apply_delta的16组Exp左乘因此保持SO(3)。结论假设中间计算不发生溢出/非有限；有限float输入本身不排除norm等中间量溢出。参考[geometry.py](../src/handloop/geometry.py)。
+
+§4.4的SE(3)等变是规范化wrapper性质，普通TWM单体直接输入world量不具备该保证。所有可用旋转合法、anchor有效且随全局变换同步变换、同mask/quality/dt/shape与eval模式下，anchor输入严格不变；缺失占位在anchor之后统一处理。无历史时固定world单位anchor不直接满足此条件。有dropout时需相同随机量或只主张分布等变。world历史噪声也需同时旋转position/root切向噪声，不能把同seed同world向量当逐样本等变；各向同性高斯可给分布等变。退化6D在world先用固定坐标轴回退亦非等变，故物理输入要求合法旋转；anchor后统一处理mask占位不改变证明。
+
+关闭四库β conditioning只改变网络输入，不改变外部固定β FK的代数性质；但同β数字跨source不等于同一shape。解码须保留源decoder与β约定。内部骨长保证不涵盖全部21点mesh指尖或所有LBS表面距离。
+
+## 9. 条件恢复为何有理论依据
+
+### 9.1 任意损失的最优风险不增
+
+令F表示history/mask等已有信息，G表示再加入当前数值观测后的信息，F⊆G；允许输出集合C非空且与真实联合分布固定，损失非负可测，并存在有限风险的允许估计器。定义
+
+\[
+R_F^*=\inf_{f\ {\rm F\text{-}measurable},\,f\in C}\mathbb E\ell(S,f),
+\qquad
+R_G^*=\inf_{g\ {\rm G\text{-}measurable},\,g\in C}\mathbb E\ell(S,g).
+\]
+
+任何仅使用F的估计器也可在G下忽略新增信息而运行，故决策类包含关系直接给出
+
+\[
+R_G^*\le R_F^*.
+\]
+
+此结论不要求高斯或凸集合，也可使用现有SmoothL1＋chordal损失；但比较的是不受限理想决策类的最优期望风险，不是指定容量Mamba的两次实训结果。它不保证每个样本/每个关节误差下降，也不是本项目首次提出的统计定理。
+
+### 9.2 局部MSE的信息收益与网络误差
+
+在避开旋转切点的局部坐标X中，参考坐标固定或由F可测历史确定，不依赖未知GT。假设E||X||²有限，定义R(f)=E||X−f||²，记μ_F=E[X|F]、μ_G=E[X|G]；冻结参数、eval模式下f_theta为G可测且平方可积。本小节比较欧氏坐标MSE，不施加额外非凸姿态输出约束，也不自动等于MPJPE。条件均值的正交性给出
+
+\[
+R(\mu_F)-R(\mu_G)
+=\mathbb E\|\mu_G-\mu_F\|^2,
+\]
+\[
+R(f_\theta)-R(\mu_F)
+=\mathbb E\|f_\theta-\mu_G\|^2
+-\mathbb E\|\mu_G-\mu_F\|^2.
+\]
+
+证明：展开X−μ_F=(X−μ_G)+(μ_G−μ_F)的平方；由于E[X−μ_G|G]=0，交叉项期望为零。第二式同理。
+
+因此实际网络兑现收益的条件是逼近/泛化误差小于新增信息收益。当前trainer并非全局MSE，不应将其直接称为MMSE或已恢复真实posterior；合成→真实HaWoR分布变化也不能由该定理消除。标准参考：[MIT MMSE与正交性笔记](https://ocw.mit.edu/courses/6-011-introduction-to-communication-control-and-signal-processing-spring-2010/a6bddaee5966f6e73450e6fe79ab0566_MIT6_011S10_notes.pdf)。
+
+### 9.3 可见部分如何约束隐藏部分
+
+观测集合O固定，或把mask选择并入H后明确假设局部状态(X_O,X_U)|H仍服从联合高斯，协方差块为Σ_OO、Σ_OU、Σ_UO、Σ_UU。观测Y=X_O+ε，ε与(X_O,X_U)在给定H后条件独立且服从N(0,R)，R正定。令V=Σ_OO+R，高斯条件分布给出
+
+\[
+\mu_U^+=\mu_U+\Sigma_{UO}V^{-1}(Y-\mu_O),
+\]
+\[
+\Sigma_{UU}^+
+=\Sigma_{UU}-\Sigma_{UO}V^{-1}\Sigma_{OU}
+\preceq\Sigma_{UU}.
+\]
+
+对任意方向v，减少量为||V^{-1/2}Σ_OU v||²≥0；严格减少要求Σ_OU v≠0。这解释跨关节/时间条件依赖为何有用，而不是“可见保留、隐藏独立预测”。非零cross-covariance不保证全部隐藏方向改善；误设观测噪声R也不提供真实误差保证。真实visibility相关缺失不能未经检查沿用联合高斯假设。现模型没有显式covariance/Kalman gain，人工quality不能充当校准R。参考：[Stanford高斯条件分布](https://web.stanford.edu/class/stats306b/doc/stats306b-spring14-lecture9_scribed.pdf)。
+
+candidate由history/raw/mask确定性构造，单独改变candidate不会增加原始贝叶斯信息；迭代可改善算法近似，但只有读取原状态未保留的真实视觉证据才可能增加恢复条件。重复查询同一图像不等于独立新样本。
+
+## 10. 当前旋转损失与内部关节几何误差
+
+相对旋转角θ∈[0,π]满足tr(RᵀR*)=1+2cosθ，因此现有chordal项
+
+\[
+c=\tfrac12\|R-R^*\|_F^2
+=4\sin^2(\theta/2),\qquad
+\frac4{\pi^2}\theta^2\le c\le\theta^2.
+\]
+
+小角度时c=θ²+O(θ⁴)。这提供旋转损失与平方角误差的联系，但平均chordal下降不能保证每个角误差或MPJPE下降。
+
+同β、同内部FK下，设路径骨向量b_k、长度ℓ_k、累计父旋转G_π(k)，有j_i=p+Σ_{k∈path(i)}G_π(k)b_k。由三角不等式与||R−R*||₂=2sin(Θ/2)，
+
+\[
+\|\hat j_i-j_i^*\|
+\le e_p+\sum_{k\in{\rm path}(i)}
+2\ell_k\sin\!\frac{\Theta_{\pi(k)}}2
+\le e_p+\sum_{k\in{\rm path}(i)}
+\ell_k\sum_{a\in{\rm ancestors}(\pi(k))}\theta_a.
+\]
+
+式中ancestors(π(k))定义为从root到π(k)且包含两端的路径节点集合，即包含父节点自身的局部旋转。该界把腕和局部旋转目标连接到内部几何；β不同须另加骨向量差项，mesh指尖/LBS另需分析，不能替代实际MPJPE。
+
+## 11. 当前Mamba能证明的稳定性
+
+### 11.1 先使用实际scan递推
+
+官方Mamba v2.3.2中a_dn=exp(A_log,dn)>0、Δ_dt=softplus(l_dt)>0，实际递推为
+
+\[
+h_{dn,t}=e^{-a_{dn}\Delta_{dt}}h_{dn,t-1}
++\Delta_{dt}B_{n,t}u_{dt}.
+\]
+
+来源：[官方Mamba类](https://github.com/state-spaces/mamba/blob/v2.3.2/mamba_ssm/modules/mamba_simple.py)、[官方selective_scan_ref](https://github.com/state-spaces/mamba/blob/v2.3.2/mamba_ssm/ops/selective_scan_interface.py)。驱动项是ΔBu；不能将[原论文](https://arxiv.org/html/2312.00752v2)完整ZOH推导的凸组合门控公式直接视为此实现。
+
+在卷积driver及Δ/B完全相同、仅SSM初始隐状态不同的两次递推中，差r满足
+
+\[
+r_{dn,t}
+=\exp\!\left(-a_{dn}\sum_{\tau=1}^t\Delta_{d\tau}\right)r_{dn,0}.
+\]
+
+若统一a_min、Δ_min均正，则ρ=exp(−a_min Δ_min)<1，||r_t||≤ρ^t||r_0||。仅Δ_t>0但累计有限，不能证明初始影响最终消失。
+
+### 11.2 pre-LayerNorm给出的条件性内部有界证明
+
+当前每个Mamba前有LayerNorm，维度D=256、epsilon>0。冻结有限参数、精确实数运算下，
+
+\[
+\left\|\frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}\right\|_2^2
+=\frac{D\sigma^2}{\sigma^2+\epsilon}\le D,
+\qquad
+\|{\rm LN}(x)\|_2\le\sqrt D\|\gamma\|_\infty+\|b_{\rm LN}\|_2.
+\]
+
+有限线性/固定长度卷积/连续激活将这个有界输入映到有界域；故softplus输入上下有界，Δ_min>0，Δ_max有限，B/u有界。令驱动范数上界为G，
+
+\[
+\|h_t\|\le\rho\|h_{t-1}\|+G
+\le\rho^t\|h_0\|+\frac{G(1-\rho^t)}{1-\rho}.
+\]
+
+这是内部bounded-state与初始状态遗忘；常数依赖冻结权重，可能极松，未提供实际数值证书。浮点underflow/overflow须另外验收。这里的隐状态范数或Lyapunov量不是手的机械能。
+
+### 11.3 内部稳定不是完整输出/反馈收缩
+
+输入不同时，Φ(u)h+g(u)的差包含[Φ(u)−Φ(u')]h'与g(u)−g(u')，不会像同驱动初态差那样相消。attention、FFN、残差、head、candidate base及anchor依赖都需要计入完整映射增益。模型没有全局Jacobian收缩证书；物理dt也只是token条件，未与Mamba内部Δ强制相等。
+
+现有架构允许简单反例：所有root/anchor朝向固定为I，missing候选取上一最终状态且candidate_availability为true，translation head令W=0、bias=c/0.1，则world位置p_t=p_(t−1)+c=p_0+tc；即使内部SSM有界，每次修正也有界，世界位置仍可漂移。每次forward重置SSM的30帧窗口也不改变这个反例。
+
+令U_f=sqrt(D)||γ_final||_∞+||b_LN,final||₂，final LayerNorm可为单次修正给出依赖权重的有限界：
+
+\[
+\|\Delta p\|\le0.1(\|W_p\|_2U_f+\|b_p\|_2),\quad
+\|\Delta\theta_j\|\le0.5(\|W_R\|_2U_f+\|b_R\|_2).
+\]
+
+0.1/0.5是缩放而非预设物理硬上限。
+
+### 11.4 30帧反馈的可选小增益命题
+
+令e_t≥0为完整状态误差、b_bar≥0，若完整world输出和quality反馈在声明域满足e_t≤Σ_{i=1}^{30}a_i e_(t−i)+b_t，a_i≥0、ρ=Σa_i<1、b_t≤b_bar，且rollout始终位于声明域（或域前向不变），则令d=b_bar/(1−ρ)，v_t=(e_t−d)_+。有v_t≤Σa_i v_(t−i)，对t≥1逐30帧归纳得到
+
+\[
+e_t\le d+\rho^{\lceil t/30\rceil}
+\max_{-29\le s\le0}(e_s-d)_+.
+\]
+
+a_i必须覆盖历史填补candidate、anchor变化、逆坐标变换和未来q误差。当前没有认证这些a_i/b_bar，也未自身历史rollout；有限扰动测试仅是经验增益，不是全域定理。
+
+## 12. 不可观测性与下一项验证边界
+
+若两种合法状态S1/S2在同一已有history/当前观测条件下不可区分，令满足三角不等式的距离d(S1,S2)=D，确定性恢复器只能给相同输出。三角不等式说明至少一种误差≥D/2；给定同一输入后两状态条件概率各为1/2时，平均平方距离误差≥D²/4。骨长、关节范围或未知输入动力学不自动排除这种多解；全局gauge也不会因参考系等变而变得可识别。
+
+主动手的肌肉驱动、接触力和惯性未独立测量；任意轨迹配一个自由力即可使动力学残差为零，不能自证真实物理正确。关节约束映射只保证定义的集合可行；非凸MANO/人体集合投影也不能套§4.3的凸投影误差不增定理。
+
+本次建议的理论主线是“合法几何与内部运动学结构＋参考系一致＋条件恢复的信息依据”，Mamba内部稳定作限定的结构性质。实际恢复、准确观测保护、跨帧反馈和独立GT几何仍靠对应实验。未决定加入HNN、hard限位、谱范数约束、下降验收或改变当前四库训练。
