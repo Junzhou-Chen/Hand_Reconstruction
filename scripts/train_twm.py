@@ -210,6 +210,8 @@ def main():
     for name in required:
         if not train.windows_by_dataset[name] or not val.windows_by_dataset[name]:
             raise ValueError(f'Required source {name} has no train/val windows')
+    if config.get('source_sampling','window_uniform') not in ('window_uniform','equal_source'):
+        raise ValueError('source_sampling must be window_uniform or equal_source')
     balanced=config.get('source_sampling','window_uniform')=='equal_source'
     sampler=SourceBalancedSampler(train,num_samples=config['steps']*config['batch_size'],seed=config['seed']) if balanced else None
     loader=DataLoader(train,batch_size=config['batch_size'],shuffle=not balanced,sampler=sampler,num_workers=0,pin_memory=True,drop_last=True,

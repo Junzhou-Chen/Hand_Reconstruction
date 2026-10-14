@@ -20,6 +20,7 @@ implement partial/raw-joint supervision. Future is returned ONLY as a target.
 from __future__ import annotations
 
 import bisect
+import hashlib
 from collections import OrderedDict
 from collections.abc import Iterator, Sequence
 import json
@@ -127,6 +128,9 @@ def _read_manifest(path: Path, overrides: dict | None = None,
     for reference in metadata.get("manifests", []):
         reference = {"path": reference} if isinstance(reference, str) else dict(reference)
         child_path = path.parent / reference.pop("path")
+        expected_hash = reference.pop("manifest_sha256", None)
+        if expected_hash is not None and hashlib.sha256(child_path.read_bytes()).hexdigest() != expected_hash:
+            raise ValueError(f"Prepared child manifest changed: {child_path}")
         # Explicit fields on a reference override that leaf's defaults;
         # collection-level prose does not overwrite a leaf's provenance.
         _, children = _read_manifest(child_path, reference, ancestors | {path})
