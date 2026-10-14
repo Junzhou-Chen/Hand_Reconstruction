@@ -215,6 +215,12 @@
 - 建完全隔离Torch2.10/cu130环境、官方wheel核SHA，pip check及GPU fused FP32/BF16通过；完整主干12项数值检查（因果/压缩误差0.0）与真实Oak3步smoke通过。包装器Pod缺git的记录问题已补真实SHA，SSH瞬断重试成功。
 - 09:47UTC在既有Pod/GPU0后台启动PID1276、独立正式run目录；09:50UTC核step650持续运行、loss有限、500步best/latest约76MB已存，约4.48steps/s。早期旋转收益与腕未改善/clean退化同报；旧run不恢复。新增[模型/环境/检查/运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)，数据/环境/权重/原始日志仅data10。
 
+## 2026-10-14 D25五万步完成核验
+
+- 用户要求查看运行情况，远程只读确认结构化Mamba在纽约08:57正常complete50000，并核latest50k/best49.5k可读、模型浮点值finite，100次验证/2000training日志无非有限/Traceback/OOM标记。没有追加训练或重启。
+- 末步合成noisy腕49.090→4.594mm、finger15.421→1.254°；missing腕37.637→4.411mm；clean退化1.276mm/0.440°/0.500°同报。腕20k后趋稳；仅固定相关val窗口/参考历史恢复，不称真实HaWoR或架构优越。
+- 新增[小型final JSON](../reports/twm_structured_mamba_20261014_final.json)，更新运行记录/入口/README/数据/状态/开发；best49.5k结果与末步区分，原completion_audit与权重只在data10。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

@@ -31,7 +31,7 @@
 | TWM完整99D输出 | 用户再次明确每手完整99D主输出；已区分统一输出、完整模型参考与部分几何监督 | [输出契约](../docs/TWM_PRETRAIN_PLAN.md#统一99d输出与标签完整性)；D23 Oak99D转换与首轮训练已实现 |
 | 传感器精度优先v2 | 用户纠正为glove/MoCap主导；HumanTouch许可/十份meta已核，新增UmeTrack | [传感器专题](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)；无实际轨迹质量/99D转换验收 |
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；D23已用zhou在GPU0训练TWM |
-| 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；旧run按D24暂停28,213步；D25新6.33M结构化Mamba实现并启动 | [运行与中途指标](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)；代码4cb1da8，checkpoint仅data10 |
+| 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；旧run按D24暂停28,213步；D25新6.33M结构化Mamba实现并正常完成50k | [新模型最终记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)；新378deda/旧4cb1da8，checkpoint仅data10 |
 | anchor codec、HaWoR adapter、TWM、Corrector | Oak quaternion→99D、受损历史anchor与TWM已有pilot实现；HaWoR adapter/独立Corrector/视觉取证未实现 | [训练入口](../scripts/train_twm.py)、[模型](../src/handloop/models/twm.py)；不存在完整视觉闭环结果 |
 | 实验和性能、投稿和录用 | 已有Oak合成受损恢复中途实测，完整方法/论文尚未完成 | [记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)同时报告clean退化；不当真实HaWoR收益 |
 
@@ -43,7 +43,7 @@
 
 ## 推荐执行顺序与交付条件
 
-D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/腕/单位/名义时间与99D codec，在官方64train/8val录制子集完成准备，并以4cb1da8在ds现有Pod计划训练50,000步。09:05 UTC核实step7275存活，best/latest已保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，同时clean退化4.551mm/1.642°。09:10 UTC再次核实step17425 alive；step17000 noisy腕7.825mm/finger1.635°，clean3.753mm/1.073°，checkpoint持续保存。详见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。随后D24在09:16UTC主动暂停：进程退出，latest28,213/best27,500均可读；数学继续暂缓，先梳理WestWorld架构与参数理由且保持任务接口。D25随后明确授权按参考方案重做并跑起：新Mamba主干、独立兼容runtime、12项数值检查和3步真实数据smoke通过；378deda于09:47UTC后台启动新run，09:50UTC核step650/loss有限且500步best/latest已存，旧run不恢复。[新运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。这仅完成P0/P2部分工作，无MANO FK/真实视觉效果。四库原包complete、D22 ARCTIC暂缓；所有实验远程执行。
+D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/腕/单位/名义时间与99D codec，在官方64train/8val录制子集完成准备，并以4cb1da8在ds现有Pod计划训练50,000步。09:05 UTC核实step7275存活，best/latest已保存；step7000 noisy腕49.090→8.657mm、finger15.421→2.259°，同时clean退化4.551mm/1.642°。09:10 UTC再次核实step17425 alive；step17000 noisy腕7.825mm/finger1.635°，clean3.753mm/1.073°，checkpoint持续保存。详见[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md)。随后D24在09:16UTC主动暂停：进程退出，latest28,213/best27,500均可读；数学继续暂缓，先梳理WestWorld架构与参数理由且保持任务接口。D25随后明确授权按参考方案重做并跑起：新Mamba主干、独立兼容runtime、12项数值检查和3步真实数据smoke通过；378deda于09:47UTC后台启动新run，纽约08:57正常完成50k；latest50k/best49.5k可读且finite，最终noisy腕4.594mm/finger1.254°、clean1.276mm/0.500°，旧run不恢复。[新运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。这仅完成P0/P2部分工作，无MANO FK/真实视觉效果。四库原包complete、D22 ARCTIC暂缓；所有实验远程执行。
 
 按D18与已定99D，v2.1首轮目标为OakInk2＋HOT3D有效train＋独立UmeTrack train＋HumanTouch；DexWild继续共同验收，可靠local过验可先加入，world链核清前不作为腕GT。第一个checkpoint只要求至少一条完整腕＋五指链过验，不等待所有loader。v2共同验收**MoCap与glove**：公开Oak/HOT/UmeTrack的native→99D，以及HumanTouch/DexWild原人体骨架＋DexCap/OpenGraph小样本。GRAB/ARCTIC有授权即为高优先来源；免申请偏好仍有效，不作为手续前置。原MoCap split约束保留，glove按subject/session/sensor校准建split；通过第一条链即可训练，不等所有库。Re/EgoDex降后续视觉来源扩展，真实HaWoR适配不挡纯轨迹起步。目标混合仍未实施；D23先跑Oak单库子集，不改变该建议职责。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)
 
@@ -51,7 +51,7 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 |---|---|---|
 | P0 传感器split与状态契约 | MoCap原录制/split，glove source/session与标定；ds Pod验native→99D及raw joint几何桥接 | 字段/形态/单位/dt、MANO转换残差、腕/finger质量来源与mask；不等全部loader |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
-| P2 纯轨迹恢复 baseline | 旧pilot按D24暂停；D25新结构化Mamba已启动，current restoration主任务＋0.1s短预测；无真实前端误差/自身rollout | 已有固定clean/noisy/missing验证及candidate baseline；FK/完整val/GRU与temporal对照待补 |
+| P2 纯轨迹恢复 baseline | 旧pilot按D24暂停；D25新结构化Mamba已完成50k，current restoration主任务＋0.1s短预测；无真实前端误差/自身rollout | 已有固定clean/noisy/missing验证及candidate baseline；FK/完整val/GRU与temporal对照待补 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
 | P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
 | P5 时间反馈训练 | 最终状态与质量一次回灌，短序列自身输出 rollout | feedback/no-feedback 与 rollout/no-rollout；再可见恢复、突发动作、误差累积 |
@@ -98,4 +98,4 @@ D23用户要求先单库pretrain跑起来、数学暂缓。已实现Oak源quat/�
 
 ## 下次会话可直接使用的任务说明
 
-> 先读MEMORY.md和docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md。D25授权参考WestWorld架构重做并跑起；378deda的新6×256结构化Mamba主干、隔离Torch2.10/cu130环境、12项GPU检查与Oak3步smoke已通过，09:47UTC启动PID1276新run，09:50核step650活跃、500步checkpoint已存，约4.48steps/s。先用ds_train_twm.py status读实际状态，默认指向新run；存活不重复启动。旧flat run保持stopped28,213，权重保留且不恢复。四库不重下载，FK/真实HaWoR/自身rollout未验，数学暂后；代码/小摘要Git同步，权重/环境/raw logs仅data10。
+> 先读MEMORY.md和docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md。D25授权参考WestWorld架构重做并跑起；378deda的新6×256结构化Mamba主干、隔离Torch2.10/cu130环境、12项GPU检查与Oak3步smoke已通过，新run纽约08:57已正常完成50k，latest50k/best49.5k可读且finite。默认status指向新run，complete/进程退出属于正常完成，不自动重启；先查看final JSON和clean退化，再按用户任务做真实误差或rollout验证。旧flat run保持stopped28,213，权重保留且不恢复。四库不重下载，FK/真实HaWoR/自身rollout未验，数学暂后；代码/小摘要Git同步，权重/环境/raw logs仅data10。

@@ -1,6 +1,6 @@
 # 结构化 Mamba TWM：重做与远程运行记录
 
-2026-10-14。用户D25明确要求按WestWorld指导的架构适配方案实现并跑起，确认运行后再结束。旧flat Transformer pilot保留在28,213步，不覆盖或恢复旧run。新模型从头初始化。
+2026-10-14。用户D25明确要求按WestWorld指导的架构适配方案实现并跑起，确认运行后再结束。旧flat Transformer pilot保留在28,213步，不覆盖或恢复旧run。新模型从头初始化；第一轮现已正常完成50,000步（纽约08:57），最终核验见末节。
 
 ## 本轮实际模型
 
@@ -71,3 +71,21 @@ helper默认指向新config/Python/run，旧pilot status需显式`--output`旧�
 | clean | 0→5.270 | ≈0→2.727 | ≈0→3.393 |
 
 旋转已有恢复，但腕暂未改善、clean退化需保留。不得用这组少量早期步数宣称超过旧模型/真实HaWoR或符合物理；训练继续，旧结果保持独立。启动、fused依赖、完整数值、真实数据smoke、checkpoint周期保存均已有实测，本轮用户要求的“重做并跑起来”已完成。
+
+## 50,000步正常完成：纽约2026-10-14 08:57
+
+2026-10-14 12:57:17UTC（纽约08:57:17）phase=complete，进程正常退出，实际启动到完成约3小时9分26秒。后续只读检查latest.pt为50,000步、best.pt为49,500步，代码均378deda，模型浮点值全部finite。2000个training日志事件、100次验证，无非有限loss/gradient日志或Traceback/FloatingPointError/OOM标记；最终约4.41steps/s，peak allocated4.733GB。未重启、追加训练或释放用户Job。completion_audit.json留原run目录。
+
+以下为**最终50,000步**固定val结果，每模式1024个相关窗口：
+
+| 模式 | 腕candidate→restored(mm) | Root candidate→restored(°) | Finger candidate→restored(°) |
+|---|---:|---:|---:|
+| noisy | 49.090→4.594 | 22.538→1.461 | 15.421→1.254 |
+| missing | 37.637→4.411 | 16.426→1.457 | 10.910→1.249 |
+| clean | 0→1.276 | ≈0→0.440 | ≈0→0.500 |
+
+noisy腕误差相对candidate下降约90.6%，missing约88.3%；clean仍有明确退化。腕误差大约20k后在4.4–4.6mm附近趋稳（noisy20k=4.532、30k=4.462、40k=4.563、50k=4.594），旋转与clean保持继续改善；不是所有指标每步单调下降。
+
+最佳选取在49,500步，noisy/missing平均恢复loss=0.0060013：noisy腕4.476mm/root1.469°/finger1.250°；missing4.328mm/1.457°/1.249°；clean1.082mm/0.418°/0.496°。这些是该保存步的已有日志，不是新增全集重评；best目标不含clean。末步短预测腕noisy/missing/clean=7.694/7.584/4.067mm，无匹配forecast baseline，不宣称预测优越。
+
+可支持的结论是留出录制固定合成受损验证上已有当前恢复能力、训练后半程趋于收敛。历史仍来自参考＋小噪声，窗口相关，仅8个val录制；没有真实HaWoR纠错、主体留出、跨库或物理验证。也不能将新50k和旧28k快照的差异归因于Mamba架构，因为容量、步数、lr与optimizer均变。小型可跟踪摘要见[final JSON](../reports/twm_structured_mamba_20261014_final.json)，原日志和权重仅远程。

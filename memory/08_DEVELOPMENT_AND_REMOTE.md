@@ -80,3 +80,5 @@ ssh ds、kubectl context/namespace、用户Pod、持久挂载与两套Python已�
 用户随后明确重新构造并跑起，旧D24暂停只保留旧run，不再禁止新run。新src主干359b88e及runtime源码378deda已同步。zhou Python建立完全隔离data10/runtime/twm_mamba_torch210_v1，Torch2.10.0+cu130/Triton3.6/Mamba2.3.2.post1/causal1.7，官方cp311 cu13 ABI TRUE两wheel核SHA，pip check/fused GPU/完整model12项数值检查/真实3步smoke均通过；不修改zhou、不新建Job。Pod无git导致初次数值记录包装器失败，实际checker已pass，后用登录节点核SHA补JSON；一次SSHUNKNOWN65535重试成功。
 
 378deda47b123d64546404bf9780c19bcc48bb31于09:47:50UTC在既有Pod/GPU0启动新run PID1276，默认helper已指向新config/Python/output，旧run查询需显式output。新run数据路径与checkpoint细节见[运行记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
+
+D25完成核验：12:57:17UTC（纽约08:57）phase=complete50000，进程正常退出，耗时约3h9m。latest50k/best49.5k只读加载成功，SHA378deda、权重finite，100次val/2000training日志未发现非有限或OOM/Traceback。completion_audit.json保存在新run目录，Git仅同步curated final JSON和文档；未重启、延长训练或删除用户Job。

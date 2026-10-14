@@ -160,3 +160,7 @@ D24后续：用户主动暂停于28,213步，latest/best保存且可读，最后
 D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption协议，从头训练新6.33M结构化Mamba。相比旧pilot架构/容量/lr及Mamba指定optimizer分组均改变，不称严格单因素消融。12项GPU数值检查＋3步真实数据smoke通过，09:47UTC启动正式run，非MPJPE/真实HaWoR或物理实测。[完整配置与产物](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
 
 09:50UTC新run核step650存活，step500验证noisy腕49.090→49.204mm/root22.538→3.981°/finger15.421→5.413°；clean退化5.270mm/2.727°/3.393°，腕尚未改善。该早期结果不判最终架构优劣，best/latest已存。[准确口径](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
+
+## 2026-10-14 D25完整训练结果
+
+新run正常完成50k（纽约08:57），代码378deda，latest50k/best49.5k可读且所有模型浮点值finite。最终fixed1024val窗口/模式：noisy腕49.090→4.594mm/root22.538→1.461°/finger15.421→1.254°；missing37.637→4.411mm/16.426→1.457°/10.910→1.249°；clean0→1.276mm/≈0→0.440°/≈0→0.500°。腕20k后趋稳，旋转/clean保持改善。best选择loss.0060013，49.5knoisy腕4.476mm、clean1.082mm；不与末步混用。8个val录制的相关滑动窗口、参考小噪声历史、合成受损与拟合MANO GT边界保持；不能据新50k比旧28k说明Mamba更优。[完整记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)、[小摘要](../reports/twm_structured_mamba_20261014_final.json)。

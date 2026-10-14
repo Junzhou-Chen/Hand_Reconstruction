@@ -1,0 +1,103 @@
+{
+  "record_date": "2026-10-14",
+  "code_version": "378deda47b123d64546404bf9780c19bcc48bb31",
+  "config": "config/twm_oakink2_structured_mamba_pilot.json",
+  "source_revision": "21705616140d726607027e70d58b7837f442ffd8",
+  "source_gt": "OakInk2 released MoCap-fitted MANO reference; no independent FK/marker geometry evaluation",
+  "split": {
+    "train_recordings": 64,
+    "val_recordings": 8,
+    "train_hand_trajectories": 128,
+    "val_hand_trajectories": 16,
+    "train_hand_frames": 204502,
+    "val_hand_frames": 18032,
+    "test_labels_read": false,
+    "subject_disjoint_claimed": false
+  },
+  "coordinates": "metres; common noisy previous-wrist anchor; wxyz source quaternion; columns_c0xyz_c1xyz rotation6D; beta10 separate",
+  "evaluation": {
+    "windows_per_mode": 1024,
+    "aggregation": "window average; correlated windows, not independent sequences",
+    "modes": [
+      "noisy",
+      "missing",
+      "clean"
+    ],
+    "baseline": "uncorrected candidate, last-history fill for missing groups",
+    "metrics": "wrist Euclidean mm; root and mean 15-finger SO(3) geodesic degrees; no PA or scale alignment; NO MPJPE/mesh"
+  },
+  "started_utc": "2026-10-14T09:47:50.954910+00:00",
+  "completed_utc": "2026-10-14T12:57:17.096441+00:00",
+  "completed_new_york": "2026-10-14 08:57:17 EDT",
+  "phase": "complete",
+  "steps": 50000,
+  "checkpoint_audit": {
+    "latest_step": 50000,
+    "best_step": 49500,
+    "latest_bytes": 76179339,
+    "best_bytes": 76177435,
+    "all_model_values_finite": true,
+    "logged_nonfinite_steps": [],
+    "traceback_or_oom_found": false
+  },
+  "best_selection": "mean noisy/missing restoration loss; clean not included",
+  "best_loss": 0.0060012878238921985,
+  "final_step_metrics": {
+    "noisy": {
+      "baseline_wrist_mm": 49.09007501602173,
+      "restored_wrist_mm": 4.5941857397556305,
+      "baseline_root_deg": 22.538346886634827,
+      "restored_root_deg": 1.4613701850175858,
+      "baseline_finger_deg": 15.421098947525024,
+      "restored_finger_deg": 1.2539234831929207,
+      "loss": 0.00631910769152455
+    },
+    "missing": {
+      "baseline_wrist_mm": 37.636924386024475,
+      "restored_wrist_mm": 4.410931497812271,
+      "baseline_root_deg": 16.42587059736252,
+      "restored_root_deg": 1.457170732319355,
+      "baseline_finger_deg": 10.909856140613556,
+      "restored_finger_deg": 1.2487666085362434,
+      "loss": 0.006010187993524596
+    },
+    "clean": {
+      "baseline_wrist_mm": 0.0,
+      "restored_wrist_mm": 1.2763419039547443,
+      "baseline_root_deg": 3.089152623373531e-09,
+      "restored_root_deg": 0.4396689869463444,
+      "baseline_finger_deg": 6.68161332928463e-08,
+      "restored_finger_deg": 0.5003929380327463,
+      "loss": 0.0006975893993512727
+    }
+  },
+  "best_step_logged_metrics": {
+    "noisy": {
+      "restored_wrist_mm": 4.475956574082375,
+      "restored_root_deg": 1.468618780374527,
+      "restored_finger_deg": 1.2501203939318657,
+      "loss": 0.006141890829894692
+    },
+    "missing": {
+      "restored_wrist_mm": 4.32804337143898,
+      "restored_root_deg": 1.4565052688121796,
+      "restored_finger_deg": 1.2489814683794975,
+      "loss": 0.005860684817889705
+    },
+    "clean": {
+      "restored_wrist_mm": 1.0817490294575691,
+      "restored_root_deg": 0.41773688048124313,
+      "restored_finger_deg": 0.4961562976241112,
+      "loss": 0.0006447453852160834
+    }
+  },
+  "run_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_structured_mamba_20261014",
+  "audit_file": "completion_audit.json",
+  "limitations": [
+    "synthetic corruption only; no real HaWoR errors",
+    "history is reference plus small noise, not own-state rollout",
+    "fixed correlated validation-window subset from 8 recordings",
+    "no physical correctness or cross-dataset claim",
+    "not a matched-budget architecture comparison against old 28k pilot"
+  ]
+}
