@@ -1,0 +1,634 @@
+{
+  "schema": "handloop.twm_dual_gpu.curated.v1",
+  "date": "2026-10-14",
+  "user_decision": "Use both existing GPUs and increase batch; retain motion-only current restoration and 99D design.",
+  "source_single_gpu": {
+    "observed_utc": "2026-10-14T19:46:08.610959+00:00",
+    "old_step": 26346,
+    "old_phase": "stopped",
+    "checkpoint_sha256": "09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f",
+    "checkpoint_bytes": 76186315,
+    "last_validation_step": 26000
+  },
+  "execution": {
+    "pid": 2963,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/train_twm_ddp.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_four_sources_structured_mamba_ddp.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014",
+      "--code-version",
+      "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+      "--migrate-from",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014/latest.pt"
+    ],
+    "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-14T19:47:53.938534+00:00"
+  },
+  "run_metadata": {
+    "started_utc": "2026-10-14T19:48:15.885657+00:00",
+    "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+    "pid": 2968,
+    "world_size": 2,
+    "backend": "nccl",
+    "global_batch_size": 1024,
+    "per_gpu_batch_size": 512,
+    "eval_batch_size": 64,
+    "config": {
+      "seed": 20261014,
+      "history_frames": 30,
+      "forecast_offset_frames": 3,
+      "window_stride": 4,
+      "batch_size": 1024,
+      "steps": 50000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 1000,
+      "save_every": 500,
+      "log_every": 25,
+      "eval_batches": 16,
+      "forecast_weight": 0.1,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 1,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false,
+      "eval_batch_size": 64,
+      "world_size": 2,
+      "cpu_threads": 4
+    },
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "parameters": 6330892,
+    "torch": "2.10.0+cu130",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+    "dataset_names": [
+      "dexycb",
+      "hot3d",
+      "oakink2",
+      "umetrack"
+    ],
+    "train_windows_by_dataset": {
+      "dexycb": 6352,
+      "hot3d": 132008,
+      "oakink2": 346860,
+      "umetrack": 151390
+    },
+    "source_sampling": "equal_source",
+    "sampling": "independent rank-seeded source/window draws WITH REPLACEMENT; overlaps are possible by design",
+    "initialization": "single-GPU batch/DDP migration",
+    "parent_checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014/latest.pt",
+    "parent_step": 26346,
+    "parent_code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+    "parent_checkpoint_sha256": "09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f",
+    "beta_conditioning": false,
+    "scheduler": "original absolute optimizer-step schedule retained; no automatic LR scaling",
+    "batch_change": "larger global batch increases sample exposure per remaining optimizer step",
+    "scope": "synthetic-corruption pure-trajectory restoration; no RGB/real HaWoR or physical guarantee",
+    "resume_limit": "per-rank RNG saved, but prefetched sampler chunk/loader cursor not exactly replayed",
+    "val_windows_by_dataset": {
+      "dexycb": 394,
+      "hot3d": 15240,
+      "oakink2": 27728,
+      "umetrack": 18008
+    },
+    "val_samples_by_dataset": {
+      "dexycb": 394,
+      "hot3d": 1024,
+      "oakink2": 1024,
+      "umetrack": 1024
+    }
+  },
+  "probe": {
+    "code_version": "a5b4723",
+    "receipt_path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_batch_gpu1_20261014_v1/receipt.json",
+    "scope": "Single-GPU repeated-real-window corruption + BF16 network/FP32 geometry + backward/AdamW probe. Excludes loader, validation and DDP; not quality or a production-safe-batch claim.",
+    "weights_checkpoint": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014/latest.pt",
+      "loaded_step": 25000,
+      "code_version": "2b40aa9790c1d18651d6ac810d23a72d3c7a5922",
+      "optimizer_loaded": false
+    },
+    "total_vram_bytes": 101974081536,
+    "warmup": 2,
+    "iterations": 5,
+    "results": [
+      {
+        "batch_size": 128,
+        "status": "passed",
+        "steps_per_second": 2.453086029368896,
+        "samples_per_second": 313.9950117592187,
+        "peak_allocated_bytes": 9264071680,
+        "peak_reserved_bytes": 9474932736,
+        "finite_loss_grad_parameters_optimizer": true,
+        "no_weight_decay_parameters": 199680,
+        "free_vram_before_bytes": 101385568256
+      },
+      {
+        "batch_size": 256,
+        "status": "passed",
+        "steps_per_second": 1.1616166403903754,
+        "samples_per_second": 297.3738599399361,
+        "peak_allocated_bytes": 18393490432,
+        "peak_reserved_bytes": 18759024640,
+        "finite_loss_grad_parameters_optimizer": true,
+        "no_weight_decay_parameters": 199680,
+        "free_vram_before_bytes": 101161172992
+      },
+      {
+        "batch_size": 512,
+        "status": "passed",
+        "steps_per_second": 0.47020684026046333,
+        "samples_per_second": 240.74590221335723,
+        "peak_allocated_bytes": 36678864384,
+        "peak_reserved_bytes": 37356568576,
+        "finite_loss_grad_parameters_optimizer": true,
+        "no_weight_decay_parameters": 199680,
+        "free_vram_before_bytes": 101161172992
+      },
+      {
+        "batch_size": 768,
+        "status": "passed",
+        "steps_per_second": 0.3089843582665171,
+        "samples_per_second": 237.29998714868515,
+        "peak_allocated_bytes": 54963127808,
+        "peak_reserved_bytes": 55981375488,
+        "finite_loss_grad_parameters_optimizer": true,
+        "no_weight_decay_parameters": 199680,
+        "free_vram_before_bytes": 101161172992
+      },
+      {
+        "batch_size": 1024,
+        "status": "passed",
+        "steps_per_second": 0.22386313213004216,
+        "samples_per_second": 229.23584730116318,
+        "peak_allocated_bytes": 73248853504,
+        "peak_reserved_bytes": 74625056768,
+        "finite_loss_grad_parameters_optimizer": true,
+        "no_weight_decay_parameters": 199680,
+        "free_vram_before_bytes": 101159075840
+      }
+    ]
+  },
+  "selection": {
+    "per_gpu_batch_size": 512,
+    "global_batch_size": 1024,
+    "reason": "Increase VRAM substantially with headroom; 768/1024 per-card probes had lower sample throughput. Engineering compromise, not optimum."
+  },
+  "smoke_first_stage": {
+    "checked_utc": "2026-10-14T19:43:43.655570+00:00",
+    "phase": "first_stage_archived_and_checkpoint_verified",
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_ddp_smoke_20261014_v1",
+    "archive": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_ddp_smoke_20261014_v1/first_stage",
+    "step": 26446,
+    "checkpoint_sha256": "47f6f1fb7403218e237102b5b605728f1a0b581997bd35baef8f2f9dc6b5060b",
+    "code_version": "0ad45f9d2c4b3e11476fd8a49ccd8f5604b1cc79",
+    "model": {
+      "floating_values_or_tensors_checked": 163,
+      "bad_paths": [],
+      "finite": true
+    },
+    "adamw": {
+      "floating_values_or_tensors_checked": 499,
+      "bad_paths": [],
+      "finite": true
+    },
+    "rank_states": {
+      "floating_values_or_tensors_checked": 2,
+      "bad_paths": [],
+      "finite": true
+    },
+    "rank_state_count": 2,
+    "plain_model_keys": true,
+    "model_state_sha256": "c595226e89ee21fba8579ee4b2ed83db40d14367f0d29c6c9d76c835bfebfd82",
+    "replica_audit_matches_cpu_hash": true,
+    "archive_sha256": {
+      "process.json": "2042b80e9271d538fd9bf33b17e57a8793ee2b71b1bc866ef2dc001eb5170da7",
+      "run_metadata.json": "6858517b130f04cf79be0e2420e393688a42b30c392c1dceb35c372cac9112be",
+      "status.json": "272cae29b13c8faf16e3abab8ab212f93a9f5eea6445a958587b67f50d462397",
+      "replica_checkpoint_audit.json": "11301a777c5999d70bbbd71666a737f1182ad0ea7016fc58e0b0233817271406"
+    },
+    "model_executed": false
+  },
+  "smoke_resume_single_rank_stop": {
+    "checked_utc": "2026-10-14T19:46:52.903121+00:00",
+    "phase": "resume_and_single_rank_SIGTERM_cooperative_stop_PASS",
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_ddp_smoke_20261014_v1",
+    "resumed_from_step": 26446,
+    "stopped_step": 26498,
+    "updates_after_resume": 52,
+    "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+    "stop_status_utc": "2026-10-14T19:45:34.839603+00:00",
+    "signal_request_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_ddp_smoke_20261014_v1/signal_request.json",
+    "first_stage_checkpoint_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_ddp_smoke_20261014_v1/first_stage/checkpoint_receipt.json",
+    "checkpoint_mtime_utc": "2026-10-14T19:45:56.527678+00:00",
+    "checkpoint_sha256": "17538795a3765421868b4129c652f26f8a56fe7feaf8a3684e99e6620147c6f0",
+    "model": {
+      "floating_values_or_tensors_checked": 163,
+      "bad_paths": [],
+      "finite": true
+    },
+    "adamw": {
+      "floating_values_or_tensors_checked": 499,
+      "bad_paths": [],
+      "finite": true
+    },
+    "adam_step_values": [
+      26498
+    ],
+    "rank_states": {
+      "floating_values_or_tensors_checked": 2,
+      "bad_paths": [],
+      "finite": true
+    },
+    "rank_state_count": 2,
+    "plain_model_keys": true,
+    "model_state_sha256": "61567794673981b4f434068ade1178deb7acc5c1846794c2b4ba94e032e71df7",
+    "checkpoint_replica_audit": {
+      "utc": "2026-10-14T19:45:34.063742+00:00",
+      "step": 26498,
+      "world_size": 2,
+      "all_model_replicas_byte_equal": true,
+      "model_state_sha256": "61567794673981b4f434068ade1178deb7acc5c1846794c2b4ba94e032e71df7"
+    },
+    "cpu_hash_matches_both_rank_hashes_and_audit": true,
+    "model_changed_since_resume": true,
+    "active_smoke_processes": [],
+    "process_states": {
+      "rank0": {
+        "pid": 2894,
+        "exists": false
+      },
+      "rank1": {
+        "pid": 2895,
+        "exists": false
+      },
+      "launcher": {
+        "pid": 2889,
+        "exists": true,
+        "state": "Z (zombie)",
+        "cmdline": ""
+      }
+    },
+    "gpu_compute_processes": "",
+    "gpus": "0, 2 MiB, 0 %\n1, 2 MiB, 0 %",
+    "both_gpus_no_active_compute": true,
+    "validation_scope": "status validation is initial resume validation, not a new final-step evaluation",
+    "model_executed_by_auditor": false
+  },
+  "formal_acceptance": {
+    "receipt_path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_ddp_formal_20261014/launch_receipt.json",
+    "receipt_sha256": "7f8b72fb5972c7a9d0440b34b9fe9003f9c4159f63b844d321cfa7a2c70d3d59",
+    "created_utc": "2026-10-14T19:52:47.112700+00:00",
+    "passed": true,
+    "ddp_source_sha256": "730e8234e1a74180988c49a9fa00f0237f90b3641b70d6dd706c5815144828d2",
+    "checkpoint_cpu_audit": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014/latest.pt",
+      "read_started_utc": "2026-10-14T19:52:46.789413+00:00",
+      "read_completed_utc": "2026-10-14T19:52:46.916566+00:00",
+      "bytes": 76213899,
+      "mtime_utc": "2026-10-14T19:49:03.073588+00:00",
+      "file_sha256": "0cfe2189d21a3c875899ed0422c531699a235b794fadcfbb2ea332dac333fa89",
+      "step": 26350,
+      "updates_since_parent": 4,
+      "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+      "top_level_keys": [
+        "step",
+        "model",
+        "optimizer",
+        "config",
+        "code_version",
+        "best_validation_loss",
+        "rank_states",
+        "run"
+      ],
+      "model_key_count": 166,
+      "model_first_keys": [
+        "history_projection.weight",
+        "history_projection.bias",
+        "current_projection.weight",
+        "current_projection.bias",
+        "joint_embedding.weight",
+        "handedness_embedding.weight",
+        "shape_projection.weight",
+        "shape_projection.bias",
+        "time_projection.0.weight",
+        "time_projection.0.bias",
+        "time_projection.2.weight",
+        "time_projection.2.bias"
+      ],
+      "plain_model_state_keys": true,
+      "floating_model_tensor_count": 163,
+      "nonfinite_model_keys": [],
+      "all_model_floating_tensors_finite": true,
+      "all_model_tensors_cpu": true,
+      "optimizer_state_entries": 163,
+      "optimizer_tensor_count": 489,
+      "optimizer_float_tensor_count": 489,
+      "all_optimizer_floating_tensors_finite": true,
+      "optimizer_per_parameter_state_key_sets": [
+        "exp_avg,exp_avg_sq,step"
+      ],
+      "optimizer_param_group_metadata": [
+        {
+          "weight_decay": 0.01,
+          "lr": 0.00010372191736302873,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-8,
+          "amsgrad": false,
+          "maximize": false,
+          "foreach": null,
+          "capturable": false,
+          "differentiable": false,
+          "fused": null,
+          "decoupled_weight_decay": true,
+          "parameter_count": 151
+        },
+        {
+          "weight_decay": 0,
+          "lr": 0.00010372191736302873,
+          "betas": [
+            0.9,
+            0.999
+          ],
+          "eps": 1e-8,
+          "amsgrad": false,
+          "maximize": false,
+          "foreach": null,
+          "capturable": false,
+          "differentiable": false,
+          "fused": null,
+          "decoupled_weight_decay": true,
+          "parameter_count": 12
+        }
+      ],
+      "optimizer_step_range": [
+        26350,
+        26350
+      ],
+      "rank_state_count": 2,
+      "rank_state_ids": [
+        0,
+        1
+      ],
+      "rank_state_keys": [
+        [
+          "rank",
+          "corruption_rng",
+          "torch_rng",
+          "cuda_rng",
+          "python_rng",
+          "numpy_rng",
+          "sampler",
+          "model_state_sha256"
+        ],
+        [
+          "rank",
+          "corruption_rng",
+          "torch_rng",
+          "cuda_rng",
+          "python_rng",
+          "numpy_rng",
+          "sampler",
+          "model_state_sha256"
+        ]
+      ],
+      "rank_sampler_keys": [
+        [
+          "generator_state",
+          "seed",
+          "num_samples",
+          "dataset_names",
+          "windows_by_dataset"
+        ],
+        [
+          "generator_state",
+          "seed",
+          "num_samples",
+          "dataset_names",
+          "windows_by_dataset"
+        ]
+      ],
+      "rank_model_hashes": [
+        "90e1dda2f5905c473ab6f3134c7758fd6532d25ab408139fc4dfda3fff7d22b9",
+        "90e1dda2f5905c473ab6f3134c7758fd6532d25ab408139fc4dfda3fff7d22b9"
+      ],
+      "cpu_recomputed_model_state_sha256": "90e1dda2f5905c473ab6f3134c7758fd6532d25ab408139fc4dfda3fff7d22b9",
+      "rank_hashes_equal_cpu": true,
+      "replica_audit_step_matches_checkpoint": true,
+      "replica_audit_hash_matches_cpu": true,
+      "torch": "2.10.0+cu130",
+      "cuda_initialized": false,
+      "scope": "CPU deserialization, tensor finiteness and byte-level replica consistency only; no model execution and no quality or final-training claim"
+    },
+    "replica_audit": {
+      "utc": "2026-10-14T19:48:40.611519+00:00",
+      "step": 26350,
+      "world_size": 2,
+      "all_model_replicas_byte_equal": true,
+      "model_state_sha256": "90e1dda2f5905c473ab6f3134c7758fd6532d25ab408139fc4dfda3fff7d22b9"
+    },
+    "training_status": {
+      "utc": "2026-10-14T19:52:33.339479+00:00",
+      "phase": "training",
+      "step": 26450,
+      "updates_since_migration": 104,
+      "loss": 0.02083021029829979,
+      "restoration_loss": 0.01245089154690504,
+      "forecast_loss": 0.07752298563718796,
+      "grad_norm": 0.15866997838020325,
+      "lr": 0.00010315224037540146,
+      "elapsed_seconds": 244.29437705036253,
+      "steps_per_second": 0.42571589758105594,
+      "samples_per_second": 435.9330791230013,
+      "global_batch_size": 1024,
+      "per_gpu_batch_size": 512,
+      "world_size": 2,
+      "ranks": [
+        {
+          "rank": 0,
+          "pid": 2968,
+          "device": 0,
+          "peak_allocated_gb": 36.716533248,
+          "peak_reserved_gb": 39.02799872,
+          "model_sum": 624376.6875,
+          "samples_by_dataset": {
+            "dexycb": 13265,
+            "hot3d": 13270,
+            "oakink2": 13291,
+            "umetrack": 13422
+          }
+        },
+        {
+          "rank": 1,
+          "pid": 2969,
+          "device": 1,
+          "peak_allocated_gb": 36.70699776,
+          "peak_reserved_gb": 37.469814784,
+          "model_sum": 624376.6875,
+          "samples_by_dataset": {
+            "dexycb": 13436,
+            "hot3d": 13299,
+            "oakink2": 13159,
+            "umetrack": 13354
+          }
+        }
+      ],
+      "samples_by_dataset": {
+        "dexycb": 26701,
+        "hot3d": 26569,
+        "oakink2": 26450,
+        "umetrack": 26776
+      }
+    },
+    "first_training_event": {
+      "utc": "2026-10-14T19:48:40.576407+00:00",
+      "phase": "training",
+      "step": 26350,
+      "updates_since_migration": 4,
+      "loss": 0.022333383560180664,
+      "restoration_loss": 0.013789019547402859,
+      "forecast_loss": 0.07892347127199173,
+      "grad_norm": 0.4028521478176117,
+      "lr": 0.00010372191736302873,
+      "elapsed_seconds": 11.531315539963543,
+      "steps_per_second": 0.3468814972704013,
+      "samples_per_second": 355.2066532048909,
+      "global_batch_size": 1024,
+      "per_gpu_batch_size": 512,
+      "world_size": 2,
+      "ranks": [
+        {
+          "rank": 0,
+          "pid": 2968,
+          "device": 0,
+          "peak_allocated_gb": 36.716533248,
+          "peak_reserved_gb": 39.02799872,
+          "model_sum": 624375.875,
+          "samples_by_dataset": {
+            "dexycb": 483,
+            "hot3d": 541,
+            "oakink2": 507,
+            "umetrack": 517
+          }
+        },
+        {
+          "rank": 1,
+          "pid": 2969,
+          "device": 1,
+          "peak_allocated_gb": 36.70699776,
+          "peak_reserved_gb": 37.469814784,
+          "model_sum": 624375.875,
+          "samples_by_dataset": {
+            "dexycb": 530,
+            "hot3d": 511,
+            "oakink2": 505,
+            "umetrack": 502
+          }
+        }
+      ],
+      "samples_by_dataset": {
+        "dexycb": 1013,
+        "hot3d": 1052,
+        "oakink2": 1012,
+        "umetrack": 1019
+      }
+    },
+    "sampling_checks": {
+      "status_step": 26450,
+      "actual_global_sum": 106496,
+      "expected_global_sum": 106496,
+      "global_count_matches": true,
+      "per_rank_expected": 53248,
+      "rank_sums": [
+        53248,
+        53248
+      ],
+      "every_source_positive_every_rank": true,
+      "per_source_rank_sum_matches": true
+    },
+    "gpu_observed_utc": "2026-10-14T19:52:47.017128+00:00",
+    "gpus": [
+      {
+        "index": 0,
+        "pid": 2968,
+        "memory_used_mib": 38172,
+        "memory_total_mib": 97887,
+        "utilization_percent": 100
+      },
+      {
+        "index": 1,
+        "pid": 2969,
+        "memory_used_mib": 36686,
+        "memory_total_mib": 97887,
+        "utilization_percent": 100
+      }
+    ],
+    "previous_receipt_attempt": {
+      "result": "CPU checks passed, final receipt assembly failed before write because Pod has no git executable.",
+      "exception": "FileNotFoundError: git",
+      "repair": "Root authorized one repeated CPU read to preserve raw receipt; no Pod git called on retry.",
+      "total_checkpoint_cpu_reads": 2
+    }
+  },
+  "budget": {
+    "source_batch_size": 64,
+    "source_completed_optimizer_steps": 26346,
+    "source_samples_derived": 1686144,
+    "total_optimizer_steps": 50000,
+    "remaining_optimizer_steps": 23654,
+    "remaining_samples_old_derived": 1513856,
+    "remaining_samples_new_derived": 24221696,
+    "remaining_sample_budget_multiplier": 16,
+    "scheduler": "Keep original absolute optimizer-step LR schedule; no automatic LR scaling."
+  },
+  "limitations": [
+    "nvidia-smi utilization is a momentary sample, not a sustained average.",
+    "Checkpoint step and later training-status step are distinct observations.",
+    "Equal rank model hashes establish byte equality at checkpoint boundary, not correctness or quality.",
+    "Sampler draws are independent with replacement; saved rank RNG does not make loader cursor replay exact.",
+    "Global batch changed from 64 to 1024; retained step-based schedule changes remaining sample exposure.",
+    "Synthetic corruption only, not real HaWoR or independent MPJPE/mesh or physical correctness.",
+    "Smokes are functional checks; their trained weights were discarded for formal continuation from original single-card checkpoint.",
+    "Validation batch64, 16 batches, fixed held-out source subsets unchanged; actual counts Dex394 and other sources1024.",
+    "All preprocessing, CUDA training and CPU checkpoint tests remote; local only source/doc edits and static checks."
+  ]
+}

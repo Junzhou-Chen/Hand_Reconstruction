@@ -251,6 +251,16 @@
 - 更新限定五份记忆的过时准备状态；保留历史attempt、源实现一致性非独立GT精度、synthetic恢复非真实HaWoR收益等边界，并保留同日数学文档复核内容。
 - root随后保存[启动JSON](../reports/twm_four_source_20261014_launch.json)和完整运行记录：19:07:32 UTC step18,550、742条training事件finite、四库实际采样；step18,000合成noisy等库均值腕49.542→6.155mm、finger15.481→2.153°，同时记录clean退化2.925mm/1.388°。补充审计后续全量事实，不改模型、配置或在跑进程。
 
+
+## 2026-10-14 D27双GPU、大batch迁移与运行
+
+- 用户要求“两张卡一起跑、batch调高”，登记D27，仅替代D26单卡执行配置；四库、当前恢复、99D、结构化Mamba、β另存/conditioning暂关、源GT/split与研究方向保持。D26旧单卡已SIGTERM保存停止于26,346步，原run及19:07历史验证保留。
+- GPU1实际batch128/256/512/768/1024全部finite；512/卡峰值allocated34.16GiB/reserved34.79GiB、240.7样本/s，768/1024分别237.3/229.2样本/s。工程选择512/卡、global1024，不当最优batch或正式DDP吞吐。验证仍64×16上限，Dex实际394窗；LR及50,000优化步不变，剩余23,654×1024=24,221,696样本抽取，是旧batch64剩余预算16倍。
+- 实际DDP smoke26346→26446完成100更新；真实resume后仅rank1 SIGTERM，共同保存stopped26498。CPU检查163个model浮点张量及499个Adam递归浮点项（含超参，非499个张量）finite，两rank完整model state keys/dtype/shape/bytes SHA一致；验证了双卡训练、同步、保存及恢复，不等于独立几何效果。
+- 正式源是旧单卡latest26346，SHA256 `09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f`，不是smoke26498。代码`10aa98327eeaa3ff0afb49eef1e6ff73879c7d22`于19:47:53 UTC启动data10项目根`runs/twm_four_sources_structured_mamba_ddp_20261014`，launcher2963、ranks2968/2969、GPU0/1。迁移保留模型/AdamW/绝对步数，重建rank RNG与采样，不宣称逐样本精确续跑。
+- 19:52:33 UTC正式actualstep26450（新增104更新），四源累计实际106,496=104×1024样本，各rank53,248且四源均正；loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态比较。updated checkpoint26350已CPU读取，163个model/489个AdamW浮点张量finite、Adam step26350，CPU重算完整模型hash与两rank/replica audit一致。19:52:47 UTC两卡瞬时util100%、显存38,172/36,686MiB，PID2968/2969；不是稳态或峰值结论。保存checkpoint步数与后续running快照分开，尚未完成50k。[双卡运行记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json)。
+- 仅更新MEMORY、决策、进展、开发远程与CHANGELOG五份记忆，将active run统一为D27双卡；未修改数学文档、模型任务或数据协议。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

@@ -37,7 +37,8 @@
 | D23 | 从已经下载的四库选一库，先实现并启动pretrain，争取睡前跑起来；数学讨论暂缓 | 2026-10-14用户直接指令，授权必要的模型、单库转换和远程训练。助手选OakInk2官方64 train/8 val子集，保持99D/纯轨迹/当前恢复主任务；4cb1da8正式run曾后台运行并保存checkpoint，随后D24暂停。单库、网络规模与噪声超参是本次pilot工程选择，不是最终混合或物理架构定案。[运行记录](../docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md) |
 | D24 | 暂停当前tiny Transformer pilot；训练与模型构造要更充分参考WestWorld的架构和参数理由，输入输出仍按本项目任务设计 | 2026-10-14用户直接指令及后续澄清“不是完全参考”。替代D23继续本次run的执行安排；已SIGTERM保存退出，latest28,213/best27,500可读。99D、纯轨迹、当前恢复主任务不变；具体结构/超参待验证，不自动恢复或启动新run。[参考方案](../docs/TWM_WESTWORLD_GUIDED_DESIGN_2026-10-14.md) |
 | D25 | 按WestWorld指导的结构适配方案重做，并启动训练；确认跑起来后再结束对话 | 2026-10-14用户直接指令“按照这样子，重新去做，然后跑起来”。撤销D24禁止另启新run的当前限制，但旧pilot保持暂停。采纳结构编码＋同帧关节attention＋时间Mamba/SSM方向和任务适配；实现6blocks/d256/4heads、连续99D当前恢复。Oak子集run已正常完成50,000步，latest50k/best49.5k可读，合成改善与clean退化同报；不证明结构优于所有对照。[实现与实测](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md) |
-| D26 | 将已下载的OakInk2、HOT3D、UmeTrack、DexYCB统一预训练，保留结构化Mamba、纯数值输入、当前恢复主任务与完整99D；授权必要转换、验收和新run | 2026-10-14用户直接指令；用户自行注册、登录MANO并确认非商业研究许可后授权官网下载，合法资产已取得并核SHA。替代D23/D25单库作为当前执行范围，不覆盖旧run/原始档案，不撤销D18 glove/MoCap精度优先或D22 ARCTIC暂缓。adapter/loader与真实四库3步smoke已过，四库full及collection已验收；2b40aa9于17:51:39 UTC从头正式启动，19:02:32 UTC为17,250步，19:05:47 UTC后续核18,075步；checkpoint仍为19:02验收的latest17,000/best16,000可读finite，尚非50k完成。库间等概率等细节为工程起点，非用户逐项指定或最优结论。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)、[启动验收](../reports/twm_four_source_20261014_launch.json) |
+| D26 | 将已下载的OakInk2、HOT3D、UmeTrack、DexYCB统一预训练，保留结构化Mamba、纯数值输入、当前恢复主任务与完整99D；授权必要转换、验收和新run | 2026-10-14用户直接指令；用户自行注册、登录MANO并确认非商业研究许可后授权官网下载，合法资产已取得并核SHA。替代D23/D25单库作为当前执行范围，不覆盖旧run/原始档案，不撤销D18 glove/MoCap精度优先或D22 ARCTIC暂缓。四库full/collection已验收；2b40aa9于17:51:39 UTC从头启动的单卡阶段后来按D27保存停止于26,346步，旧数据/验证记录保留。库间等概率等细节为工程起点，非用户逐项指定或最优结论。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)、[单卡启动验收](../reports/twm_four_source_20261014_launch.json) |
+| D27 | 当前四库TWM使用现有两张GPU一起训练，并提高batch | 2026-10-14用户直接要求“两张卡一起跑、batch调高”。仅替代D26单卡执行配置；任务、六层结构化Mamba、99D、β另存及本轮conditioning关闭、源GT/split保持。五档GPU1探针通过后，工程选择每卡512/global1024；验证仍64×16上限，LR与原50,000优化步不变。旧单卡26,346步模型/AdamW/绝对步数迁入独立run，rank RNG/采样重建，非逐样本精确续跑。双卡smoke/实际resume/仅rank1信号共同保存停机通过；10aa983正式run于19:47:53 UTC启动，19:52:33 UTC为26,450步。正式26,350 checkpoint双rank完整模型hash相等，CPU检查163个model及489个AdamW浮点张量finite；尚非50k完成。[双卡执行与边界](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json) |
 
 ## 已替代的历史路线
 
@@ -51,7 +52,8 @@
 | 固定 confidence gate，high confidence 不可修改 | 图像证据和候选支持下重估可靠性 | D06、D08 |
 | 72D→69D关节坐标 | 历史上排除重复wrist得到69D；随后D16明确选99D MANO，69D只留可选对照 | 归档§15.2；START§2；2026-10-13 D16 |
 | 直接 WestWorld checkpoint、action conditioning、MPPI、MoE | 仅借鉴 structured/kinematic trajectory modelling | D04；START §1 |
-| D23/D25单库作为当前执行范围 | 旧Oak pilot和50k结果保留；当前四库联合run已从头正式启动 | D26；不是否定glove/MoCap精度原则或自动恢复旧run |
+| D23/D25单库作为当前执行范围 | 旧Oak pilot和50k结果保留；四库联合范围已采纳，现按D27双卡继续 | D26；不是否定glove/MoCap精度原则或自动恢复旧run |
+| D26单GPU、batch64执行配置 | 旧四库run保存停止于26,346步；新run两卡、每卡512/global1024，源数据与模型任务保持 | D27；batch具体值为探针支持的工程折中，非用户逐项指定 |
 | 全身/物体接触图/长短记忆/完整机器人执行链 | 暂不进入第一版；只有明确研究必要性时再扩展 | D02、D07 |
 | 旧方法图作为最终架构 | 保留作历史示意；新的概念图见 MEMORY，论文图以后按实现重画 | 归档 §15.1；START 开头说明 |
 
@@ -67,7 +69,7 @@
 
 数据建议演进：v0 HOT＋Re→v1 HOT＋Oak及Re/EgoDex扩展→D18用户纠正为传感器精度主导。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)恢复GRAB/ARCTIC/Oak/HOT高优先，新增UmeTrack、提升HumanTouch/DexWild主要glove；Re/EgoDex后续单列。随后D26明确本轮联合Oak/HOT/Ume/Dex四库，替代旧单库执行；**精度优先原则已定，等库采样比例仍是本轮工程假设**。后续glove验收及ARCTIC暂缓不变。[专题证据](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
-HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。D25已用独立Torch2.10/cu130 runtime完成50k；D26的四库源adapter、loader、有限smoke、全量准备和collection工程验收通过，正式run已启动并保存finite checkpoint；计划50k尚未完成，独立GT精度仍需验证。严格逐样本resume和后续Job续跑仍未验。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
+HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。D25已用独立Torch2.10/cu130 runtime完成50k；D26四库准备与单卡中途checkpoint验收通过，旧run保存停止于26,346步。当前D27双卡运行，计划50k尚未完成；DDP实际resume与仅rank1信号共同停机已验，但sampler预取块/loader游标未完整保存，不宣称逐样本精确续跑。正式双卡checkpoint26350的CPU finite检查已过；50k最终效果、独立GT精度与后续Job续跑仍按实际证据验收。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 
@@ -79,7 +81,9 @@ HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取
 
 **2026-10-14四库适用审计与后续D26：** 初始“MoCap三库核心＋Dex补充”是审计建议；随后用户明确要求四库统一训练，已登记D26。Meta/Dex PCA必须源解码，GT/test/缺标签与99D输出分开；有限decoder/FK检查和四库smoke通过不等于全库独立精度验收。[审计事实](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)
 
-**D26工程选择与用户决定分开（2026-10-14）：** root选择库间等概率、库内窗口均匀采样，分别固定各库validation windows并宏平均；没有最优比例结论。Meta左手shapedirs修复与Dex/Oak原始约定不同，实际zero＋7组源β、左右两侧/两种pose审计显示同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm，right/zeroβ差0，full-pose旋转参数差0。root据此采用本轮`condition_on_beta=false`：只把模型输入`beta_valid`置false，源β及其真实有效性仍保存，99D动态状态不变。此为经检查的工程选择，不是用户指定的永久架构更改，也未统一shape语义；未来开启conditioning需adapter与消融。证据：data10项目根下`audits/beta_convention_20261014/receipt.json`；正式run源码固定2b40aa9，配置明确关闭本轮β conditioning；GPU1实际forward/backward也已核源mask true4、模型mask false4、shape projection输入4×11全零及有限梯度，receipt为同目录`model_conditioning_receipt.json`。详见[启动验收](../reports/twm_four_source_20261014_launch.json)。
+**D26工程选择与用户决定分开（2026-10-14）：** root选择库间等概率、库内窗口均匀采样，分别固定各库validation windows并宏平均；没有最优比例结论。Meta左手shapedirs修复与Dex/Oak原始约定不同，实际zero＋7组源β、左右两侧/两种pose审计显示同腕左手joint差3.74–19.81mm、mesh差5.60–24.28mm，right/zeroβ差0，full-pose旋转参数差0。root据此采用本轮`condition_on_beta=false`：只把模型输入`beta_valid`置false，源β及其真实有效性仍保存，99D动态状态不变。此为经检查的工程选择，不是用户指定的永久架构更改，也未统一shape语义；未来开启conditioning需adapter与消融。证据：data10项目根下`audits/beta_convention_20261014/receipt.json`；D26单卡阶段源码固定2b40aa9，D27双卡继续关闭本轮β conditioning；GPU1实际forward/backward也已核源mask true4、模型mask false4、shape projection输入4×11全零及有限梯度，receipt为同目录`model_conditioning_receipt.json`。详见[启动验收](../reports/twm_four_source_20261014_launch.json)。
+
+**D27工程配置与预算边界（2026-10-14）：** 用户确定两卡和提高batch，没有指定512或要求LR缩放。GPU1的128/256/512/768/1024实际探针均finite；每卡512峰值allocated34.16GiB/reserved34.79GiB、240.7样本/s，768/1024为237.3/229.2样本/s。该测量排除loader和DDP，不当正式双卡稳态吞吐。采用512/卡、global1024是容量和吞吐的工程折中；验证仍64×16上限（Dex实际394窗），原LR与50,000优化步不变。剩余23,654次更新因此抽取24,221,696样本，相比batch64剩余预算16倍；不能以相同步数推断等样本公平比较，也没有证明更大batch改善精度。[双卡记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)。
 
 ## 对后续协作有用的偏好
 

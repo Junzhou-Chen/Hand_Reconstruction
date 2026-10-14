@@ -2,6 +2,8 @@
 
 日期：2026-10-14。用户要求把已经下载的 OakInk2、HOT3D、UmeTrack、DexYCB 统一训练；这是 D25 单库结构化 Mamba pilot 之后的新实验。四库全量准备、collection 验收和真实混合 smoke 已通过，正式 run 于17:51:39 UTC（纽约13:51）启动。19:07:32 UTC只读快照为 **18,550 / 50,000步、phase=training**；计划尚未完成。可复现的小型摘要见 [正式启动与运行验收](../reports/twm_four_source_20261014_launch.json)。
 
+后续D27：用户要求两张卡一起训练并提高batch，本文件所述单卡run已在26,346步保存退出并保留；新双卡阶段从同一模型/AdamW/绝对步数迁移，每卡512、global1024、验证batch仍64。当前正式双卡训练与验收见[双GPU运行记录](TWM_DUAL_GPU_RUN_2026-10-14.md)，不再自动恢复此旧单卡run。
+
 保留纯轨迹输入、当前受损状态恢复主任务、0.1 秒预测辅助和每手 99D＋独立 beta10。结构沿用 6 blocks、d256、同帧关节 attention/FFN、逐关节官方 Mamba，以及 MANO 树 embedding。联合 run 从头初始化，旧 Oak 两次 pilot 与 checkpoint 保留。代码入口为 [train_twm.py](../scripts/train_twm.py)，配置 [twm_four_sources_structured_mamba.json](../config/twm_four_sources_structured_mamba.json)。
 
 ## 数据协议
