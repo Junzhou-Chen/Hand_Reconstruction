@@ -54,7 +54,7 @@ def main():
         assert torch.isfinite(padded).all()
     print(json.dumps({'passed':True,'device':device,'torch':torch.__version__,
                       'rotation_roundtrip_max':float((r-back).abs().max()),
-                      'gradient_loss':float(loss),'tests':['quaternion_sign','6d_roundtrip','degenerate_6d','zero_pi_gradients','state_zero_delta','model_backward','forecast_no_current_leak','padded_history']}))
+                      'gradient_loss':float(loss.detach()),'tests':['quaternion_sign','6d_roundtrip','degenerate_6d','zero_pi_gradients','state_zero_delta','model_backward','forecast_no_current_leak','padded_history']}))
 
 
 if __name__=='__main__': main()

@@ -97,10 +97,9 @@ def sample_batch(batch, generator, mode='mixed'):
     raw[:,:3]=torch.where(available[:,:1],raw[:,:3],0.)
     raw[:,3:]=torch.where(available[:,1:,None],raw_r,g.identity_rotation_6d(device=device)).flatten(1)
     # Noisy, occasionally false-high quality hints, NOT calibrated GT error.
-    quality=0.55+rand(b,17)*0.3
-    quality[clean_case]=1.
-    false_high=(rand(b,17)<0.2)&~clean_case[:,None]
-    quality[false_high]=0.98
+    quality=0.55+rand(b,17)*0.4
+    false_high=rand(b,17)<0.2
+    quality[false_high]=1.
     quality=torch.where(available,quality,0.)
     quality=torch.where((rand(b,17)<0.2)&available,-1.,quality)
     kwargs={'history_valid':torch.ones(b,h,device=device,dtype=torch.bool),
