@@ -243,3 +243,8 @@ legacy保持原强噪、质量提示和anchor过程，作为历史压力参考�
 新run在`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015`。helper默认status/stop已指该run；每100步checkpoint、500步验证、10步记录。执行cutoff仍为16:25UTC，早于原Pod约16:37UTC时限；10k为训练目标，未完成不能宣称完成，不自动新建Job。
 
 小型可复核记录：[启动、旧曲线、有限性与SHA摘要](../reports/twm_batch512_10k_20261015.json)。完整checks在data10项目根`evaluations/twm_batch512_10k_20261015`，含`launch_audit.py`、`formal_checkpoint_audit.json`、`batch512_probe.json`、`previous_run_review.json`及图。权重、原始logs、MANO资产与私有key均不入Git。此次证明训练确实启动且数值/同步正常，未证明已收敛、增加batch有效、真实HaWoR纠错或物理正确。
+
+
+### D34中途检查：纽约10月15日01:25
+
+训练快照4,180/10,000步，最新完整fixed validation为4k；ordinary/noisy腕7.158→7.180mm、root3.999→2.373°、finger3.224→1.561°。旋转改善但腕位置尚无改善，clean仍引入0.688mm；训练继续，没有改配置。完整同轮曲线、分库/预测/覆盖率及限制见[中途效果检查](TWM_B512_PROGRESS_2026-10-15.md)和[小型摘要](../reports/twm_b512_progress_20261015_0521.json)。

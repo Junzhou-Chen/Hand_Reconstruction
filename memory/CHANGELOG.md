@@ -343,6 +343,12 @@
 - 核DIP/PAD-Hand真实预测输入、WHAM双阶段全文及保留AMASS/差分LR源码、LP-FT适用边界。建议插件暖身后低LR全量适配与motion恢复/长预测回放，明确采样比仍有取舍、冻结future头与current-only回放不足以保护长预测。
 - 补[现有框架文档](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md#2026-10-15twm真实误差适配与先验保持讨论建议未实施)及入口/状态/未决事项；没有新用户解冻决定、模型/训练器改动、权重或远程动作，D35仍仅127帧20步smoke。
 
+## 2026-10-15 D34纯轨迹训练4k效果检查
+
+- 用户要求查看当前训练效果；只读run status、metadata和既有固定validation，未暂停/改训或启动额外模型前向。7d53fa4原双卡每卡512 run快照4,180/10k；最新完整验证4k、每源256窗。D35视觉smoke与本次结果分开。
+- ordinary root/finger降低40.7%/51.6%，但腕7.158→7.180mm未改善；clean引入0.688mm且14.26%窗口>1mm退化，reanchor为0.571mm/4.39%。同轮3k→4k weighted score降4.03%，不把best-so-far或负NLL当收敛。1s预测腕103.568<hold120.242mm，2s150.508>hold148.162mm；90%当前xyz覆盖82.03%，不称校准。
+- 新增只读[摘要脚本](../scripts/review_probabilistic_twm_run.py)，核对宏平均、保存各时域有效数与原validation字节SHA；远程复用已有绘图脚本并审图。配置/source/data SHA、12模式/分库及曲线在[小型摘要](../reports/twm_b512_progress_20261015_0521.json)，[效果与限制](../docs/TWM_B512_PROGRESS_2026-10-15.md)。更新当前入口、状态及数据记忆；没有新设计决定或真实视觉/独立传感器效果结论。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。
