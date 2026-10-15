@@ -1,5 +1,7 @@
 # D29：当前恢复、MoE 与长轨迹概率预测
 
+**最新D32：** 用户已要求按混合设置跑起；新run `twm_four_sources_moe_mixed_v2_20261015` 已通过双卡训练/checkpoint/W&B验收，旧D29/D28仍暂停。当前执行见[文末D32](#d32混合有界噪声训练已启动)，下文D29是架构与启动历史。
+
 **随后D31暂停（00:36:36UTC）：** 用户要求先停当前训练，架构在另一聊天修改。已共同保存停止814步，latest814/best500原件与额外快照SHA一致，模型/AdamW finite、两rank hash一致；STOP保留不自动resume。[暂停核验](../reports/twm_moe_pause_20261015.json)、[混合训练建议](TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。下文配置与运行快照为D29历史，不表示当前仍在跑。
 
 日期：2026-10-15（UTC）。用户明确要求修改模型并启动训练：同时恢复当前受损手状态、预测较长未来轨迹、加入 MoE、由实现者选择时间编码，并接入在线 W&B。这里区分用户决定、源码事实、工程起始配置与实际运行结果。
@@ -157,3 +159,43 @@ W&B配置 `enabled=true, mode=online, require_online=true, project=handloop-twm`
 | dexycb | 6352/394 | 0/0 | 1263/124 | 0/0 |
 
 HOT3D的60帧offset有微小时间抖动，因此完整60步计数与严格“达到2秒”计数不同；固定验证最近帧容差另见前文。Dex本准备中train最大1.5秒、val最大1.433秒，没有2秒监督，不能报告Dex2秒GT误差；模型仍输出60个queries，尾部不进入loss。四库验证各固定256窗口、noisy/missing/clean独立固定RNG；新协议不是旧dense评测的3466固定窗/61370全量窗，不将二者直接当公平容量消融。
+
+
+## D32：混合有界噪声训练已启动
+
+用户在D31讨论后明确要求“按照你目前的设置，跑起来”。本轮实际模型架构仍为13,530,032参数的6层结构化Mamba＋4个dense experts、当前99D恢复＋4模式×60步分布；没有发现随后落地的其他架构改动，因此仅接入用户刚采纳的训练输入方案，保持原四库GT/split、β另存/conditioning关闭、未来mask与loss权重。旧D29已暂停814步、旧D28暂停32,783步，其STOP和checkpoint均保留。
+
+### 实现与配置
+
+- 实际训练源码`0d83a5478bc261fe138c43b109f7621206d34e4a`；[sampler](../src/handloop/data/corruption.py)、[active profile](../config/twm_corruption_mixed_v2.json)、[训练配置](../config/twm_four_sources_moe_mixed_v2.json)、[接入](../scripts/train_probabilistic_twm.py)。原sample_batch及D31 proposal文件保留，legacy评测显式选择，不无声改旧实验。
+- 输入混合20%全净、20%当前准确/近准而历史中噪、35%当前轻/中与历史准确/轻/中独立、20%局部缺失、5%局部强异常。具体范数/角度范围沿[讨论§9](TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)，是用户采纳的起始配置，仍非最优或HaWoR标定结论。
+- 位置按实际三维范数、旋转按SO(3)总角采样，方向归一化；约一半独立、一半按真实dt的OU相关方向，latent τ0.1–0.3s。quality可用部分为unknown，missing另由availability表示。所有监督GT/future不加噪，future状态不参与输入。
+- profile的完整解析内容和原文件SHA进入resolved config、run metadata与checkpoint；active profile SHA=`6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518`。现有strict resume校验包含它，后续改profile需显式新实验，不覆盖原协议。
+- 工程选择**新run从头训练**，不将已暂停814步的旧目标训练状态冒充新分布的精确resume。global512/每卡256、原AdamW与50k计划不变，16:25UTC共同保存早于现有Job16:37UTC到期；本allocation可能无法完成50k，不自动重建Job。
+
+### 分层验证与best选择
+
+每库固定最多32×8=256窗口，四库初始验证均256；12种条件为noisy、missing、clean、reanchor、light_clean_history、light_noisy_history、medium、strong、history_only与三种legacy。noisy/history_only使用同seed、同历史与anchor，只移除当前输入；reanchor为准确当前＋中噪历史，独立于clean-clean。
+
+best score按当前恢复loss的clean/reanchor/noisy/missing/strong以0.2/0.2/0.35/0.2/0.05加权。这里固定reanchor只用clean当前，不等于mixed训练内clean/near各半的精确风险估计；未来、准确输入退化和其他诊断仍单列，best不代表所有指标赢家。新增每库腕/root/finger p50、p95和腕误差增加>1mm比例，四库宏平均分位数不能称总体分位数。
+
+legacy保持原强噪、质量提示和anchor过程，作为历史压力参考；新旧评测batch/RNG切分及quality条件不同，不能直接把更轻输入产生的更低误差当作模型提升，更不能与真实HaWoR MPJPE拼表。未来时域、MAP/GT挑选minADE、有效样本数等D29口径保留。
+
+### 远程验收与实际启动
+
+所有Torch运算均在原Pod的项目runtime Torch2.10/cu130执行；本机仅源码、JSON/AST和文档。原始检查在data10项目根`evaluations/twm_mixed_v2_checks_20261015`，小型摘要为[启动验收JSON](../reports/twm_mixed_v2_20261015_launch.json)。
+
+| 项目 | 实际记录 |
+|---|---|
+| 合成语义 | 4096窗通过真实几何界、同seed、源不变、future不泄漏、当前准/历史错、局部异常、missing因果fill、unknown质量和物理dt相关性；实际五类19.75/19.65/34.79/20.95/4.86% |
+| 双卡smoke | `runs/twm_moe_mixed_v2_smoke_20261015_v1`，global512三次AdamW更新、12模式初始验证完成，四库与五类均参与，loss/梯度finite；峰值allocated约32.09GB/卡，非最优batch或稳态吞吐结论 |
+| smoke checkpoint | step3，模型322/AdamW963浮点张量finite，CPU完整模型hash与两rank一致 |
+| 正式启动 | 00:54:45 UTC（纽约10-14 20:54），launcher4496、ranks4501/4502，GPU0/1；独立新run从头 |
+| 正式运行快照 | 00:57:06UTC实际50步，四源累计25,600样本：Dex6320/HOT6403/Oak6425/Ume6452；loss=-0.3916746、原始grad norm1.146734，均finite |
+| 正式五类抽取 | clean5044/reanchor5160/ordinary9001/missing5098/strong1297，合计25,600；这是本次进程计数，resume后重计，不是跨checkpoint终身累计 |
+| 正式checkpoint审计 | 检查的是step10，模型322/AdamW963浮点张量finite，Adam step10，两rank完整hash与CPU一致，SHA=d4255a88873b51248d9811575fef5a70e951446e17ab9c96c2f1e7639c12be10；不混为更晚step50权重检查 |
+| W&B服务端 | [cd487764](https://wandb.ai/black-ant/handloop-twm/runs/cd487764)，state=running，已收到optimizer_step40及train/loss、grad；不是仅生成URL或offline |
+
+正式目录：`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015`。默认`ds_train_probabilistic_twm.py status`现指此新run；旧run查询须明确output。每100步checkpoint、500步验证、10步记录；私有W&B key仍只在远程600文件经child环境传入，不进入Git/config。已有正式训练在运行，不重复start。
+
+以上证明新混合数据路径和实际训练已跑通，**尚无训练后最终精度、同架构噪声消融、真实HaWoR纠错或物理正确性结果**。初始validation为step0，不能把零初始化的准确输入保持当成训练后验收。

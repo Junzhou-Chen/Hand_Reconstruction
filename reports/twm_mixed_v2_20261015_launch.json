@@ -1,0 +1,323 @@
+{
+  "ready": true,
+  "utc": "2026-10-15T00:57:06.878572+00:00",
+  "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+  "formal_run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015",
+  "launch": {
+    "pid": 4496,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/train_probabilistic_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_four_sources_moe_mixed_v2.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015",
+      "--code-version",
+      "0d83a5478bc261fe138c43b109f7621206d34e4a"
+    ],
+    "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-15T00:54:45.165104+00:00"
+  },
+  "parameters": 13530032,
+  "initialization": "from scratch",
+  "world_size": 2,
+  "global_batch_size": 512,
+  "per_gpu_batch_size": 256,
+  "config_file_sha256": "cb6134cc0335eb8eca5dee9c59bf5ad2dc1297ee5328a60fdfdfd9a6679db26a",
+  "resolved_config_sha256": "6aad46e4a4aae6454e0ed999db21035bd33c9a12322808d4fa3d551c106ff37c",
+  "corruption_profile_sha256": "6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "source_sha256": {
+    "scripts/train_probabilistic_twm.py": "c64396f33e8a11103dd610bef6a92175a2eb6e0373a9104f3c7f0a3a18157c69",
+    "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+    "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+    "src/handloop/models/probabilistic_twm.py": "032f454ed4426a0e6554f4d509b916bd8f2ef63b8f1656ae7178e52bc91c5b86",
+    "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+    "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+    "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+    "src/handloop/tracking.py": "64b11cf6de95d49cb10cfd85478e42f1ba1dde72d0764915748824af64948e65",
+    "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce"
+  },
+  "effective_stop_before_utc": "2026-10-15T16:25:00+00:00",
+  "sampling_semantics": {
+    "passed": true,
+    "utc": "2026-10-15T00:51:14.638060+00:00",
+    "torch": "2.10.0+cu130",
+    "device": "cpu",
+    "samples": 4096,
+    "profile": "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_corruption_mixed_v2.json",
+    "profile_sha256": "6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518",
+    "scope": "synthetic corruption semantics only; no accuracy claim",
+    "determinism_and_leakage": {
+      "same_seed_exact": true,
+      "source_unchanged": true,
+      "future_labels_not_inputs": true,
+      "history_not_current_dependent": true
+    },
+    "mixture": {
+      "clean_motion": {
+        "count": 809,
+        "fraction": 0.197509765625,
+        "expected": 0.2,
+        "tolerance": 0.037500000000000006
+      },
+      "current_reanchors_history": {
+        "count": 805,
+        "fraction": 0.196533203125,
+        "expected": 0.2,
+        "tolerance": 0.037500000000000006
+      },
+      "ordinary_restoration": {
+        "count": 1425,
+        "fraction": 0.347900390625,
+        "expected": 0.35,
+        "tolerance": 0.04471590006641933
+      },
+      "partial_missing": {
+        "count": 858,
+        "fraction": 0.20947265625,
+        "expected": 0.2,
+        "tolerance": 0.037500000000000006
+      },
+      "rare_local_failure": {
+        "count": 199,
+        "fraction": 0.048583984375,
+        "expected": 0.05,
+        "tolerance": 0.020432338797846908
+      }
+    },
+    "correlated_fraction": 0.501220703125,
+    "measured_geometric_extrema": {
+      "history": {
+        "max_wrist_mm": 14.999650001525879,
+        "max_root_deg": 9.998355865478516,
+        "max_finger_deg": 7.99997091293335
+      },
+      "current": {
+        "max_wrist_mm": 49.98760223388672,
+        "max_root_deg": 34.28484344482422,
+        "max_finger_deg": 24.940074920654297
+      }
+    },
+    "forced_validation_modes": {
+      "clean": true,
+      "reanchor": true,
+      "light_clean_history": true,
+      "light_noisy_history": true,
+      "medium": true,
+      "strong": true,
+      "missing": true,
+      "history_only": true,
+      "noisy": true,
+      "noisy_vs_history_only_paired_exactly": true
+    },
+    "time_correlation": {
+      "actual_direction_lag1_at_1ms": 0.9903973340988159,
+      "actual_direction_lag1_at_1s": -0.0055404407903552055,
+      "independent_noise_unchanged_except_dt_metadata": true
+    }
+  },
+  "smoke": {
+    "status": {
+      "phase": "smoke_complete",
+      "step": 3,
+      "utc": "2026-10-15T00:52:58.271923+00:00"
+    },
+    "checkpoint": {
+      "step": 3,
+      "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+      "parameters": 13530032,
+      "model_and_optimizer_finite": true,
+      "model_float_tensors": 322,
+      "adamw_float_tensors": 963,
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "model_state_sha256": "fb980fc9ce29a820527c0a058302eabff33208da91669bb0d82894b769fc7796",
+      "world_size": 2,
+      "adamw_steps": [
+        3.0
+      ]
+    },
+    "last_training_event": {
+      "utc": "2026-10-15T00:52:56.608532+00:00",
+      "phase": "training",
+      "step": 3,
+      "loss": -0.02788158692419529,
+      "restoration_loss": 0.022682461887598038,
+      "current_nll_per_dof": -2.656679153442383,
+      "forecast_nll_per_dof": -0.8358076214790344,
+      "best_trajectory_geometry_loss": 1.6559510231018066,
+      "velocity_loss": 0.024030450731515884,
+      "moe_balance_loss": 0.062048010528087616,
+      "mode_entropy": 1.3862943649291992,
+      "current_xyz_std_mm": 49.78706741333008,
+      "future_within_mode_xyz_std_mm": 100.57264709472656,
+      "future_total_xyz_std_mm": 100.67523956298828,
+      "grad_norm": 30.37248992919922,
+      "lr": 1.2000000000000002e-06,
+      "elapsed_seconds": 5.178435725159943,
+      "samples_per_second": 296.614669278831,
+      "ranks": [
+        {
+          "rank": 0,
+          "pid": 4417,
+          "device": 0,
+          "peak_allocated_gb": 32.09202176,
+          "peak_reserved_gb": 32.658948096
+        },
+        {
+          "rank": 1,
+          "pid": 4418,
+          "device": 1,
+          "peak_allocated_gb": 32.092857344,
+          "peak_reserved_gb": 32.531021824
+        }
+      ],
+      "samples_by_dataset": {
+        "dexycb": 386,
+        "hot3d": 385,
+        "oakink2": 376,
+        "umetrack": 389
+      },
+      "corruption_samples_by_case": {
+        "clean_motion": 316,
+        "current_reanchors_history": 323,
+        "ordinary_restoration": 533,
+        "partial_missing": 288,
+        "rare_local_failure": 76
+      },
+      "moe_load": {
+        "0": 0.26500585675239563,
+        "1": 0.25458991527557373,
+        "2": 0.2538498044013977,
+        "3": 0.22655442357063293
+      },
+      "wandb_url": null
+    }
+  },
+  "formal_checkpoint": {
+    "step": 10,
+    "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+    "parameters": 13530032,
+    "model_and_optimizer_finite": true,
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "model_state_sha256": "d4255a88873b51248d9811575fef5a70e951446e17ab9c96c2f1e7639c12be10",
+    "world_size": 2,
+    "adamw_steps": [
+      10.0
+    ]
+  },
+  "running_snapshot": {
+    "utc": "2026-10-15T00:57:03.369314+00:00",
+    "phase": "training",
+    "step": 50,
+    "loss": -0.39167463779449463,
+    "restoration_loss": 0.019360117614269257,
+    "current_nll_per_dof": -2.693729877471924,
+    "forecast_nll_per_dof": -1.7693817615509033,
+    "best_trajectory_geometry_loss": 1.2638905048370361,
+    "velocity_loss": 0.0233219712972641,
+    "moe_balance_loss": 0.05220671743154526,
+    "mode_entropy": 1.3858617544174194,
+    "current_xyz_std_mm": 44.628841400146484,
+    "future_within_mode_xyz_std_mm": 97.70977783203125,
+    "future_total_xyz_std_mm": 97.78623962402344,
+    "grad_norm": 1.1467337608337402,
+    "lr": 2e-05,
+    "elapsed_seconds": 67.40708547923714,
+    "samples_per_second": 379.78203356508214,
+    "ranks": [
+      {
+        "rank": 0,
+        "pid": 4501,
+        "device": 0,
+        "peak_allocated_gb": 32.095447552,
+        "peak_reserved_gb": 32.658948096
+      },
+      {
+        "rank": 1,
+        "pid": 4502,
+        "device": 1,
+        "peak_allocated_gb": 32.093466112,
+        "peak_reserved_gb": 32.531021824
+      }
+    ],
+    "samples_by_dataset": {
+      "dexycb": 6320,
+      "hot3d": 6403,
+      "oakink2": 6425,
+      "umetrack": 6452
+    },
+    "corruption_samples_by_case": {
+      "clean_motion": 5044,
+      "current_reanchors_history": 5160,
+      "ordinary_restoration": 9001,
+      "partial_missing": 5098,
+      "rare_local_failure": 1297
+    },
+    "moe_load": {
+      "0": 0.2595721483230591,
+      "1": 0.26002800464630127,
+      "2": 0.24912533164024353,
+      "3": 0.2312745451927185
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/cd487764"
+  },
+  "wandb_server": {
+    "state": "running",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/cd487764",
+    "optimizer_step": 40,
+    "train_loss": -0.28682833909988403,
+    "train_grad_norm": 1.9890708923339844
+  },
+  "initial_validation": {
+    "step": 0,
+    "modes": [
+      "noisy",
+      "missing",
+      "clean",
+      "reanchor",
+      "light_clean_history",
+      "light_noisy_history",
+      "medium",
+      "strong",
+      "history_only",
+      "legacy_noisy",
+      "legacy_missing",
+      "legacy_clean"
+    ],
+    "samples_by_source": {
+      "dexycb": 256,
+      "hot3d": 256,
+      "oakink2": 256,
+      "umetrack": 256
+    },
+    "scope": "Initialization only, not trained model quality"
+  },
+  "previous_runs": {
+    "twm_four_sources_moe_long_horizon_20261015": {
+      "phase": "stopped",
+      "step": 814,
+      "STOP": true
+    },
+    "twm_four_sources_structured_mamba_ddp_20261014": {
+      "phase": "stopped",
+      "step": 32783,
+      "STOP": true
+    }
+  },
+  "scope": "Verified startup and finite synchronized training, not final accuracy or real HaWoR correction evidence"
+}

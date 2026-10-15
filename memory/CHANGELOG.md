@@ -297,6 +297,14 @@
 - 两个只读agent独立审查混合比例、单位、质量提示与验收。建议20%全净/20%当前准历史错/35%轻中/20%缺失/5%强异常；范数有界位移与SO(3)总角、相关方向控制、默认quality unknown，GT始终未受损。具体数值为待验证工程假设，不称HaWoR标定结果。
 - 保存[§9设置与边界](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)和[版本化配置草案](../config/twm_corruption_mixed_v2_proposal.json)，标明未接trainer；未改模型架构、旧sampler或启动新实验。更新当前执行/开发/数据/决策记忆，D29启动快照转为历史。
 
+## 2026-10-15 UTC D32混合噪声实施并正式运行
+
+- 用户要求按D31当前设置跑起，授权接入与新训练；保留原13.53M架构、四库GT/split/β策略，工程选择独立新run从头，旧D29停814/旧D28停32783均保留STOP。
+- 0d83a54实现versioned bounded mixed sampler、active profile及显式配置、12条件验证、加权best与实际类别计数；没有改旧sample_batch。位移为实际范数、旋转为总角，quality unknown，GT/future不受损。原profile提案保持历史。
+- 远程4096窗语义检查通过，双卡global512三更新/12条件初始验证与CPU checkpoint审计通过；模型322/AdamW963张量finite、两rank/CPU完整hash一致。未为未改变的模型架构重复大规模概率/因果测试。
+- 00:54:45UTC正式启动新run twm_four_sources_moe_mixed_v2_20261015，launcher4496/ranks4501/4502，2卡每卡256。00:57:06UTC实际50步/25600样本、四库与五类均参与，loss/grad finite；正式审计checkpoint10 finite/两rank一致，不与运行步数混同。
+- W&B cd487764服务端state=running、optimizer_step40与train/loss/grad实际可读；私有key不打印/入Git。计划50k、16:25UTC共同保存早于Job时限，不自动新建Job。[协议及边界](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)、[小型摘要](../reports/twm_mixed_v2_20261015_launch.json)。尚无训练后最终效果或真实视觉纠错结果。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

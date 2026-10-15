@@ -181,3 +181,6 @@ D29双卡于00:36:36 UTC（纽约20:36）共同保存停止在814步，rank4039/
 配置草案：[mixed v2](../config/twm_corruption_mixed_v2_proposal.json)，显式标记`proposal_only_not_wired_to_a_trainer`。它尚未接入任何训练入口，不覆盖另一聊天的架构；接入时另建versioned profile，保留旧sample_batch默认和旧强噪验证，避免破坏D28复现。此轮没有恢复训练或新模型实验。
 
 固定validation至少分开：H准/C准、H错/C准、H准/C轻噪、H错/C轻噪、局部中噪、强异常、部分/整手缺失、移除当前输入控制。H错/C准是D28失败条件，不能被clean-clean替代。每项比较input、history-hold、restored，逐库给均值/中位数/P95、准确输入退化>1mm比例及误差分桶；未来按有效目标和0.1/0.5/1/2s对比hold/常速度。保留旧压力测试，不把换简单噪声后数字下降当模型变好。将来比较新旧sampler时须同新架构、数据和样本预算，避免和D28旧架构混为单因素结论。
+
+
+**D32执行补充：** 用户随后明确要求按上述设置跑起。现已实现[active profile](../config/twm_corruption_mixed_v2.json)与独立sampler并从头启动双卡新run，语义、真实更新、checkpoint及在线W&B验收通过；D31的proposal保留为历史。原D29/D28仍暂停，不是恢复它们。[实际配置与验收](TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)。
