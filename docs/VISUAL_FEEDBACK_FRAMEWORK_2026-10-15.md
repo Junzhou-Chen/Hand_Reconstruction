@@ -143,3 +143,47 @@ raw HaWoR本身腕95.071mm、root4.879°、finger6.808°。腕改善同时root/f
 从train扩大paired训练池并保持独立validation；补真实detector/camera输入、双手和移动相机长录制；在同数据/预算下比较插件不给历史、正常反馈、错误反馈与原HaWoR/HaWoR＋TWM；补独立joint/mesh几何与长forecast评测。小样本NLL拟合、实现等价、平滑或正常运行均不构成完整方法性能结论。
 
 设计依据：[D33讨论§11](TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)、[HaWoR官方源码](https://github.com/ThunderVVV/HaWoR/tree/66c7d4108d58a716deccd192cb7645170cdc7bd7)、[公平评测协议](HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)。
+
+## 2026-10-15：TWM真实误差适配与先验保持讨论（建议，未实施）
+
+用户进一步询问：合成受损轨迹与真实HaWoR误差分布不同，后续是否应局部或全量微调TWM。用户认为全量也可能合理，尚未指定最终解冻范围。本节是源码审计与论文对照后的建议，不改变以上D35冻结smoke事实；本轮未修改模型、训练器、权重或远程运行。
+
+### 为什么值得适配
+
+统一接口仍是99D，改变的是误差在不同方向/关节/时间上的分布，而非状态维数。真实前端可能产生深度方向偏差、跨关节相关错误、遮挡连续缺失和16帧窗口内相关误差；闭环历史还是模型自身已完成输出，与独立合成扰动也不同。这些是需由train数据核验的机制假设，不是本轮已完成的全库残差统计。应先排除单位、参考系、MANO/左右手等实现错误，不能用训练补偿格式错误。
+
+TWM是条件恢复网络，运动规律与观测可信性的处理混合在共享权重中，并没有可独立冻结的纯motion-prior子网。只改输入层/读出头限制较大；改变Mamba/MoE也会改变运动表征。参数少、低学习率、冻结专家但改router，都不是防遗忘保证。
+
+### 现有代码与参数范围
+
+以下预算来自实际mixed_v2配置及源码维度核算，不是新远程梯度实验：
+
+| TWM解冻范围 | 参数数 | 含义 |
+|---|---:|---|
+| 4个当前均值/不确定性头 | 2,570 | 当前已支持的可选current_readout模式，尚未实跑；不能代表主干适配 |
+| current_projection＋最后完整结构block/MoE＋final_norm＋4头 | 2,102,286 | 可作局部对照；会改变共享运动特征，尚无此训练scope |
+| 完整当前计算路径 | 12,652,578 | 当前NLL可连接到的路径，不保证每个参数在给定数据中均有非零梯度 |
+| 完整TWM | 13,530,032 | 另含877,454个future专属参数，需要未来训练目标 |
+
+新增视觉插件始终另有2,458,118参数。当前trainer只支持adapter/current_readout，并检查冻结梯度/hash；TWM被强制eval，HaWoR采用离线缓存且raw detach。正式解冻需显式实现参数分组、训练模式和梯度审计，不能仅改requires_grad就宣称完成。
+
+### 推荐主路线与对照
+
+正式研究倾向于允许**插件暖身后，小学习率全量TWM适配，并继续训练原motion任务**；局部解冻是过渡或同预算对照，不设永久只调2,570个头的上限。先固定HaWoR，避免同时改变数值输入源和运动网络；这不要求TWM接图像。新插件与预训练TWM使用不同学习率，具体倍数/步数由训练集和独立validation确定，不能从论文直接当最优值。13.53M规模没有因为参数量而必须优先引入LoRA的依据。
+
+正式数据应扩大至多录制/主体/动作/相机条件，并固定隔离的validation。现有63帧train、64帧val各约2.1秒，同主体、右手、固定camera、GT crop，只够smoke；完整30帧历史＋当前＋60步未来需要91个连续有效状态，现有两条短录制均不满足。重叠切窗不能创造独立动作。当前使用D32 step3110中途参考，也不能代表后续预训练最终能力。
+
+### 保持能力依靠数据和验收
+
+建议保留两类更新：真实HaWoR/反馈候选批使用最终current state NLL；纯轨迹回放批继续当前恢复及coherent长轨迹概率训练，GT仅作监督，TWM输入始终纯数值。无需默认再加平滑、teacher蒸馏、参数距离或多项物理加权loss。回放来自合法train分区，原val/test不得混入。两类批的抽样比例仍是任务权衡，必须明示并验证；不能把采样当作没有权重。若采用current＋60future联合NLL，horizon和有效state归一化也决定梯度份额，不能因只有一条公式就称无取舍。
+
+**仅回放current NLL无法主动保住长预测。** 当前D35用return_forecast=false，future专属路径没有梯度；即便打开forecast而loss仍仅current NLL，结论相同。冻结future头也不足：future依赖变化的共享表征，且直接以恢复后当前state为积分起点。当前纠偏导致未来整体移动可能是正确变化，不能把所有输出差异当遗忘。
+
+保存原预训练参考，训练工作副本；用独立集同时检查真实当前腕/joint/mesh几何、准确输入被改坏的程度、原motion恢复、未来绝对几何及相对当前的运动增量、NLL/coverage和闭环长录制漂移。能力容差在训练前按基线波动声明，以此早停/拒收/回滚。该机制仅给出有限保持集上的实证约束，不是所有运动上的数学保证。只扩大sigma也可改善严重失配时的NLL，不能取代几何改善；D35旋转退化及过度自信已说明两者需同时验收。SO(3)合法性等结构性质仍由算子保持，不等于学习到的动力学统计不会遗忘。
+
+### 官方依据与边界
+
+- [DIP全文Appendix A](https://arxiv.org/html/2508.01835v1)：模型针对性版本直接使用HaMeR预测与参考轨迹配对，支持学习真实视觉错误分布；未清楚交代从通用checkpoint继续微调及冻结协议，不能当作全量微调/防遗忘证明。
+- [PAD-Hand全文§4.1、Appendix E](https://arxiv.org/html/2603.26068v2)：使用真实WiLoR初始预测训练refiner，支持估计器误差适配；不证明本项目的partial/full选择或sigma/kappa校准。
+- [WHAM全文§3.3](https://arxiv.org/html/2312.07531v2)：AMASS合成投影/noise/mask预训练后，真实视频阶段保持图像encoder冻结，训练新integrator并微调motion encoder及motion/trajectory decoders；论文LR为新模块1e-4、预训练模块1e-5。[官方stage2数据混合源码](https://github.com/yohanshin/WHAM/blob/main/lib/data/datasets/mixed_dataset.py)仍包含AMASS，[配置](https://github.com/yohanshin/WHAM/blob/main/configs/yamls/stage2.yaml)和[optimizer分组](https://github.com/yohanshin/WHAM/blob/main/lib/utils/utils.py)支持较低LR与保留motion数据的机制。body任务与我们的99D手部恢复不同；论文30epochs与当前源码40epochs不可混称同一协议，论文比例/学习率不直接照搬。
+- [LP-FT全文](https://arxiv.org/pdf/2202.10054)：在其分类实验和受限线性理论中支持先拟合新head再全量适配；只能作为插件暖身的参考，不能外推为Mamba恢复的保证，低LR本身也非普适防遗忘定理。

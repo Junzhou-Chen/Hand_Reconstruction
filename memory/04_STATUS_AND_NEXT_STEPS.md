@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-15微调讨论，未启动新实验：** 建议正式paired数据扩大后，固定HaWoR、插件暖身，再小LR全量适配TWM并继续原motion恢复/60步分布训练；局部解冻作为对照。现有current_readout仅2,570参数，新增约2.10M局部scope/全量scope均未实现。future头冻结仍受共享特征及当前积分初值变化影响，只有current NLL回放不保护长预测。需独立几何/校准/原motion/长forecast保持验收；127帧不能决定全量优劣。用户尚未作解冻决定，本轮不改模型/权重/远程运行。[详细建议与论文依据](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md#2026-10-15twm真实误差适配与先验保持讨论建议未实施)。
+
 **D35视觉框架已搭建并验收：** 用户要求按D33搭建。官方冻结HaWoR＋2.458M反馈插件＋纯数值TWM＋最终状态跨帧反馈已实现；真实127帧缓存、官方前向/16项核心合同/缺测边界通过，独立目录用D32已停step3110副本完成3→20步与完整RGB/4×60未来接口。checkpoint395个model/216个AdamW浮点张量finite，TWM hash不变，[W&B e00b708e](https://wandb.ai/black-ant/handloop-twm/runs/e00b708e)服务端完成20步。GT crop/固定camera/same-subject仅1 train＋1 val录制；val腕95.029→65.048mm但旋转退化、coverage0，正式性能/校准/自动检测SLAM仍待验证。原D34纯轨迹训练保持。[实现文档](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[摘要](../reports/visual_feedback_framework_20261015.json)。
 
 更新日期：2026-10-15 UTC（纽约10-14）。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
