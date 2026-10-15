@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-15 20:24UTC：按用户要求完成12篇损失/训练协议与关键官方实现对照，纠正“主流都单loss”“StableHand单FM”“WestWorld为MoE balance背书”等潜在误读。建议概率主线＋同架构逐项辅助/初值梯度消融，生成路线另需采样及可靠性接口重设；全部标未采纳/未实施，D37原配置保持，未添加新损失或运行实验。[完整调研](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
+
 2026-10-15 20:09UTC：用户要求专项查看未来预测。D37完整验证5000，腕0.1/0.5/1/2s相对hold改善35.6/25.5/14.2/1.2%；2s仅三源，HOT/Ume退化，干净输入亦仅改善3.7%，low_motion比hold差。新增只读forecast汇总/绘图脚本，核宏平均与时域counts，所有分析远程CPU；报告ADE/oracle加权差异、逐轴coverage与宽区间、多模态未证实和非闭环边界，训练继续。[专项报告](../docs/TWM_FORECAST_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_forecast_progress_20261015_2012.json)。
 
 2026-10-15 19:48UTC：D37只读效果检查，运行4,700/10k、完整验证4,500。普通腕4.652→3.331mm/位置四帧6.520→5.244mm，3.5k→4.5k score下降32.9%；clean0→0.884mm且30.66% >1mm退化、近准当前/错误历史0.267→1.471mm，仍有失败。14模式candidate跨验证不变及等源聚合通过，修复reviewer漏读forecast NLL/漏收模式/续跑initial时间边界，远程CPU汇总绘图；不改训练。[结果](../docs/TWM_TRANSIENT_10K_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_transient_v3_progress_20261015_1944.json)。
