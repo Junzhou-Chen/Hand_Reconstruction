@@ -1,0 +1,215 @@
+{
+  "profile": "transient_motion_restoration_v3",
+  "status": "active",
+  "architecture_independent": true,
+  "target_policy": "All current and future targets remain uncorrupted source reference trajectories",
+  "amplitude_convention": "event peak actual norm/angle within severity band; ramp instantaneous amplitude can be below peak lower bound; other groups/frames clean or <=1mm/degree; no additive full errors",
+  "levels": {
+    "clean": {
+      "translation_norm_mm": [
+        0,
+        0
+      ],
+      "root_angle_deg": [
+        0,
+        0
+      ],
+      "finger_angle_deg": [
+        0,
+        0
+      ]
+    },
+    "near": {
+      "translation_norm_mm": [
+        0,
+        1
+      ],
+      "root_angle_deg": [
+        0,
+        1
+      ],
+      "finger_angle_deg": [
+        0,
+        1
+      ]
+    },
+    "light": {
+      "translation_norm_mm": [
+        1,
+        6
+      ],
+      "root_angle_deg": [
+        0,
+        4
+      ],
+      "finger_angle_deg": [
+        0,
+        3
+      ]
+    },
+    "medium": {
+      "translation_norm_mm": [
+        6,
+        15
+      ],
+      "root_angle_deg": [
+        3,
+        10
+      ],
+      "finger_angle_deg": [
+        2,
+        8
+      ]
+    },
+    "strong": {
+      "translation_norm_mm": [
+        20,
+        50
+      ],
+      "root_angle_deg": [
+        10,
+        35
+      ],
+      "finger_angle_deg": [
+        8,
+        25
+      ]
+    }
+  },
+  "amplitude_sampling": "Uniform radius/angle within selected range; isotropic random direction; group rotations composed on SO(3)",
+  "window_cases": [
+    {
+      "name": "clean_motion",
+      "probability": 0.2,
+      "current_levels": {
+        "clean": 1.0
+      },
+      "history_levels": {
+        "clean": 1.0
+      }
+    },
+    {
+      "name": "current_reanchors_history",
+      "probability": 0.2,
+      "current_levels": {
+        "clean": 0.5,
+        "near": 0.5
+      },
+      "history_levels": {
+        "medium": 1.0
+      }
+    },
+    {
+      "name": "ordinary_restoration",
+      "probability": 0.35,
+      "current_levels": {
+        "light": 0.5,
+        "medium": 0.5
+      },
+      "history_levels": {
+        "clean": 0.3333333333333333,
+        "light": 0.3333333333333333,
+        "medium": 0.3333333333333333
+      },
+      "severity_relation": "independent history/current draws"
+    },
+    {
+      "name": "partial_missing",
+      "probability": 0.2,
+      "current_levels": {
+        "near": 0.5,
+        "light": 0.5
+      },
+      "history_levels": {
+        "light": 0.5,
+        "medium": 0.5
+      },
+      "missing_cases": {
+        "one_whole_finger": 0.7,
+        "one_to_three_state_groups": 0.2,
+        "whole_current_hand": 0.1
+      },
+      "candidate_fill": "causal previous completed history only"
+    },
+    {
+      "name": "rare_local_failure",
+      "probability": 0.05,
+      "current_levels": {
+        "light": 1.0
+      },
+      "history_levels": {
+        "light": 0.5,
+        "medium": 0.5
+      },
+      "strong_override": {
+        "wrist_translation_and_root": 0.5,
+        "one_or_two_fingers": 0.5
+      }
+    }
+  ],
+  "temporal_noise": {
+    "process": "window-local jitter, fixed-vector plateau, ramp or scattered events; one to four frames; current covers onset/continuation and reanchor covers recovery",
+    "limitations": "events are redrawn across independently sampled overlapping windows, not recording-persistent or learned rollout errors"
+  },
+  "quality": {
+    "default": "unknown_for_available_state_groups",
+    "unknown_value": -1,
+    "availability_is_separate": true,
+    "oracle_quality": "optional separately labeled ablation only; not the default condition"
+  },
+  "source_sampling": "retain current four-source split and sampling; no new images required",
+  "evaluation": {
+    "fixed_cases": [
+      "clean_history_clean_current",
+      "noisy_history_clean_current",
+      "clean_history_light_current",
+      "noisy_history_light_current",
+      "noisy_history_medium_or_local_current",
+      "rare_strong_current",
+      "partial_and_whole_missing",
+      "history_only_control"
+    ],
+    "retain_legacy_stress_profile": true,
+    "paired_corruption_seed": true,
+    "metrics": [
+      "input_hold_output_wrist_mm_root_deg_finger_deg",
+      "median_and_p95_by_source",
+      "wrist_degradation_over_1mm",
+      "input_severity_bins",
+      "current_removal_effect",
+      "forecast_per_horizon_with_valid_counts"
+    ]
+  },
+  "limitations": [
+    "Mixture, durations, amplitudes and feature scale are engineering hypotheses, not fitted to HaWoR",
+    "No future observations or oracle event/quality labels fed to model",
+    "References remain fitted MANO; not independent physical ground truth",
+    "Window-local error process is not a closed-loop deployment distribution"
+  ],
+  "execution_policy": "Explicitly selected by a fresh training run; old checkpoints/runs remain preserved",
+  "version": 3,
+  "events": {
+    "pattern_probabilities": [
+      0.3,
+      0.45,
+      0.15,
+      0.1
+    ],
+    "duration_probabilities": [
+      0.15,
+      0.15,
+      0.35,
+      0.35
+    ],
+    "spatial_probabilities": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ],
+    "jitter_frame_probability": 0.3,
+    "medium_probability": 0.4,
+    "near_background_probability": 0.5
+  },
+  "window_cases_description": "Only case names/probabilities and range table inherited from v2; v3 ignores legacy current/history level draws, missing_cases and strong_override. Reanchor: event ends 1..4 frames before current; other nonclean cases current in event."
+}

@@ -1,5 +1,7 @@
 # 开发、GitHub同步和远程实验约定
 
+**D36执行中（2026-10-15）：** 用户要求修复短时噪声及相关问题并重跑，按2个epoch、可中停。旧D34已于06:28:48UTC保存停止5,519步，322个model/963个AdamW浮点张量finite且CPU/两rank hash一致。新增window-local事件增广、因果缺失填充、encoder-only位置尺度0.05m，以及完整覆盖epoch/cursor；每轮636,610窗、双卡每卡512、622更新。新源码待远程语义/DDP/续跑验收，尚未宣称启动或精度改善；默认全遍历改变旧等源采样权重，比例/尺度仍为假设。[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。
+
 **2026-10-15腕位置只读诊断：** 原Pod/GPU1额外约3.88GB峰值，冻结D34 checkpoint4400、32个val窗扰动/梯度探测，无optimizer/参数变更，正式run继续。独立`evaluations/twm_wrist_diagnosis_20261015/training_code_7d53fa4`由Git archive导出并匹配原metadata source SHA；未用D35改过的模型诊断D34。[结果和产物](../docs/TWM_WRIST_DIAGNOSIS_2026-10-15.md)。
 
 **最新D34：每卡512、global1024，从头训练10,000步。** 用户要求检查约3k步曲线并加大batch重新跑；D32已于02:02:24UTC共同保存停止3,110步，latest/best原件及额外快照保留，模型/AdamW finite、CPU与两rank hash一致。新run `twm_four_sources_moe_mixed_v2_b512_10k_20261015` 以7d53fa4于02:09:50UTC在原GPU0/1从头启动；02:12:13UTC验收实际20步/20,480样本、四库与五类均参与，W&B12cc0781服务端step20已收到标量。正式checkpoint10的322个model/963个AdamW浮点张量finite、两rank与CPU一致；当时每卡峰值allocated约63.9GB。保留13.53M架构、四库GT/split和mixed_v2；LR2e-4/warmup500不变，cosine改10k结束。旧1k→3k加权恢复score0.02225→0.01281、finger3.22→1.77°仍改善，但腕位置输出7.21mm未优于输入7.16mm，不能保证仅加步数解决。10k是目标、非完成；本轮不改D33视觉方案。 [运行与操作](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[摘要](../reports/twm_batch512_10k_20261015.json)。默认`ds_train_probabilistic_twm.py status/stop`现指D34，查旧run须显式`--output`；16:25UTC共同保存，原Job不重建，不重复start。

@@ -184,3 +184,6 @@ D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption
 实现/接入使用既有DexYCB subject01、camera836212060125、right手，s0 train录制20200709_141754的63帧、val录制20200709_142123的64帧，先recording分割后切窗，未读test。RGB为原JPEG640×480，reference复用已审计的fitted MANO/腕J0；GT joint投影crop，固定camera gauge/metres，nominal frame_id/30而非实测timestamp。角色是paired视觉适配smoke，不改变四库pure-motion训练池/精度优先原则，也不是HaWoR原论文全量复现。
 
 真实官方HaWoR post-IAM缓存、14项NPY/record的SHA/bytes、recording不泄漏、mmap和tail masks通过；source/cache及权重hash详见[报告](../reports/visual_feedback_framework_20261015.json)。默认clip32，val64全部完整参考帧进入单current NLL；腕为未对齐J0欧氏mm，root/finger为SO(3)测地角，raw指标另外按原availability计数，缺测不记零误差。20步正常反馈val腕65.048mm（旁路95.029）但root5.856°/finger8.493°（旁路4.936/6.779）退化，xyz90%coverage0。推理隐藏插件历史不是独立重训消融，不能宣称公平因果收益。未来4×60只验有限性与接口，未验新候选分布下预测精度；真正detector/移动相机/双手/长录制与独立几何评测仍待完成。
+
+
+**2026-10-15短时漂移审计与D36：** 原5000步冻结模型，64条val（每源16）上单帧30mm→29.913mm、block4→29.972mm；因果五帧外推单帧3.327mm但clean3.119mm且block4为28.097mm。带oracle边界和未来的插值block4=2.182mm仅说明离线空间，不是公平在线结果。4096旧sampler窗在>6mm无历史3/4 enclosed run，但>10mm存在1419窗，不能泛称没见过短异常。确认缺口为显式可靠前缀—持续局部误差—恢复事件，非全局常数解释全部；[证据](../docs/TWM_TRANSIENT_DRIFT_AUDIT_2026-10-15.md)。用户随后授权v3修复＋两轮：GT/split/单位不变，完整遍历改变source权重，预期622updates/epoch；具体检查/启动待执行，[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。

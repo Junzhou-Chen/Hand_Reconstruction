@@ -18,6 +18,7 @@ Final-state reliability is NOT predicted by this minimal baseline.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Optional
 
@@ -37,6 +38,7 @@ class TWMConfig:
     dropout: float = 0.1
     forecast_horizon: int = 1
     translation_scale: float = 0.1  # metres per unit restoration head output
+    position_feature_scale: float = 1.0  # metres per encoder feature unit; legacy default
     rotation_scale: float = 0.5     # radians per unit restoration head output
     check_finite: bool = True
     mamba_state_size: int = 64
@@ -68,6 +70,8 @@ class TWM(nn.Module):
             raise ValueError("num_layers >= 1 and forecast_horizon >= 0 required")
         if c.backbone not in ("flat_transformer", "structured_mamba"):
             raise ValueError(f"Unknown backbone: {c.backbone}")
+        if not math.isfinite(c.position_feature_scale) or c.position_feature_scale <= 0:
+            raise ValueError("position_feature_scale must be finite and positive")
         # Geometry9 + availability2 + quality2 + quality-known2.
         self.history_projection = nn.Linear(15, c.d_model)
         # raw9 + candidate9 + raw-mask2 + candidate-mask2 + quality2 + known2.
@@ -137,7 +141,7 @@ class TWM(nn.Module):
         self._finite(clean, "state")
         clean = normalize_state(clean)
         token_p = torch.zeros(*clean.shape[:-1], 16, 3, device=clean.device)
-        token_p[..., 0, :] = clean[..., :3]
+        token_p[..., 0, :] = clean[..., :3] / self.config.position_feature_scale
         return torch.cat((token_p, clean[..., 3:].reshape(*clean.shape[:-1], 16, 6)), -1), clean
 
     def _quality(self, quality: Optional[Tensor], availability: Tensor) -> tuple[Tensor, Tensor]:

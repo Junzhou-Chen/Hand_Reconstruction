@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**D36执行中（2026-10-15）：** 用户要求修复短时噪声及相关问题并重跑，按2个epoch、可中停。旧D34已于06:28:48UTC保存停止5,519步，322个model/963个AdamW浮点张量finite且CPU/两rank hash一致。新增window-local事件增广、因果缺失填充、encoder-only位置尺度0.05m，以及完整覆盖epoch/cursor；每轮636,610窗、双卡每卡512、622更新。新源码待远程语义/DDP/续跑验收，尚未宣称启动或精度改善；默认全遍历改变旧等源采样权重，比例/尺度仍为假设。[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。
+
 **D34腕位置原因诊断（纽约2026-10-15 01:37；建议未实施）：** 在原7d53fa4源码快照、冻结checkpoint4,400上做四库各8窗只读扰动/梯度检查；模型/buffer前后相等，无optimizer，原10k继续（05:37UTC实际4,450步）。位置平均更新0.562mm，当前raw/candidate额外±10mm时残差平均反向响应仅0.005–0.034mm；FP32仍近似相同，属于很弱的位置纠错输入依赖，不是head/监督断开。current geometry位置头梯度norm0.411；weighted future geometry0.459，future NLL0.232且与current cosine−0.204，仅支持小样本牵制迹象。优先怀疑米单位位置未做feature尺度归一化、clean/near保护下identity策略和future直接经current均值回传；共同位置bias另有不可辨识边界，但不解释独立噪声全部失败。位置归一化/current-only是待验单因素建议，本轮未改训。 [证据、边界与建议](../docs/TWM_WRIST_DIAGNOSIS_2026-10-15.md)、[诊断JSON](../reports/twm_wrist_diagnosis_20261015.json)。
 
 **2026-10-15微调讨论，未启动新实验：** 建议正式paired数据扩大后，固定HaWoR、插件暖身，再小LR全量适配TWM并继续原motion恢复/60步分布训练；局部解冻作为对照。现有current_readout仅2,570参数，新增约2.10M局部scope/全量scope均未实现。future头冻结仍受共享特征及当前积分初值变化影响，只有current NLL回放不保护长预测。需独立几何/校准/原motion/长forecast保持验收；127帧不能决定全量优劣。用户尚未作解冻决定，本轮不改模型/权重/远程运行。[详细建议与论文依据](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md#2026-10-15twm真实误差适配与先验保持讨论建议未实施)。

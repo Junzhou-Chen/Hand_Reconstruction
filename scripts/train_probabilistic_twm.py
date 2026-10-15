@@ -28,8 +28,10 @@ from torch.utils.data import DataLoader, Subset
 from train_twm import atomic_json, sample_batch, utc
 from handloop import geometry as g
 from handloop.data.trajectory import SourceBalancedSampler
+from handloop.data.epoch_sampling import CoverageEpochSampler
 from handloop.data.forecast_trajectory import ForecastTrajectoryWindows
 from handloop.data.corruption import sample_mixed_batch
+from handloop.data.temporal_corruption import sample_temporal_batch
 from handloop.models.probabilistic_twm import (
     ProbabilisticTWM, ProbabilisticTWMConfig,
     current_distribution_log_prob, forecast_distribution_log_prob,
@@ -49,7 +51,8 @@ def prepare_batch(batch, generator, mode='mixed', *, condition_on_beta=False,
     # Its full-GT guard must not mistake padding for partial MANO supervision.
     checked = {key:value for key,value in batch.items() if key != 'future_gt_mask'}
     if corruption_profile is not None and not mode.startswith('legacy_'):
-        return sample_mixed_batch(checked, generator, mode,
+        sampler_fn = sample_temporal_batch if corruption_profile.get("version") == 3 else sample_mixed_batch
+        return sampler_fn(checked, generator, mode,
             condition_on_beta=condition_on_beta, profile=corruption_profile,
             return_diagnostics=return_diagnostics)
     legacy_mode = mode.removeprefix('legacy_')
@@ -296,8 +299,9 @@ def main():
     manifest_hash = hashlib.sha256(args.manifest.read_bytes()).hexdigest()
     if args.resume:
         checkpoint = torch.load(args.resume,map_location='cpu',weights_only=False)
-        if checkpoint['config']!=config or checkpoint['run']['manifest_sha256']!=manifest_hash or checkpoint['run']['world_size']!=world:
-            raise ValueError('Resume requires unchanged configuration, source manifests and world size')
+        # Derived epoch schedule is checked after the dataset has been loaded.
+        if checkpoint['run']['manifest_sha256']!=manifest_hash or checkpoint['run']['world_size']!=world:
+            raise ValueError('Resume requires unchanged manifests and world size')
         model.load_state_dict(checkpoint['model'],strict=True); optimizer.load_state_dict(checkpoint['optimizer'])
         start_step,best = checkpoint['step'],checkpoint['best_validation_loss']
     ddp = DDP(model,device_ids=[local_rank],output_device=local_rank,broadcast_buffers=False,gradient_as_bucket_view=True)
@@ -308,8 +312,20 @@ def main():
     if set(train.dataset_names)!=set(config['required_datasets']): raise ValueError('Required training sources differ')
     if any(train.windows_by_dataset[name]<1 for name in config['required_datasets']):
         raise ValueError('Every required source needs usable train windows')
-    sampler = SourceBalancedSampler(train,num_samples=config['steps']*local_batch,seed=seed)
-    loader = DataLoader(train,batch_size=local_batch,sampler=sampler,num_workers=0,pin_memory=True,drop_last=True,
+    epoch_training=config.get('training_unit')=='epoch'
+    steps_per_epoch=None
+    if epoch_training:
+        if not isinstance(config['epochs'],int) or config['epochs']<1: raise ValueError('Positive integer epochs required')
+        sampler=CoverageEpochSampler(train,replicas=world,rank=rank,seed=config['seed'],batch_size=local_batch)
+        steps_per_epoch=math.ceil(len(sampler)/local_batch)
+        config['steps']=config['epochs']*steps_per_epoch
+        config['warmup_steps']=max(1,math.ceil(config['warmup_epochs']*steps_per_epoch))
+        config['eval_every']=max(1,math.ceil(config['eval_every_epochs']*steps_per_epoch))
+    else:
+        sampler=SourceBalancedSampler(train,num_samples=config['steps']*local_batch,seed=seed)
+    if checkpoint and checkpoint['config']!=config:
+        raise ValueError('Resume requires unchanged resolved configuration')
+    loader = DataLoader(train,batch_size=local_batch,sampler=sampler,num_workers=0,pin_memory=True,drop_last=not epoch_training,
                         generator=torch.Generator().manual_seed(seed))
     loaders = {}
     if rank==0:
@@ -336,18 +352,21 @@ def main():
            'train_windows_by_dataset':train.windows_by_dataset,'initialization':'resume' if args.resume else 'from scratch',
            'train_forecast_contract':train.forecast_contract,
            'rotation6d':g.ROTATION_6D_CONVENTION,'position_units':'metres in noisy-history wrist anchor frame',
-           'sampling':'equal source then uniform windows, independent rank RNG, with replacement',
+           'sampling':('full shuffled coverage, disjoint rank shards, no dropped final batch' if epoch_training else 'equal source then uniform windows, independent rank RNG, with replacement'),
+           'epoch_schedule':({'epochs':config['epochs'],'windows_per_epoch':len(train),'steps_per_epoch':steps_per_epoch,
+                              'ddp_padding_per_epoch':sampler.total_size-len(train)} if epoch_training else None),
            'GT':'source fitted MANO references; unchanged recording-disjoint four-source splits; no test labels',
            'beta_conditioning':config['condition_on_beta'],'future_targets':'next up to 60 contiguous source frames, mask tails/gaps; physical timestamps',
            'scope':'synthetic corruption pure-motion current restoration and multi-modal trajectory forecast; no visual correction evidence yet',
-           'resume_limit':'rank RNG saved; sampler prefetched chunks/loader cursor not bitwise replay',
+           'resume_limit':('deterministic epoch permutation and batch cursor; num_workers=0; rank RNG restored' if epoch_training else 'rank RNG saved; sampler prefetched chunks/loader cursor not bitwise replay'),
            'likelihood':'xyz diagonal Gaussian in m; isotropic matrix Fisher on SO3 normalized Haar; trajectory-wide categorical mixture'}
     source_root=Path(__file__).resolve().parents[1]
     run['source_sha256']={name:hashlib.sha256((source_root/name).read_bytes()).hexdigest() for name in (
         'scripts/train_probabilistic_twm.py','scripts/train_twm.py','src/handloop/geometry.py',
         'src/handloop/models/probabilistic_twm.py','src/handloop/models/structured_mamba.py',
         'src/handloop/data/trajectory.py','src/handloop/data/forecast_trajectory.py','src/handloop/tracking.py',
-        'src/handloop/data/corruption.py')}
+        'src/handloop/data/corruption.py','src/handloop/data/temporal_corruption.py',
+        'src/handloop/data/epoch_sampling.py','src/handloop/models/twm.py')}
     tracker = WandbTracker(config=config['tracking'],output_dir=args.output,metadata=run,rank=rank,resume=bool(args.resume))
     if rank==0:
         run.update(wandb=tracker.metadata,val_windows_by_dataset=val.windows_by_dataset,
@@ -355,6 +374,14 @@ def main():
                    val_samples_by_dataset={name:len(item.dataset) for name,item in loaders.items()})
         atomic_json(args.output/'run_metadata.json',run); print(json.dumps(run),flush=True)
     checkpoint = None
+
+    def progress(step):
+        if not epoch_training: return {}
+        completed,within=divmod(step,steps_per_epoch)
+        seen=completed*sampler.total_size+min(within*config['batch_size'],sampler.total_size)
+        return {'epoch_progress':completed+min(within*config['batch_size']/sampler.total_size,1.),
+                'completed_epochs':completed,'target_epochs':config['epochs'],'windows_seen':seen,
+                'updates_per_epoch':steps_per_epoch,'batch_in_epoch':within}
 
     def save(step,best_checkpoint=False):
         digest=hashlib.sha256()
@@ -370,7 +397,8 @@ def main():
             atomic_json(args.output/'replica_checkpoint_audit.json',{'utc':utc(),'step':step,'byte_equal':True,'sha256':digest.hexdigest()})
             path=args.output/('best.pt' if best_checkpoint else 'latest.pt'); tmp=path.with_suffix('.pt.tmp')
             torch.save({'step':step,'model':model.state_dict(),'optimizer':optimizer.state_dict(),'config':config,
-                        'code_version':args.code_version,'best_validation_loss':best,'rank_states':states,'run':run},tmp)
+                        'code_version':args.code_version,'best_validation_loss':best,'rank_states':states,'run':run,
+                        'progress':progress(step)},tmp)
             tmp.replace(path)
         dist.barrier()
 
@@ -385,19 +413,23 @@ def main():
                 raise ValueError('Best-checkpoint validation weights must be a probability mixture')
             score=sum(weight*values[mode]['restoration_loss'] for mode,weight in selection.items())
             if score<best: best=score; decision.fill_(1)
-            event={'utc':utc(),'step':step,'validation':values,'best_validation_loss':best}
+            event={'utc':utc(),'step':step,**progress(step),'validation':values,'best_validation_loss':best}
             atomic_json(args.output/('initial_validation.json' if initial else 'latest_validation.json'),event)
-            tracker.log(flatten_numbers(values,'validation'),step=step)
+            tracker.log({**flatten_numbers(values,'validation'),**progress(step)},step=step)
             print(json.dumps(event),flush=True)
         dist.broadcast(decision,0)
         best_value=torch.tensor(best,device=device,dtype=torch.float64); dist.broadcast(best_value,0); best=best_value.item()
         if decision.item(): save(step,True)
         model.train(); return values
 
+    if epoch_training:
+        sampler.set_epoch(start_step//steps_per_epoch); sampler.batch_cursor=start_step%steps_per_epoch
     latest_val=validate(start_step,True); save(start_step)
     iterator=iter(loader); step=start_step; start=time.monotonic()
     sampled=torch.zeros(len(train.dataset_names),device=device,dtype=torch.long)
     corruption_counts=torch.zeros(5,device=device,dtype=torch.long)
+    pattern_counts=torch.zeros(4,device=device,dtype=torch.long)
+    spatial_counts=torch.zeros(4,device=device,dtype=torch.long)
     end_step=min(config['steps'],start_step+args.stop_after_updates) if args.stop_after_updates else config['steps']
     while step<end_step:
         stopping=torch.tensor(int(stop['requested'] or (args.output/'STOP').exists() or
@@ -405,7 +437,10 @@ def main():
         dist.all_reduce(stopping,op=dist.ReduceOp.MAX)
         if stopping.item(): stop['requested']=True; break
         try: batch=next(iterator)
-        except StopIteration: iterator=iter(loader); batch=next(iterator)
+        except StopIteration:
+            if epoch_training:
+                sampler.set_epoch(step//steps_per_epoch); sampler.batch_cursor=0
+            iterator=iter(loader); batch=next(iterator)
         batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
         sampled+=torch.bincount(batch['dataset_id'],minlength=len(train.dataset_names))
         prepared,diagnostics=prepare_batch(batch,generator,condition_on_beta=config['condition_on_beta'],
@@ -413,7 +448,11 @@ def main():
         history,raw,candidate,kwargs,target,future=prepared
         if 'case_id' in diagnostics:
             corruption_counts+=torch.bincount(diagnostics['case_id'],minlength=5)
+        if 'pattern_id' in diagnostics:
+            pattern_counts+=torch.bincount(diagnostics['pattern_id'],minlength=4)
+            spatial_counts+=torch.bincount(diagnostics['spatial_id'],minlength=4)
         step+=1
+        if epoch_training: sampler.batch_cursor=(step-1)%steps_per_epoch+1
         multiplier=step/config['warmup_steps'] if step<=config['warmup_steps'] else .1+.9*.5*(1+math.cos(math.pi*(step-config['warmup_steps'])/max(1,config['steps']-config['warmup_steps'])))
         for group in optimizer.param_groups: group['lr']=config['learning_rate']*multiplier
         optimizer.zero_grad(set_to_none=True)
@@ -428,6 +467,8 @@ def main():
             dist.all_reduce(scalars); scalars/=world
             counts=sampled.clone(); dist.all_reduce(counts)
             case_counts=corruption_counts.clone(); dist.all_reduce(case_counts)
+            patterns=pattern_counts.clone(); dist.all_reduce(patterns)
+            spatials=spatial_counts.clone(); dist.all_reduce(spatials)
             loads=output['moe_load'].detach().float(); dist.all_reduce(loads); loads/=world
             local={'rank':rank,'pid':os.getpid(),'device':local_rank,
                    'peak_allocated_gb':torch.cuda.max_memory_allocated(device)/1e9,
@@ -435,23 +476,25 @@ def main():
             ranks=[None]*world; dist.all_gather_object(ranks,local)
             if rank==0:
                 elapsed=time.monotonic()-start
-                event={'utc':utc(),'phase':'training','step':step,**dict(zip(keys,scalars[:-1].cpu().tolist())),
+                event={'utc':utc(),'phase':'training','step':step,**progress(step),**dict(zip(keys,scalars[:-1].cpu().tolist())),
                        'grad_norm':float(scalars[-1]),'lr':optimizer.param_groups[0]['lr'],'elapsed_seconds':elapsed,
-                       'samples_per_second':(step-start_step)*config['batch_size']/elapsed,'ranks':ranks,
+                       'samples_per_second':int(counts.sum())/elapsed,'ranks':ranks,
                        'samples_by_dataset':dict(zip(train.dataset_names,counts.cpu().tolist())),
                        'corruption_samples_by_case':dict(zip(
                            ('clean_motion','current_reanchors_history','ordinary_restoration','partial_missing','rare_local_failure'),
                            case_counts.cpu().tolist())),
+                       'temporal_samples_by_pattern':dict(zip(('jitter','plateau','ramp','scattered'),patterns.cpu().tolist())),
+                       'spatial_samples_by_pattern':dict(zip(('translation_only','wrist_pose','fingers','whole_hand'),spatials.cpu().tolist())),
                        'moe_load':{str(i):float(value) for i,value in enumerate(loads)},'wandb_url':tracker.url}
                 atomic_json(args.output/'status.json',event)
                 with (args.output/'metrics.jsonl').open('a') as stream: stream.write(json.dumps(event)+'\n')
                 tracker.log(flatten_numbers(event,'train'),step=step); print(json.dumps(event),flush=True)
-        if step%config['eval_every']==0: latest_val=validate(step)
-        if step%config['save_every']==0 or step==start_step+config['log_every']: save(step)
+        if step%config['eval_every']==0 or (epoch_training and step%steps_per_epoch==0): latest_val=validate(step)
+        if step%config['save_every']==0 or step==start_step+config['log_every'] or (epoch_training and step%steps_per_epoch==0): save(step)
     save(step)
     if rank==0:
         phase='stopped' if stop['requested'] else ('smoke_complete' if args.stop_after_updates else 'complete')
-        atomic_json(args.output/'status.json',{'utc':utc(),'step':step,'phase':phase,'best_validation_loss':best,
+        atomic_json(args.output/'status.json',{'utc':utc(),'step':step,'phase':phase,**progress(step),'best_validation_loss':best,
                     'wandb_url':tracker.url,'validation':latest_val})
         tracker.finish()
     dist.destroy_process_group()

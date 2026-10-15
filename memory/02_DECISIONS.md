@@ -48,6 +48,8 @@
 | D34 | 检查当前约3k步收敛；batch翻倍为每卡512/global1024，独立从头训练10,000步 | 纽约2026-10-14用户明确要求，仅替代D32训练执行配置，不替代D33视觉方向。旧D32于02:02:24.032654UTC保存停止3,110步，latest与best均保留、额外快照SHA一致，模型/AdamW有限且CPU完整模型hash与两rank一致。旧1k→3k实际加权恢复score下降0.022255→0.012810，但noisy腕7.210mm仍高于input7.158mm，不能称全面收敛。7d53fa4a1b14f31e08f41ba545556e59adadd31f新配置保留模型、GT/split、mixed_v2、LR2e-4/warmup500，cosine终点改10k，目标10.24M样本抽取；02:12:13.931674UTC新run实际20步/20,480样本，独立检查checkpoint10有限且CPU与两rankhash一致，W&B12cc0781服务器step20同步。启动验收通过，不当10k完成或真实HaWoR收益。[执行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[本轮摘要](../reports/twm_batch512_10k_20261015.json)。 |
 | D35 | 按D33视觉反馈方案搭建完整首版框架并作必要验收 | 纽约2026-10-14用户明确要求“尝试搭建出来这个完整的框架”。已实现冻结HaWoR读出插件→纯数值TWM→最终状态跨帧反馈、单一current NLL、缓存/训练/保存续跑/RGB track入口；原主干冻结、每帧一次。网络尺寸/clip32/20步为工程起点。真实127帧、官方等价、16项合同、3→20步及RGB/60步接口验收通过；GT crop/固定camera小样本中腕改善但旋转退化、coverage0，非正式性能结论。D34纯轨迹run不改，未永久决定删除所有Corrector对照或新增自动SLAM。[实现与记录](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[摘要](../reports/visual_feedback_framework_20261015.json)。 |
 
+| D36 | 修复短时噪声生成及相关问题，重新运行；预算改为2个epoch，可中途保存停止 | 2026-10-15用户明确要求。D34已保存停止5,519步，旧checkpoint/STOP保留，替代继续10k安排。工程实现：window-local局部plateau/ramp/scattered/jitter＋因果缺失填充，encoder位置尺度0.05m，完整遍历636,610窗/epoch（可选均衡口径已询问，默认全遍历），每卡512。比例/幅度/尺度为待验证工程假设；D35框架不改，尚不能声称精度改善。[运行协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。 |
+
 ## 已替代的历史路线
 
 | 历史方案 | 当前处理 | 替代依据 |
