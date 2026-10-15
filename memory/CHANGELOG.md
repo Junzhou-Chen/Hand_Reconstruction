@@ -285,6 +285,11 @@
 - W&B0.30.0实际在线；默认团队yc-node及个人空间403，定位black-ant后新建独立handloop-twm成功。用户新key验证后仅存远程600私有文件、child环境传入，不改旧netrc、不进入Git/config/receipt。正式run [943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)；每100步保存/500步val/10步log，16:25UTC共同保存早于Job到期，不自动重建Job。
 - 保存[设计、概率推导及运行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)与[小型启动JSON](../reports/twm_moe_long_horizon_20261015.json)，更新方法/决策/进展/开发记忆与AGENTS。时域/模式/权重为工程起点，无新模型最终精度或真实视觉闭环结果；D28当前可靠观测利用不足仍须新实验复查。
 
+## 2026-10-14纽约 D30 HaWoR错误分布与corruption校准目标
+
+- 用户强调纠错应模拟现有HaWoR的错误；记录为分布匹配目标，具体噪声幅度/比例与训练执行调整未定。核实D29调用旧sample_batch，当前与历史噪声强弱悬殊、quality独立，不能假定新架构已解决D28历史主导。
+- 对照PAD-Hand真实WiLoR配对、DIP通用与特定前端训练、StableHand质量增广、HaWoR连续mask，补[直接恢复讨论§8](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#8-2026-10-14corruption应贴近hawor实际误差)及决策/数据/进展记忆。明确每轴σ≠平均欧氏误差≠PA/W-MPJPE、排除最终评测集拟合、当前准/历史错、部件与时间相关性和oracle质量边界。无新模型实验或run变更。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。
