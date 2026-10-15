@@ -1,4 +1,4 @@
-# D34：HaWoR视觉反馈框架实现与验收
+# D35：HaWoR视觉反馈框架实现与验收
 
 日期：2026-10-15 UTC（纽约10-14）。用户在D33讨论后明确要求“尝试搭建出来这个完整的框架”，授权本轮实现和必要的远程验收。具体网络尺寸、20步smoke预算和优化器设置是工程起点，不是最优配置。正式效果验证与完整自动视频前端分开记录。
 
@@ -12,6 +12,8 @@
 - 99D为真实腕J0 p3＋16个absolute/local旋转的column6D；β另存。51D残差通过SO(3)复合，不逐元素相加6D。左右手共享参数、显式handedness。
 - 每帧使用上一完成腕为固定anchor；无历史时用可用raw暖启动。历史默认30帧、帧间detach，显式reset/身份变化/超过0.25秒gap清对应track；padding不提交。未知质量不冒充1，σ/κ只作分布描述。
 - 当前mean/std/κ来自同一次TWM读出。NLL在anchor内计算，另外输出world mean与完整平移covariance；不能把anchor对角std直接当world对角std。未来保留4模式×60步和对应world covariance，mode由预测概率选择，不用GT选mode。
+
+这里world covariance仅把当前条件Gaussian从anchor旋转到world，未传播anchor/SLAM误差或模型认知不确定性；不是完整世界状态后验的校准保证。
 
 完整RGB入口`HandLoopFeedbackPipeline.run_track`要求原始检测mask、bbox、intrinsics、camera_to_world和时间戳。它保留world转换，不自行实现YOLO/DROID-SLAM/Metric3D，也不把缺少的相机轨迹默认为identity。部署可接原HaWoR相机与跟踪结果；本轮Dex固定camera gauge仅用于接入验收，不能当移动头戴相机SLAM成功。整个系统保留16帧lookahead。
 
@@ -104,9 +106,37 @@ cd "$HANDLOOP_CODE"
 
 ## 验收记录
 
-CPU codec、source RGB和loader合同检查已完成；官方checkpoint parity、真实cache、反馈梯度、短程训练与RGB组合推理的数值结果将在完成后补入，未完成项不视为通过。
+完整摘要：[framework JSON](../reports/visual_feedback_framework_20261015.json)。实现版本`4f5b4af`，边界修复`bacd221`，实际训练/组合推理使用`1f842cf`；续跑前9个关键源码/config SHA全部核对。
+
+| 项目 | 实际结果 |
+|---|---|
+| 官方checkpoint | 严格load缺失/多余键均0；10个源码blob通过。IAM/PAM/β/camera与官方逐值相同；rotation matrix差≤1.19e-7，right腕J0差1.49e-8m |
+| MANO与几何 | 左右shape、腕J0、FK/SE(3)往返、冻结MANO输入梯度通过，GPU几何差≤2.38e-7 |
+| 核心参数 | TWM13,530,032；新增插件2,458,118；二者合计15,988,150，不含冻结HaWoR |
+| 核心16项合同 | 全通过；current-only/full当前输出最大差0；zero-init候选差≤1.19e-7，最终与插件旁路差0；candidate梯度非零、冻结权重hash不变 |
+| 数据/缺测 | 127张JPEG、全部NPY hash、split/mmap/tail通过；缺测NaN raw计数为0、masked NaN GT不会污染loss/指标；仅代表数值安全 |
+| 真实训练 | 32帧跨块clip、batch1，先3步保存再严格resume到20步，02:45:39UTC完成；TWM完整hash不变 |
+| checkpoint | 第20步395个model浮点张量、216个AdamW浮点张量全finite，72个optimizer参数状态均step20；另存step3原件及审计 |
+| RGB组合入口 | 16张真实val RGB → 当前[1,16,99]、未来[1,16,4,60,99]；浮点输出finite、world covariance正定、mode概率和误差1.19e-7 |
+| 在线监控 | [W&B e00b708e](https://wandb.ai/black-ant/handloop-twm/runs/e00b708e)服务端state=finished、optimizer_step20、最终NLL1497.547119实际可读 |
+
+冻结TWM参考是D32已停止的step3110完整副本，训练代码`0d83a54`，checkpoint SHA=`bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed`；不是D34新run最新权重或最终模型。视觉run为`runs/visual_feedback_framework_smoke_v1_20261015`，latest20 SHA=`ae2671bda3aa7f651520b20e4367c59f6a87db2cba16e94f8db8bda4791e89e3`。实际完整预测在`evaluations/visual_feedback_framework_20261015/rgb_predictions16.pt`，weights/cache/predictions不上传GitHub。
+
+64个val帧、固定camera未对齐参考状态的smoke结果如下；NLL为完整state均值，不除51，与pure-motion训练日志per-DoF项不能直接比较：
+
+| 第20步验证方式 | 当前NLL | 腕mm | root° | finger° | xyz90% coverage |
+|---|---:|---:|---:|---:|---:|
+| 原HaWoR＋TWM，旁路插件 | 4558.707 | 95.029 | 4.936 | 6.779 | 0 |
+| 训练后插件，验证时隐藏其历史 | 1962.288 | 67.436 | 5.665 | 8.544 | 0 |
+| 正常反馈插件 | 1497.547 | 65.048 | 5.856 | 8.493 | 0 |
+
+raw HaWoR本身腕95.071mm、root4.879°、finger6.808°。腕改善同时root/finger退化，不能宣称整体纠错已成功；推理时隐藏历史仅为干预，不是独立重训的公平消融。正常反馈的平均xyz std仅4.058mm而腕误差65.048mm、90% coverage为0，表明当前分布明显过于自信，不能用σ/κ作已校准可靠性。只有一个train和一个val录制，不能以此作泛化结论。缺测warmup合同测试亦出现约1.14m腕误差而数值finite，明确保留失败边界。
+
+详细记录：[官方比对](../reports/hawor_bridge_parity_attempt2_20261015.json)、[反馈合同](../reports/visual_feedback_backend_contract_20261015.json)、[指标边界](../reports/visual_feedback_metrics_boundary_20261015.json)、[训练状态](../reports/visual_feedback_smoke_20261015.json)、[保存/续跑](../reports/visual_feedback_checkpoint_20261015.json)、[RGB入口](../reports/visual_feedback_rgb_inference_20261015.json)。
 
 早期依赖失败保留：原runtime无PIL/skimage；首次向在读target复制SciPy时遭遇`__pycache__`并发FileExists，改为staging；旧HF hub pin与基础Transformers5.19冲突，改为与基础版本一致的hub2.2/safetensors0.8。均发生视觉验收环境，不改现TWM runtime和run。
+
+官方central左右translation与桥接完全一致；非中心主点left的原center恢复公式由`2cx`改为真实图像宽度，合成case产生32.170mm差且符合解析式，这是显式几何勘误，不当重建精度收益。真实RGBsmoke仅右手，不能据左右codec/parity检查扩大为双手真实评测。
 
 ## 后续正式研究仍需完成
 

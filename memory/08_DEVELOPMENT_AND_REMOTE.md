@@ -151,3 +151,9 @@ GPU1实际batch128/256/512/768/1024探针均finite；512/卡峰值allocated34.16
 19:52:33 UTC step26450 loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态吞吐比较。19:52:47 UTC GPU0/1瞬时util均100%，显存38,172/36,686MiB，实际GPU进程为2968/2969；只记录当时占用，不推断长期利用率或峰值。
 
 `train_twm_ddp.py`用torchrun两进程/NCCL，各rank独立seed的有放回等库采样；相等local batch的local mean loss由DDP平均梯度。rank0通过unwrapped model验证，其他rank等待广播；保存由所有rank收集RNG并核完整模型byte hash，rank0原子写plain model/optimizer。停止在共同collective边界归约flag，不在handler内保存。launcher显式resume会归档旧STOP，直接入口拒绝已有STOP，避免零步退出；同world resume核完整config，迁移只允许执行字段变化并核模型/任务/manifest。sampler块内未消费indices和loader cursor未完整保存，不能声称exact replay。沿用既有Pod与独立runtime，不修改zhou或创建/删除Job。[双卡运行记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json)。
+
+## D35视觉反馈验收隔离（2026-10-15 UTC）
+
+当前TWM D34训练checkout/run不改。本轮使用独立checkout `/sciclone/home/jchen57/project/HandLoop_Feedback_20261015`，数据根仍data10/Hand_Reconstruction；官方HaWoR固定源码/3.267GB checkpoint在`model_assets/hawor_v1`，合法MANO复用`model_assets/mano_v1_2/prepared_v1/derived`。HaWoR extras在`runtime/hawor_extra/site-packages`，用独立staging完整导入后切换，不升级现Torch2.10/cu130。旧PIL/skimage缺失、SciPy并发复制和HF hub版本导入失败保留，已修复；不要边pip复制边启动读者。
+
+缓存`prepared/visual_feedback_dex_cache_v1`，训练`runs/visual_feedback_framework_smoke_v1_20261015`，完整推理/检查`evaluations/visual_feedback_framework_20261015`。TWM参考是D32停止3110步的冻结副本，不能把独立D34运行latest当固定接口。1f842cf真实GPU验收20步已完成，3步原件和resume审计保留；W&B私有文件仍仅经child环境使用，不打印/入Git。模型/optimizer395/216浮点张量finite、原TWM hash不变；RGB当前99D和4×60未来接口通过。[完整复现与路径](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)。

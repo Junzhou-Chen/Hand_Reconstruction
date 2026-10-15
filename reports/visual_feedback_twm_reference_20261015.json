@@ -1,0 +1,35 @@
+{
+  "source": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015/latest.pt",
+  "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/reference/twm_d32_step3110.pt",
+  "step": 3110,
+  "sha256": "bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed",
+  "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+  "model_config": {
+    "backbone": "structured_mamba",
+    "d_model": 256,
+    "num_layers": 6,
+    "nhead": 4,
+    "dim_feedforward": 512,
+    "dropout": 0.1,
+    "forecast_horizon": 60,
+    "translation_scale": 0.1,
+    "rotation_scale": 0.5,
+    "check_finite": false,
+    "mamba_state_size": 64,
+    "mamba_conv": 4,
+    "mamba_expand": 2,
+    "num_experts": 4,
+    "num_modes": 4,
+    "future_decoder_layers": 1,
+    "future_joint_width": 64,
+    "time_frequencies_hz": [
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      4.0,
+      8.0
+    ]
+  },
+  "scope": "frozen integration reference; not a final trained model"
+}

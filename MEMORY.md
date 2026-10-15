@@ -8,7 +8,9 @@
 
 ## 当前真实进展
 
-**D33视觉反馈方向（纽约2026-10-14）：** 用户要求在HaWoR官方预训练权重上增加反馈接口，使视觉侧读取TWM已校正信息，并反对多项手工加权loss。新推荐：保留原16帧双向路径，在其后加小型视觉读出插件，读取真实图像特征与已完成历史；raw/candidate分槽后交TWM输出最终当前状态与不确定性。视觉阶段先冻结两主干、只训练插件，用单一最终当前state NLL；具体插点/目标/冻结范围仍为待实现建议，不代表删除Corrector已永久定案。D32运行未改。[逻辑、梯度与验收§11](docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)。
+**D35视觉反馈首版已实现并远程跑通（纽约2026-10-14）：** 用户要求搭建D33完整框架。已实现冻结官方HaWoR真实patch/raw99D→2,458,118参数视觉反馈插件→纯数值TWM最终当前分布→下一帧历史，以及单一current NLL训练、checkpoint/resume、RGB track推理。官方前向比对和16项反馈合同通过，127帧Dex s0 train/val真实缓存通过；1f842cf在独立checkout用D32已停step3110参考完成3→20步，395个model/216个AdamW浮点张量finite、TWM hash不变，W&B服务端[e00b708e](https://wandb.ai/black-ant/handloop-twm/runs/e00b708e)完成20步。16张真实RGB组合推理输出当前99D及4×60未来分布通过。此smoke采用GT crop/固定camera gauge/标称30Hz，只有1 train＋1 val录制；val腕95.029→65.048mm，但root4.936→5.856°、finger6.779→8.493°退化，90% xyz coverage为0，不能声称整体提升或不确定性已校准。检测/SLAM由原前端提供，未实现任意原始视频自动入口；D34纯轨迹run保持原样。[框架与验收](docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[完整摘要](reports/visual_feedback_framework_20261015.json)。
+
+**D33视觉反馈方向（纽约2026-10-14）：** 用户要求在HaWoR官方预训练权重上增加反馈接口，使视觉侧读取TWM已校正信息，并反对多项手工加权loss。新推荐：保留原16帧双向路径，在其后加小型视觉读出插件，读取真实图像特征与已完成历史；raw/candidate分槽后交TWM输出最终当前状态与不确定性。视觉阶段先冻结两主干、只训练插件，用单一最终当前state NLL；当时具体插点/目标/冻结范围仍为建议；后续D35已按此搭建首版，独立Corrector是否永久删除仍未定案。D33讨论时D32未改。[逻辑、梯度与验收§11](docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)。
 
 **最新D34：每卡512、global1024，从头训练10,000步。** 用户要求检查约3k步曲线并加大batch重新跑；D32已于02:02:24UTC共同保存停止3,110步，latest/best原件及额外快照保留，模型/AdamW finite、CPU与两rank hash一致。新run `twm_four_sources_moe_mixed_v2_b512_10k_20261015` 以7d53fa4于02:09:50UTC在原GPU0/1从头启动；02:12:13UTC验收实际20步/20,480样本、四库与五类均参与，W&B12cc0781服务端step20已收到标量。正式checkpoint10的322个model/963个AdamW浮点张量finite、两rank与CPU一致；当时每卡峰值allocated约63.9GB。保留13.53M架构、四库GT/split和mixed_v2；LR2e-4/warmup500不变，cosine改10k结束。旧1k→3k加权恢复score0.02225→0.01281、finger3.22→1.77°仍改善，但腕位置输出7.21mm未优于输入7.16mm，不能保证仅加步数解决。10k是目标、非完成；本轮不改D33视觉方案。 [运行记录](docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[验收摘要](reports/twm_batch512_10k_20261015.json)、[W&B](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)。
 
@@ -52,7 +54,7 @@
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
-完整方法已整理为[方法框架](docs/METHOD_FRAMEWORK.md)：三个主体、两个闭环、用户已选单手99D、统一TWM输入、w/q分工和三阶段训练。完整视觉闭环仍为方案；首轮TWM已实现独立raw/candidate/history、17组mask、51D内部更新、单手共享参数，不能将pilot等同全框架已实现。
+原始完整方法保留于[方法框架](docs/METHOD_FRAMEWORK.md)。D35当前可运行首版以[视觉反馈框架](docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)为准：冻结HaWoR＋视觉读出插件＋纯数值TWM最终恢复，raw/candidate/history分槽、每帧一次、单一NLL。原w/q/独立Corrector/帧内多轮不是已实现模块，仍为历史设计或后续对照。
 
 **2026-10-14架构重新评估：** 用户提出删除独立Corrector，让TWM直接修正并联合微调；助手推荐先验证统一99D恢复及真实HaWoR误差适配，保留必要的数值几何证据而非仅quality。已记录[讨论方案](docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)；尚非用户最终采纳的架构替代，不自动解冻HaWoR；随后D23仅启动纯轨迹pretrain。
 
@@ -105,7 +107,7 @@
 3. **恢复当前状态为主。** TWM 结合历史和当前受损/部分状态；D29新增较长未来轨迹分布（本轮60步约2秒）用于学习时序关系，并加入MoE及输出不确定性。当前恢复仍单独监督与验收，不按confidence硬拼接。
 4. **可信观测可约束其他关节。** 不只是“看得见保留，看不见预测”。局部可信状态应通过结构关系帮助恢复其他部分。
 5. **视觉和先验都可能出错。** 高 confidence 仍需检验；真实急停/转向应能推翻错误运动预期。
-6. **两个闭环有不同作用。** 帧内候选改变图像证据查询位置；跨帧仅回灌最终校正状态及其可靠性。它们不是长短记忆双分支。
+6. **视觉反馈和时间反馈分开。** D35首版每帧一次：校正历史条件化真实图像读取，candidate交TWM，最终状态及分布描述只在下一帧回灌；不等同已实现帧内多轮或已校准质量q。
 7. **状态与测量分开。** 固定原始观测 `Z_t`，更新候选 `S_t^(k)`；当前帧内历史 `H_t` 和参考系 `A_t` 固定。不能把中间输出当成新测量。
 8. **每手99D已定。** p3＋root6＋15个finger rotation6D90，β另存；不是99个独立物理DoF。HaWoR输出需经hand mean/腕偏移等adapter统一，视频支持双手；Oak/Meta/Dex已在各自记录范围验证codec/FK一致性，HaWoR adapter和独立GT几何精度尚未验。
 9. **有效性不等于正确性。** raw detection、joint availability、原观测可靠性 `w`、最终状态可靠性 `q` 含义不同。
@@ -117,29 +119,21 @@
 
 ```mermaid
 flowchart TD
-    I[头戴 RGB 视频] --> V[HaWoR 视觉重建与世界坐标对齐]
-    V --> Z[固定原始状态 Z 与有效性 M]
-    V --> F[缓存真实图像特征 F 与相机信息]
-    Z --> S[当前候选状态 S]
-    S --> E[候选投影并重新读取视觉证据]
-    F --> E
-    E --> W[重新评估原观测可靠性 w]
-    H[已校正历史 H 与质量 q] --> T[TWM 当前状态恢复建议]
+    I[RGB与检测/相机元数据] --> V[冻结HaWoR原16帧路径]
+    V --> F[真实IAM图像特征]
+    V --> Z[不可覆盖的raw99D]
+    F --> A[视觉反馈插件]
+    Z --> A
+    H[已完成历史与分布描述] --> A
+    A --> C[当前candidate99D]
+    H --> T[纯数值TWM最终恢复]
     Z --> T
-    S --> T
-    W --> T
-    T --> C[Corrector 结构化残差更新]
-    E --> C
-    Z --> C
-    S --> C
-    C --> S
-    C --> O[N 轮后最终状态与质量 q]
-    O -->|下一帧只反馈一次| H
-    G[训练专用 glove 与 MoCap 轨迹] -.-> T
-    P[训练专用同步视频与参考状态] -.-> C
+    C --> T
+    T --> O[最终当前状态/不确定性及可选60步分布]
+    O --> N[下一帧历史]
 ```
 
-这是依据原文字方案重建的概念图，未代表已运行代码。D33新增视觉侧反馈方向及更简化的首版建议见§11，上图独立Corrector/w/q不再代表首版默认实施建议；其永久替代关系尚未定案。HaWoR 官方源码已核验使用非因果时间上下文；闭环后端不意味着完整系统严格在线。代码版本及16/120帧范围见[论文精读](docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)。
+这是D35已实现首版，不代表正式效果已通过。原16帧HaWoR仍有lookahead；RGB入口要求外部检测与相机轨迹，本轮以GT crop和固定camera小样本验收。旧独立Corrector/w/q/帧内多轮图保留在Git历史与原方法文档，不能当首版代码事实。[实现与边界](docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)。
 
 ## 研究价值与证据边界
 

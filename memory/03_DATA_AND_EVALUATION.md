@@ -174,3 +174,9 @@ D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption
 ## 2026-10-14 D25完整训练结果
 
 新run正常完成50k（纽约08:57），代码378deda，latest50k/best49.5k可读且所有模型浮点值finite。最终fixed1024val窗口/模式：noisy腕49.090→4.594mm/root22.538→1.461°/finger15.421→1.254°；missing37.637→4.411mm/16.426→1.457°/10.910→1.249°；clean0→1.276mm/≈0→0.440°/≈0→0.500°。腕20k后趋稳，旋转/clean保持改善。best选择loss.0060013，49.5knoisy腕4.476mm、clean1.082mm；不与末步混用。8个val录制的相关滑动窗口、参考小噪声历史、合成受损与拟合MANO GT边界保持；不能据新50k比旧28k说明Mamba更优。[完整记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)、[小摘要](../reports/twm_structured_mamba_20261014_final.json)。
+
+## D35视觉框架接入数据与smoke（2026-10-15 UTC）
+
+实现/接入使用既有DexYCB subject01、camera836212060125、right手，s0 train录制20200709_141754的63帧、val录制20200709_142123的64帧，先recording分割后切窗，未读test。RGB为原JPEG640×480，reference复用已审计的fitted MANO/腕J0；GT joint投影crop，固定camera gauge/metres，nominal frame_id/30而非实测timestamp。角色是paired视觉适配smoke，不改变四库pure-motion训练池/精度优先原则，也不是HaWoR原论文全量复现。
+
+真实官方HaWoR post-IAM缓存、14项NPY/record的SHA/bytes、recording不泄漏、mmap和tail masks通过；source/cache及权重hash详见[报告](../reports/visual_feedback_framework_20261015.json)。默认clip32，val64全部完整参考帧进入单current NLL；腕为未对齐J0欧氏mm，root/finger为SO(3)测地角，raw指标另外按原availability计数，缺测不记零误差。20步正常反馈val腕65.048mm（旁路95.029）但root5.856°/finger8.493°（旁路4.936/6.779）退化，xyz90%coverage0。推理隐藏插件历史不是独立重训消融，不能宣称公平因果收益。未来4×60只验有限性与接口，未验新候选分布下预测精度；真正detector/移动相机/双手/长录制与独立几何评测仍待完成。

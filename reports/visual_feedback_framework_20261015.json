@@ -1,0 +1,264 @@
+{
+  "acceptance": {
+    "backend_16_contracts": true,
+    "missing_metrics": "visual_feedback_metrics_boundary_20261015.json",
+    "official_bridge": "hawor_bridge_parity_attempt2_20261015.json",
+    "rgb_inference": {
+      "all_float_outputs_finite": true,
+      "checkpoint_sha256": "ae2671bda3aa7f651520b20e4367c59f6a87db2cba16e94f8db8bda4791e89e3",
+      "covariance_min_eigenvalue": 2.0481934370764066e-06,
+      "current_shape": [
+        1,
+        16,
+        99
+      ],
+      "feedback_step": 20,
+      "forecast_modes_shape": [
+        1,
+        16,
+        4,
+        60,
+        99
+      ],
+      "frames": 16,
+      "history_count_last": 15,
+      "mixture_sum_max_error": 1.1920928955078125e-07,
+      "passed": true,
+      "scope": "real RGB to HaWoR to feedback with supplied GT crop and fixed-camera metadata; no accuracy or automatic SLAM claim"
+    }
+  },
+  "artifacts": {
+    "cache": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_cache_v1",
+    "remote_code": "/sciclone/home/jchen57/project/HandLoop_Feedback_20261015",
+    "rgb_predictions": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/rgb_predictions16.pt",
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015"
+  },
+  "code_versions": {
+    "actual_training_and_rgb": "1f842cf",
+    "initial_implementation": "4f5b4af",
+    "trainer_boundaries": "bacd221"
+  },
+  "data": {
+    "cache_manifest_sha256": "105476a3dfb56532d1d317c4f87eaeb8123b10586d833f544670523426df6439",
+    "camera": "836212060125",
+    "coordinates": "fixed camera gauge, metres; root/finger column-6D rotations",
+    "crop": "reference joint projection GT crop, not detector",
+    "dataset": "DexYCB",
+    "handedness": "right",
+    "reference": "previously audited fitted MANO and joint0; not independent sensor truth",
+    "setup": "s0",
+    "split_before_windows": true,
+    "subject": "20200709-subject-01",
+    "test_used": false,
+    "timestamps": "frame_id/30 nominal seconds, not measured capture timestamps",
+    "train_frames": 63,
+    "train_recording": "20200709_141754",
+    "val_frames": 64,
+    "val_recording": "20200709_142123"
+  },
+  "decision": "D35",
+  "existing_twm_readonly_snapshot": {
+    "action": "read only; no stop/resume/config/Job mutation",
+    "phase": "training",
+    "run": "twm_four_sources_moe_mixed_v2_b512_10k_20261015",
+    "step": 820,
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/12cc0781",
+    "utc": "2026-10-15T02:49:22.164183+00:00"
+  },
+  "limits": [
+    "Only one train and one val recording; same subject and fixed camera; no formal benchmark conclusion.",
+    "Wrist error decreased while root/finger rotation errors increased; do not claim overall improvement.",
+    "Observed 90% xyz ellipsoid coverage is zero: uncertainty is overconfident and not calibrated.",
+    "World covariance rotates the conditional anchor Gaussian; no anchor/SLAM/epistemic uncertainty propagation.",
+    "Future distributions passed finite/interface checks only; no new future accuracy evaluation.",
+    "Initial missing raw warmup is numerically safe but can be very inaccurate; finite is not correctness."
+  ],
+  "metric_definitions": {
+    "finger_deg": "mean SO3 geodesic error over valid15 local rotations",
+    "raw_metric_mask": "reference-valid and corresponding original raw availability; absent raw not zero error",
+    "root_deg": "SO3 geodesic root rotation error",
+    "wrist_mm": "unaligned Euclidean anatomical wrist J0 error, mean over valid frames",
+    "xyz_90pct_ellipsoid_coverage": "anchor-space diagonal Gaussian standardized squared distance<=6.2513886, complete frames only"
+  },
+  "parameters": {
+    "adapter_trainable": 2458118,
+    "feedback_total_excluding_frozen_hawor": 15988150,
+    "twm": 13530032
+  },
+  "schema": "handloop.visual_feedback_framework.v1",
+  "scope": "model/trainer/RGB-track integration; supplied GT crops and fixed-camera metadata; not automatic arbitrary-video SLAM or benchmark validation",
+  "status": "implemented_and_remote_integration_accepted",
+  "training": {
+    "batch_size": 1,
+    "clip_length": 32,
+    "final_checkpoint": {
+      "all_finite": true,
+      "completed_steps": 20,
+      "model_float_tensors": 395,
+      "optimizer_float_tensors": 216,
+      "optimizer_steps": [
+        20.0
+      ],
+      "resume_from_step": 3,
+      "sha256": "ae2671bda3aa7f651520b20e4367c59f6a87db2cba16e94f8db8bda4791e89e3",
+      "step": 20,
+      "twm_hash_unchanged": true,
+      "utc": "2026-10-15T02:47:03.387650+00:00"
+    },
+    "final_status_utc": "2026-10-15T02:45:39.989330+00:00",
+    "frozen": [
+      "official HaWoR",
+      "all TWM parameters"
+    ],
+    "history_length": 30,
+    "nll_scaling": "per complete state, not divided by51",
+    "objective": "one mean final-current Gaussian x 16 isotropic matrix-Fisher NLL; complete reference frames only",
+    "resume": {
+      "checkpoint_model_optimizer_finite": true,
+      "optimizer_steps": [
+        3.0
+      ],
+      "parameter_states": 72,
+      "source_sha256_verified": true,
+      "step": 3
+    },
+    "steps": 20,
+    "train_current_readout": false,
+    "twm_reference": {
+      "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+      "model_config": {
+        "backbone": "structured_mamba",
+        "check_finite": false,
+        "d_model": 256,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 60,
+        "future_decoder_layers": 1,
+        "future_joint_width": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2,
+        "mamba_state_size": 64,
+        "nhead": 4,
+        "num_experts": 4,
+        "num_layers": 6,
+        "num_modes": 4,
+        "rotation_scale": 0.5,
+        "time_frequencies_hz": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0
+        ],
+        "translation_scale": 0.1
+      },
+      "scope": "frozen integration reference; not a final trained model",
+      "sha256": "bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed",
+      "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/reference/twm_d32_step3110.pt",
+      "source": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015/latest.pt",
+      "step": 3110
+    }
+  },
+  "validation": {
+    "adapter_bypass": {
+      "candidate/finger_deg": 6.8083436489105225,
+      "candidate/root_deg": 4.878698348999023,
+      "candidate/wrist_mm": 95.07092666625977,
+      "current_nll": 4558.70703125,
+      "final/finger_deg": 6.778505325317383,
+      "final/root_deg": 4.935501575469971,
+      "final/wrist_mm": 95.02911758422852,
+      "metric_counts": {
+        "candidate/finger_deg": 960,
+        "candidate/root_deg": 64,
+        "candidate/wrist_mm": 64,
+        "current_nll": 64,
+        "final/finger_deg": 960,
+        "final/root_deg": 64,
+        "final/wrist_mm": 64,
+        "raw/finger_deg": 960,
+        "raw/root_deg": 64,
+        "raw/wrist_mm": 64,
+        "wrist_degradation_over_1mm": 64,
+        "xyz_90pct_ellipsoid_coverage": 64,
+        "xyz_std_mm": 64
+      },
+      "raw/finger_deg": 6.8083436489105225,
+      "raw/root_deg": 4.8786985874176025,
+      "raw/wrist_mm": 95.07093048095703,
+      "valid_states": 64,
+      "wrist_degradation_over_1mm": 0.0,
+      "xyz_90pct_ellipsoid_coverage": 0.0,
+      "xyz_std_mm": 1.4131013751029968
+    },
+    "adapter_without_history": {
+      "candidate/finger_deg": 8.863764762878418,
+      "candidate/root_deg": 5.562140464782715,
+      "candidate/wrist_mm": 67.39897727966309,
+      "current_nll": 1962.2882080078125,
+      "final/finger_deg": 8.543945074081421,
+      "final/root_deg": 5.665218114852905,
+      "final/wrist_mm": 67.43645858764648,
+      "metric_counts": {
+        "candidate/finger_deg": 960,
+        "candidate/root_deg": 64,
+        "candidate/wrist_mm": 64,
+        "current_nll": 64,
+        "final/finger_deg": 960,
+        "final/root_deg": 64,
+        "final/wrist_mm": 64,
+        "raw/finger_deg": 960,
+        "raw/root_deg": 64,
+        "raw/wrist_mm": 64,
+        "wrist_degradation_over_1mm": 64,
+        "xyz_90pct_ellipsoid_coverage": 64,
+        "xyz_std_mm": 64
+      },
+      "raw/finger_deg": 6.8083436489105225,
+      "raw/root_deg": 4.8786985874176025,
+      "raw/wrist_mm": 95.07093048095703,
+      "valid_states": 64,
+      "wrist_degradation_over_1mm": 0.03125,
+      "xyz_90pct_ellipsoid_coverage": 0.0,
+      "xyz_std_mm": 3.0076587200164795
+    },
+    "normal": {
+      "candidate/finger_deg": 8.87840747833252,
+      "candidate/root_deg": 5.6192662715911865,
+      "candidate/wrist_mm": 64.9394760131836,
+      "current_nll": 1497.547119140625,
+      "final/finger_deg": 8.493030309677124,
+      "final/root_deg": 5.856156349182129,
+      "final/wrist_mm": 65.04826736450195,
+      "metric_counts": {
+        "candidate/finger_deg": 960,
+        "candidate/root_deg": 64,
+        "candidate/wrist_mm": 64,
+        "current_nll": 64,
+        "final/finger_deg": 960,
+        "final/root_deg": 64,
+        "final/wrist_mm": 64,
+        "raw/finger_deg": 960,
+        "raw/root_deg": 64,
+        "raw/wrist_mm": 64,
+        "wrist_degradation_over_1mm": 64,
+        "xyz_90pct_ellipsoid_coverage": 64,
+        "xyz_std_mm": 64
+      },
+      "raw/finger_deg": 6.8083436489105225,
+      "raw/root_deg": 4.8786985874176025,
+      "raw/wrist_mm": 95.07093048095703,
+      "valid_states": 64,
+      "wrist_degradation_over_1mm": 0.03125,
+      "xyz_90pct_ellipsoid_coverage": 0.0,
+      "xyz_std_mm": 4.058427214622498
+    }
+  },
+  "wandb_server": {
+    "current_nll": 1497.547119140625,
+    "optimizer_step": 20,
+    "state": "finished",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/e00b708e"
+  }
+}

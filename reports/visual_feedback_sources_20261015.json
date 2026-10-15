@@ -1,0 +1,33 @@
+{
+  "scope": "real RGB/reference source preparation only; no model inference or accuracy claim",
+  "source_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_sources_v1/source_manifest.json",
+  "records": [
+    {
+      "recording": "20200709-subject-01/20200709_141754",
+      "split": "train",
+      "frames": 63,
+      "frame_id_minmax": [
+        9,
+        71
+      ],
+      "frame_gaps": 0,
+      "handedness": 1,
+      "timestamp_source": "nominal_30hz_frame_index_not_measured",
+      "decoded_images": 63
+    },
+    {
+      "recording": "20200709-subject-01/20200709_142123",
+      "split": "val",
+      "frames": 64,
+      "frame_id_minmax": [
+        3,
+        66
+      ],
+      "frame_gaps": 0,
+      "handedness": 1,
+      "timestamp_source": "nominal_30hz_frame_index_not_measured",
+      "decoded_images": 64
+    }
+  ],
+  "complete": true
+}

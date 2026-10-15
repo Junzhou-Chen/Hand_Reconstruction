@@ -188,4 +188,10 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 
 用户要求在官方HaWoR权重上加反馈接口，拒绝多项手工带权loss。本轮[§11推荐](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)：原ViT/IAM/MANO/PAM的16帧双向路径固定并缓存F/Z0；新增PAM之后的小视觉读出插件，逐帧读F、raw和已完成校正历史，产生51D切向残差candidate，再由冻结纯数值TWM输出最终状态及同一次读出的σ/κ。原始Z0不覆盖，当前输出只在下一帧成为历史；不把逐帧变化的反馈直接塞入原双向PAM。仍有原片段lookahead，不宣称在线。
 
-视觉阶段首版只用最终current Gaussian×16个isotropic matrix-Fisher NLL；不再默认叠2D/joint/mesh/velocity/cycle/quality/replay各项。两主干冻结但保留TWM到candidate的输入梯度，先训练插件；若candidate通道梯度/利用不足，再联合少量current读出参数，同一目标。长60步预测保留为预训练能力并单独复测，不宣称冻结后新输入下能力不变。状态NLL要求完整reference可用，不伪造joint-only旋转标签；归一化似然不是无任何统计假设的“自动消除权重”。具体结构未实现、未替代D32正在用的多目标预训练，也未永久决定删除Corrector。
+视觉阶段首版只用最终current Gaussian×16个isotropic matrix-Fisher NLL；不再默认叠2D/joint/mesh/velocity/cycle/quality/replay各项。两主干冻结但保留TWM到candidate的输入梯度，先训练插件；若candidate通道梯度/利用不足，再联合少量current读出参数，同一目标。长60步预测保留为预训练能力并单独复测，不宣称冻结后新输入下能力不变。状态NLL要求完整reference可用，不伪造joint-only旋转标签；归一化似然不是无任何统计假设的“自动消除权重”。本段提出时尚未实现；后续D35已搭建该首版并完成接入验收，不改变pure-motion多目标训练，未永久决定删除Corrector对照。
+
+## D35：视觉反馈首版实现与真实接入验收（2026-10-15 UTC）
+
+用户明确要求搭建。代码以[框架文档](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)为当前实现依据：官方HaWoR冻结原16帧路径/192×1280真实patch、post-PAM raw99D；2层d256/2,458,118参数插件用16个状态query读取图像和已完成history，51D SO(3)残差candidate后交原13,530,032参数TWM最终读出。单一完整state NLL，TWM/HaWoR参数冻结但candidate输入梯度保留；默认clip32/历史30帧、帧间detach，每帧只提交最终状态一次。支持跨块initial/finalhistory、mask/reset/gap、current-only与可选60步分布。最后mean/std/κ同次读出，NLL在anchor内，另出world完整平移covariance；不含anchor/SLAM/epistemic传播或质量q保证。
+
+官方比对、几何与16项核心合同、缺测NaN指标/GT隔离通过。真实Dex source127帧、s0 train/val各一录制，固定单相机、GT crop、nominal frame_id/30；用已停D32 step3110副本完成3→20步及RGB track组合推理，冻结hash不变。val64帧腕95.029→65.048mm同时root4.936→5.856°/finger6.779→8.493°退化，xyz90%coverage0；只证明框架能训练与接入，未证明整体效果、概率校准或future精度。检测/SLAM由caller提供，任意原始视频自动流程尚未打通。D34预训练未改，具体范围与产物见[摘要](../reports/visual_feedback_framework_20261015.json)。

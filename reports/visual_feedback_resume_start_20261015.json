@@ -1,0 +1,9 @@
+{
+  "step": 3,
+  "checkpoint_model_optimizer_finite": true,
+  "source_sha256_verified": true,
+  "optimizer_steps": [
+    3.0
+  ],
+  "parameter_states": 72
+}

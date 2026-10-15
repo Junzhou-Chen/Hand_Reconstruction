@@ -1,0 +1,11 @@
+{
+  "scope": "remote CPU synthetic loader invariants only, no image/model accuracy claim",
+  "checks": {
+    "train_tail_masks_mmap_immutable": true,
+    "val_tail_masks_mmap_immutable": true,
+    "cross_split_recording_rejected": true,
+    "resident_mtime_edit_rejected": true,
+    "fresh_sha_edit_rejected": true
+  },
+  "test_artifacts": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/visual_loader_hash_rhce1tnt"
+}

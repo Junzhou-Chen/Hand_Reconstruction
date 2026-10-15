@@ -1,0 +1,47 @@
+{
+  "scope": "real frozen-HaWoR cache and data-interface acceptance on bounded s0 train/val GT-crop subset; fitted MANO reference, not independent MoCap or final performance",
+  "cache_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_cache_v1/manifest.json",
+  "cache_manifest_sha256": "105476a3dfb56532d1d317c4f87eaeb8123b10586d833f544670523426df6439",
+  "code_version": "4f5b4af",
+  "records": [
+    {
+      "recording": "20200709-subject-01/20200709_141754",
+      "split": "train",
+      "frames": 63,
+      "feature_shape": [
+        63,
+        192,
+        1280
+      ],
+      "feature_dtype_cached": "torch.float16",
+      "features_finite": true,
+      "feature_std": 0.6458274126052856,
+      "feature_adjacent_abs_diff": 0.1530188024044037,
+      "raw_wrist_mm": 109.08557891845703,
+      "raw_root_deg": 7.986173629760742,
+      "raw_finger_deg": 6.6575422286987305,
+      "tensor_hashes_verified": 14,
+      "tail_padding_unsupervised": true
+    },
+    {
+      "recording": "20200709-subject-01/20200709_142123",
+      "split": "val",
+      "frames": 64,
+      "feature_shape": [
+        64,
+        192,
+        1280
+      ],
+      "feature_dtype_cached": "torch.float16",
+      "features_finite": true,
+      "feature_std": 0.6355154514312744,
+      "feature_adjacent_abs_diff": 0.13983121514320374,
+      "raw_wrist_mm": 95.0709457397461,
+      "raw_root_deg": 4.878698348999023,
+      "raw_finger_deg": 6.808342456817627,
+      "tensor_hashes_verified": 14,
+      "tail_padding_unsupervised": true
+    }
+  ],
+  "complete": true
+}

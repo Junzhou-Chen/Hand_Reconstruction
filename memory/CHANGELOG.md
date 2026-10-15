@@ -329,6 +329,14 @@
 - 02:12:13.931674UTC正式运行验收为step20、累计20,480样本，GPU0/1峰值allocated分别63.9163/63.9073GB；单独审计的是checkpoint10，其322个model/963个AdamW浮点张量有限、CPU完整模型hash与两rank一致，不能把step10权重审计冒充step20权重检查。[W&B12cc0781](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)服务端state=running，step20的loss与grad实际可读；正式启动验收已通过，未完成10k或最终效果验证。
 - 运行与后续实测见[训练记录D34](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)与[小型摘要](../reports/twm_batch512_10k_20261015.json)。同时修正决策记忆中“当前D27双卡运行”的过时表述，明确其已按D28停止32,783步。
 
+## 2026-10-15 UTC D35视觉反馈完整首版实现与验收
+
+- 用户明确要求搭建D33方案；实现官方HaWoR frozen bridge/可微MANO99D codec、2.458M视觉读出插件、纯数值TWM单步恢复/跨块history、单一current NLL trainer、严格cache/checkpoint/resume、RGB track推理与60步分布导出。原多轮Corrector/w/q不是首版代码事实，D34 pure-motion run保持原样。
+- 官方源码10blob/权重严格load与前向parity、左右MANO几何、16项反馈合同、raw/GT NaN指标边界通过；cache为127帧Dex train/val独立录制、right单camera、GT crop/nominal30Hz，14tensor/record SHA通过。不将GT-crop固定camera验收写成任意RGB自动检测/SLAM成功。
+- 代码4f5b4af/bacd221/1f842cf；TWM使用已停D32 step3110副本，A参数2,458,118、W13,530,032。32帧clip先3步保存再strictresume到20，395个model/216个AdamW浮点张量finite、72optimizer状态step20、W hash不变；W&B[e00b708e](https://wandb.ai/black-ant/handloop-twm/runs/e00b708e)服务端finished/step20实际可读。真实16RGB输出当前[1,16,99]与未来[1,16,4,60,99]、world covariance正定/全finite。
+- val64帧：旁路→正常反馈NLL4558.707→1497.547、腕95.029→65.048mm，但root4.936→5.856°、finger6.779→8.493°退化，xyz90%coverage均0。记录为能训练的框架smoke，未证明整体精度/不确定性校准/future性能；空raw暖启动虽finite仍可能很不准。保留依赖失败记录，不挑正指标宣传。
+- 新[框架文档](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)与[完整摘要](../reports/visual_feedback_framework_20261015.json)，更新README/MEMORY/方法/决策/数据/状态/远程约定；权重/缓存/原日志/预测均只留远程，小型结果入Git。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

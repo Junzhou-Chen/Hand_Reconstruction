@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-15T02:47:03.387650+00:00",
+  "step": 20,
+  "model_float_tensors": 395,
+  "optimizer_float_tensors": 216,
+  "all_finite": true,
+  "twm_hash_unchanged": true,
+  "optimizer_steps": [
+    20.0
+  ],
+  "sha256": "ae2671bda3aa7f651520b20e4367c59f6a87db2cba16e94f8db8bda4791e89e3",
+  "resume_from_step": 3,
+  "completed_steps": 20
+}

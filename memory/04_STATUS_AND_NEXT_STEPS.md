@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**D35视觉框架已搭建并验收：** 用户要求按D33搭建。官方冻结HaWoR＋2.458M反馈插件＋纯数值TWM＋最终状态跨帧反馈已实现；真实127帧缓存、官方前向/16项核心合同/缺测边界通过，独立目录用D32已停step3110副本完成3→20步与完整RGB/4×60未来接口。checkpoint395个model/216个AdamW浮点张量finite，TWM hash不变，[W&B e00b708e](https://wandb.ai/black-ant/handloop-twm/runs/e00b708e)服务端完成20步。GT crop/固定camera/same-subject仅1 train＋1 val录制；val腕95.029→65.048mm但旋转退化、coverage0，正式性能/校准/自动检测SLAM仍待验证。原D34纯轨迹训练保持。[实现文档](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[摘要](../reports/visual_feedback_framework_20261015.json)。
+
 更新日期：2026-10-15 UTC（纽约10-14）。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
 
 **最新D34：每卡512、global1024，从头训练10,000步。** 用户要求检查约3k步曲线并加大batch重新跑；D32已于02:02:24UTC共同保存停止3,110步，latest/best原件及额外快照保留，模型/AdamW finite、CPU与两rank hash一致。新run `twm_four_sources_moe_mixed_v2_b512_10k_20261015` 以7d53fa4于02:09:50UTC在原GPU0/1从头启动；02:12:13UTC验收实际20步/20,480样本、四库与五类均参与，W&B12cc0781服务端step20已收到标量。正式checkpoint10的322个model/963个AdamW浮点张量finite、两rank与CPU一致；当时每卡峰值allocated约63.9GB。保留13.53M架构、四库GT/split和mixed_v2；LR2e-4/warmup500不变，cosine改10k结束。旧1k→3k加权恢复score0.02225→0.01281、finger3.22→1.77°仍改善，但腕位置输出7.21mm未优于输入7.16mm，不能保证仅加步数解决。10k是目标、非完成；本轮不改D33视觉方案。 [运行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[验收摘要](../reports/twm_batch512_10k_20261015.json)、[W&B](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)。
@@ -152,7 +154,7 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 ## 已识别的主要风险与验证路径
 
-**D33视觉反馈与简化目标（纽约2026-10-14）：** 用户进一步要求反馈进入HaWoR视觉侧，并反对堆多项手工加权loss。[§11新推荐](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)为：固定原16帧双向路径，在PAM后新增读图像特征和已完成校正历史的小插件，raw/candidate分槽交TWM最终恢复；先冻结两主干，仅训练插件，单一最终current state NLL。候选输入梯度、坐标/原始观测、空/错历史、固定crop覆盖和lookahead分别验收；σ/κ不能冒充质量q，未来预测保留但需在新candidate分布复测。具体方案未实现，原§10多loss/额外模块不再默认，D32未改或重启，本轮没有新增实验结果。
+**D33视觉反馈与简化目标（历史建议，后续D35已实现首版）：** 用户进一步要求反馈进入HaWoR视觉侧，并反对堆多项手工加权loss。[§11新推荐](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)为：固定原16帧双向路径，在PAM后新增读图像特征和已完成校正历史的小插件，raw/candidate分槽交TWM最终恢复；先冻结两主干，仅训练插件，单一最终current state NLL。候选输入梯度、坐标/原始观测、空/错历史、固定crop覆盖和lookahead分别验收；σ/κ不能冒充质量q，未来预测保留但需在新candidate分布复测。D33提出时未实现，原§10多loss/额外模块不再默认；后续D35已完成上述首版与验收，以本文件顶部及实现文档为准。
 
 **2026-10-14（纽约）视觉接入/联合训练复核：** 用户询问TWM之后如何结合视觉baseline。已读实际TWM接口及HaWoR官方代码/论文，给出[分阶段实施建议§10](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)：冻结前端pre-infiller→99D adapter/evaluator验收→真实prediction/reference适配→视觉证据/质量/校正联合与自身历史→可选前端局部解冻。HaWoR adapter、视觉baseline、evidence/w/q/Corrector及联合trainer仍未实现；不能说TWM长头已在视觉生效，不能将同Z条件后验当独立prior再次相乘。本轮仅文档/研究，未修改或重新启动D32，也未采纳删除C。HOT27资源与Dex推理入口缺口保留，详细读[对比协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)。
 

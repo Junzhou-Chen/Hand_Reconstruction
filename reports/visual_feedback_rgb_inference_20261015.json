@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "all_float_outputs_finite": true,
+  "frames": 16,
+  "current_shape": [
+    1,
+    16,
+    99
+  ],
+  "forecast_modes_shape": [
+    1,
+    16,
+    4,
+    60,
+    99
+  ],
+  "covariance_min_eigenvalue": 2.0481934370764066e-06,
+  "mixture_sum_max_error": 1.1920928955078125e-07,
+  "history_count_last": 15,
+  "checkpoint_sha256": "ae2671bda3aa7f651520b20e4367c59f6a87db2cba16e94f8db8bda4791e89e3",
+  "feedback_step": 20,
+  "scope": "real RGB to HaWoR to feedback with supplied GT crop and fixed-camera metadata; no accuracy or automatic SLAM claim"
+}
