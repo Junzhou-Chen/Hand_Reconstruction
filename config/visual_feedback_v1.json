@@ -2,7 +2,7 @@
   "seed": 20261015,
   "steps": 20,
   "batch_size": 1,
-  "clip_length": 16,
+  "clip_length": 32,
   "learning_rate": 0.0001,
   "weight_decay": 0.01,
   "grad_clip": 1.0,

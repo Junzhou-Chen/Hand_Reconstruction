@@ -1,0 +1,65 @@
+{
+  "adapter_config": {
+    "condition_on_beta": false,
+    "d_model": 256,
+    "default_dt": 0.03333333333333333,
+    "detach_history": true,
+    "dim_feedforward": 512,
+    "dropout": 0.0,
+    "history_length": 30,
+    "image_feature_dim": 1280,
+    "max_gap_seconds": 0.25,
+    "nhead": 4,
+    "num_layers": 2,
+    "patch_grid_height": 16,
+    "patch_grid_width": 12,
+    "rotation_delta_scale": 0.5,
+    "translation_delta_scale": 0.1
+  },
+  "adapter_parameters": 2458118,
+  "cache_sha256": "105476a3dfb56532d1d317c4f87eaeb8123b10586d833f544670523426df6439",
+  "checks": {
+    "actual_checkpoint_strict_load": true,
+    "candidate_gradient_frozen_weights_unchanged": {
+      "candidate_gradient_norm": [
+        41707.67578125,
+        37543.44140625
+      ],
+      "losses": [
+        5295.25390625,
+        4850.4853515625
+      ],
+      "twm_hash": "9779805fd3dc42679197277076936f261ddb6d77c8588c293123d8bafdcc75d0"
+    },
+    "current_only_matches_full": {
+      "state": 0.0,
+      "state_rotation_concentration": 0.0,
+      "state_translation_std": 0.0
+    },
+    "empty_missing_warm_start_finite_explicit_masks": true,
+    "gap_explicit_and_hand_switch_reset": true,
+    "later_core_cache_cannot_change_earlier_output": true,
+    "legal_rotations": true,
+    "masked_nan_gt_nll_and_backward_finite": 4421.537109375,
+    "no_feedback_ablation_preserves_motion_history": true,
+    "optional_current_readout_scope": true,
+    "padding_never_commits_and_nan_placeholders_safe": true,
+    "raw_and_candidate_full_masks_preserved": true,
+    "streaming_matches_clip_and_detaches": true,
+    "world_translation_covariance_transform_and_positive_definite": true,
+    "zero_init_candidate_raw_max_abs": 1.1920928955078125e-07,
+    "zero_init_final_bypass_max_abs": 0.0
+  },
+  "device": "cuda:0",
+  "finished_utc": "2026-10-15T02:40:11.474018+00:00",
+  "passed": true,
+  "recording": "20200709-subject-01/20200709_141754",
+  "schema": "handloop.visual_feedback_contracts.v1",
+  "scope": "short numerical integration; no accuracy/physical claim",
+  "start_frame": 0,
+  "started_utc": "2026-10-15T02:39:53.261263+00:00",
+  "twm_checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/reference/twm_d32_step3110.pt",
+  "twm_checkpoint_sha256": "bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed",
+  "twm_parameters": 13530032,
+  "twm_step": 3110
+}

@@ -88,7 +88,7 @@ cd "$HANDLOOP_CODE"
   --mano-models "$HANDLOOP_DATA/model_assets/mano_v1_2/prepared_v1/derived" --device cuda:1
 ```
 
-训练配置`config/visual_feedback_v1.json`默认20步、batch1、clip16，属于框架smoke。`--twm-checkpoint`必须指向冻结参考副本，不能在训练过程中跟随另一个run的latest变化。W&B通过正常私有环境配置，不在CLI/JSON/Git中传key。
+训练配置`config/visual_feedback_v1.json`默认20步、batch1、clip32（跨两个HaWoR原块，能填满30帧历史），属于框架smoke。`--twm-checkpoint`必须指向冻结参考副本，不能在训练过程中跟随另一个run的latest变化。W&B通过正常私有环境配置，不在CLI/JSON/Git中传key。
 
 ```bash
 "$HANDLOOP_PYTHON" scripts/train_visual_feedback.py \
