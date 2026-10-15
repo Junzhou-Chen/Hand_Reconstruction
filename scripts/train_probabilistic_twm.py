@@ -29,6 +29,7 @@ from train_twm import atomic_json, sample_batch, utc
 from handloop import geometry as g
 from handloop.data.trajectory import SourceBalancedSampler
 from handloop.data.forecast_trajectory import ForecastTrajectoryWindows
+from handloop.data.corruption import sample_mixed_batch
 from handloop.models.probabilistic_twm import (
     ProbabilisticTWM, ProbabilisticTWMConfig,
     current_distribution_log_prob, forecast_distribution_log_prob,
@@ -36,8 +37,9 @@ from handloop.models.probabilistic_twm import (
 from handloop.tracking import WandbTracker
 
 
-def prepare_batch(batch, generator, mode='mixed', *, condition_on_beta=False):
-    """Reuse audited corruption/anchor, explicitly mask truncated future labels."""
+def prepare_batch(batch, generator, mode='mixed', *, condition_on_beta=False,
+                  corruption_profile=None, return_diagnostics=False):
+    """Select an explicit corruption version without changing historical sampling."""
     valid = batch['future_valid']
     if valid.dtype != torch.bool or not bool(valid.any(-1).all()):
         raise ValueError('Every window needs at least one valid future target')
@@ -46,7 +48,13 @@ def prepare_batch(batch, generator, mode='mixed', *, condition_on_beta=False):
     # Legacy preparation already handles arbitrary leading future dimensions.
     # Its full-GT guard must not mistake padding for partial MANO supervision.
     checked = {key:value for key,value in batch.items() if key != 'future_gt_mask'}
-    return sample_batch(checked, generator, mode, condition_on_beta=condition_on_beta)
+    if corruption_profile is not None and not mode.startswith('legacy_'):
+        return sample_mixed_batch(checked, generator, mode,
+            condition_on_beta=condition_on_beta, profile=corruption_profile,
+            return_diagnostics=return_diagnostics)
+    legacy_mode = mode.removeprefix('legacy_')
+    prepared = sample_batch(checked, generator, legacy_mode, condition_on_beta=condition_on_beta)
+    return (prepared, {}) if return_diagnostics else prepared
 
 
 def state_geometry_loss(pred, target):
@@ -142,11 +150,12 @@ def flatten_numbers(value, prefix=''):
 def evaluate(model, loaders, device, config):
     model.eval()
     by_source = {}
+    modes = config.get('eval_corruption_modes', ['noisy','missing','clean'])
     for source,loader in loaders.items():
         by_source[source] = {}
-        for corruption in ('noisy','missing','clean'):
+        for corruption in modes:
             generator = torch.Generator(device=device).manual_seed(config['seed']+123)
-            totals,counts = {},{}
+            totals,counts,tails = {},{},{}
             def add(key,values,valid=None):
                 values = values.float()
                 chosen = values.flatten() if valid is None else values[valid]
@@ -157,14 +166,20 @@ def evaluate(model, loaders, device, config):
                 if index >= config['eval_batches']: break
                 batch = {k:v.to(device,non_blocking=True) for k,v in batch.items()}
                 history,raw,candidate,kwargs,target,future = prepare_batch(batch,generator,corruption,
-                    condition_on_beta=config.get('condition_on_beta',False))
+                    condition_on_beta=config.get('condition_on_beta',False),
+                    corruption_profile=config.get('corruption_profile'))
                 with torch.autocast('cuda',dtype=torch.bfloat16): result = model(history,raw,candidate,**kwargs)
                 valid = batch['future_valid']
                 _,losses = objective(result,target,future,valid,batch['future_dt'],config)
                 n = len(target)
                 for key,value in losses.items(): add(key,value.expand(n))
                 for name,state in [('candidate',candidate),('history_hold',history[:,-1]),('restored',result['state'])]:
-                    for key,value in state_errors(state,target).items(): add(name+'/'+key,value)
+                    for key,value in state_errors(state,target).items():
+                        add(name+'/'+key,value)
+                        tails.setdefault(name+'/'+key,[]).append(value.detach().float().cpu())
+                input_wrist = state_errors(candidate,target)['wrist_mm']
+                restored_wrist = state_errors(result['state'],target)['wrist_mm']
+                add('wrist_degradation_over_1mm',(restored_wrist>input_wrist+1).float())
                 last_delta_time = batch['dt'][:, -2].clamp_min(1e-5)
                 hist_rotations = g.state_to_rotmat(history)
                 hist_dp = (history[:,-1,:3]-history[:,-2,:3])/last_delta_time[:,None]
@@ -205,12 +220,18 @@ def evaluate(model, loaders, device, config):
                     add(f'future_{label}/within_mode_xyz_std_mm',within_std.mean(-1)[rows,slot]*1000,eligible)
                     add(f'future_{label}/total_xyz_std_mm',total_std.mean(-1)[rows,slot]*1000,eligible)
             values = {key:totals[key]/counts[key] for key in totals}
+            if not all(math.isfinite(value) for value in values.values()):
+                raise FloatingPointError(f'Nonfinite validation measurement: {source}/{corruption}')
+            for key,chunks in tails.items():
+                joined=torch.cat(chunks)
+                values[key+'_p50']=float(joined.quantile(0.5))
+                values[key+'_p95']=float(joined.quantile(0.95))
             values['samples'] = counts.get('restored/wrist_mm',0)
             values['counts'] = {f'{seconds:g}s':counts.get(f'future_{seconds:g}s/map/wrist_mm',0)
                                 for seconds in config['eval_horizons_seconds']}
             by_source[source][corruption] = values
-    result = {'by_dataset':by_source,'aggregation':'equal-source mean over sources with eligible targets at each horizon'}
-    for corruption in ('noisy','missing','clean'):
+    result = {'by_dataset':by_source,'aggregation':'equal-source mean over sources with eligible targets at each horizon; p50/p95 macro values are source-quantile means, not pooled quantiles'}
+    for corruption in modes:
         keys = set().union(*(item[corruption].keys() for item in by_source.values()))-{'counts','samples'}
         result[corruption] = {key:sum(item[corruption][key] for item in by_source.values() if key in item[corruption])
                              /sum(key in item[corruption] for item in by_source.values()) for key in keys}
@@ -231,6 +252,12 @@ def main():
     args = parser.parse_args()
     if not Path('/sciclone/home/jchen57').is_dir(): parser.error('Run inside the authorized remote compute Pod')
     config = json.loads(args.config.read_text())
+    if config.get('corruption_profile_path'):
+        profile_path=Path(__file__).resolve().parents[1]/config['corruption_profile_path']
+        config['corruption_profile']=json.loads(profile_path.read_text())
+        config['corruption_profile_sha256']=hashlib.sha256(profile_path.read_bytes()).hexdigest()
+        if config['corruption_profile'].get('status')!='active':
+            raise ValueError('Training needs an explicitly active corruption profile')
     if args.batch_size: config['batch_size']=args.batch_size
     if args.eval_batches: config['eval_batches']=args.eval_batches
     if args.tracking_mode:
@@ -319,7 +346,8 @@ def main():
     run['source_sha256']={name:hashlib.sha256((source_root/name).read_bytes()).hexdigest() for name in (
         'scripts/train_probabilistic_twm.py','scripts/train_twm.py','src/handloop/geometry.py',
         'src/handloop/models/probabilistic_twm.py','src/handloop/models/structured_mamba.py',
-        'src/handloop/data/trajectory.py','src/handloop/data/forecast_trajectory.py','src/handloop/tracking.py')}
+        'src/handloop/data/trajectory.py','src/handloop/data/forecast_trajectory.py','src/handloop/tracking.py',
+        'src/handloop/data/corruption.py')}
     tracker = WandbTracker(config=config['tracking'],output_dir=args.output,metadata=run,rank=rank,resume=bool(args.resume))
     if rank==0:
         run.update(wandb=tracker.metadata,val_windows_by_dataset=val.windows_by_dataset,
@@ -351,7 +379,11 @@ def main():
         decision=torch.zeros(1,device=device); values=None
         if rank==0:
             values=evaluate(model,loaders,device,config)
-            score=(values['noisy']['restoration_loss']+values['missing']['restoration_loss'])/2
+            selection=config.get('best_selection_weights',{'noisy':0.5,'missing':0.5})
+            if (any(weight<0 for weight in selection.values())
+                    or not math.isclose(sum(selection.values()),1.0)):
+                raise ValueError('Best-checkpoint validation weights must be a probability mixture')
+            score=sum(weight*values[mode]['restoration_loss'] for mode,weight in selection.items())
             if score<best: best=score; decision.fill_(1)
             event={'utc':utc(),'step':step,'validation':values,'best_validation_loss':best}
             atomic_json(args.output/('initial_validation.json' if initial else 'latest_validation.json'),event)
@@ -365,6 +397,7 @@ def main():
     latest_val=validate(start_step,True); save(start_step)
     iterator=iter(loader); step=start_step; start=time.monotonic()
     sampled=torch.zeros(len(train.dataset_names),device=device,dtype=torch.long)
+    corruption_counts=torch.zeros(5,device=device,dtype=torch.long)
     end_step=min(config['steps'],start_step+args.stop_after_updates) if args.stop_after_updates else config['steps']
     while step<end_step:
         stopping=torch.tensor(int(stop['requested'] or (args.output/'STOP').exists() or
@@ -375,7 +408,11 @@ def main():
         except StopIteration: iterator=iter(loader); batch=next(iterator)
         batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
         sampled+=torch.bincount(batch['dataset_id'],minlength=len(train.dataset_names))
-        history,raw,candidate,kwargs,target,future=prepare_batch(batch,generator,condition_on_beta=config['condition_on_beta'])
+        prepared,diagnostics=prepare_batch(batch,generator,condition_on_beta=config['condition_on_beta'],
+            corruption_profile=config.get('corruption_profile'),return_diagnostics=True)
+        history,raw,candidate,kwargs,target,future=prepared
+        if 'case_id' in diagnostics:
+            corruption_counts+=torch.bincount(diagnostics['case_id'],minlength=5)
         step+=1
         multiplier=step/config['warmup_steps'] if step<=config['warmup_steps'] else .1+.9*.5*(1+math.cos(math.pi*(step-config['warmup_steps'])/max(1,config['steps']-config['warmup_steps'])))
         for group in optimizer.param_groups: group['lr']=config['learning_rate']*multiplier
@@ -390,6 +427,7 @@ def main():
             keys=list(losses); scalars=torch.stack([losses[k].detach() for k in keys]+[grad.detach()])
             dist.all_reduce(scalars); scalars/=world
             counts=sampled.clone(); dist.all_reduce(counts)
+            case_counts=corruption_counts.clone(); dist.all_reduce(case_counts)
             loads=output['moe_load'].detach().float(); dist.all_reduce(loads); loads/=world
             local={'rank':rank,'pid':os.getpid(),'device':local_rank,
                    'peak_allocated_gb':torch.cuda.max_memory_allocated(device)/1e9,
@@ -401,6 +439,9 @@ def main():
                        'grad_norm':float(scalars[-1]),'lr':optimizer.param_groups[0]['lr'],'elapsed_seconds':elapsed,
                        'samples_per_second':(step-start_step)*config['batch_size']/elapsed,'ranks':ranks,
                        'samples_by_dataset':dict(zip(train.dataset_names,counts.cpu().tolist())),
+                       'corruption_samples_by_case':dict(zip(
+                           ('clean_motion','current_reanchors_history','ordinary_restoration','partial_missing','rare_local_failure'),
+                           case_counts.cpu().tolist())),
                        'moe_load':{str(i):float(value) for i,value in enumerate(loads)},'wandb_url':tracker.url}
                 atomic_json(args.output/'status.json',event)
                 with (args.output/'metrics.jsonl').open('a') as stream: stream.write(json.dumps(event)+'\n')
