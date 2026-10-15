@@ -27,7 +27,7 @@
 
 ## epoch与运行协议
 
-[两轮配置](../config/twm_four_sources_moe_transient_v3_epoch2.json)。询问epoch口径后，未收到其他选择时采用已明确推荐的完整遍历默认：每轮四库窗口各一次，双卡共享同一shuffle permutation，disjoint shard、最后不足batch保留。不是旧equal-source有放回采样的换名。
+[两轮配置](../config/twm_four_sources_moe_transient_v3_epoch2.json)。启动时先采用已说明的完整遍历默认；用户随后于2026-10-15异步回复明确确认“每个窗口一次，先跑2个epoch”，与已启动配置一致：每轮四库窗口各一次，双卡共享同一shuffle permutation，disjoint shard、最后不足batch保留。不是旧equal-source有放回采样的换名。
 
 | 来源 | train窗口/epoch |
 |---|---:|
@@ -76,3 +76,6 @@ python3 /sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261
 [W&B在线新run](https://wandb.ai/black-ant/handloop-twm/runs/58f012f8)服务端已实际返回10/20/30/40/50训练标量及epoch_progress，默认横轴设为epoch_progress；本地log存在不是唯一验收依据。完整小型[启动验收摘要](../reports/twm_transient_epoch2_20261015.json)含配置、数据/代码hash、初始验证几何、语义/续跑/停止及CPU数值审计。原始数据、短片段、权重和全日志均仅远程保存。Source GT仍为拟合MANO，坐标单位与原prepared数据及共同anchor契约不变。
 
 注意日志temporal/spatial pattern计数是窗口模式抽签，含全净case的未施加模式；strong空间部分另有局部override，不能把这些计数直接当作实际坏关节/坏帧数。旧mixed_v2及既有checkpoint原样保留，后续相同连续clip与真实HaWoR验证仍待做；本次组合修复尚未构成单因素因果证明或最终性能提升证据。
+
+
+用户随后确认其可登录ds。先前入口短暂拒绝已在正式启动前恢复，并非当前阻塞；本次确认无需重启或修改已运行训练。
