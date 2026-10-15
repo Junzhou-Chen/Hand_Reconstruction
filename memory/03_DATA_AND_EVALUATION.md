@@ -16,6 +16,8 @@
 
 **HaWoR对比复核：** 视觉训练四库HOT573K/ARCTIC165K/DexYCB169K/HO3D66K，infiller单HOT；主定量HOT Aria27 validation/world＋Dex test/camera，EPIC定性。建议首轮主HOT补Dex，ARCTIC/HO3D另加则标为扩展。当前官方HOT evaluator为GT crop/visibility、右手、GT-valid交集、100帧含scale对齐，未调用infiller；部署detector/双手/不可见恢复另报。Dex作者fork默认s0_test，缺预测ID会跳过，须锁定共同覆盖。本轮只核资料，没有运行baseline。[完整协议与资源缺口](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)
 
+**2026-10-14作者报告误差复核：** 原论文Table3 HOT3D PA/W/WA-MPJPE=4.79/33.20/11.27mm、RTE0.78%；Table4(b)不可见片段infiller=6.22/66.25/37.22mm、RTE7.41%，线性/球面插值W75.01mm、最后姿态W116.79mm。Table1 DexYCB PA整体/中重遮挡/重遮挡=4.76/5.03/5.07mm。PA逐帧对齐，W起始和WA整段100帧similarity（含scale），均非D28合成受损wrist指标；不能凭D28的5.435mm声称优于HaWoR。只是论文/官方代码核验，无新模型实验，未恢复旧训练。[数值及定义](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md#2026-10-14复核的论文报告数值)。
+
 **四个已下载来源的后续审计：** 字段条件允许用于pure-motion TWM，建议MoCap三库核心＋Dex train补充，不按四库等精度/等权监督。Oak raw_mano有16 quaternion/tsl/beta；HOT/Ume MANO为PCA15＋root axis-angle/transl，Dex为PCA45＋非flat mean的51D，需源模型展开后编码99D。Ume样本native与MANO可独立缺失；HOT有真实ref timestamps，Ume抽查包仅frame IDs；Dex TAR顺序乱序且多view共享motion。固定train后排序、mask、时间与腕原点/FK验收仍待做，不能把全包含val/test都用于训练。[代码与样本范围](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)
 
 v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验收可用MoCap及glove，按质量和字段能力训练；99D不要求源原生MANO。DexYCB仍可纯轨迹恢复对照，固定第三视角不是排除条件；它的论文用频率不使其GT优先于独立sensor参考。

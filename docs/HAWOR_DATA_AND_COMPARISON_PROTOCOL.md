@@ -18,6 +18,21 @@
 
 ## HOT3D作为world主评测
 
+### 2026-10-14复核的论文报告数值
+
+以下均为作者原论文结果，不是本项目重跑。来源：[Table 1、3、4(b)与补充§8.3](https://arxiv.org/html/2501.02973v1)。
+
+| 评测 | PA-MPJPE (mm) | W-MPJPE (mm) | WA-MPJPE (mm) | RTE (%) |
+|---|---:|---:|---:|---:|
+| HOT3D主表Table 3，HaWoR | 4.79 | 33.20 | 11.27 | 0.78 |
+| HOT3D不可见片段Table 4(b)，HaWoR infiller | 6.22 | 66.25 | 37.22 | 7.41 |
+| 同一不可见片段，LERP/SLERP | 6.33 | 75.01 | 49.16 | 9.39 |
+| 同一不可见片段，保持最后姿态 | 7.83 | 116.79 | 78.78 | 13.04 |
+
+DexYCB test Table 1的PA-MPJPE为整体4.76mm、50%–75%遮挡5.03mm、75%–100%遮挡5.07mm；表头简写MPJPE，但caption及§4明确为PA-MPJPE。HOT3D主表Accel为5.41m/s²。相机Table 2报告ATE3.36mm（使用GT尺度对齐）、ATE-S14.61mm（预测尺度），不是手部joint或wrist误差。
+
+PA允许逐帧similarity对齐，消除了全局位姿和尺度误差；W与WA为100帧分段的起始/整段对齐，官方实现起始使用前两帧且包含scale，详见下文。因此4.79mm不是绝对world手误差，33.20mm也不是未经对齐的世界误差。它们均为joint position指标，不能与本项目D28合成corruption的腕位置5.435mm或手指rotation误差直接拼表；需要同split、同输入、同GT/mask与同alignment的真实HaWoR前后对照。
+
 论文使用的27个validation是作者从Aria原录制留出的集合，**不是Hugging Face的`test_aria`分区**。官方代码版本`66c7d4108d58a716deccd192cb7645170cdc7bd7`（本轮核main未变）在README列出27个ID，按完整VRS导出。`export_gt.py`会生成`val.json`，无须另寻找一份未发布的名单文件。[评测入口](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/README.md#evaluation-on-hot3d)、[名单生成](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/hot3d/export_gt.py)
 
 完整复现数据需要RGB视频、手部MANO参考、相机标定/轨迹、时间对应。官方导出跳过前20个时间戳，从索引20起，使用RGB `214-1`流、去畸变与顺时针90°旋转，30fps；产物含RGB/mp4、`anno.pth`、`head_pose.pkl`、`ego_extrinsics.pkl`、`focal.txt`、`tt_list.pkl`。应沿同一导出实现，不能把别的view或旋转约定直接混入。[导出实现](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/hot3d/viewer_export_gt.py)、[视觉流处理](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/hot3d/Hot3DVisualizer.py)
