@@ -9,13 +9,13 @@ import subprocess
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('start','status','stop'))
-    parser.add_argument('--pod', default='jchen57-debug-mpd5p')
+    parser.add_argument('--pod', default='jchen57-fineturn-tl4zr')
     parser.add_argument('--namespace', default='jchen57')
-    parser.add_argument('--code', default='/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015')
+    parser.add_argument('--code', default='/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_10k_20261015')
     parser.add_argument('--python', default='/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python')
     parser.add_argument('--manifest', default='/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json')
-    parser.add_argument('--config', default='config/twm_four_sources_moe_transient_v3_epoch2.json')
-    parser.add_argument('--output', default='/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015')
+    parser.add_argument('--config', default='config/twm_four_sources_moe_transient_v3_b512_10k.json')
+    parser.add_argument('--output', default='/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_b512_10k_20261015')
     parser.add_argument('--gpus', default='0,1')
     parser.add_argument('--wandb-key-file', default='/sciclone/data10/jchen57/Hand_Reconstruction/private/wandb_api_key',
                         help='Private remote file; only passed through the child environment')

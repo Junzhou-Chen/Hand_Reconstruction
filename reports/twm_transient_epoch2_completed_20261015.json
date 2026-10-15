@@ -1,0 +1,389 @@
+{
+  "utc": "2026-10-15T15:53:45.376433+00:00",
+  "pod": "jchen57-fineturn-tl4zr",
+  "torch": "2.10.0+cu130",
+  "cuda": "13.0",
+  "gpu_probes": [
+    {
+      "index": 0,
+      "name": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+      "tiny_cuda_result": 140.0,
+      "memory_bytes": 101974081536
+    },
+    {
+      "index": 1,
+      "name": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+      "tiny_cuda_result": 140.0,
+      "memory_bytes": 101974081536
+    }
+  ],
+  "source_code_unchanged": true,
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015",
+  "status": {
+    "utc": "2026-10-15T07:53:55.396241+00:00",
+    "step": 1244,
+    "phase": "complete",
+    "epoch_progress": 2.0,
+    "completed_epochs": 2,
+    "target_epochs": 2,
+    "windows_seen": 1273220,
+    "updates_per_epoch": 622,
+    "batch_in_epoch": 0,
+    "best_validation_loss": 0.020710244453493946,
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/58f012f8"
+  },
+  "code_version": "25fee71a1fe1f0347054153b2135f0d018f63068",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "epoch_schedule": {
+    "epochs": 2,
+    "windows_per_epoch": 636610,
+    "steps_per_epoch": 622,
+    "ddp_padding_per_epoch": 0
+  },
+  "train_windows_by_dataset": {
+    "dexycb": 6352,
+    "hot3d": 132008,
+    "oakink2": 346860,
+    "umetrack": 151390
+  },
+  "source_sampling_counts": {
+    "dexycb": 12704,
+    "hot3d": 264016,
+    "oakink2": 693720,
+    "umetrack": 302780
+  },
+  "corruption_counts": {
+    "clean_motion": 254728,
+    "current_reanchors_history": 255211,
+    "ordinary_restoration": 445097,
+    "partial_missing": 254767,
+    "rare_local_failure": 63417
+  },
+  "checkpoint": {
+    "step": 1244,
+    "code_version": "25fee71a1fe1f0347054153b2135f0d018f63068",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "992b14ac20f60d5d013d48513b2f12917b27a7468fe89fbb3eb8945ed26865cc",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      1244.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "best_checkpoint": {
+    "step": 1244,
+    "progress": {
+      "epoch_progress": 2.0,
+      "completed_epochs": 2,
+      "target_epochs": 2,
+      "windows_seen": 1273220,
+      "updates_per_epoch": 622,
+      "batch_in_epoch": 0
+    },
+    "model_and_optimizer_finite": true
+  },
+  "validation_step": 1244,
+  "validation_geometry": {
+    "clean": {
+      "initial": {
+        "candidate/wrist_mm": 0.0,
+        "restored/wrist_mm": 0.0,
+        "history_hold/wrist_mm": 5.04943186044693,
+        "candidate/root_deg": 1.9471553353023197e-07,
+        "restored/root_deg": 2.0084123464325643e-07,
+        "candidate/finger_deg": 7.496568266152082e-08,
+        "restored/finger_deg": 9.389423216710213e-08,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 2.012662977762872e-15
+      },
+      "final": {
+        "candidate/wrist_mm": 0.0,
+        "restored/wrist_mm": 1.4567160457372665,
+        "history_hold/wrist_mm": 5.04943186044693,
+        "candidate/root_deg": 1.9471553353023197e-07,
+        "restored/root_deg": 0.19251303235068917,
+        "candidate/finger_deg": 7.496568266152082e-08,
+        "restored/finger_deg": 0.06671456410549581,
+        "wrist_degradation_over_1mm": 0.5927734375,
+        "restoration_loss": 0.0004436446211002476
+      }
+    },
+    "reanchor": {
+      "initial": {
+        "candidate/wrist_mm": 0.2671874361112714,
+        "restored/wrist_mm": 0.2671874361112714,
+        "history_hold/wrist_mm": 5.940705820918083,
+        "candidate/root_deg": 0.26243313588202,
+        "restored/root_deg": 0.2624331400729716,
+        "candidate/finger_deg": 0.25771703384816647,
+        "restored/finger_deg": 0.2577170408330858,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.0001807583885238273
+      },
+      "final": {
+        "candidate/wrist_mm": 0.2671874361112714,
+        "restored/wrist_mm": 1.8069361820816994,
+        "history_hold/wrist_mm": 5.940705820918083,
+        "candidate/root_deg": 0.26243313588202,
+        "restored/root_deg": 0.3878650739789009,
+        "candidate/finger_deg": 0.25771703384816647,
+        "restored/finger_deg": 0.29342007311061025,
+        "wrist_degradation_over_1mm": 0.603515625,
+        "restoration_loss": 0.0008201112486858619
+      }
+    },
+    "noisy": {
+      "initial": {
+        "candidate/wrist_mm": 4.651723489165306,
+        "restored/wrist_mm": 4.651723489165306,
+        "history_hold/wrist_mm": 6.2905550971627235,
+        "candidate/root_deg": 1.9902560468763113,
+        "restored/root_deg": 1.9902560207992792,
+        "candidate/finger_deg": 1.0579894818365574,
+        "restored/finger_deg": 1.057989489287138,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.012542543656309135
+      },
+      "final": {
+        "candidate/wrist_mm": 4.651723489165306,
+        "restored/wrist_mm": 4.217484824359417,
+        "history_hold/wrist_mm": 6.2905550971627235,
+        "candidate/root_deg": 1.9902560468763113,
+        "restored/root_deg": 2.037291157990694,
+        "candidate/finger_deg": 1.0579894818365574,
+        "restored/finger_deg": 1.0799080114811659,
+        "wrist_degradation_over_1mm": 0.208984375,
+        "restoration_loss": 0.011073832836700603
+      }
+    },
+    "missing": {
+      "initial": {
+        "candidate/wrist_mm": 7.2358227372169495,
+        "restored/wrist_mm": 7.2358227372169495,
+        "history_hold/wrist_mm": 8.266562059521675,
+        "candidate/root_deg": 1.879042224958539,
+        "restored/root_deg": 1.879042224958539,
+        "candidate/finger_deg": 0.6848005540668964,
+        "restored/finger_deg": 0.6848005522042513,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.03461979924759362
+      },
+      "final": {
+        "candidate/wrist_mm": 7.2358227372169495,
+        "restored/wrist_mm": 5.9349649623036385,
+        "history_hold/wrist_mm": 8.266562059521675,
+        "candidate/root_deg": 1.879042224958539,
+        "restored/root_deg": 1.9345073271542788,
+        "candidate/finger_deg": 0.6848005540668964,
+        "restored/finger_deg": 0.711349899880588,
+        "wrist_degradation_over_1mm": 0.2001953125,
+        "restoration_loss": 0.027291697144391946
+      }
+    },
+    "strong": {
+      "initial": {
+        "candidate/wrist_mm": 16.78713086247444,
+        "restored/wrist_mm": 16.78713086247444,
+        "history_hold/wrist_mm": 12.34837755560875,
+        "candidate/root_deg": 10.868943244218826,
+        "restored/root_deg": 10.868943184614182,
+        "candidate/finger_deg": 2.5838422998785973,
+        "restored/finger_deg": 2.5838422924280167,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.24383271671831608
+      },
+      "final": {
+        "candidate/wrist_mm": 16.78713086247444,
+        "restored/wrist_mm": 14.710624366998672,
+        "history_hold/wrist_mm": 12.34837755560875,
+        "candidate/root_deg": 10.868943244218826,
+        "restored/root_deg": 10.854196339845657,
+        "candidate/finger_deg": 2.5838422998785973,
+        "restored/finger_deg": 2.6115180030465126,
+        "wrist_degradation_over_1mm": 0.3330078125,
+        "restoration_loss": 0.2224662471562624
+      }
+    },
+    "single": {
+      "initial": {
+        "candidate/wrist_mm": 5.042336359620094,
+        "restored/wrist_mm": 5.042336359620094,
+        "history_hold/wrist_mm": 5.091667167842388,
+        "candidate/root_deg": 2.226531997323036,
+        "restored/root_deg": 2.2265319786965847,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.181404311209917,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.014691317453980446
+      },
+      "final": {
+        "candidate/wrist_mm": 5.042336359620094,
+        "restored/wrist_mm": 4.12169972807169,
+        "history_hold/wrist_mm": 5.091667167842388,
+        "candidate/root_deg": 2.226531997323036,
+        "restored/root_deg": 2.2659147940576077,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.205792885273695,
+        "wrist_degradation_over_1mm": 0.1806640625,
+        "restoration_loss": 0.011852189651108347
+      }
+    },
+    "burst3": {
+      "initial": {
+        "candidate/wrist_mm": 5.042336329817772,
+        "restored/wrist_mm": 5.042336329817772,
+        "history_hold/wrist_mm": 7.2768842577934265,
+        "candidate/root_deg": 2.2265319749712944,
+        "restored/root_deg": 2.226531967520714,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.181404311209917,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.014691317541291937
+      },
+      "final": {
+        "candidate/wrist_mm": 5.042336329817772,
+        "restored/wrist_mm": 5.094411306083202,
+        "history_hold/wrist_mm": 7.2768842577934265,
+        "candidate/root_deg": 2.2265319749712944,
+        "restored/root_deg": 2.2865817919373512,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.2058226894587278,
+        "wrist_degradation_over_1mm": 0.2646484375,
+        "restoration_loss": 0.014133384334854782
+      }
+    },
+    "burst4": {
+      "initial": {
+        "candidate/wrist_mm": 5.042336344718933,
+        "restored/wrist_mm": 5.042336344718933,
+        "history_hold/wrist_mm": 7.450716719031334,
+        "candidate/root_deg": 2.226531967520714,
+        "restored/root_deg": 2.2265319637954235,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.181404311209917,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.014691317628603429
+      },
+      "final": {
+        "candidate/wrist_mm": 5.042336344718933,
+        "restored/wrist_mm": 5.237440228462219,
+        "history_hold/wrist_mm": 7.450716719031334,
+        "candidate/root_deg": 2.226531967520714,
+        "restored/root_deg": 2.2882524728775024,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.2058374118059874,
+        "wrist_degradation_over_1mm": 0.2783203125,
+        "restoration_loss": 0.014498473989078775
+      }
+    },
+    "position_burst4": {
+      "initial": {
+        "candidate/wrist_mm": 6.519845798611641,
+        "restored/wrist_mm": 6.519845798611641,
+        "history_hold/wrist_mm": 8.072550177574158,
+        "candidate/root_deg": 1.9471553353023197e-07,
+        "restored/root_deg": 2.0084123464325643e-07,
+        "candidate/finger_deg": 7.496568266152082e-08,
+        "restored/finger_deg": 9.389423216710213e-08,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.007912513363407925
+      },
+      "final": {
+        "candidate/wrist_mm": 6.519845798611641,
+        "restored/wrist_mm": 6.328552633523941,
+        "history_hold/wrist_mm": 8.072550177574158,
+        "candidate/root_deg": 1.9471553353023197e-07,
+        "restored/root_deg": 0.20597882801666856,
+        "candidate/finger_deg": 7.496568266152082e-08,
+        "restored/finger_deg": 0.06718057685066015,
+        "wrist_degradation_over_1mm": 0.197265625,
+        "restoration_loss": 0.00745508712134324
+      }
+    },
+    "scattered3": {
+      "initial": {
+        "candidate/wrist_mm": 5.042336389422417,
+        "restored/wrist_mm": 5.042336389422417,
+        "history_hold/wrist_mm": 5.6657209396362305,
+        "candidate/root_deg": 2.226531982421875,
+        "restored/root_deg": 2.2265319749712944,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.181404311209917,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.014691317483084276
+      },
+      "final": {
+        "candidate/wrist_mm": 5.042336389422417,
+        "restored/wrist_mm": 4.4139558002352715,
+        "history_hold/wrist_mm": 5.6657209396362305,
+        "candidate/root_deg": 2.226531982421875,
+        "restored/root_deg": 2.270289868116379,
+        "candidate/finger_deg": 1.181404298171401,
+        "restored/finger_deg": 1.2058349214494228,
+        "wrist_degradation_over_1mm": 0.1962890625,
+        "restoration_loss": 0.012460915022529662
+      }
+    },
+    "ramp4": {
+      "initial": {
+        "candidate/wrist_mm": 3.316857025027275,
+        "restored/wrist_mm": 3.316857025027275,
+        "history_hold/wrist_mm": 6.038675546646118,
+        "candidate/root_deg": 1.5221920050680637,
+        "restored/root_deg": 1.5221919976174831,
+        "candidate/finger_deg": 0.8448978969827294,
+        "restored/finger_deg": 0.8448979035019875,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.007392269966658205
+      },
+      "final": {
+        "candidate/wrist_mm": 3.316857025027275,
+        "restored/wrist_mm": 3.571050211787224,
+        "history_hold/wrist_mm": 6.038675546646118,
+        "candidate/root_deg": 1.5221920050680637,
+        "restored/root_deg": 1.5841311868280172,
+        "candidate/finger_deg": 0.8448978969827294,
+        "restored/finger_deg": 0.8704687785357237,
+        "wrist_degradation_over_1mm": 0.2568359375,
+        "restoration_loss": 0.00720470015949104
+      }
+    },
+    "history_only": {
+      "initial": {
+        "candidate/wrist_mm": 6.2905550971627235,
+        "restored/wrist_mm": 6.2905550971627235,
+        "history_hold/wrist_mm": 6.2905550971627235,
+        "candidate/root_deg": 2.4361335821449757,
+        "restored/root_deg": 2.4361335821449757,
+        "candidate/finger_deg": 1.4542570523917675,
+        "restored/finger_deg": 1.4542570523917675,
+        "wrist_degradation_over_1mm": 0.0,
+        "restoration_loss": 0.020653587867855094
+      },
+      "final": {
+        "candidate/wrist_mm": 6.2905550971627235,
+        "restored/wrist_mm": 4.96500838547945,
+        "history_hold/wrist_mm": 6.2905550971627235,
+        "candidate/root_deg": 2.4361335821449757,
+        "restored/root_deg": 2.4413188360631466,
+        "candidate/finger_deg": 1.4542570523917675,
+        "restored/finger_deg": 1.4596227537840605,
+        "wrist_degradation_over_1mm": 0.1376953125,
+        "restoration_loss": 0.016943364986218512
+      }
+    }
+  },
+  "wandb": {
+    "state": "finished",
+    "optimizer_step": 1244,
+    "epoch_progress": 2,
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/58f012f8"
+  },
+  "scope": "Completed original two epochs on old Pod; no new training or budget extension; new Pod CUDA and checkpoint read verified; saved fixed synthetic validation only, not real HaWoR/independent GT evidence."
+}

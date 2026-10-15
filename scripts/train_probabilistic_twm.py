@@ -316,20 +316,22 @@ def main():
     if set(train.dataset_names)!=set(config['required_datasets']): raise ValueError('Required training sources differ')
     if any(train.windows_by_dataset[name]<1 for name in config['required_datasets']):
         raise ValueError('Every required source needs usable train windows')
-    epoch_training=config.get('training_unit')=='epoch'
+    epoch_budget=config.get('training_unit')=='epoch'
+    coverage_sampling=epoch_budget or config.get('source_sampling')=='full_coverage'
     steps_per_epoch=None
-    if epoch_training:
-        if not isinstance(config['epochs'],int) or config['epochs']<1: raise ValueError('Positive integer epochs required')
+    if coverage_sampling:
         sampler=CoverageEpochSampler(train,replicas=world,rank=rank,seed=config['seed'],batch_size=local_batch)
         steps_per_epoch=math.ceil(len(sampler)/local_batch)
+    else:
+        sampler=SourceBalancedSampler(train,num_samples=config['steps']*local_batch,seed=seed)
+    if epoch_budget:
+        if not isinstance(config['epochs'],int) or config['epochs']<1: raise ValueError('Positive integer epochs required')
         config['steps']=config['epochs']*steps_per_epoch
         config['warmup_steps']=max(1,math.ceil(config['warmup_epochs']*steps_per_epoch))
         config['eval_every']=max(1,math.ceil(config['eval_every_epochs']*steps_per_epoch))
-    else:
-        sampler=SourceBalancedSampler(train,num_samples=config['steps']*local_batch,seed=seed)
     if checkpoint and checkpoint['config']!=config:
         raise ValueError('Resume requires unchanged resolved configuration')
-    loader = DataLoader(train,batch_size=local_batch,sampler=sampler,num_workers=0,pin_memory=True,drop_last=not epoch_training,
+    loader = DataLoader(train,batch_size=local_batch,sampler=sampler,num_workers=0,pin_memory=True,drop_last=not coverage_sampling,
                         generator=torch.Generator().manual_seed(seed))
     loaders = {}
     if rank==0:
@@ -356,13 +358,14 @@ def main():
            'train_windows_by_dataset':train.windows_by_dataset,'initialization':'resume' if args.resume else 'from scratch',
            'train_forecast_contract':train.forecast_contract,
            'rotation6d':g.ROTATION_6D_CONVENTION,'position_units':'metres in noisy-history wrist anchor frame',
-           'sampling':('full shuffled coverage, disjoint rank shards, no dropped final batch' if epoch_training else 'equal source then uniform windows, independent rank RNG, with replacement'),
-           'epoch_schedule':({'epochs':config['epochs'],'windows_per_epoch':len(train),'steps_per_epoch':steps_per_epoch,
-                              'ddp_padding_per_epoch':sampler.total_size-len(train)} if epoch_training else None),
+           'sampling':('full shuffled coverage, disjoint rank shards, no dropped final batch' if coverage_sampling else 'equal source then uniform windows, independent rank RNG, with replacement'),
+           'epoch_schedule':({**({'epochs':config['epochs']} if epoch_budget else {'budget_unit':'step','target_steps':config['steps']}),
+                              'windows_per_epoch':len(train),'steps_per_epoch':steps_per_epoch,
+                              'ddp_padding_per_epoch':sampler.total_size-len(train)} if coverage_sampling else None),
            'GT':'source fitted MANO references; unchanged recording-disjoint four-source splits; no test labels',
            'beta_conditioning':config['condition_on_beta'],'future_targets':'next up to 60 contiguous source frames, mask tails/gaps; physical timestamps',
            'scope':'synthetic corruption pure-motion current restoration and multi-modal trajectory forecast; no visual correction evidence yet',
-           'resume_limit':('deterministic epoch permutation and batch cursor; num_workers=0; rank RNG restored' if epoch_training else 'rank RNG saved; sampler prefetched chunks/loader cursor not bitwise replay'),
+           'resume_limit':('deterministic epoch permutation and batch cursor; num_workers=0; rank RNG restored' if coverage_sampling else 'rank RNG saved; sampler prefetched chunks/loader cursor not bitwise replay'),
            'likelihood':'xyz diagonal Gaussian in m; isotropic matrix Fisher on SO3 normalized Haar; trajectory-wide categorical mixture'}
     source_root=Path(__file__).resolve().parents[1]
     run['source_sha256']={name:hashlib.sha256((source_root/name).read_bytes()).hexdigest() for name in (
@@ -380,11 +383,14 @@ def main():
     checkpoint = None
 
     def progress(step):
-        if not epoch_training: return {}
+        if not coverage_sampling: return {}
         completed,within=divmod(step,steps_per_epoch)
         seen=completed*sampler.total_size+min(within*config['batch_size'],sampler.total_size)
         return {'epoch_progress':completed+min(within*config['batch_size']/sampler.total_size,1.),
-                'completed_epochs':completed,'target_epochs':config['epochs'],'windows_seen':seen,
+                'completed_epochs':completed,
+                **({'target_epochs':config['epochs']} if epoch_budget else
+                   {'target_steps':config['steps'],'step_progress':step/config['steps']}),
+                'windows_seen':seen,
                 'updates_per_epoch':steps_per_epoch,'batch_in_epoch':within}
 
     def save(step,best_checkpoint=False):
@@ -426,7 +432,7 @@ def main():
         if decision.item(): save(step,True)
         model.train(); return values
 
-    if epoch_training:
+    if coverage_sampling:
         sampler.set_epoch(start_step//steps_per_epoch); sampler.batch_cursor=start_step%steps_per_epoch
     latest_val=validate(start_step,True); save(start_step)
     iterator=iter(loader); step=start_step; start=time.monotonic()
@@ -442,7 +448,7 @@ def main():
         if stopping.item(): stop['requested']=True; break
         try: batch=next(iterator)
         except StopIteration:
-            if epoch_training:
+            if coverage_sampling:
                 sampler.set_epoch(step//steps_per_epoch); sampler.batch_cursor=0
             iterator=iter(loader); batch=next(iterator)
         batch={k:v.to(device,non_blocking=True) for k,v in batch.items()}
@@ -456,7 +462,7 @@ def main():
             pattern_counts+=torch.bincount(diagnostics['pattern_id'],minlength=4)
             spatial_counts+=torch.bincount(diagnostics['spatial_id'],minlength=4)
         step+=1
-        if epoch_training: sampler.batch_cursor=(step-1)%steps_per_epoch+1
+        if coverage_sampling: sampler.batch_cursor=(step-1)%steps_per_epoch+1
         multiplier=step/config['warmup_steps'] if step<=config['warmup_steps'] else .1+.9*.5*(1+math.cos(math.pi*(step-config['warmup_steps'])/max(1,config['steps']-config['warmup_steps'])))
         for group in optimizer.param_groups: group['lr']=config['learning_rate']*multiplier
         optimizer.zero_grad(set_to_none=True)
@@ -493,8 +499,8 @@ def main():
                 atomic_json(args.output/'status.json',event)
                 with (args.output/'metrics.jsonl').open('a') as stream: stream.write(json.dumps(event)+'\n')
                 tracker.log({**flatten_numbers(event,'train'),**progress(step)},step=step); print(json.dumps(event),flush=True)
-        if step%config['eval_every']==0 or (epoch_training and step%steps_per_epoch==0): latest_val=validate(step)
-        if step%config['save_every']==0 or step==start_step+config['log_every'] or (epoch_training and step%steps_per_epoch==0): save(step)
+        if step%config['eval_every']==0 or (epoch_budget and step%steps_per_epoch==0): latest_val=validate(step)
+        if step%config['save_every']==0 or step==start_step+config['log_every'] or (epoch_budget and step%steps_per_epoch==0): save(step)
     save(step)
     if rank==0:
         phase='stopped' if stop['requested'] else ('smoke_complete' if args.stop_after_updates else 'complete')
