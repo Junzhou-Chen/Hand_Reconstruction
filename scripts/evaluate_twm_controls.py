@@ -7,6 +7,7 @@ All cases share the same noisy past and target. No future state enters model.
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 from train_twm import (torch,TWM,TWMConfig,TrajectoryWindows,sample_batch,metrics,atomic_json,utc)
 from torch.utils.data import DataLoader,Subset
@@ -46,6 +47,7 @@ def main():
                 values=metrics(prediction,target)
                 values.update({'input_'+k:v for k,v in metrics(c,target).items()})
                 values.update({'change_from_normal_'+k:v for k,v in metrics(prediction,normal).items()})
+                if not all(math.isfinite(v) for v in values.values()):raise FloatingPointError(f'Nonfinite {source}/{case}')
                 for k,v in values.items():totals[case][k]=totals[case].get(k,0.)+v*len(target)
             count+=len(target)
         by_source[source]={case:{**{k:v/count for k,v in values.items()},'samples':count} for case,values in totals.items()}
