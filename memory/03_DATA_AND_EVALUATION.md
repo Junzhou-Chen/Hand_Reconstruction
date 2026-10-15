@@ -20,6 +20,8 @@
 
 **D30误差分布匹配：** 用户强调模拟HaWoR真实错误。D29仍复用旧sample_batch：当前每轴σ25mm、root12°/finger8°，10%乘3；历史4mm/1.5°且quality不依实际误差。位置高斯解析平均距离约47.9mm（含severe），不是HaWoR误差。建议train/calibration提取pre-infiller的wrist/SO(3)/local与world joint残差、时间相关性/连续缺失，先验adapter与shape约定；排HOT27/Dex test/TWM val。独立覆盖当前准确而历史错误，保留少量严重失败，quality与几何误差关联但部署不用oracle。已对照PAD-Hand真实WiLoR配对、DIP两类训练、StableHand质量增广和HaWoR连续mask；具体幅度/比例未定、无新训练修改或校准结果。[校准建议及证据](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#8-2026-10-14corruption应贴近hawor实际误差)。
 
+**D31混合训练澄清：** 用户不要求本轮先做真实HaWoR标定，要求暂停当前训练并考虑干净/有噪条件混合、严重少量。D29已暂停814步；建议20%全净、20%当前近准/历史中噪、35%双方独立轻中噪、20%局部缺失、5%局部强异常。幅度改为实际位移范数近0–1/轻1–6/中6–15/强20–50mm、SO(3)总角，避免每轴σ带来隐含长尾；默认quality unknown，所有监督GT不受损。配置仅草案，尚未接入trainer或证明适配HaWoR，具体比例/幅度待验。[设置与验收](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。
+
 **四个已下载来源的后续审计：** 字段条件允许用于pure-motion TWM，建议MoCap三库核心＋Dex train补充，不按四库等精度/等权监督。Oak raw_mano有16 quaternion/tsl/beta；HOT/Ume MANO为PCA15＋root axis-angle/transl，Dex为PCA45＋非flat mean的51D，需源模型展开后编码99D。Ume样本native与MANO可独立缺失；HOT有真实ref timestamps，Ume抽查包仅frame IDs；Dex TAR顺序乱序且多view共享motion。固定train后排序、mask、时间与腕原点/FK验收仍待做，不能把全包含val/test都用于训练。[代码与样本范围](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)
 
 v1只要求HOT/Oak、先扩Re/EgoDex的建议被D18替代：第一批共同验收可用MoCap及glove，按质量和字段能力训练；99D不要求源原生MANO。DexYCB仍可纯轨迹恢复对照，固定第三视角不是排除条件；它的论文用频率不使其GT优先于独立sensor参考。

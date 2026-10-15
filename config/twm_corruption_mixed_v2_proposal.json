@@ -1,0 +1,44 @@
+{
+  "profile": "mixed_motion_restoration_v2",
+  "status": "proposal_only_not_wired_to_a_trainer",
+  "architecture_independent": true,
+  "restart_training": false,
+  "target_policy": "All current and future targets remain uncorrupted source reference trajectories",
+  "amplitude_convention": "Translation is actual 3D displacement norm in mm; rotation is actual SO(3) geodesic angle in degrees, never per-axis std or noise added to rot6d",
+  "levels": {
+    "clean": {"translation_norm_mm": [0, 0], "root_angle_deg": [0, 0], "finger_angle_deg": [0, 0]},
+    "near": {"translation_norm_mm": [0, 1], "root_angle_deg": [0, 1], "finger_angle_deg": [0, 1]},
+    "light": {"translation_norm_mm": [1, 6], "root_angle_deg": [0, 4], "finger_angle_deg": [0, 3]},
+    "medium": {"translation_norm_mm": [6, 15], "root_angle_deg": [3, 10], "finger_angle_deg": [2, 8]},
+    "strong": {"translation_norm_mm": [20, 50], "root_angle_deg": [10, 35], "finger_angle_deg": [8, 25]}
+  },
+  "amplitude_sampling": "Uniform radius/angle within selected range; isotropic random direction; group rotations composed on SO(3)",
+  "window_cases": [
+    {"name": "clean_motion", "probability": 0.2, "current_levels": {"clean": 1.0}, "history_levels": {"clean": 1.0}},
+    {"name": "current_reanchors_history", "probability": 0.2, "current_levels": {"clean": 0.5, "near": 0.5}, "history_levels": {"medium": 1.0}},
+    {"name": "ordinary_restoration", "probability": 0.35, "current_levels": {"light": 0.5, "medium": 0.5}, "history_levels": {"clean": 0.3333333333333333, "light": 0.3333333333333333, "medium": 0.3333333333333333}, "severity_relation": "independent history/current draws"},
+    {"name": "partial_missing", "probability": 0.2, "current_levels": {"near": 0.5, "light": 0.5}, "history_levels": {"light": 0.5, "medium": 0.5}, "missing_cases": {"one_whole_finger": 0.7, "one_to_three_state_groups": 0.2, "whole_current_hand": 0.1}, "candidate_fill": "causal previous completed history only"},
+    {"name": "rare_local_failure", "probability": 0.05, "current_levels": {"light": 1.0}, "history_levels": {"light": 0.5, "medium": 0.5}, "strong_override": {"wrist_translation_and_root": 0.5, "one_or_two_fingers": 0.5}}
+  ],
+  "temporal_noise": {
+    "affected_window_modes": {"independent": 0.5, "correlated": 0.5},
+    "latent_direction_correlation_seconds": [0.1, 0.3],
+    "history_current_joint_process": "shared continuous noise where case permits; explicit reset at current time in current_reanchors_history",
+    "bounded_rule": "Normalize direction after any mixing, then multiply by bounded radius/angle. Do not add multiple full-amplitude errors.",
+    "actual_correlation": "Must be measured after direction normalization; latent OU rho is not the final error correlation"
+  },
+  "quality": {"default": "unknown_for_available_state_groups", "unknown_value": -1, "availability_is_separate": true, "oracle_quality": "optional separately labeled ablation only; not the default condition"},
+  "source_sampling": "retain current four-source split and sampling; no new images required",
+  "evaluation": {
+    "fixed_cases": ["clean_history_clean_current", "noisy_history_clean_current", "clean_history_light_current", "noisy_history_light_current", "noisy_history_medium_or_local_current", "rare_strong_current", "partial_and_whole_missing", "history_only_control"],
+    "retain_legacy_stress_profile": true,
+    "paired_corruption_seed": true,
+    "metrics": ["input_hold_output_wrist_mm_root_deg_finger_deg", "median_and_p95_by_source", "wrist_degradation_over_1mm", "input_severity_bins", "current_removal_effect", "forecast_per_horizon_with_valid_counts"]
+  },
+  "limitations": [
+    "Not fitted to HaWoR empirical error distribution; all amplitudes and mixture weights are unvalidated starting hypotheses",
+    "Five percent strong-case sampling is not a guarantee that only five percent of candidate/model joint errors are large; missing-value hold and rotation/FK coupling can add error",
+    "Clean restoration may be copied; future labels and dedicated restoration conditions remain necessary",
+    "No trainer or model architecture is changed by this proposal file; the user-paused run remains stopped"
+  ]
+}

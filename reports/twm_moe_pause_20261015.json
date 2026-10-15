@@ -1,0 +1,66 @@
+{
+  "utc": "2026-10-15T00:37:42.079104+00:00",
+  "reason": "User explicitly paused current run for architecture changes and mixed corruption design",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015",
+  "status": {
+    "utc": "2026-10-15T00:36:36.430391+00:00",
+    "step": 814,
+    "phase": "stopped",
+    "best_validation_loss": 0.29427344095893204,
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c"
+  },
+  "stop_retained": true,
+  "processes": {
+    "4034": {
+      "active_training": false,
+      "proc_exists": true
+    },
+    "4039": {
+      "active_training": false,
+      "proc_exists": false
+    },
+    "4040": {
+      "active_training": false,
+      "proc_exists": false
+    }
+  },
+  "checkpoints": {
+    "latest.pt": {
+      "step": 814,
+      "code_version": "4798b62af806f582f420849c2b2a64d90c6de884",
+      "bytes": 162803955,
+      "file_sha256": "a03b860b6d1bcad1fb050bd73b4126f88b6e0726d08eb8548bdbb0bee68951de",
+      "model_state_sha256": "84ec880453a0a95a78075df89263adbd28e37247164f9d272d23214f66800ce6",
+      "model_and_optimizer_finite": true,
+      "model_float_tensors": 322,
+      "optimizer_float_tensors": 963,
+      "rank_count": 2,
+      "saved_ranks_equal_checkpoint": true,
+      "adamw_steps": [
+        814.0
+      ],
+      "original": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015/latest.pt",
+      "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_moe_pause_20261015_v1/snapshots/latest.pt",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f"
+    },
+    "best.pt": {
+      "step": 500,
+      "code_version": "4798b62af806f582f420849c2b2a64d90c6de884",
+      "bytes": 162800839,
+      "file_sha256": "3bb8292a63a531ff99c76e4db18110935d01df8e9b0eaa2fb14ce317afc8bfa1",
+      "model_state_sha256": "d4108f0a6245b92b3484db6ad26cdccfbbc05be51df60185e1b5eafb7da9f7e7",
+      "model_and_optimizer_finite": true,
+      "model_float_tensors": 322,
+      "optimizer_float_tensors": 963,
+      "rank_count": 2,
+      "saved_ranks_equal_checkpoint": true,
+      "adamw_steps": [
+        500.0
+      ],
+      "original": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015/best.pt",
+      "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_moe_pause_20261015_v1/snapshots/best.pt",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f"
+    }
+  },
+  "scope": "Pause/persistence/finite-state audit only; no model quality evaluation or restart"
+}

@@ -8,7 +8,9 @@
 
 ## 当前真实进展
 
-**最新D29：用户明确要求当前恢复＋较长未来轨迹分布、MoE、输出不确定性，并修改模型、启动训练及配置W&B。** 已实现13,530,032参数纯轨迹模型：6层d256结构化Mamba，每层4个dense MLP experts，物理秒Fourier时间编码；当前99D恢复＋4个整段模式、最多60步约2秒预测，xyz Gaussian＋SO(3) isotropic matrix Fisher。新run从头训练，保留四库GT/split和β另存/conditioning关闭；旧D28 run保持暂停。4798b62于00:19:13 UTC启动既有两卡，每卡256/global512；00:20:51 UTC实际40步、四库均参与，W&B服务器已收到同step标量。正式checkpoint10的322个model浮点张量和963个AdamW浮点张量finite，CPU重算hash与两rank一致。FP32/BF16、概率归一化、因果/padding、完整目标mask、双卡3步＋resume至5步均通过。新key只存远程私有文件，W&B为[943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)。时域/模式数/权重是工程起点，尚无新模型最终精度或视觉闭环收益。[架构、数学与运行](docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[启动摘要](reports/twm_moe_long_horizon_20261015.json)。
+**最新D31：用户要求先暂停正在跑的训练，因另一个聊天正在修改架构；混合高质量干净轨迹和受损条件，轻中噪为主，强异常少量，不把真实HaWoR误差标定当开工前置。** D29已在814步共同保存退出，latest814/best500原件与额外快照hash一致，模型/AdamW finite、两rank一致，STOP保留不自动resume。建议输入混合20%全净/20%当前近准历史错/35%轻中噪/20%局部缺失/5%强异常；位移按范数分档，quality默认unknown。具体比例为待验证建议，未接入trainer或修改另一聊天架构。[暂停摘要](reports/twm_moe_pause_20261015.json)、[混合设计§9](docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。
+
+**D29模型与启动历史（随后D31暂停）：用户明确要求当前恢复＋较长未来轨迹分布、MoE、输出不确定性，并修改模型、启动训练及配置W&B。** 已实现13,530,032参数纯轨迹模型：6层d256结构化Mamba，每层4个dense MLP experts，物理秒Fourier时间编码；当前99D恢复＋4个整段模式、最多60步约2秒预测，xyz Gaussian＋SO(3) isotropic matrix Fisher。新run从头训练，保留四库GT/split和β另存/conditioning关闭；旧D28 run保持暂停。4798b62于00:19:13 UTC启动既有两卡，每卡256/global512；00:20:51 UTC实际40步、四库均参与，W&B服务器已收到同step标量。正式checkpoint10的322个model浮点张量和963个AdamW浮点张量finite，CPU重算hash与两rank一致。FP32/BF16、概率归一化、因果/padding、完整目标mask、双卡3步＋resume至5步均通过。新key只存远程私有文件，W&B为[943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)。时域/模式数/权重是工程起点，尚无新模型最终精度或视觉闭环收益。[架构、数学与运行](docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[启动摘要](reports/twm_moe_long_horizon_20261015.json)。
 
 **D28旧dense模型历史状态（2026-10-14）：用户要求暂停当前运行、保留checkpoint并先验证效果。** 已通过STOP共同保存，双卡训练于23:53:53 UTC（纽约19:53）停止在32,783步，rank2968/2969退出，原latest/best保留；不自动resume。冻结checkpoint固定/全量validation及当前输入干预均已完成；结果与限制见下文和暂停评测报告。下文D27启动快照保留为历史。
 
@@ -40,7 +42,7 @@
 
 **数据原则D18（2026-10-13，仍有效）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入；本轮四库由后续D26选定，后续候选比例未定。主候选具备完整任务字段条件；glove需验映射/腕质量，OpenGraph只确认局部补充，尚无本项目适配验收，不将候选全称为“完全适配”。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 
-**当前执行与后续建议：** D29已以同一四库启动独立MoE＋长轨迹概率模型，替代旧短单点执行设计，保留D28旧模型暂停。D26已明确本轮联合训练Oak/HOT/Ume/Dex四库，D27进一步改为双卡大batch；D26取代D23/D25单库执行范围，D27只替代单卡执行配置；它不证明Dex拟合参考与MoCap等精度，也未否定glove候选。此前v2.1的HumanTouch/DexWild共同验收、GRAB/ARCTIC授权后接入等保留为后续建议；ARCTIC当前仍按D22暂缓。glove local/world映射与质量需分别验收，不因本轮四库已可用而取消。[v2.1历史建议](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+**当前执行与后续建议：** D31已暂停D29于814步；当前只形成混合corruption草案，等待另一聊天的架构工作，不自动resume。D29此前以同一四库启动独立MoE＋长轨迹概率模型，替代旧短单点执行设计，D28旧模型仍暂停。D26已明确本轮联合训练Oak/HOT/Ume/Dex四库，D27进一步改为双卡大batch；D26取代D23/D25单库执行范围，D27只替代单卡执行配置；它不证明Dex拟合参考与MoCap等精度，也未否定glove候选。此前v2.1的HumanTouch/DexWild共同验收、GRAB/ARCTIC授权后接入等保留为后续建议；ARCTIC当前仍按D22暂缓。glove local/world映射与质量需分别验收，不因本轮四库已可用而取消。[v2.1历史建议](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
@@ -145,7 +147,7 @@ flowchart TD
 
 **在统一时间戳、骨架、坐标和 GT 条件下，纯轨迹条件恢复能否降低真实 HaWoR 输出的几何误差，并优于 smoothing/Kalman/普通 temporal model？**
 
-当前按D29继续新13.53M模型训练、验证长预测是否优于hold/常速度及当前恢复是否受益；旧模型可靠当前观测利用不足仍是必须复查的问题，不能假定加MoE/长预测已解决。D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
+当前按D31保持D29训练暂停；混合干净与受损条件的20/20/35/20/5仅为草案，后续同架构验证分布设计、长预测是否优于hold/常速度及当前恢复是否受益；旧模型可靠当前观测利用不足仍是必须复查的问题，不能假定加MoE/长预测已解决。D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
 
 ## 记忆的效力与维护
 

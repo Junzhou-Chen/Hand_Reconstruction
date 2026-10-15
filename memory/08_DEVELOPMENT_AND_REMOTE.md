@@ -1,6 +1,8 @@
 # 开发、GitHub同步和远程实验约定
 
-**当前D29（2026-10-15 UTC）：** 新架构、长轨迹分布/MoE训练已按用户授权在原Pod另建run，旧D28 STOP与checkpoint保留。正式代码4798b62，launcher4034/ranks4039/4040，输出`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015`；两卡每卡256/global512。00:20:51 UTC实际40步、W&B服务端已同步；checkpoint10的322个model浮点张量与963个AdamW浮点张量finite，CPU与两rank完整hash相等。独立Mamba runtime新增wandb0.30.0，zhou未改。新key仅在data10项目根`private/wandb_api_key`（600、checkout外），启动器只经child环境传入，不进入config/command receipt/代码；旧netrc不改。明确entity=`black-ant`，默认yc-node和个人bioble写入403，已在独立handloop-twm项目成功在线，run943f9c0c。每100步checkpoint/500步val/10步log，现有Job预计16:37UTC到期，新run16:25UTC共同保存退出；50k计划可能需新allocation续跑，不自动创建或删除Job。使用`ds_train_probabilistic_twm.py status/stop`检查或共同停机；resume必须匹配架构/目标/config；新allocation可显式`--stop-before-utc`覆盖执行deadline，无需篡改checkpoint训练协议，sampler chunk不保证逐样本重放。[新协议](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)。下文D28仅针对旧dense run。
+**当前D31（2026-10-15 UTC）：** 用户要求暂停当前训练，架构在另一聊天修改。D29于00:36:36UTC（纽约20:36）STOP共同保存停止814步，rank4039/4040退出；latest814/best500权重322/AdamW963浮点张量finite，CPU完整模型hash与两rank一致，原件和快照SHA一致。独立备份在data10项目根`evaluations/twm_moe_pause_20261015_v1/snapshots`，原run保留。00:37:42UTC核验，随后GPU无计算进程。保持STOP，不当故障自动resume；本轮混合corruption仅草案，未改架构/训练入口或用户Job。[暂停摘要](../reports/twm_moe_pause_20261015.json)。
+
+**D29启动历史（D31已暂停）：** 新架构、长轨迹分布/MoE训练已按用户授权在原Pod另建run，旧D28 STOP与checkpoint保留。正式代码4798b62，launcher4034/ranks4039/4040，输出`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015`；两卡每卡256/global512。00:20:51 UTC实际40步、W&B服务端已同步；checkpoint10的322个model浮点张量与963个AdamW浮点张量finite，CPU与两rank完整hash相等。独立Mamba runtime新增wandb0.30.0，zhou未改。新key仅在data10项目根`private/wandb_api_key`（600、checkout外），启动器只经child环境传入，不进入config/command receipt/代码；旧netrc不改。明确entity=`black-ant`，默认yc-node和个人bioble写入403，已在独立handloop-twm项目成功在线，run943f9c0c。每100步checkpoint/500步val/10步log，现有Job预计16:37UTC到期，新run16:25UTC共同保存退出；50k计划可能需新allocation续跑，不自动创建或删除Job。使用`ds_train_probabilistic_twm.py status/stop`检查或共同停机；resume必须匹配架构/目标/config；新allocation可显式`--stop-before-utc`覆盖执行deadline，无需篡改checkpoint训练协议，sampler chunk不保证逐样本重放。[新协议](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)。下文D28仅针对旧dense run。
 
 更新日期：2026-10-15 UTC。D13/D14为原GitHub与远程分工约定；最新D19因hongfei GPU占用改用ssh ds，并明确授权复用用户预申请Pod。已定约定与下文建议路径分别标注。
 
@@ -25,12 +27,12 @@
 | 编辑代码、论文、文档、Git同步、静态检查 | 本机 `/Users/junzhou/Project/Visual_Hand_Reconstruction` |
 | 当前远程登录入口 | `ssh ds` → `cm.geo.sciclone.wm.edu`（Kubernetes登录节点） |
 | 当前计算资源 | 用户明确授权的Pod `jchen57-debug-mpd5p`，namespace `jchen57` |
-| 当前GPU/CPU/RAM | 已分配2×约96GiB Blackwell、12CPU、128Gi；D29新MoE/长轨迹DDP使用GPU0/1 |
+| 当前GPU/CPU/RAM | 已分配2×约96GiB Blackwell、12CPU、128Gi；D29原用GPU0/1，D31已暂停，核验时无计算进程 |
 | 当前ds代码checkout | `/sciclone/home/jchen57/project/Hand_Reconstruction`，D20已从GitHub clone/sync |
 | 当前大数据目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/datasets`，D20已建立三库子目录；其他产物以后按用途分目录 |
 | 原hongfei checkout | `/data/hongfei/zhou/Hand_Reconstruction`保留备用，不再是当前唯一入口 |
 
-训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20建立checkout与数据获取；之后D23/D25已运行模型，D26四库准备完成、单卡阶段保存停止于26,346步，D27后按D28保存暂停；D29已另行启动新MoE/长轨迹双GPU训练。本项目没有创建/删除用户Job或修改旧项目；新增依赖与数据均按下文隔离保存。
+训练、模型推理、数据预处理和性能评测全部远程运行；登录节点负责kubectl/Git等运维，GPU计算在Pod内。源文档、资源、环境和存储见[ds操作记录](../docs/DS_SERVER_OPERATIONS.md)。D19先学习运维，D20建立checkout与数据获取；之后D23/D25已运行模型，D26四库准备完成、单卡阶段保存停止于26,346步，D27后按D28保存暂停；D29曾另行启动新MoE/长轨迹双GPU训练，D31已按用户指令保存暂停814步。本项目没有创建/删除用户Job或修改旧项目；新增依赖与数据均按下文隔离保存。
 
 用户home和data10为Pod持久NFS挂载，`/dev/shm`为64Gi临时内存盘；scr清理政策及个人存储配额未核，不当永久唯一存储。Pod默认Python不等于zhou：默认Torch2.6/cu126在Blackwell上tiny CUDA失败，现有zhou Torch2.12/cu130两卡均通过；D25起项目官方Mamba使用独立Torch2.10/cu130 runtime且已验。不改旧项目环境/数据。
 

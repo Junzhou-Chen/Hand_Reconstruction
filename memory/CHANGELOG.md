@@ -290,6 +290,13 @@
 - 用户强调纠错应模拟现有HaWoR的错误；记录为分布匹配目标，具体噪声幅度/比例与训练执行调整未定。核实D29调用旧sample_batch，当前与历史噪声强弱悬殊、quality独立，不能假定新架构已解决D28历史主导。
 - 对照PAD-Hand真实WiLoR配对、DIP通用与特定前端训练、StableHand质量增广、HaWoR连续mask，补[直接恢复讨论§8](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#8-2026-10-14corruption应贴近hawor实际误差)及决策/数据/进展记忆。明确每轴σ≠平均欧氏误差≠PA/W-MPJPE、排除最终评测集拟合、当前准/历史错、部件与时间相关性和oracle质量边界。无新模型实验或run变更。
 
+## 2026-10-15 UTC D31暂停当前训练与混合噪声草案
+
+- 用户要求暂停正在跑的模型，架构在另一聊天修改；澄清可混合高质量纯轨迹与受损输入，轻中误差为主、严重少量，不必先完成HaWoR误差标定。
+- 已通过共同STOP在00:36:36UTC保存停止814步，rank4039/4040退出；原latest814/best500与独立快照SHA一致，322个model/963个AdamW浮点张量finite，CPU完整模型hash与两rank一致。00:37:42UTC核验，随后GPU无计算进程；原run、旧D28权重、用户Job保留，不自动resume。[暂停摘要](../reports/twm_moe_pause_20261015.json)。
+- 两个只读agent独立审查混合比例、单位、质量提示与验收。建议20%全净/20%当前准历史错/35%轻中/20%缺失/5%强异常；范数有界位移与SO(3)总角、相关方向控制、默认quality unknown，GT始终未受损。具体数值为待验证工程假设，不称HaWoR标定结果。
+- 保存[§9设置与边界](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)和[版本化配置草案](../config/twm_corruption_mixed_v2_proposal.json)，标明未接trainer；未改模型架构、旧sampler或启动新实验。更新当前执行/开发/数据/决策记忆，D29启动快照转为历史。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。
