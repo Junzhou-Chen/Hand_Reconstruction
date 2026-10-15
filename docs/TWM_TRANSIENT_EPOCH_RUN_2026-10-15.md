@@ -47,3 +47,32 @@ Epoch sampler保存epoch/batch cursor，resume先恢复相同permutation再跳�
 
 
 06:44UTC：SSH短暂被入口拒绝后恢复；原远程checkout的pull因另一聊天两份untracked视觉源码而安全拒绝。保留原目录，改用独立detached源码worktree `data10/.../code/twm_transient_v3_20261015`；训练与launcher显式指向这里。新验证的history-hold/constant-velocity基线对missing history只做因果carry-forward，避免把placeholder当有效运动。
+
+
+## 远程验收（正式效果尚待训练）
+
+- 13个v3模式各1,024抽样，用四源各一个真实train reference重复，位移范数/SO(3)角与profile一致。mixed有28个>6mm、两侧较准的历史三四帧run，reanchor有79个；相较旧同阈值的零覆盖，证明新sampler产生预期事件，不能说明已拟合实际HaWoR。
+- 修改future数值不影响任何输入/当前标签；修改被隐藏的history/current GT不改变history/raw/candidate；available quality为unknown，beta conditioning关闭。公开状态仍是米，encoder position feature扩大20倍，旧默认行为保留。
+- 对实际636,610个index验证两rank disjoint且并集完整，最后每卡353；permutation和batch cursor保存/恢复检查通过。
+- 初次检查错误地用1.1mm数值容差同时比较position和rotation6D，reanchor的near旋转因此被拒绝；改为分别按位移/SO(3)实际角检查后通过，未为此放宽或修改噪声生成。失败记录保留在本报告。
+- `smoke_temporal_epoch_training.py`从每源各一train/val录制取42连续参考帧，只写remote独立测试目录；每源3窗，12train窗，global8，最后global4。第一段1更新后保存，resume到4更新/2完整epoch/24窗口使用，实际经过尾批次及epoch重置；两段模型hash不同、AdamW更新到4，各source总计6。另一个fresh smoke在第1次更新后STOP，双rank共同保存退出。所有checkpoint模型/AdamW finite、CPU与两rank hash一致。没有将24样本smoke用作精度结论。
+
+语义检查源码9e48955（后续25fee71未改对应runtime文件）；双卡smoke源码25fee71。远程产物在`data10/.../audits/transient_v3_epoch2_20261015/semantic_checks.json`、`ddp_smoke/summary.json`及各审计/日志/checkpoint；所有原始短片段仅远程保留。正式启动验收将在实际更新后补充。
+
+运行入口（ds登录节点；训练实际在原Pod）：
+
+```bash
+python3 /sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015/scripts/ds_train_probabilistic_twm.py status
+python3 /sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015/scripts/ds_train_probabilistic_twm.py stop
+# 用户明确要继续已停止的新run时才执行；保留旧STOP归档后恢复同一run
+python3 /sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015/scripts/ds_train_probabilistic_twm.py start --resume
+```
+
+
+## 正式启动通过（06:56:30 UTC；纽约02:56）
+
+源码25fee71a1fe1f0347054153b2135f0d018f63068，06:52:11 UTC启动，launcher6447、rank6452/6453。06:56验收实际50更新/0.080426epoch/51,200窗口，loss/grad finite，四源与五case均正；两卡peak allocated63.924/63.913GB。warmup自动63次、总1244次为两轮派生值，非用户另定步数预算。正式latest10模型322/AdamW963浮点张量finite，CPU与两rank完整hash=`238f3e37899da065883fe8070a9990eff383f7103792bc373f8343d3438e0f74`。metadata记录的源码文件SHA均与独立worktree匹配。
+
+[W&B在线新run](https://wandb.ai/black-ant/handloop-twm/runs/58f012f8)服务端已实际返回10/20/30/40/50训练标量及epoch_progress，默认横轴设为epoch_progress；本地log存在不是唯一验收依据。完整小型[启动验收摘要](../reports/twm_transient_epoch2_20261015.json)含配置、数据/代码hash、初始验证几何、语义/续跑/停止及CPU数值审计。原始数据、短片段、权重和全日志均仅远程保存。Source GT仍为拟合MANO，坐标单位与原prepared数据及共同anchor契约不变。
+
+注意日志temporal/spatial pattern计数是窗口模式抽签，含全净case的未施加模式；strong空间部分另有局部override，不能把这些计数直接当作实际坏关节/坏帧数。旧mixed_v2及既有checkpoint原样保留，后续相同连续clip与真实HaWoR验证仍待做；本次组合修复尚未构成单因素因果证明或最终性能提升证据。

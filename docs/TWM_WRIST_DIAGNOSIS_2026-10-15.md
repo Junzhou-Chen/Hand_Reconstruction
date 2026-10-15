@@ -56,3 +56,6 @@
 然后用同预算current-only对照判断future是否牵制；也可只切断future经当前均值的直达梯度作为更窄对照，但共享encoder仍接收future梯度，不能声称完全隔离。上述修改要单因素验证，不能同时改尺度/噪声/loss后归因。当前10k run保留作对照，本轮没有实施这些训练改动。
 
 远程目录：`/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_wrist_diagnosis_20261015/`，含`training_code_7d53fa4/`、`probe_v1.json`及`diagnose_source_v1.py`；训练checkpoint仍在原run，不新增或上传权重。诊断模型SHA=`81d9ea33e7c99d2616041e2b798d3b7d5a8528894587821455eb6f0b6dc0364c`，数据manifest SHA见JSON。
+
+
+后续证据更新：冻结5000步的[短时漂移实验](TWM_TRANSIENT_DRIFT_AUDIT_2026-10-15.md)直接显示单帧/三四帧局部偏移几乎未恢复，不能用整段常偏移不可辨识代替原因分析。用户随后授权[D36事件增广＋位置feature尺度＋两epoch试跑](TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)，D34已保存停止5519步。上文“未改训/继续10k”仅为本次诊断当时状态。

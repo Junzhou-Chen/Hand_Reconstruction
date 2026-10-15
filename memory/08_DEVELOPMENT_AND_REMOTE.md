@@ -1,6 +1,6 @@
 # 开发、GitHub同步和远程实验约定
 
-**D36执行中（2026-10-15）：** 用户要求修复短时噪声及相关问题并重跑，按2个epoch、可中停。旧D34已于06:28:48UTC保存停止5,519步，322个model/963个AdamW浮点张量finite且CPU/两rank hash一致。新增window-local事件增广、因果缺失填充、encoder-only位置尺度0.05m，以及完整覆盖epoch/cursor；每轮636,610窗、双卡每卡512、622更新。新源码待远程语义/DDP/续跑验收，尚未宣称启动或精度改善；默认全遍历改变旧等源采样权重，比例/尺度仍为假设。[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。
+**D36已启动（2026-10-15纽约02:56验收）：** 用户要求修复短时噪声并按2个epoch重跑。旧D34已保存停止5,519步，checkpoint/STOP保留且finite/sync通过。新v3显式局部plateau/ramp/scattered/jitter、因果缺失填充、encoder-only位置尺度0.05m；完整覆盖每轮636,610窗、622更新、最后每卡353，每卡512/global1024。25fee71在独立远程worktree从头启动，实际50更新=0.080426/2 epoch、51,200窗口；四库与五case均参与，每卡peak allocated约63.9GB。正式checkpoint10的322个model/963个AdamW浮点张量finite，CPU/两rank hash一致；W&B[58f012f8](https://wandb.ai/black-ant/handloop-twm/runs/58f012f8)服务端已收到step50及epoch曲线。13模式语义检查、全量索引并集/互斥、真实短片段1→4更新跨epoch续跑/尾批次，以及独立STOP保存通过。2epochs是pilot目标，非完成或已证实精度改善；自然样本占比改变旧等源权重，具体比例/尺度仍是假设，D35框架不改。[协议与失败修正](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)、[验收摘要](../reports/twm_transient_epoch2_20261015.json)。
 
 **2026-10-15腕位置只读诊断：** 原Pod/GPU1额外约3.88GB峰值，冻结D34 checkpoint4400、32个val窗扰动/梯度探测，无optimizer/参数变更，正式run继续。独立`evaluations/twm_wrist_diagnosis_20261015/training_code_7d53fa4`由Git archive导出并匹配原metadata source SHA；未用D35改过的模型诊断D34。[结果和产物](../docs/TWM_WRIST_DIAGNOSIS_2026-10-15.md)。
 

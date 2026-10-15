@@ -1,0 +1,997 @@
+{
+  "utc": "2026-10-15T06:56:30.419687+00:00",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015",
+  "code_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015",
+  "code_version": "25fee71a1fe1f0347054153b2135f0d018f63068",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "source_sha256_verified": {
+    "scripts/train_probabilistic_twm.py": "596828831e05b72f8a0f1d3f24e76e8b43c927d8d067ce4563186629fc28d39b",
+    "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+    "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+    "src/handloop/models/probabilistic_twm.py": "5459d1e396a09b657619d2029e19b46ea553ba744e09afb22125ed8238992804",
+    "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+    "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+    "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+    "src/handloop/tracking.py": "aeb1c73564c6306579caa4e8a7dde8b01af60711c5b98e37419dbbca8cb41ab0",
+    "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce",
+    "src/handloop/data/temporal_corruption.py": "67de303b65ba0634bfabe850a0958c978bc85d7ac45f01fbd43b7bbd09e8dfac",
+    "src/handloop/data/epoch_sampling.py": "ed8c320266c2bc1e82a2bd4253cdb3dea0da946c34f76e3df7087c29a0b527e1",
+    "src/handloop/models/twm.py": "f75a736c200e572cd6acb5159cb8bc1ad45eec7f3133193e63cd0404afa02262"
+  },
+  "config": {
+    "seed": 20261015,
+    "history_frames": 30,
+    "min_future_frames": 3,
+    "window_stride": 4,
+    "batch_size": 1024,
+    "learning_rate": 0.0002,
+    "weight_decay": 0.01,
+    "save_every": 100,
+    "log_every": 10,
+    "eval_batch_size": 32,
+    "eval_batches": 8,
+    "eval_horizons_seconds": [
+      0.1,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "current_nll_weight": 0.05,
+    "forecast_nll_weight": 0.3,
+    "forecast_geometry_weight": 0.2,
+    "velocity_weight": 0.05,
+    "moe_balance_weight": 0.01,
+    "model": {
+      "backbone": "structured_mamba",
+      "d_model": 256,
+      "num_layers": 6,
+      "nhead": 4,
+      "dim_feedforward": 512,
+      "dropout": 0.1,
+      "forecast_horizon": 60,
+      "translation_scale": 0.1,
+      "rotation_scale": 0.5,
+      "check_finite": false,
+      "mamba_state_size": 64,
+      "mamba_conv": 4,
+      "mamba_expand": 2,
+      "num_experts": 4,
+      "num_modes": 4,
+      "future_decoder_layers": 1,
+      "future_joint_width": 64,
+      "time_frequencies_hz": [
+        0.25,
+        0.5,
+        1.0,
+        2.0,
+        4.0,
+        8.0
+      ],
+      "position_feature_scale": 0.05
+    },
+    "required_datasets": [
+      "oakink2",
+      "hot3d",
+      "umetrack",
+      "dexycb"
+    ],
+    "source_sampling": "full_coverage",
+    "cache_sequences": 8192,
+    "cache_bytes": 4294967296,
+    "condition_on_beta": false,
+    "world_size": 2,
+    "cpu_threads": 4,
+    "stop_before_utc": "2026-10-15T16:25:00+00:00",
+    "tracking": {
+      "enabled": true,
+      "mode": "online",
+      "require_online": true,
+      "project": "handloop-twm",
+      "entity": "black-ant",
+      "name": "twm-moe-transient-v3-b512-2epochs",
+      "group": "four-source-mixed-current-and-future",
+      "tags": [
+        "mamba",
+        "dense-moe4",
+        "trajectory-modes4",
+        "future60",
+        "current-restoration",
+        "current-reanchor",
+        "quality-unknown",
+        "per-gpu512",
+        "global1024",
+        "transient-v3",
+        "two-epochs",
+        "position-scale-0.05"
+      ]
+    },
+    "corruption_profile_path": "config/twm_corruption_transient_v3.json",
+    "eval_corruption_modes": [
+      "noisy",
+      "missing",
+      "clean",
+      "reanchor",
+      "strong",
+      "single",
+      "burst3",
+      "burst4",
+      "position_burst4",
+      "scattered3",
+      "ramp4",
+      "history_only",
+      "legacy_noisy",
+      "legacy_missing"
+    ],
+    "best_selection_weights": {
+      "clean": 0.2,
+      "reanchor": 0.2,
+      "noisy": 0.35,
+      "missing": 0.2,
+      "strong": 0.05
+    },
+    "best_selection_description": "Current geometry weighted clean/reanchor/noisy/missing/local-strong 20/20/35/20/5, diagnostic strata rather than exact mixture risk; transient cases and legacy stress also reported.",
+    "training_unit": "epoch",
+    "epochs": 2,
+    "warmup_epochs": 0.1,
+    "eval_every_epochs": 0.5,
+    "corruption_profile": {
+      "profile": "transient_motion_restoration_v3",
+      "status": "active",
+      "architecture_independent": true,
+      "target_policy": "All current and future targets remain uncorrupted source reference trajectories",
+      "amplitude_convention": "event peak actual norm/angle within severity band; ramp instantaneous amplitude can be below peak lower bound; other groups/frames clean or <=1mm/degree; no additive full errors",
+      "levels": {
+        "clean": {
+          "translation_norm_mm": [
+            0,
+            0
+          ],
+          "root_angle_deg": [
+            0,
+            0
+          ],
+          "finger_angle_deg": [
+            0,
+            0
+          ]
+        },
+        "near": {
+          "translation_norm_mm": [
+            0,
+            1
+          ],
+          "root_angle_deg": [
+            0,
+            1
+          ],
+          "finger_angle_deg": [
+            0,
+            1
+          ]
+        },
+        "light": {
+          "translation_norm_mm": [
+            1,
+            6
+          ],
+          "root_angle_deg": [
+            0,
+            4
+          ],
+          "finger_angle_deg": [
+            0,
+            3
+          ]
+        },
+        "medium": {
+          "translation_norm_mm": [
+            6,
+            15
+          ],
+          "root_angle_deg": [
+            3,
+            10
+          ],
+          "finger_angle_deg": [
+            2,
+            8
+          ]
+        },
+        "strong": {
+          "translation_norm_mm": [
+            20,
+            50
+          ],
+          "root_angle_deg": [
+            10,
+            35
+          ],
+          "finger_angle_deg": [
+            8,
+            25
+          ]
+        }
+      },
+      "amplitude_sampling": "Peak norm/angle uniform within light/medium or rare strong range; direction shared within plateau/ramp/scattered, per-frame independent for jitter",
+      "window_cases": [
+        {
+          "name": "clean_motion",
+          "probability": 0.2
+        },
+        {
+          "name": "current_reanchors_history",
+          "probability": 0.2
+        },
+        {
+          "name": "ordinary_restoration",
+          "probability": 0.35
+        },
+        {
+          "name": "partial_missing",
+          "probability": 0.2
+        },
+        {
+          "name": "rare_local_failure",
+          "probability": 0.05
+        }
+      ],
+      "temporal_noise": {
+        "process": "window-local jitter, fixed-vector plateau, ramp or scattered events; one to four frames; current covers onset/continuation and reanchor covers recovery",
+        "limitations": "events are redrawn across independently sampled overlapping windows, not recording-persistent or learned rollout errors"
+      },
+      "quality": {
+        "default": "unknown_for_available_state_groups",
+        "unknown_value": -1,
+        "availability_is_separate": true,
+        "oracle_quality": "optional separately labeled ablation only; not the default condition"
+      },
+      "source_sampling": "finite full traversal of original four-source train windows; no new images required",
+      "evaluation": {
+        "fixed_cases": [
+          "clean",
+          "reanchor",
+          "noisy",
+          "missing",
+          "strong",
+          "single",
+          "burst3",
+          "burst4",
+          "position_burst4",
+          "scattered3",
+          "ramp4",
+          "history_only"
+        ],
+        "retain_legacy_stress_profile": true,
+        "paired_corruption_seed": "noisy/history_only use matching draws; fixed duration modes can change RNG schedule",
+        "metrics": [
+          "input_hold_output_wrist_mm_root_deg_finger_deg",
+          "median_and_p95_by_source",
+          "wrist_degradation_over_1mm",
+          "input_severity_bins",
+          "current_removal_effect",
+          "forecast_per_horizon_with_valid_counts"
+        ]
+      },
+      "limitations": [
+        "Mixture, durations, amplitudes and feature scale are engineering hypotheses, not fitted to HaWoR",
+        "No future observations or oracle event/quality labels fed to model",
+        "References remain fitted MANO; not independent physical ground truth",
+        "Window-local error process is not a closed-loop deployment distribution"
+      ],
+      "execution_policy": "Explicitly selected by a fresh training run; old checkpoints/runs remain preserved",
+      "version": 3,
+      "events": {
+        "pattern_probabilities": [
+          0.3,
+          0.45,
+          0.15,
+          0.1
+        ],
+        "duration_probabilities": [
+          0.15,
+          0.15,
+          0.35,
+          0.35
+        ],
+        "spatial_probabilities": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "jitter_frame_probability": 0.3,
+        "medium_probability": 0.4,
+        "near_background_probability": 0.5
+      },
+      "window_cases_description": "Reanchor event ends 1..4 frames before current; other nonclean cases include current in error/missing event. All clean case is exact."
+    },
+    "corruption_profile_sha256": "7dea2b94c5080c11eb86154837157a248902c6f7dda2fd81def609269078c4bb",
+    "steps": 1244,
+    "warmup_steps": 63,
+    "eval_every": 311
+  },
+  "epoch_schedule": {
+    "epochs": 2,
+    "windows_per_epoch": 636610,
+    "steps_per_epoch": 622,
+    "ddp_padding_per_epoch": 0
+  },
+  "train_windows_by_dataset": {
+    "dexycb": 6352,
+    "hot3d": 132008,
+    "oakink2": 346860,
+    "umetrack": 151390
+  },
+  "status_snapshot": {
+    "utc": "2026-10-15T06:56:10.546703+00:00",
+    "phase": "training",
+    "step": 50,
+    "epoch_progress": 0.08042600650319662,
+    "completed_epochs": 0,
+    "target_epochs": 2,
+    "windows_seen": 51200,
+    "updates_per_epoch": 622,
+    "batch_in_epoch": 50,
+    "loss": -0.4989131987094879,
+    "restoration_loss": 0.0224829763174057,
+    "current_nll_per_dof": -3.0569543838500977,
+    "forecast_nll_per_dof": -1.9339954853057861,
+    "best_trajectory_geometry_loss": 1.0531644821166992,
+    "velocity_loss": 0.018148502334952354,
+    "moe_balance_loss": 0.010995368473231792,
+    "mode_entropy": 1.380246877670288,
+    "current_xyz_std_mm": 21.857378005981445,
+    "future_within_mode_xyz_std_mm": 81.4591064453125,
+    "future_total_xyz_std_mm": 81.72554016113281,
+    "grad_norm": 4.4922990798950195,
+    "lr": 0.00015873015873015873,
+    "elapsed_seconds": 149.3049066727981,
+    "samples_per_second": 342.9224205752653,
+    "ranks": [
+      {
+        "rank": 0,
+        "pid": 6452,
+        "device": 0,
+        "peak_allocated_gb": 63.925547008,
+        "peak_reserved_gb": 64.709722112
+      },
+      {
+        "rank": 1,
+        "pid": 6453,
+        "device": 1,
+        "peak_allocated_gb": 63.913988608,
+        "peak_reserved_gb": 64.699236352
+      }
+    ],
+    "samples_by_dataset": {
+      "dexycb": 473,
+      "hot3d": 10523,
+      "oakink2": 28103,
+      "umetrack": 12101
+    },
+    "corruption_samples_by_case": {
+      "clean_motion": 10282,
+      "current_reanchors_history": 10208,
+      "ordinary_restoration": 17740,
+      "partial_missing": 10335,
+      "rare_local_failure": 2635
+    },
+    "temporal_samples_by_pattern": {
+      "jitter": 15365,
+      "plateau": 23115,
+      "ramp": 7605,
+      "scattered": 5115
+    },
+    "spatial_samples_by_pattern": {
+      "translation_only": 12819,
+      "wrist_pose": 12775,
+      "fingers": 12804,
+      "whole_hand": 12802
+    },
+    "moe_load": {
+      "0": 0.2426341474056244,
+      "1": 0.26743412017822266,
+      "2": 0.24500086903572083,
+      "3": 0.24493086338043213
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/58f012f8"
+  },
+  "launcher": {
+    "pid": 6447,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015/scripts/train_probabilistic_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_20261015/config/twm_four_sources_moe_transient_v3_epoch2.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015",
+      "--code-version",
+      "25fee71a1fe1f0347054153b2135f0d018f63068"
+    ],
+    "code_version": "25fee71a1fe1f0347054153b2135f0d018f63068",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-15T06:52:11.195877+00:00"
+  },
+  "rank_processes_alive": {
+    "0": true,
+    "1": true
+  },
+  "formal_checkpoint": {
+    "step": 10,
+    "code_version": "25fee71a1fe1f0347054153b2135f0d018f63068",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "238f3e37899da065883fe8070a9990eff383f7103792bc373f8343d3438e0f74",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      10.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "semantic_checks": {
+    "checks": {
+      "norm_angle_bounds_future_isolation_unknown_quality_causal_missing_fill": true,
+      "full_epoch_coverage_disjoint_ranks_partial_batch_and_resume_cursor": true,
+      "encoder_only_position_scale_preserves_public_metre_state_and_legacy_default": true
+    },
+    "cases": {
+      "mixed": {
+        "enclosed_3_or_4_runs_over_6mm": 28,
+        "cases": [
+          213,
+          191,
+          369,
+          192,
+          59
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          370,
+          226,
+          191,
+          108,
+          45,
+          29,
+          31,
+          24
+        ],
+        "history_missing_groups": 2007,
+        "input_wrist_mm": 4.1127214431762695
+      },
+      "clean": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          1024,
+          0,
+          0,
+          0,
+          0
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          452,
+          276,
+          206,
+          90
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 0.0
+      },
+      "reanchor": {
+        "enclosed_3_or_4_runs_over_6mm": 79,
+        "cases": [
+          0,
+          1024,
+          0,
+          0,
+          0
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          0,
+          39,
+          90,
+          188,
+          244,
+          199,
+          173,
+          91
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 0.2608765661716461
+      },
+      "noisy": {
+        "enclosed_3_or_4_runs_over_6mm": 13,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          452,
+          276,
+          206,
+          90
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 4.712817192077637
+      },
+      "missing": {
+        "enclosed_3_or_4_runs_over_6mm": 13,
+        "cases": [
+          0,
+          0,
+          0,
+          1024,
+          0
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          452,
+          276,
+          206,
+          90
+        ],
+        "history_missing_groups": 10055,
+        "input_wrist_mm": 6.447348117828369
+      },
+      "strong": {
+        "enclosed_3_or_4_runs_over_6mm": 15,
+        "cases": [
+          0,
+          0,
+          0,
+          0,
+          1024
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          452,
+          276,
+          206,
+          90
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 17.1267032623291
+      },
+      "single": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          1024,
+          0,
+          0
+        ],
+        "current_event_age_histogram": [
+          1024
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 4.78609561920166
+      },
+      "burst3": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          1024,
+          0,
+          0
+        ],
+        "current_event_age_histogram": [
+          346,
+          304,
+          374
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 4.78609561920166
+      },
+      "burst4": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          1024,
+          0,
+          0
+        ],
+        "current_event_age_histogram": [
+          259,
+          235,
+          255,
+          275
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 4.78609561920166
+      },
+      "position_burst4": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          1024,
+          0,
+          0
+        ],
+        "current_event_age_histogram": [
+          259,
+          235,
+          255,
+          275
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 6.294469833374023
+      },
+      "scattered3": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          0,
+          0,
+          1024
+        ],
+        "current_event_age_histogram": [
+          346,
+          304,
+          374
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 4.78609561920166
+      },
+      "ramp4": {
+        "enclosed_3_or_4_runs_over_6mm": 0,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          0,
+          0,
+          1024,
+          0
+        ],
+        "current_event_age_histogram": [
+          259,
+          235,
+          255,
+          275
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 3.0683045387268066
+      },
+      "history_only": {
+        "enclosed_3_or_4_runs_over_6mm": 13,
+        "cases": [
+          0,
+          0,
+          1024,
+          0,
+          0
+        ],
+        "patterns": [
+          322,
+          440,
+          160,
+          102
+        ],
+        "current_event_age_histogram": [
+          452,
+          276,
+          206,
+          90
+        ],
+        "history_missing_groups": 0,
+        "input_wrist_mm": 6.310113906860352
+      }
+    },
+    "epoch_schedule": {
+      "windows": 636610,
+      "by_source": {
+        "dexycb": 6352,
+        "hot3d": 132008,
+        "oakink2": 346860,
+        "umetrack": 151390
+      },
+      "updates_per_epoch": 622,
+      "last_per_gpu_batch": 353
+    },
+    "scope": "1024 draws per mode using four real train reference windows; sampler semantics, not trained accuracy"
+  },
+  "ddp_integration": {
+    "code_version": "25fee71",
+    "source_selections": [
+      {
+        "source": "oakink2",
+        "split": "train",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/train/scene_01__A001++seq__07bb164dc3d3873d6389__2023-04-27-20-45-29__lh",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "oakink2",
+        "split": "val",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/val/scene_01__A003++seq__783bd4550274783193c3__2023-04-15-09-58-39__lh",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "hot3d",
+        "split": "train",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/train/clip-000006__left.npz",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "hot3d",
+        "split": "val",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/val/clip-000000__left.npz",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "umetrack",
+        "split": "train",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/train/subject_000_separate_hand_000000__left.npz",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "umetrack",
+        "split": "val",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/val/subject_023_separate_hand_000674__right.npz",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "dexycb",
+        "split": "train",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/train/20200709-subject-01++20200709_141754__right",
+        "frame_begin": 0,
+        "frames": 42
+      },
+      {
+        "source": "dexycb",
+        "split": "val",
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/val/20200709-subject-01++20200709_142123__right",
+        "frame_begin": 0,
+        "frames": 42
+      }
+    ],
+    "first": {
+      "step": 1,
+      "model_and_optimizer_finite": true,
+      "model_state_sha256": "e190f68ae5332dcab600063c615e7422e8964070253d70e6f6b71a06a2e17762",
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "world_size": 2,
+      "progress": {
+        "epoch_progress": 0.6666666666666666,
+        "completed_epochs": 0,
+        "windows_seen": 8
+      }
+    },
+    "resumed": {
+      "step": 4,
+      "model_and_optimizer_finite": true,
+      "model_state_sha256": "9362d31238623759c0b833a86906a25590cbc01dc5074414d446b0b236b72bdb",
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "world_size": 2,
+      "progress": {
+        "epoch_progress": 2.0,
+        "completed_epochs": 2,
+        "windows_seen": 24
+      }
+    },
+    "stopped": {
+      "step": 1,
+      "model_and_optimizer_finite": true,
+      "model_state_sha256": "ad3d4f75b4f9dd93d956644c95b5934c56cc401e1088000e81fbcedae94a3ef2",
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "world_size": 2,
+      "progress": {
+        "epoch_progress": 0.6666666666666666,
+        "completed_epochs": 0,
+        "windows_seen": 8
+      }
+    },
+    "checks": {
+      "two_rank_updates_finite_sync": true,
+      "resume_across_epoch_boundary": true,
+      "last_partial_batch": true,
+      "two_epochs_24_window_exposures": true,
+      "cooperative_stop_saved": true
+    },
+    "scope": "tiny real-reference integration check; no quality claim; formal data/splits untouched"
+  },
+  "previous_stopped_checkpoint": {
+    "step": 5519,
+    "code_version": "7d53fa4a1b14f31e08f41ba545556e59adadd31f",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "44a930a53cc5942a80f12cfa901b26bc055c560acef890249e17adb4a602f8d0",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      5519.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "wandb_server_verified": {
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/58f012f8",
+    "training_rows": [
+      {
+        "optimizer_step": 10,
+        "epoch_progress": 0.016085201300639323,
+        "train/loss": -0.2825084328651428
+      },
+      {
+        "optimizer_step": 20,
+        "epoch_progress": 0.032170402601278646,
+        "train/loss": -0.40873944759368896
+      },
+      {
+        "optimizer_step": 30,
+        "epoch_progress": 0.04825560390191797,
+        "train/loss": -0.43298259377479553
+      },
+      {
+        "optimizer_step": 40,
+        "epoch_progress": 0.06434080520255729,
+        "train/loss": -0.44285619258880615
+      },
+      {
+        "optimizer_step": 50,
+        "epoch_progress": 0.08042600650319662,
+        "train/loss": -0.4989131987094879
+      }
+    ]
+  },
+  "initial_validation_geometry": {
+    "clean": {
+      "history_hold/finger_deg": 1.0796322217211127,
+      "restored/root_deg": 2.0084123464325643e-07,
+      "candidate/finger_deg": 7.496568266152082e-08,
+      "restored/wrist_mm": 0.0,
+      "history_hold/wrist_mm": 5.04943186044693,
+      "restored/finger_deg": 9.389423216710213e-08,
+      "candidate/root_deg": 1.9471553353023197e-07,
+      "candidate/wrist_mm": 0.0,
+      "history_hold/root_deg": 1.7764941845089197
+    },
+    "reanchor": {
+      "history_hold/finger_deg": 1.3717452064156532,
+      "restored/root_deg": 0.2624331400729716,
+      "candidate/finger_deg": 0.25771703384816647,
+      "restored/wrist_mm": 0.2671874361112714,
+      "history_hold/wrist_mm": 5.940705820918083,
+      "restored/finger_deg": 0.2577170408330858,
+      "candidate/root_deg": 0.26243313588202,
+      "candidate/wrist_mm": 0.2671874361112714,
+      "history_hold/root_deg": 2.2840003669261932
+    },
+    "noisy": {
+      "history_hold/finger_deg": 1.4542570523917675,
+      "restored/root_deg": 1.9902560207992792,
+      "candidate/finger_deg": 1.0579894818365574,
+      "restored/wrist_mm": 4.651723489165306,
+      "history_hold/wrist_mm": 6.2905550971627235,
+      "restored/finger_deg": 1.057989489287138,
+      "candidate/root_deg": 1.9902560468763113,
+      "candidate/wrist_mm": 4.651723489165306,
+      "history_hold/root_deg": 2.4361335821449757
+    },
+    "missing": {
+      "history_hold/finger_deg": 1.334647823125124,
+      "restored/root_deg": 1.879042224958539,
+      "candidate/finger_deg": 0.6848005540668964,
+      "restored/wrist_mm": 7.2358227372169495,
+      "history_hold/wrist_mm": 8.266562059521675,
+      "restored/finger_deg": 0.6848005522042513,
+      "candidate/root_deg": 1.879042224958539,
+      "candidate/wrist_mm": 7.2358227372169495,
+      "history_hold/root_deg": 2.6425424702465534
+    },
+    "position_burst4": {
+      "history_hold/finger_deg": 1.0796322217211127,
+      "restored/root_deg": 2.0084123464325643e-07,
+      "candidate/finger_deg": 7.496568266152082e-08,
+      "restored/wrist_mm": 6.519845798611641,
+      "history_hold/wrist_mm": 8.072550177574158,
+      "restored/finger_deg": 9.389423216710213e-08,
+      "candidate/root_deg": 1.9471553353023197e-07,
+      "candidate/wrist_mm": 6.519845798611641,
+      "history_hold/root_deg": 1.7764941845089197
+    }
+  },
+  "failed_attempts": [
+    "Initial semantic test compared rotation6D using a position tolerance; corrected to geometric position norm / SO3 angle, then all modes passed.",
+    "SSH entry briefly returned Not allowed at this time, later recovered. Original checkout pull refused untracked visual files; preserved it and used independent worktree."
+  ],
+  "scope": "Launch/numerical/coverage verification only; initial metrics are before optimization, no trained-quality claim; references remain source-fitted MANO."
+}

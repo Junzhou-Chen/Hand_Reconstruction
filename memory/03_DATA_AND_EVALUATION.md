@@ -187,3 +187,6 @@ D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption
 
 
 **2026-10-15短时漂移审计与D36：** 原5000步冻结模型，64条val（每源16）上单帧30mm→29.913mm、block4→29.972mm；因果五帧外推单帧3.327mm但clean3.119mm且block4为28.097mm。带oracle边界和未来的插值block4=2.182mm仅说明离线空间，不是公平在线结果。4096旧sampler窗在>6mm无历史3/4 enclosed run，但>10mm存在1419窗，不能泛称没见过短异常。确认缺口为显式可靠前缀—持续局部误差—恢复事件，非全局常数解释全部；[证据](../docs/TWM_TRANSIENT_DRIFT_AUDIT_2026-10-15.md)。用户随后授权v3修复＋两轮：GT/split/单位不变，完整遍历改变source权重，预期622updates/epoch；具体检查/启动待执行，[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。
+
+
+**D36启动验收（06:56UTC）：** full shuffled coverage每epoch636,610窗（Oak346,860/HOT132,008/Ume151,390/Dex6,352），无DDP padding、每卡512、尾353，622updates/epoch；改为自然数据比例，非等源25%。v3在每模式1024抽样上范数/角/未来隔离/隐藏值不泄露/unknown quality检查通过；mixed出现28个>6mm历史enclosed3/4run，reanchor79。初次checker把6D旋转也用position容差对比导致失败，改成分别几何单位后通过；未改变sampler来迎合检查。真实tiny片段两卡1→4更新跨epoch/partial batch/resume与独立STOP保存通过。正式验收到50更新/0.080426epoch/51,200窗口，各源/五case均正；checkpoint10 finite与CPU/双rank hash一致，W&B服务端到50。尚只有启动/初始验证，不宣称腕纠错已改善或真实HaWoR收益。GT/split/米单位/rotation codec仍同原四库拟合MANO；详见[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)、[摘要](../reports/twm_transient_epoch2_20261015.json)。
