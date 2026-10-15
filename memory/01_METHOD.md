@@ -1,6 +1,6 @@
 # HandLoop 方法与接口记忆
 
-更新日期：2026-10-14。本文整理现行设计，完整视觉闭环尚待验证；D23首轮纯轨迹TWM已有实现与合成恢复训练。主依据：[START_HERE §2–4](../HandLoop_Project/START_HERE.md) 和[讨论 §15.23、§16](../HandLoop_Project/01_Conversation_Research_Archive.md)。
+更新日期：2026-10-15 UTC。本文整理现行设计，完整视觉闭环尚待验证；D29已按用户新指令实现当前恢复＋MoE＋较长未来分布并启动纯轨迹训练。主依据：[START_HERE §2–4](../HandLoop_Project/START_HERE.md)、后续用户决定和[讨论 §15.23、§16](../HandLoop_Project/01_Conversation_Research_Archive.md)。
 
 完整叙述见[docs/METHOD_FRAMEWORK.md](../docs/METHOD_FRAMEWORK.md)。本次新增的统一预训练槽位、anchor残差、初始化与单手实例化均为建议契约；用户最新免申请数据偏好已单独登记，不把旧的注册数据开工建议视为当前要求。
 
@@ -71,6 +71,8 @@ S_t=(p_t^W,R_t^W,Q_{t,1:15}),\quad Q_{t,i}\in SO(3),\quad\beta\in\mathbb R^{10}\
 未来取证可复用缓存特征并训练轻量 evidence head；不要求每轮重跑 backbone。“独立”指证据来自图像，不是用候选自己的几何输出自我证实，不必另建完整视觉 backbone。
 
 ## 纯轨迹 TWM
+
+**D29已替代本节早期短预测/Transformer建议：** 当前实现为13.53M、6层d256结构化Mamba＋每层4个dense experts，保持当前99D恢复；新增60步约2秒、4个整段mode的轨迹分布。时间采用物理秒relative time/dt/log1p(dt)＋0.25–8Hz固定Fourier特征。当前与未来分布定义在R³×SO(3)^16：对角Gaussian平移和Haar归一化的isotropic matrix Fisher旋转；未来先跨有效帧累计log density，再对整段mode做logsumexp。未来不作输入，tail/gap mask排除无标签帧，最少3未来帧保留短片段。用户决定方向；时域/专家/模式数及loss权重为工程起点。新目标为restore＋0.05 current NLL＋0.3 future NLL＋0.2 best-trajectory geometry＋0.05 GT velocity＋0.01 MoE balance，仍非力/接触物理定律或校准保证。[公式、源码与验收](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)。下文早期建议保留演进背景。
 
 主要预训练任务：对高质量状态做缺失或扰动，条件于历史恢复当前状态。
 

@@ -1,6 +1,6 @@
 # HandLoop 项目记忆入口
 
-更新日期：2026-10-14。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
+更新日期：2026-10-15 UTC（纽约10-14）。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
 
 **核心 idea：将高精度 glove/MoCap 轨迹中学到的手部结构和运动知识，转移到头戴 RGB 的当前状态估计中。让当前可信的局部视觉观测帮助修复不可见或错误的关节，并通过帧内取证和跨帧反馈持续校正。**
 
@@ -8,9 +8,11 @@
 
 ## 当前真实进展
 
-**最新执行状态D28（2026-10-14）：用户要求暂停当前运行、保留checkpoint并先验证效果。** 已通过STOP共同保存，双卡训练于23:53:53 UTC（纽约19:53）停止在32,783步，rank2968/2969退出，原latest/best保留；不自动resume。冻结checkpoint固定/全量validation及当前输入干预均已完成；结果与限制见下文和暂停评测报告。下文D27启动快照保留为历史。
+**最新D29：用户明确要求当前恢复＋较长未来轨迹分布、MoE、输出不确定性，并修改模型、启动训练及配置W&B。** 已实现13,530,032参数纯轨迹模型：6层d256结构化Mamba，每层4个dense MLP experts，物理秒Fourier时间编码；当前99D恢复＋4个整段模式、最多60步约2秒预测，xyz Gaussian＋SO(3) isotropic matrix Fisher。新run从头训练，保留四库GT/split和β另存/conditioning关闭；旧D28 run保持暂停。4798b62于00:19:13 UTC启动既有两卡，每卡256/global512；00:20:51 UTC实际40步、四库均参与，W&B服务器已收到同step标量。正式checkpoint10的322个model浮点张量和963个AdamW浮点张量finite，CPU重算hash与两rank一致。FP32/BF16、概率归一化、因果/padding、完整目标mask、双卡3步＋resume至5步均通过。新key只存远程私有文件，W&B为[943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)。时域/模式数/权重是工程起点，尚无新模型最终精度或视觉闭环收益。[架构、数学与运行](docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[启动摘要](reports/twm_moe_long_horizon_20261015.json)。
 
-工作区已有研究记忆、四库数据转换、结构化Mamba训练与冻结评测源码，当前为**D28暂停并验证**。D27 dense TWM已在32,783步保存停止，latest与best28,000均finite且另存快照；不自动resume。两模型固定3,466窗及全量61,370窗/模式评测完成，best原训练fixed指标复现最大差0。latest全量noisy腕48.703→5.435mm（上一历史保持8.961mm）、finger15.444→1.808°，clean腕退化0.454mm；但固定窗中不提供当前观测为5.451mm，与正常5.476mm近似，当前GT＋带噪历史仍有5.317mm腕误差。结果提示历史先验占主导、可靠当前观测利用不足，未证明真实HaWoR、独立joint/mesh或物理正确性。旧D23/D25/D26产物保留；[暂停与评测](docs/TWM_PAUSED_EVAL_2026-10-14.md)、[摘要](reports/twm_paused_eval_20261014.json)。GitHub为origin/main：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；本轮不涉及其他并行开发模型。
+**D28旧dense模型历史状态（2026-10-14）：用户要求暂停当前运行、保留checkpoint并先验证效果。** 已通过STOP共同保存，双卡训练于23:53:53 UTC（纽约19:53）停止在32,783步，rank2968/2969退出，原latest/best保留；不自动resume。冻结checkpoint固定/全量validation及当前输入干预均已完成；结果与限制见下文和暂停评测报告。下文D27启动快照保留为历史。
+
+工作区已有研究记忆、四库数据转换、结构化Mamba训练与冻结评测源码，其中旧dense模型已完成**D28暂停与验证**。D27 dense TWM已在32,783步保存停止，latest与best28,000均finite且另存快照；不自动resume。两模型固定3,466窗及全量61,370窗/模式评测完成，best原训练fixed指标复现最大差0。latest全量noisy腕48.703→5.435mm（上一历史保持8.961mm）、finger15.444→1.808°，clean腕退化0.454mm；但固定窗中不提供当前观测为5.451mm，与正常5.476mm近似，当前GT＋带噪历史仍有5.317mm腕误差。结果提示历史先验占主导、可靠当前观测利用不足，未证明真实HaWoR、独立joint/mesh或物理正确性。旧D23/D25/D26产物保留；[暂停与评测](docs/TWM_PAUSED_EVAL_2026-10-14.md)、[摘要](reports/twm_paused_eval_20261014.json)。GitHub为origin/main：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；该次评测不代表随后D29新模型的效果。
 
 **已定工作分工：本机写代码、论文和文档，实验全部远程。最新D19改用`ssh ds`的SciClone Kubernetes，用户已授权复用Pod `jchen57-debug-mpd5p`；hongfei原checkout保留备用。** 代码、论文、记忆和小型结果同步GitHub，数据集、权重与大文件依`.gitignore`排除。
 
@@ -38,7 +40,7 @@
 
 **数据原则D18（2026-10-13，仍有效）：** 用户强调TWM无视觉，优先更准确的手姿态，恢复初始glove/MoCap导向；论文用库作参考，不主导训练池。v2建议MoCap高优先GRAB/ARCTIC/OakInk2/HOT3D＋新增UmeTrack，主要glove候选HumanTouch/DexWild，DexCap/OpenGraph小样本验映射；Re/EgoDex降为后续视觉来源扩展。免申请偏好仍有效，注册资源有授权再接入；本轮四库由后续D26选定，后续候选比例未定。主候选具备完整任务字段条件；glove需验映射/腕质量，OpenGraph只确认局部补充，尚无本项目适配验收，不将候选全称为“完全适配”。[传感器精度专题](memory/11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)、[v2计划](docs/TWM_PRETRAIN_PLAN.md)
 
-**当前执行与后续建议：** D26已明确本轮联合训练Oak/HOT/Ume/Dex四库，D27进一步改为双卡大batch；D26取代D23/D25单库执行范围，D27只替代单卡执行配置；它不证明Dex拟合参考与MoCap等精度，也未否定glove候选。此前v2.1的HumanTouch/DexWild共同验收、GRAB/ARCTIC授权后接入等保留为后续建议；ARCTIC当前仍按D22暂缓。glove local/world映射与质量需分别验收，不因本轮四库已可用而取消。[v2.1历史建议](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
+**当前执行与后续建议：** D29已以同一四库启动独立MoE＋长轨迹概率模型，替代旧短单点执行设计，保留D28旧模型暂停。D26已明确本轮联合训练Oak/HOT/Ume/Dex四库，D27进一步改为双卡大batch；D26取代D23/D25单库执行范围，D27只替代单卡执行配置；它不证明Dex拟合参考与MoCap等精度，也未否定glove候选。此前v2.1的HumanTouch/DexWild共同验收、GRAB/ARCTIC授权后接入等保留为后续建议；ARCTIC当前仍按D22暂缓。glove local/world映射与质量需分别验收，不因本轮四库已可用而取消。[v2.1历史建议](docs/TWM_PRETRAIN_PLAN.md#0-当前推荐的预训练组合)
 
 **同日扩查修正：** 上述首轮清单偏学术，不是完整可用数据全景。新增SynData、Lightwheel EgoSuite、EgoVerse、OOJU、OpenGraph MANUS样本、Daimon DataDex及BeingBeyond UniHand Preview。SynData优先检查ITW骨架映射，Lightwheel/EgoVerse按手标签完整性与实际开放量筛选，UniHand按原来源去重。详见[产业数据补充](memory/09_INDUSTRY_HAND_DATASETS_2026-10-13.md)。
 
@@ -72,7 +74,8 @@
 | 使用ds登录入口、现有GPU Pod、环境及持久存储 | [ds服务器操作](docs/DS_SERVER_OPERATIONS.md) |
 | 查询新结构化Mamba TWM、依赖、验证及运行 | [新运行记录](docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md) |
 | 查询D26四库数据、单卡历史、合法MANO资产与全量验收 | [四库执行协议](docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)、[正式启动验收](reports/twm_four_source_20261014_launch.json)、[adapter摘要](reports/twm_four_source_adapters_20261014.json) |
-| 查询当前D27双GPU、大batch迁移与验收 | [双卡运行记录](docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[双卡验收摘要](reports/twm_dual_gpu_20261014.json) |
+| 查询当前D29 MoE＋长轨迹分布与在线监控 | [新架构与运行](docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[摘要](reports/twm_moe_long_horizon_20261015.json)、[W&B](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c) |
+| 查询历史D27双GPU、大batch迁移与验收 | [双卡运行记录](docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[双卡验收摘要](reports/twm_dual_gpu_20261014.json) |
 | 查询Oak单库TWM预训练、checkpoint、配置和合成验证 | [单库运行记录](docs/TWM_OAKINK2_PILOT_RUN_2026-10-14.md) |
 | 查询三库后台下载、实际范围、路径与续传 | [数据下载与检查](docs/TWM_DATA_DOWNLOADS.md) |
 | 查询DexYCB下载、配置ARCTIC官方账号与启动 | [对比数据下载](docs/COMPARISON_DATA_DOWNLOADS.md) |
@@ -91,7 +94,7 @@
 
 1. **输入和主干已选定。** 第一版是头戴 RGB + HaWoR，先冻结视觉权重。RGB-D 优先、EgoInfinity 为主干、WiLoR 单帧作为完整系统是历史路线。
 2. **TWM 独立学状态关系。** 仅以 glove/MoCap 等高质量运动轨迹预训练，不用配对图像、不直接复用 WestWorld 机器人权重、不依赖真实控制 action。
-3. **恢复当前状态为主。** TWM 结合历史和当前受损/部分状态；辅助短期预测用于学习时序规律。不是只依据历史预测未来，再按 confidence 拼接。
+3. **恢复当前状态为主。** TWM 结合历史和当前受损/部分状态；D29新增较长未来轨迹分布（本轮60步约2秒）用于学习时序关系，并加入MoE及输出不确定性。当前恢复仍单独监督与验收，不按confidence硬拼接。
 4. **可信观测可约束其他关节。** 不只是“看得见保留，看不见预测”。局部可信状态应通过结构关系帮助恢复其他部分。
 5. **视觉和先验都可能出错。** 高 confidence 仍需检验；真实急停/转向应能推翻错误运动预期。
 6. **两个闭环有不同作用。** 帧内候选改变图像证据查询位置；跨帧仅回灌最终校正状态及其可靠性。它们不是长短记忆双分支。
@@ -142,7 +145,7 @@ flowchart TD
 
 **在统一时间戳、骨架、坐标和 GT 条件下，纯轨迹条件恢复能否降低真实 HaWoR 输出的几何误差，并优于 smoothing/Kalman/普通 temporal model？**
 
-D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
+当前按D29继续新13.53M模型训练、验证长预测是否优于hold/常速度及当前恢复是否受益；旧模型可靠当前观测利用不足仍是必须复查的问题，不能假定加MoE/长预测已解决。D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
 
 ## 记忆的效力与维护
 

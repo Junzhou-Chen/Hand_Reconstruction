@@ -14,7 +14,7 @@ D28 暂停的旧双卡 run 与 checkpoint 保留，不自动恢复。新架构�
 | 未来 | +3 源帧的一个状态 | 接下来最多 60 个连续源帧，约 2 秒；4 条带概率的完整轨迹 |
 | 时序结构 | 6 个关节 Mamba blocks | 保留；每 block 后增加 4 个 dense MLP experts；另有未来 latent Mamba decoder |
 | 时间 | relative time、dt、log1p(dt) MLP | 保留三项并增加物理秒的多频 Fourier features |
-| 参数 | 6,330,892 | 静态预计 13,530,032；实际远程 parameter sum 待填 |
+| 参数 | 6,330,892 | 远程实际 13,530,032（旧模型约2.14倍） |
 
 源码：[模型](../src/handloop/models/probabilistic_twm.py)、[结构编码器](../src/handloop/models/structured_mamba.py)、[未来窗口](../src/handloop/data/forecast_trajectory.py)、[训练](../scripts/train_probabilistic_twm.py)、[配置](../config/twm_four_sources_moe_long_horizon.json)、[启动器](../scripts/ds_train_probabilistic_twm.py)、[W&B helper](../src/handloop/tracking.py)。
 
@@ -102,7 +102,7 @@ L=L_{restore}+0.05L_{current\ NLL}+0.3L_{future\ NLL}
 
 以上 loss 权重、四个 modes/experts、频带、预测时域均是用户方向下的工程起点，尚未通过消融证明最佳。配置计划50,000步，AdamW lr2e-4、warmup500、cosine至0.1倍峰值、weight decay0.01；Mamba `_no_weight_decay` 参数保持0。BF16网络、FP32几何/损失、梯度clip1与非finite拒绝保留。
 
-配置当前 global batch512 / 每卡256、两GPU；**正式采用的 batch 仍待新模型远程 smoke/显存检查确认**，不得复用旧模型每卡512的成本结论。验证batch32×最多8批/库；每500步验证、100步保存、10步记录。`stop_before_utc=2026-10-15T16:25:00Z` 触发共同保存退出，早于现有Job预期时限；50k是计划，不保证本次 allocation 内完成。
+配置当前 global batch512 / 每卡256、两GPU；**已通过新模型远程 smoke/显存检查并正式采用**；每卡256的3更新短探针为230.4 samples/s，peak allocated31.85GB/reserved32.47GB，排除loader/DDP，非稳态或全局最优结论。验证batch32×最多8批/库；每500步验证、100步保存、10步记录。`stop_before_utc=2026-10-15T16:25:00Z` 触发共同保存退出，早于现有Job预期时限；50k是计划，不保证本次 allocation 内完成。
 
 ## 评价与 W&B
 
@@ -112,9 +112,9 @@ L=L_{restore}+0.05L_{current\ NLL}+0.3L_{future\ NLL}
 
 当前 xyz 90%椭球 coverage 用三维 Normal Mahalanobis²≤6.251389；未来用各轴混合 CDF 的 `[0.05,0.95]` coverage，后者是边缘90%而非三维联合90%。当前没有旋转 coverage。平移不确定性分别记录 within-mode与total：`Var_total=Σπ[σ²+(μ−Σπμ)²]`，包含mode均值分歧，不能以component std无权均值替代。
 
-W&B配置 `enabled=true, mode=online, require_online=true, project=handloop-twm`，名称`twm-moe-long-horizon-v1`。仅rank0建run/上传标量，entity从已有账号解析，`wandb_run.json` 保存id/url用于resume。记录loss分项、NLL、velocity、MoE load/balance、mode entropy、分库/分时域几何误差、coverage/std、吞吐、学习率、梯度及GPU显存；train/val使用显式optimizer_step横轴，允许同一步分别记录。
+W&B配置 `enabled=true, mode=online, require_online=true, project=handloop-twm`，名称`twm-moe-long-horizon-v1`。仅rank0建run/上传标量，显式entity=`black-ant`，与可写的已有团队一致，`wandb_run.json` 保存id/url用于resume。记录loss分项、NLL、velocity、MoE load/balance、mode entropy、分库/分时域几何误差、coverage/std、吞吐、学习率、梯度及GPU显存；train/val使用显式optimizer_step横轴，允许同一步分别记录。
 
-不上传数据、MANO资产、checkpoint、源码diff或console；凭据使用正常环境/netrc配置，不进入公开config。在线初始化失败明确报错，不将offline伪称可实时check。checkpoint保存在持久远程目录，保存前对两rank完整模型hash一致性审计；resume要求config、manifest与world size一致。rank RNG保留，但prefetched sampler chunk/loader cursor未保证逐样本精确重放。
+不上传数据、MANO资产、checkpoint、源码diff或console；凭据使用正常环境/netrc配置，不进入公开config。在线初始化失败明确报错，不将offline伪称可实时check。checkpoint保存在持久远程目录，保存前对两rank完整模型hash一致性审计；resume要求config、manifest与world size一致；换allocation时可显式传`--stop-before-utc 新的带时区ISO时间`（或`none`）更新本次执行deadline，不改模型/数据/损失配置，避免沿用过期deadline后立即退出。该执行参数在正式启动后的源码提交补充，当前运行仍按原16:25UTC deadline。rank RNG保留，但prefetched sampler chunk/loader cursor未保证逐样本精确重放。
 
 ## 设计证据与收益边界
 
@@ -127,17 +127,31 @@ W&B配置 `enabled=true, mode=online, require_online=true, project=handloop-twm`
 
 未来意图无观测，长期预测应被视为条件分布而非唯一真值。合法旋转与积分保持几何约束，不证明力/力矩、contact、能量守恒或闭环稳定；scale/NLL可训练不代表已经校准。长预测能否改善当前恢复、MoE能否提升精度、真实视觉校正是否受益，均需相同数据预算与独立GT的消融/闭环评测。
 
-## 实际运行验收（启动后补充）
+## 实际运行验收
 
-本节仅由实际远程产物填写，当前不把计划写成完成：
+正式run使用用户随后提供的新key：仅存持久data10项目根的`private/wandb_api_key`，权限600、checkout外，启动器从文件读入child环境；未改旧netrc，未写Git或公开配置。新key的API身份与正式online init均通过。原凭据在默认yc-node/个人bioble创建run返回403；只读项目查询定位已有训练使用的black-ant团队，在该团队独立`handloop-twm`项目创建及同步成功。失败记录保留在远程checks目录，不把403当模型故障。
 
-| 项目 | 待实测记录 |
+| 项目 | 实测记录 |
 |---|---|
-| 训练代码commit、config SHA | 待填 |
-| 实际参数sum、GPU/环境与batch | 待填 |
-| 概率归一化/梯度/因果/padding/objective mask检查 | 待填 |
-| 各库未来覆盖与固定验证样本数 | 待填run_metadata产物 |
-| 两卡smoke、checkpoint finite与replica hash | 待填 |
-| 新run目录、启动UTC/PID、已完成步数 | 待填 |
-| 在线W&B run URL及实际metrics上传 | 待填 |
+| 正式训练代码 | `4798b62af806f582f420849c2b2a64d90c6de884`，从头初始化，未加载旧run/smoke权重 |
+| config文件SHA256 | `5a8aeca75bbf14792724e098ba33ad07ded9f2941b07cb9f4575e5ccc83f4041`；resolved config SHA及8份关键源码SHA见JSON |
+| 运行环境 | 既有Pod `jchen57-debug-mpd5p`，GPU0/1；独立Torch2.10/cu130＋官方Mamba runtime，新增wandb0.30.0，zhou未改 |
+| 模型与batch | 13,530,032参数；2卡，每卡256/global512；32/64/128/256/384单卡完整3更新均finite，256短探针吞吐最高 |
+| 概率/因果检查 | unit-Haar SO(3)密度积分最大绝对差4.480e-7，导数差1.035e-7；encoder/future causal与padding compaction最大差0 |
+| FP32/BF16/完整mask | 两精度321个parameter张量均有finite梯度、输出合法旋转；修改228个无效future标签后inputs、outputs、完整objective与所有分项最大差0 |
+| 双卡smoke与resume | global16，真实四库3步后保存，再严格resume至5步；checkpoint322个model浮点张量/963个AdamW浮点张量finite，CPU hash与两rank相同 |
+| 正式checkpoint | 已只读检查step10，Adam step10，322/963个浮点张量finite；模型SHA `303f23ae189a3c46e819324ba2233ddccf92599f3a06e1a7564f6b57fdeafc3d` 与两rank一致；不与更晚running步数混用 |
+| 正式启动 | 2026-10-15 00:19:13 UTC（纽约10-14 20:19），launcher4034/ranks4039/4040 |
+| 运行快照 | 2026-10-15T00:22:37.091785+00:00：step120、四源累计61440样本；loss/grad finite，双卡实际更新，尚非50k完成 |
+| W&B服务器验证 | [正式run943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)，API state=running，server optimizer_step=110，已收到train/loss、grad与初始validation标量 |
 
+正式输出：`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015`。运行时进度读`status.json`；上述为带时间的验收快照。完整小型记录见[启动JSON](../reports/twm_moe_long_horizon_20261015.json)。远程原始检查在data10项目根`evaluations/moe_long_horizon_checks_20261015`：data_contract.json、batch_probe.json、ddp_smoke.log、ddp_resume_smoke.log、smoke_checkpoint_audit.json、formal_checkpoint_audit.json。模型归一化/因果检查是7126dd8远程stdout，JSON保留其小型数值摘要；不伪称另有原始报告文件。
+
+| 数据源 | train/val窗口 | train/val完整60步标签窗口 | train/val可达1秒窗口 | train/val可达2秒窗口 |
+|---|---|---|---|---|
+| oakink2 | 346860/27728 | 334558/26616 | 341036/27210 | 334558/26616 |
+| hot3d | 132008/15240 | 65950/7620 | 101166/11684 | 51528/5600 |
+| umetrack | 151390/18008 | 126567/15125 | 139478/16628 | 126567/15125 |
+| dexycb | 6352/394 | 0/0 | 1263/124 | 0/0 |
+
+HOT3D的60帧offset有微小时间抖动，因此完整60步计数与严格“达到2秒”计数不同；固定验证最近帧容差另见前文。Dex本准备中train最大1.5秒、val最大1.433秒，没有2秒监督，不能报告Dex2秒GT误差；模型仍输出60个queries，尾部不进入loss。四库验证各固定256窗口、noisy/missing/clean独立固定RNG；新协议不是旧dense评测的3466固定窗/61370全量窗，不将二者直接当公平容量消融。

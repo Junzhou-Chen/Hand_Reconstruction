@@ -275,6 +275,16 @@
 - 按用户要求回查原论文Table1/3/4(b)、补充§8.3与官方对齐函数，补入HOT3D主表PA/W/WA=4.79/33.20/11.27mm、不可见infiller6.22/66.25/37.22mm、DexYCB整体PA4.76mm及遮挡分组。更新[对比协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)和数据评测记忆。
 - 区分joint位置/腕位置/旋转及对齐口径，不能把D28合成腕误差5.435mm与HaWoR直接排名；无新训练/推理、没有恢复暂停run。
 
+## 2026-10-15 UTC D29当前恢复＋MoE＋长轨迹分布与在线训练
+
+- 用户明确要求当前受损状态恢复同时预测更长未来轨迹、加入MoE、由实现者选时间编码及输出不确定性，并修改/跑起模型、配置W&B；覆盖早期短预测和默认无MoE限制，旧D28 run保持暂停。
+- 新13,530,032参数模型：6层d256结构化Mamba＋每层4个dense MLP experts，物理秒Fourier；当前99D＋4整段mode×60步约2秒，Gaussian平移/归一化SO(3) isotropic matrix Fisher，未来latent Mamba速度解码与逐步合法旋转积分。保留raw/candidate/history、四库GT/split、β另存与本轮conditioning关闭。
+- 新loader保留原636610/61370窗口与最少3未来帧，tail/gap mask；Dex无2秒标签，完整60步/物理秒覆盖分开保存。新增分库/分时域hold与常速度、moving/low-motion、NLL/coverage与within/total uncertainty指标；不以长预测、多样性或合法旋转宣称真实动力学/视觉收益。
+- 远程概率积分/导数、因果/padding、FP32/BF16全部321个parameter梯度、完整objective无效标签不变性通过；真实batch32/64/128/256/384三次AdamW更新全finite，选256/卡global512。双卡smoke3步＋resume至5步、CPU checkpoint/hash检查通过。
+- 正式4798b62于00:19:13 UTC从头启动独立run `twm_four_sources_moe_long_horizon_20261015`，launcher4034/ranks4039/4040；00:22:37 UTC实际120步/61440样本，W&B server step110可读。已检查正式checkpoint10，322个model与963个AdamW浮点张量finite，CPU hash与两rank一致；不把验收步数与更晚运行快照混用。
+- W&B0.30.0实际在线；默认团队yc-node及个人空间403，定位black-ant后新建独立handloop-twm成功。用户新key验证后仅存远程600私有文件、child环境传入，不改旧netrc、不进入Git/config/receipt。正式run [943f9c0c](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)；每100步保存/500步val/10步log，16:25UTC共同保存早于Job到期，不自动重建Job。
+- 保存[设计、概率推导及运行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)与[小型启动JSON](../reports/twm_moe_long_horizon_20261015.json)，更新方法/决策/进展/开发记忆与AGENTS。时域/模式/权重为工程起点，无新模型最终精度或真实视觉闭环结果；D28当前可靠观测利用不足仍须新实验复查。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

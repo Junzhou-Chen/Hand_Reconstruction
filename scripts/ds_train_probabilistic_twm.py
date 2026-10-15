@@ -22,6 +22,7 @@ def main():
     initial=parser.add_mutually_exclusive_group()
     initial.add_argument('--resume', action='store_true')
     parser.add_argument('--stop-after-updates', type=int)
+    parser.add_argument('--stop-before-utc', help='Execution deadline for this allocation; ISO timestamp or none')
     args=parser.parse_args()
     config=vars(args)
     config['code_version']=subprocess.check_output(['git','-C',args.code,'rev-parse','HEAD'],text=True).strip()
@@ -54,6 +55,7 @@ if CONFIG['action']=='start' and not alive:
              '--config',str(cfg),'--output',str(out),'--code-version',CONFIG['code_version']]
     if CONFIG['resume']: command+=['--resume',str(out/'latest.pt')]
     if CONFIG['stop_after_updates']: command+=['--stop-after-updates',str(CONFIG['stop_after_updates'])]
+    if CONFIG.get('stop_before_utc') is not None: command+=['--stop-before-utc',CONFIG['stop_before_utc']]
     env=os.environ.copy(); threads=str(protocol.get('cpu_threads',4))
     env.update(CUDA_VISIBLE_DEVICES=CONFIG['gpus'],OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS=threads,OMP_NUM_THREADS=threads)
     secret=Path(CONFIG['wandb_key_file']) if CONFIG.get('wandb_key_file') else None

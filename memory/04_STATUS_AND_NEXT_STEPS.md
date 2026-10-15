@@ -1,13 +1,16 @@
 # HandLoop 进展与下一步
 
-更新日期：2026-10-14。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
+更新日期：2026-10-15 UTC（纽约10-14）。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
 
-**D28当前优先状态：** 用户要求暂停并保留checkpoint、先验证效果。D27正式双卡已在32,783步共同保存退出（23:53:53 UTC/纽约19:53），STOP保留，不自动resume；冻结latest/best的固定＋全量61,370个val窗口及输入干预已完成；latest全量noisy腕5.435mm，去掉当前观测的固定窗5.451mm≈正常5.476mm，当前GT＋带噪历史仍5.317mm。证据见[暂停评测](../docs/TWM_PAUSED_EVAL_2026-10-14.md)。后文双卡启动/26,450快照属于历史，不表示当前仍在训练。
+**D29当前执行：** 用户授权当前受损恢复＋较长未来分布、MoE与W&B。新13.53M模型4798b62已从头在GPU0/1训练，每卡256/global512；00:20:51 UTC验收40步、累计20,480样本四源均正，W&B服务器同step40可读。正式checkpoint10模型/AdamW finite且完整hash与两rank相等；双卡smoke3步、resume至5步通过。当前输出99D恢复、4个整段mode×60未来步、Gaussian/Matrix-Fisher不确定性，物理秒Fourier编码。D28旧run保持暂停，以下D28/D27为历史记录；新模型收益和是否解决旧模型当前观测利用不足仍待验证。[新运行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[小型摘要](../reports/twm_moe_long_horizon_20261015.json)、[W&B](https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c)。
+
+**D28旧模型历史状态：** 用户要求暂停并保留checkpoint、先验证效果。D27正式双卡已在32,783步共同保存退出（23:53:53 UTC/纽约19:53），STOP保留，不自动resume；冻结latest/best的固定＋全量61,370个val窗口及输入干预已完成；latest全量noisy腕5.435mm，去掉当前观测的固定窗5.451mm≈正常5.476mm，当前GT＋带噪历史仍5.317mm。证据见[暂停评测](../docs/TWM_PAUSED_EVAL_2026-10-14.md)。后文双卡启动/26,450快照属于历史，不表示当前仍在训练。
 
 ## 已有和未有的产物
 
 | 项目 | 当前状态 | 证据 |
 |---|---|---|
+| D29当前MoE＋长轨迹分布 | 13.53M、当前99D恢复＋4modes×60步；正式两卡global512已运行，W&B在线；checkpoint有限性与保存恢复已验 | [新运行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md)、[启动摘要](../reports/twm_moe_long_horizon_20261015.json)；尚无最终精度/真实视觉收益 |
 | 原始研究资料 | 已有 | `HandLoop_Project/` 中 5 个 Markdown 文件与 1 张 PNG |
 | 核心 idea 与现行路线 | 已形成文字方案 | START_HERE 与对话归档 §15.23–16 |
 | 中文/英文 Introduction | 已有草稿与认可首段；10月14日按当前方法与前作复核在对话中提供新中文参考稿，待用户审阅 | 原档 `02_Introduction_CN_EN.md` 保留；[重写要点](05_WRITING_AND_REFERENCES.md#2026-10-14-中文-introduction-重写)，无新增结果或设计决定 |
@@ -99,12 +102,13 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 双卡smoke实际26346→26446共100更新，随后真实DDP resume并仅对rank1发SIGTERM，两rank共同保存stopped26498；CPU检查163个model浮点张量及499个Adam递归浮点项（含超参，非499个张量）finite，两rank完整模型state的keys/dtype/shape/bytes SHA一致。正式迁移源是旧单卡latest26346，SHA256 `09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f`，不是smoke26498。正式run于19:47:53 UTC启动，launcher2963，rank0/1为2968/2969并使用GPU0/1；19:52:33 UTC actual step26450（迁移后104更新），四源实际累计抽取106,496=104×1024样本，各rank53,248且四源均正；该step loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态吞吐比较。updated checkpoint26350已独立CPU读取，163个model及489个AdamW浮点张量finite、Adam step26350；CPU重算完整模型hash与两rank及replica audit相等。19:52:47 UTC两卡瞬时util100%、显存38,172/36,686MiB，PID2968/2969；这不是长期利用率或峰值显存结论。严格逐样本resume未成立，sampler预取块/loader游标仍未完整保存。[运行与验收](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[摘要](../reports/twm_dual_gpu_20261014.json)。
 
-下一步按D28保持旧dense run暂停，先复查当前观测/历史可靠性与corruption设计，再考虑真实HaWoR验证。D27未完成50k；不自动重启下载、准备或训练。50k最终结果尚未核验，也不能把D25的50k挪作D26结果。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
+下一步按D29验证新MoE/长轨迹模型，按D28保持旧dense run暂停，先复查当前观测/历史可靠性与corruption设计，再考虑真实HaWoR验证。D27未完成50k；不自动重启旧run、重复下载或准备；D29新run已另行授权启动。50k最终结果尚未核验，也不能把D25的50k挪作D26结果。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
 | P0 传感器split与状态契约 | D26四库full/collection工程验收已完成；后续glove source/session与native/raw joint几何桥接 | 分组split、单位/dt、源解码/FK残差、完整GT mask与provenance；不混淆roundtrip和独立精度 |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
+| P2b D29长轨迹分布与MoE | 新模型已启动：13.53M、60步/4modes、当前恢复＋分布＋velocity；W&B在线，两卡global512 | 分库分时域MAP与hold/常速度、NLL/coverage、clean退化、current输入干预与公平消融待正式结果 |
 | P2 纯轨迹恢复 baseline | D25已完成50k；D26单卡停止26,346步，D27已暂停32,783步，冻结评测完成，尚未完成50k；current restoration主任务＋0.1s短预测 | 后续checkpoint检查、分库clean/noisy/missing、宏平均与累计样本量；真实前端误差/自身rollout、GRU公平对照待补 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
 | P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
@@ -153,5 +157,7 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 ## 下次会话可直接使用的任务说明
 
 **2026-10-14数学讨论新增：** 用户再次要求证明当前Mamba的物理/数学性质。已完成源码2b40aa9与官方Mamba scan核查及条件性推导，见[物理证明§8–12](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md#8-2026-10-14当前mamba-twm的证明范围复核)。SO(3)更新已实现；固定β内部FK与anchor-wrapper等变各有限定；条件恢复理想风险、旋转→内部joint误差界和pre-LN Mamba内部boundedness可推导。完整反馈收缩、真实HaWoR收益与独立物理正确性未证明。本轮没有远程数值实验或训练修改，四库执行状态仍以其真实运行记录为准。
+
+> 最新D29优先：先读MEMORY.md与docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md。新13.53M模型4798b62已在原Pod两卡从头训练，run=twm_four_sources_moe_long_horizon_20261015，每卡256/global512；W&B https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c。当前99D恢复＋4整段modes×60步分布，当前/未来不确定性；新key仅存远程私有文件，勿读/打印/提交。16:25UTC共同保存早于Job16:37UTC到期；当前step读status.json，摘要快照不当实时状态。下文是D28旧模型移交背景。
 
 > 先读MEMORY.md、docs/TWM_PAUSED_EVAL_2026-10-14.md及reports/twm_paused_eval_20261014.json。D28按用户要求暂停旧6.33M dense DDP，STOP保存停止32,783步，禁止自动resume；latest32,783和best28,000原件及评测快照hash相同，模型/AdamW finite。固定3,466窗、full61,370窗/模式与输入干预全部完成，原best fixed指标复现差0。latest full noisy腕48.703→5.435mm、finger15.444→1.808°，但固定normal5.476mm≈整手当前缺失5.451mm，当前GT＋带噪历史仍5.317mm，提示历史主导及可靠当前观测利用不足；原因假设需另行验证，未重新训练。全部模型评测已退出，不当真实HaWoR/独立GT/物理保证。远程产物在data10项目根evaluations/twm_paused_20261014_v1，旧run仍runs/twm_four_sources_structured_mamba_ddp_20261014。D25已完成50k、D26停止26,346及D27启动记录保留为历史；本条不涉及其他并行模型。

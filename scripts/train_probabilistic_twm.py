@@ -227,6 +227,7 @@ def main():
     parser.add_argument('--batch-size',type=int,help='explicit fresh-run/smoke global batch override')
     parser.add_argument('--eval-batches',type=int)
     parser.add_argument('--tracking-mode',choices=('online','offline','disabled'))
+    parser.add_argument('--stop-before-utc',help='Execution-only deadline override for a new allocation; ISO timestamp or none')
     args = parser.parse_args()
     if not Path('/sciclone/home/jchen57').is_dir(): parser.error('Run inside the authorized remote compute Pod')
     config = json.loads(args.config.read_text())
@@ -235,6 +236,10 @@ def main():
     if args.tracking_mode:
         config['tracking']['mode']=args.tracking_mode
         config['tracking']['require_online']=args.tracking_mode=='online'
+    deadline_value=args.stop_before_utc if args.stop_before_utc is not None else config.get('stop_before_utc')
+    deadline=None if deadline_value in (None,'none') else datetime.fromisoformat(deadline_value)
+    if deadline is not None and deadline.utcoffset() is None:
+        raise ValueError('Execution deadline needs an explicit UTC offset')
     rank,local_rank,world = (int(os.environ[k]) for k in ('RANK','LOCAL_RANK','WORLD_SIZE'))
     if world != config['world_size'] or config['batch_size']%world: raise ValueError('Invalid world/global batch')
     local_batch = config['batch_size']//world
@@ -294,6 +299,8 @@ def main():
         np.random.set_state(state['numpy_rng']); sampler.load_state_dict(state['sampler'])
     run = {'started_utc':utc(),'code_version':args.code_version,'pid':os.getpid(),'world_size':world,
            'global_batch_size':config['batch_size'],'per_gpu_batch_size':local_batch,'config':config,
+           'effective_stop_before_utc':deadline.isoformat() if deadline else None,
+           'deadline_override':args.stop_before_utc,
            'config_file_sha256':hashlib.sha256(args.config.read_bytes()).hexdigest(),
            'resolved_config_sha256':hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest(),
            'manifest':str(args.manifest),'manifest_sha256':manifest_hash,'source_revisions':train.source_revisions,
@@ -359,7 +366,6 @@ def main():
     iterator=iter(loader); step=start_step; start=time.monotonic()
     sampled=torch.zeros(len(train.dataset_names),device=device,dtype=torch.long)
     end_step=min(config['steps'],start_step+args.stop_after_updates) if args.stop_after_updates else config['steps']
-    deadline=datetime.fromisoformat(config['stop_before_utc']) if config.get('stop_before_utc') else None
     while step<end_step:
         stopping=torch.tensor(int(stop['requested'] or (args.output/'STOP').exists() or
             (deadline is not None and datetime.now(timezone.utc)>=deadline)),device=device)

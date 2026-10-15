@@ -1,0 +1,626 @@
+{
+  "captured_utc": "2026-10-15T00:22:37.091785+00:00",
+  "decision": "D29",
+  "run_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015",
+  "launch": {
+    "pid": 4034,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/train_probabilistic_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_four_sources_moe_long_horizon.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015",
+      "--code-version",
+      "4798b62af806f582f420849c2b2a64d90c6de884"
+    ],
+    "code_version": "4798b62af806f582f420849c2b2a64d90c6de884",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-15T00:19:13.383828+00:00"
+  },
+  "status_snapshot": {
+    "utc": "2026-10-15T00:22:29.853246+00:00",
+    "phase": "training",
+    "step": 120,
+    "loss": 0.3578779697418213,
+    "restoration_loss": 0.562836229801178,
+    "current_nll_per_dof": -1.9058232307434082,
+    "forecast_nll_per_dof": -1.3449125289916992,
+    "best_trajectory_geometry_loss": 1.4624940156936646,
+    "velocity_loss": 0.023068247362971306,
+    "moe_balance_loss": 0.015446683391928673,
+    "mode_entropy": 1.3819432258605957,
+    "current_xyz_std_mm": 31.722322463989258,
+    "future_within_mode_xyz_std_mm": 85.03205108642578,
+    "future_total_xyz_std_mm": 86.7125244140625,
+    "grad_norm": 3.1160380840301514,
+    "lr": 4.8e-05,
+    "elapsed_seconds": 153.77798695955426,
+    "samples_per_second": 399.5370287696611,
+    "ranks": [
+      {
+        "rank": 0,
+        "pid": 4039,
+        "device": 0,
+        "peak_allocated_gb": 32.086623232,
+        "peak_reserved_gb": 32.644268032
+      },
+      {
+        "rank": 1,
+        "pid": 4040,
+        "device": 1,
+        "peak_allocated_gb": 32.087993856,
+        "peak_reserved_gb": 32.514244608
+      }
+    ],
+    "samples_by_dataset": {
+      "dexycb": 15386,
+      "hot3d": 15345,
+      "oakink2": 15442,
+      "umetrack": 15267
+    },
+    "moe_load": {
+      "0": 0.2564544677734375,
+      "1": 0.2569899559020996,
+      "2": 0.2676733136177063,
+      "3": 0.21888227760791779
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c"
+  },
+  "metadata": {
+    "code_version": "4798b62af806f582f420849c2b2a64d90c6de884",
+    "parameters": 13530032,
+    "config_file_sha256": "5a8aeca75bbf14792724e098ba33ad07ded9f2941b07cb9f4575e5ccc83f4041",
+    "resolved_config_sha256": "f32da4d7e0919715f5e696c9cc4afefc94dea1966c59690a79ca8dd22c405cf1",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "source_sha256": {
+      "scripts/train_probabilistic_twm.py": "e1e4fbb88a22c7e368ec58a8aa1a13a7d5fc519f61c9d9c2cc26ea541bfffcb9",
+      "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+      "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+      "src/handloop/models/probabilistic_twm.py": "032f454ed4426a0e6554f4d509b916bd8f2ef63b8f1656ae7178e52bc91c5b86",
+      "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+      "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+      "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+      "src/handloop/tracking.py": "64b11cf6de95d49cb10cfd85478e42f1ba1dde72d0764915748824af64948e65"
+    },
+    "config": {
+      "seed": 20261015,
+      "history_frames": 30,
+      "min_future_frames": 3,
+      "window_stride": 4,
+      "batch_size": 512,
+      "steps": 50000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 500,
+      "save_every": 100,
+      "log_every": 10,
+      "eval_batch_size": 32,
+      "eval_batches": 8,
+      "eval_horizons_seconds": [
+        0.1,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "current_nll_weight": 0.05,
+      "forecast_nll_weight": 0.3,
+      "forecast_geometry_weight": 0.2,
+      "velocity_weight": 0.05,
+      "moe_balance_weight": 0.01,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 60,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2,
+        "num_experts": 4,
+        "num_modes": 4,
+        "future_decoder_layers": 1,
+        "future_joint_width": 64,
+        "time_frequencies_hz": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0
+        ]
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false,
+      "world_size": 2,
+      "cpu_threads": 4,
+      "stop_before_utc": "2026-10-15T16:25:00+00:00",
+      "tracking": {
+        "enabled": true,
+        "mode": "online",
+        "require_online": true,
+        "project": "handloop-twm",
+        "entity": "black-ant",
+        "name": "twm-moe-long-horizon-v1",
+        "group": "four-source-current-and-future",
+        "tags": [
+          "mamba",
+          "dense-moe4",
+          "trajectory-modes4",
+          "future60",
+          "current-restoration"
+        ]
+      }
+    },
+    "source_revisions": {
+      "dexycb": [
+        "64551b001d360ad83bc383157a559ec248fb9100"
+      ],
+      "hot3d": [
+        "30fe9674782f32e1e5edba98476b6ff4300132c5"
+      ],
+      "oakink2": [
+        "21705616140d726607027e70d58b7837f442ffd8"
+      ],
+      "umetrack": [
+        "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+      ]
+    },
+    "train_windows_by_dataset": {
+      "dexycb": 6352,
+      "hot3d": 132008,
+      "oakink2": 346860,
+      "umetrack": 151390
+    },
+    "val_windows_by_dataset": {
+      "dexycb": 394,
+      "hot3d": 15240,
+      "oakink2": 27728,
+      "umetrack": 18008
+    },
+    "val_samples_by_dataset": {
+      "dexycb": 256,
+      "hot3d": 256,
+      "oakink2": 256,
+      "umetrack": 256
+    },
+    "rotation6d": "columns_c0xyz_c1xyz",
+    "position_units": "metres in noisy-history wrist anchor frame",
+    "GT": "source fitted MANO references; unchanged recording-disjoint four-source splits; no test labels",
+    "scope": "synthetic corruption pure-motion current restoration and multi-modal trajectory forecast; no visual correction evidence yet",
+    "likelihood": "xyz diagonal Gaussian in m; isotropic matrix Fisher on SO3 normalized Haar; trajectory-wide categorical mixture"
+  },
+  "wandb": {
+    "enabled": true,
+    "entity": "black-ant",
+    "id": "943f9c0c",
+    "last_optimizer_step": 120,
+    "mode": "online",
+    "project": "handloop-twm",
+    "state": "running",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c"
+  },
+  "wandb_server_verification": {
+    "state": "running",
+    "summary": {
+      "optimizer_step": 110,
+      "train/loss": 0.4582417607307434,
+      "train/grad_norm": 3.527627468109131,
+      "validation/noisy/restored/wrist_mm": 50.24842345714569
+    }
+  },
+  "checkpoint_audit": {
+    "step": 10,
+    "code_version": "4798b62af806f582f420849c2b2a64d90c6de884",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "303f23ae189a3c46e819324ba2233ddccf92599f3a06e1a7564f6b57fdeafc3d",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      10.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015",
+    "config": {
+      "seed": 20261015,
+      "history_frames": 30,
+      "min_future_frames": 3,
+      "window_stride": 4,
+      "batch_size": 512,
+      "steps": 50000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 500,
+      "save_every": 100,
+      "log_every": 10,
+      "eval_batch_size": 32,
+      "eval_batches": 8,
+      "eval_horizons_seconds": [
+        0.1,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "current_nll_weight": 0.05,
+      "forecast_nll_weight": 0.3,
+      "forecast_geometry_weight": 0.2,
+      "velocity_weight": 0.05,
+      "moe_balance_weight": 0.01,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 60,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2,
+        "num_experts": 4,
+        "num_modes": 4,
+        "future_decoder_layers": 1,
+        "future_joint_width": 64,
+        "time_frequencies_hz": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0
+        ]
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false,
+      "world_size": 2,
+      "cpu_threads": 4,
+      "stop_before_utc": "2026-10-15T16:25:00+00:00",
+      "tracking": {
+        "enabled": true,
+        "mode": "online",
+        "require_online": true,
+        "project": "handloop-twm",
+        "entity": "black-ant",
+        "name": "twm-moe-long-horizon-v1",
+        "group": "four-source-current-and-future",
+        "tags": [
+          "mamba",
+          "dense-moe4",
+          "trajectory-modes4",
+          "future60",
+          "current-restoration"
+        ]
+      }
+    },
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "wandb": {
+      "enabled": true,
+      "id": "943f9c0c",
+      "project": "handloop-twm",
+      "entity": "black-ant",
+      "mode": "online",
+      "url": "https://wandb.ai/black-ant/handloop-twm/runs/943f9c0c",
+      "state": "running",
+      "last_optimizer_step": 10
+    },
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "smoke_checkpoint_audit": {
+    "step": 5,
+    "code_version": "ea317e3",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "ab0929417fc747f782702e425b85ebda7acacfc4197e9542ce771afa167ad597",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      5.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/moe_long_horizon_checks_20261015/ddp_smoke",
+    "config": {
+      "seed": 20261015,
+      "history_frames": 30,
+      "min_future_frames": 3,
+      "window_stride": 4,
+      "batch_size": 16,
+      "steps": 50000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 500,
+      "save_every": 100,
+      "log_every": 10,
+      "eval_batch_size": 32,
+      "eval_batches": 1,
+      "eval_horizons_seconds": [
+        0.1,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "current_nll_weight": 0.05,
+      "forecast_nll_weight": 0.3,
+      "forecast_geometry_weight": 0.2,
+      "velocity_weight": 0.05,
+      "moe_balance_weight": 0.01,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 60,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2,
+        "num_experts": 4,
+        "num_modes": 4,
+        "future_decoder_layers": 1,
+        "future_joint_width": 64,
+        "time_frequencies_hz": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0
+        ]
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false,
+      "world_size": 2,
+      "cpu_threads": 4,
+      "stop_before_utc": "2026-10-15T16:25:00+00:00",
+      "tracking": {
+        "enabled": true,
+        "mode": "offline",
+        "require_online": false,
+        "project": "handloop-twm",
+        "name": "twm-moe-long-horizon-v1",
+        "group": "four-source-current-and-future",
+        "tags": [
+          "mamba",
+          "dense-moe4",
+          "trajectory-modes4",
+          "future60",
+          "current-restoration"
+        ]
+      }
+    },
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "wandb": {
+      "enabled": true,
+      "id": "b9f0d6f5",
+      "project": "handloop-twm",
+      "entity": "",
+      "mode": "offline",
+      "url": null,
+      "state": "running",
+      "last_optimizer_step": 5
+    },
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "data_contract_passed": true,
+  "forecast_coverage": {
+    "train": {
+      "dexycb": {
+        "windows": 6352,
+        "full_60_frame_windows": 0,
+        "windows_reaching_seconds": {
+          "0.1": 6352,
+          "0.5": 3961,
+          "1.0": 1263,
+          "2.0": 0
+        },
+        "maximum_observed_seconds": 1.5
+      },
+      "hot3d": {
+        "windows": 132008,
+        "full_60_frame_windows": 65950,
+        "windows_reaching_seconds": {
+          "0.1": 130862,
+          "0.5": 117700,
+          "1.0": 101166,
+          "2.0": 51528
+        },
+        "maximum_observed_seconds": 2.002507668999897
+      },
+      "oakink2": {
+        "windows": 346860,
+        "full_60_frame_windows": 334558,
+        "windows_reaching_seconds": {
+          "0.1": 346860,
+          "0.5": 344274,
+          "1.0": 341036,
+          "2.0": 334558
+        },
+        "maximum_observed_seconds": 2.0000000000000284
+      },
+      "umetrack": {
+        "windows": 151390,
+        "full_60_frame_windows": 126567,
+        "windows_reaching_seconds": {
+          "0.1": 151390,
+          "0.5": 146123,
+          "1.0": 139478,
+          "2.0": 126567
+        },
+        "maximum_observed_seconds": 2.000000000000001
+      }
+    },
+    "val": {
+      "dexycb": {
+        "windows": 394,
+        "full_60_frame_windows": 0,
+        "windows_reaching_seconds": {
+          "0.1": 394,
+          "0.5": 274,
+          "1.0": 124,
+          "2.0": 0
+        },
+        "maximum_observed_seconds": 1.4333333333333331
+      },
+      "hot3d": {
+        "windows": 15240,
+        "full_60_frame_windows": 7620,
+        "windows_reaching_seconds": {
+          "0.1": 15086,
+          "0.5": 13548,
+          "1.0": 11684,
+          "2.0": 5600
+        },
+        "maximum_observed_seconds": 2.0021134440030437
+      },
+      "oakink2": {
+        "windows": 27728,
+        "full_60_frame_windows": 26616,
+        "windows_reaching_seconds": {
+          "0.1": 27728,
+          "0.5": 27494,
+          "1.0": 27210,
+          "2.0": 26616
+        },
+        "maximum_observed_seconds": 2.000000000000014
+      },
+      "umetrack": {
+        "windows": 18008,
+        "full_60_frame_windows": 15125,
+        "windows_reaching_seconds": {
+          "0.1": 18008,
+          "0.5": 17394,
+          "1.0": 16628,
+          "2.0": 15125
+        },
+        "maximum_observed_seconds": 2.000000000000001
+      }
+    }
+  },
+  "mask_objective": {
+    "passed": true,
+    "masked_labels": 228,
+    "input_max_abs": 0.0,
+    "current_output_max_abs": 0.0,
+    "forecast_output_max_abs": 0.0,
+    "full_objective_abs_difference": 0.0,
+    "objective_term_max_abs": 0.0
+  },
+  "batch_probe": [
+    {
+      "batch_size": 32,
+      "status": "passed",
+      "samples_per_second": 80.92837713898261,
+      "peak_allocated_bytes": 4251313664,
+      "peak_reserved_bytes": 4431282176,
+      "all_gradients_used_finite": true,
+      "parameters_optimizer_finite": true
+    },
+    {
+      "batch_size": 64,
+      "status": "passed",
+      "samples_per_second": 169.84331799020913,
+      "peak_allocated_bytes": 8277956096,
+      "peak_reserved_bytes": 8573157376,
+      "all_gradients_used_finite": true,
+      "parameters_optimizer_finite": true
+    },
+    {
+      "batch_size": 128,
+      "status": "passed",
+      "samples_per_second": 216.25109342293442,
+      "peak_allocated_bytes": 16066909184,
+      "peak_reserved_bytes": 16519266304,
+      "all_gradients_used_finite": true,
+      "parameters_optimizer_finite": true
+    },
+    {
+      "batch_size": 256,
+      "status": "passed",
+      "samples_per_second": 230.4121853835387,
+      "peak_allocated_bytes": 31850339840,
+      "peak_reserved_bytes": 32472301568,
+      "all_gradients_used_finite": true,
+      "parameters_optimizer_finite": true
+    },
+    {
+      "batch_size": 384,
+      "status": "passed",
+      "samples_per_second": 208.8800876537203,
+      "peak_allocated_bytes": 47688618496,
+      "peak_reserved_bytes": 48232398848,
+      "all_gradients_used_finite": true,
+      "parameters_optimizer_finite": true
+    }
+  ],
+  "numerical_checks": {
+    "source": "remote stdout of check_probabilistic_twm_numerics.py at 7126dd8; full formal model config",
+    "parameters": 13530032,
+    "SO3_density_normalization_max_abs": 4.479793529466036e-07,
+    "normalizer_derivative_max_abs": 1.0342562095644325e-07,
+    "encoder_causal_max_abs": 0.0,
+    "padding_compaction_max_abs": 0.0,
+    "future_decoder_causal_max_abs": 0.0,
+    "fp32_all_321_parameter_gradients_finite": true,
+    "bf16_all_321_parameter_gradients_finite": true,
+    "all_output_rotations_legal": true
+  },
+  "checks_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/moe_long_horizon_checks_20261015",
+  "limits": [
+    "Training-running verification only; not model quality, calibration, real HaWoR or visual-loop evidence",
+    "Predicts 60 queries for every sample; labels masked at gaps/tails; DexYCB has no 2-second supervision in these preparations",
+    "Same source GT, splits, convention and beta-conditioning-off policy as prior four-source model",
+    "Checkpoint audit step and later running snapshot step are distinct"
+  ]
+}
