@@ -255,6 +255,9 @@ def main():
     parser.add_argument('--stop-before-utc',help='Execution-only deadline override for a new allocation; ISO timestamp or none')
     args = parser.parse_args()
     if not Path('/sciclone/home/jchen57').is_dir(): parser.error('Run inside the authorized remote compute Pod')
+    source_root=Path(__file__).resolve().parents[1]
+    if Path(g.__file__).resolve()!=source_root/'src/handloop/geometry.py':
+        raise RuntimeError('PYTHONPATH must select this exact training source directory')
     config = json.loads(args.config.read_text())
     if config.get('corruption_profile_path'):
         profile_path=Path(__file__).resolve().parents[1]/config['corruption_profile_path']

@@ -57,7 +57,8 @@ if CONFIG['action']=='start' and not alive:
     if CONFIG['stop_after_updates']: command+=['--stop-after-updates',str(CONFIG['stop_after_updates'])]
     if CONFIG.get('stop_before_utc') is not None: command+=['--stop-before-utc',CONFIG['stop_before_utc']]
     env=os.environ.copy(); threads=str(protocol.get('cpu_threads',4))
-    env.update(CUDA_VISIBLE_DEVICES=CONFIG['gpus'],OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS=threads,OMP_NUM_THREADS=threads)
+    env.update(CUDA_VISIBLE_DEVICES=CONFIG['gpus'],OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS=threads,OMP_NUM_THREADS=threads,
+               PYTHONPATH=str(Path(CONFIG['code'])/'src')+os.pathsep+env.get('PYTHONPATH',''))
     secret=Path(CONFIG['wandb_key_file']) if CONFIG.get('wandb_key_file') else None
     if secret:
         if not secret.is_file() or secret.stat().st_mode & 0o077:
