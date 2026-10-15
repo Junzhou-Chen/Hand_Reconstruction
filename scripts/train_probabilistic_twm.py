@@ -175,6 +175,14 @@ def evaluate(model, loaders, device, config):
                 hold_errors = state_errors(result['state'][:,None],future)
                 cv_errors = state_errors(constant_velocity,future)
                 for key,value in forecast_errors.items(): add('forecast_ade/'+key,value,valid)
+                target_motion = state_errors(future,target[:,None])
+                moving = ((target_motion['wrist_mm'].masked_fill(~valid,0).amax(-1)>=20)
+                          |(target_motion['finger_deg'].masked_fill(~valid,0).amax(-1)>=10))
+                for motion_group,rows_mask in [('moving',moving),('low_motion',~moving)]:
+                    for key,value in forecast_errors.items():
+                        add('future_motion_'+motion_group+'/map/'+key,value,valid&rows_mask[:,None])
+                    for key,value in hold_errors.items():
+                        add('future_motion_'+motion_group+'/restored_hold/'+key,value,valid&rows_mask[:,None])
                 mode_errors = state_errors(result['forecast_modes'],future[:,None])
                 mode_ade = (mode_errors['wrist_mm']*valid[:,None]).sum(-1)/valid.sum(-1)[:,None]
                 add('forecast_minade_wrist_mm',mode_ade.min(-1).values)
