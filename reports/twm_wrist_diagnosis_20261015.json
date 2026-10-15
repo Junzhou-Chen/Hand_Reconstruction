@@ -1,0 +1,223 @@
+{
+  "utc": "2026-10-15T05:37:26.454538+00:00",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015",
+  "checkpoint_step": 4400,
+  "checkpoint_model_sha256": "81d9ea33e7c99d2616041e2b798d3b7d5a8528894587821455eb6f0b6dc0364c",
+  "training_code_version": "7d53fa4a1b14f31e08f41ba545556e59adadd31f",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "source_sha256_verified": {
+    "scripts/train_probabilistic_twm.py": "c64396f33e8a11103dd610bef6a92175a2eb6e0373a9104f3c7f0a3a18157c69",
+    "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+    "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+    "src/handloop/models/probabilistic_twm.py": "032f454ed4426a0e6554f4d509b916bd8f2ef63b8f1656ae7178e52bc91c5b86",
+    "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+    "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+    "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+    "src/handloop/tracking.py": "64b11cf6de95d49cb10cfd85478e42f1ba1dde72d0764915748824af64948e65",
+    "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce"
+  },
+  "selected_indices": {
+    "dexycb": [
+      60976,
+      61025,
+      61074,
+      61123,
+      61173,
+      61222,
+      61271,
+      61321
+    ],
+    "hot3d": [
+      27728,
+      29640,
+      31552,
+      33465,
+      35377,
+      37289,
+      39202,
+      41114
+    ],
+    "oakink2": [
+      0,
+      3479,
+      6958,
+      10438,
+      13917,
+      17397,
+      20876,
+      24356
+    ],
+    "umetrack": [
+      42968,
+      45227,
+      47487,
+      49747,
+      52006,
+      54266,
+      56526,
+      58785
+    ]
+  },
+  "samples": 32,
+  "corruption_seed": 20261138,
+  "corruption_mode": "noisy",
+  "baselines": {
+    "candidate_mm": 5.533995151519775,
+    "history_hold_mm": 9.430749893188477,
+    "fixed_history_hold_blend_0.25_mm": 5.216277122497559,
+    "fixed_history_hold_blend_0.5_mm": 6.0019989013671875,
+    "fixed_history_hold_blend_0.75_mm": 7.416487216949463,
+    "past_3_linear_extrapolation_mm": 7.642155647277832,
+    "fixed_half_candidate_half_past_3_mm": 5.438704013824463,
+    "past_5_linear_extrapolation_mm": 7.626265525817871,
+    "fixed_half_candidate_half_past_5_mm": 5.367051124572754
+  },
+  "precision": {
+    "bf16": {
+      "wrist_mm": 5.430903434753418,
+      "mean_correction_norm_mm": 0.5615078806877136,
+      "correction_coordinate_mean_mm": [
+        -0.35901665687561035,
+        -0.07588864117860794,
+        -0.13952255249023438
+      ],
+      "correction_coordinate_std_mm": [
+        0.20576009154319763,
+        0.26654303073883057,
+        0.3006298542022705
+      ],
+      "projection_dtype": "torch.bfloat16",
+      "sensitivity": [
+        {
+          "offset_mm": 1.0,
+          "axis": 0,
+          "mean_residual_response_slope": -0.0014424325781874359,
+          "mean_projection_changed_fraction": 0.27764892578125
+        },
+        {
+          "offset_mm": 1.0,
+          "axis": 1,
+          "mean_residual_response_slope": -3.5762088373303413e-05,
+          "mean_projection_changed_fraction": 0.23712158203125
+        },
+        {
+          "offset_mm": 1.0,
+          "axis": 2,
+          "mean_residual_response_slope": -0.003331898944452405,
+          "mean_projection_changed_fraction": 0.2862548828125
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 0,
+          "mean_residual_response_slope": -0.0017452239990234375,
+          "mean_projection_changed_fraction": 0.80389404296875
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 1,
+          "mean_residual_response_slope": -0.0005006788851460442,
+          "mean_projection_changed_fraction": 0.77191162109375
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 2,
+          "mean_residual_response_slope": -0.0034081937046721578,
+          "mean_projection_changed_fraction": 0.79400634765625
+        }
+      ]
+    },
+    "fp32": {
+      "wrist_mm": 5.431802749633789,
+      "mean_correction_norm_mm": 0.5638137459754944,
+      "correction_coordinate_mean_mm": [
+        -0.3605359196662903,
+        -0.07692094892263412,
+        -0.14142639935016632
+      ],
+      "correction_coordinate_std_mm": [
+        0.20610253512859344,
+        0.26636025309562683,
+        0.3021484613418579
+      ],
+      "projection_dtype": "torch.float32",
+      "sensitivity": [
+        {
+          "offset_mm": 1.0,
+          "axis": 0,
+          "mean_residual_response_slope": -0.0017359685152769089,
+          "mean_projection_changed_fraction": 1.0
+        },
+        {
+          "offset_mm": 1.0,
+          "axis": 1,
+          "mean_residual_response_slope": -0.0004645777225960046,
+          "mean_projection_changed_fraction": 1.0
+        },
+        {
+          "offset_mm": 1.0,
+          "axis": 2,
+          "mean_residual_response_slope": -0.003397084539756179,
+          "mean_projection_changed_fraction": 1.0
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 0,
+          "mean_residual_response_slope": -0.0017360157216899097,
+          "mean_projection_changed_fraction": 1.0
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 1,
+          "mean_residual_response_slope": -0.0004646114248316735,
+          "mean_projection_changed_fraction": 1.0
+        },
+        {
+          "offset_mm": 10.0,
+          "axis": 2,
+          "mean_residual_response_slope": -0.0033970974618569016,
+          "mean_projection_changed_fraction": 1.0
+        }
+      ]
+    }
+  },
+  "loss_gradients_on_translation_head": {
+    "restoration_loss": {
+      "term_value": 0.012185661122202873,
+      "weight": 1.0,
+      "translation_head_grad_norm": 0.4109534025192261,
+      "cosine_to_restoration": 1.0
+    },
+    "current_nll_per_dof": {
+      "term_value": -3.85892391204834,
+      "weight": 0.05,
+      "translation_head_grad_norm": 0.30743837356567383,
+      "cosine_to_restoration": 0.43351495265960693
+    },
+    "forecast_nll_per_dof": {
+      "term_value": -2.58469820022583,
+      "weight": 0.3,
+      "translation_head_grad_norm": 0.2320733219385147,
+      "cosine_to_restoration": -0.20396508276462555
+    },
+    "best_trajectory_geometry_loss": {
+      "term_value": 1.1088505983352661,
+      "weight": 0.2,
+      "translation_head_grad_norm": 0.45875903964042664,
+      "cosine_to_restoration": 0.04429091513156891
+    },
+    "velocity_loss": {
+      "term_value": 0.023414624854922295,
+      "weight": 0.05,
+      "translation_head_grad_norm": 0.0
+    }
+  },
+  "head_weight_norm": 0.011177591979503632,
+  "head_bias": [
+    0.00012799064279533923,
+    0.0012074093101546168,
+    -0.0007115642074495554
+  ],
+  "parameters_unchanged": true,
+  "peak_allocated_bytes": 3877155328,
+  "scope": "Small fixed synthetic diagnostic sample, eval-mode frozen checkpoint. No optimizer, no production run mutation, not an accuracy benchmark or causal proof of a training failure."
+}

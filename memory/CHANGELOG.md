@@ -349,6 +349,12 @@
 - ordinary root/finger降低40.7%/51.6%，但腕7.158→7.180mm未改善；clean引入0.688mm且14.26%窗口>1mm退化，reanchor为0.571mm/4.39%。同轮3k→4k weighted score降4.03%，不把best-so-far或负NLL当收敛。1s预测腕103.568<hold120.242mm，2s150.508>hold148.162mm；90%当前xyz覆盖82.03%，不称校准。
 - 新增只读[摘要脚本](../scripts/review_probabilistic_twm_run.py)，核对宏平均、保存各时域有效数与原validation字节SHA；远程复用已有绘图脚本并审图。配置/source/data SHA、12模式/分库及曲线在[小型摘要](../reports/twm_b512_progress_20261015_0521.json)，[效果与限制](../docs/TWM_B512_PROGRESS_2026-10-15.md)。更新当前入口、状态及数据记忆；没有新设计决定或真实视觉/独立传感器效果结论。
 
+## 2026-10-15 D34腕位置缺少校正的源码与数值诊断
+
+- 用户要求分析原因；核输入米单位直接进入root token、loss已有0.05m缩放、残差加法/梯度连通、future从current均值积分。排除把3/99维简单均分或位置head断开当解释；未修改模型/训练执行，归一化和current-only仅建议。
+- 冻结checkpoint4400、原7d53fa4源码hash/两rank CPU模型hash匹配，四库各8窗；±10mm输入偏移只触发约0.005–0.034mm平均反向位置残差，BF16/FP32相近。current几何head梯度0.411，weighted future geometry0.459；future NLL梯度0.232/cos−0.204，仅为小样本牵制迹象，不当因果证明。参数/buffer前后完全相等、无optimizer，GPU1额外峰值3.877GB；正式训练05:37UTC仍4450步。
+- 保存[完整解释](../docs/TWM_WRIST_DIAGNOSIS_2026-10-15.md)、[诊断摘要](../reports/twm_wrist_diagnosis_20261015.json)及[脚本](../scripts/diagnose_twm_wrist.py)。区分input尺度/identity/multitask待验假设、common-bias条件性不可辨识、32窗探索和4k固定1024窗效果；记录所有固定融合比例，不选择有利样本冒充全量改善。更新入口、状态、数据与远程记忆，无新用户设计决定。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

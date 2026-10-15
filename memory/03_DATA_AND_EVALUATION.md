@@ -24,6 +24,8 @@
 
 **D34训练执行更新（2026-10-15UTC）：** 保留D32四源参考/recording split、12模式固定validation与20/20/35/20/5 mixed_v2；旧run停3,110步，新run每卡512/global1024、从头10k。目标10.24M次样本抽取，非独立新样本数；batch/调度改变后不能只按同step比较。旧1k→3k weighted current score0.02225→0.01281、root3.871→2.573°、finger3.215→1.773°，但noisy腕输出7.287→7.210mm仍高于输入7.158mm；clean/reanchor退化及未来误差在摘要同报。指标为四库均值的等权宏平均、源拟合MANO wrist mm/局部SO(3)角，非独立joint/mesh或真实HaWoR；未宣称已收敛。[曲线与设置](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[小型摘要](../reports/twm_batch512_10k_20261015.json)。
 
+**D34腕诊断（2026-10-15，非新增全量评测）：** 冻结4,400步、四库各8窗32窗，原7d53fa4源码/hash一致且无参数更新；ordinary候选5.534→模型5.431mm，不替代4k1024窗结果。±10mm位置干预的残差平均反向响应仅0.005–0.034mm，FP32相近；head有非零current几何梯度，future项量级相当/部分负cosine。固定融合全结果保留，不在GT拟合融合比例。输入尺度/identity倾向/多任务牵制为假设，不把common-bias不可辨识当全部失败解释。[诊断记录](../docs/TWM_WRIST_DIAGNOSIS_2026-10-15.md)、[摘要](../reports/twm_wrist_diagnosis_20261015.json)。
+
 **D34的4k中途验证（纽约2026-10-15）：** 本轮新run ordinary/noisy腕7.158→7.180mm、root3.999→2.373°、finger3.224→1.561°；clean腕0→0.688mm（>1mm退化14.26%），reanchor 0→0.571mm（4.39%）。固定每源256窗、四库等权，分库与样本/未来时域有效数保存在[摘要](../reports/twm_b512_progress_20261015_0521.json)；宏平均和p95不当总体pool统计。score同轮3k→4k降4.03%，未宣称收敛或真实HaWoR收益。1s预测优于hold、2s在三库有效窗上未优于hold；90%当前xyz椭球覆盖82.03%。[效果文档](../docs/TWM_B512_PROGRESS_2026-10-15.md)。
 
 **D32实施：** 已按用户要求接入mixed v2，源GT/split未变；20/20/35/20/5、有界位移范数/总角、quality unknown，旧sample_batch保留。4096窗远程语义检查通过，9种新fixed modes加3种legacy共12种，best按clean/reanchor/noisy/missing/strong加权0.2/0.2/0.35/0.2/0.05的current restoration loss选择。reanchor固定当前clean，是诊断分层，不等于mixed内clean/near各半的精确期望风险。新正式run已实际更新，尚无新模型最终恢复收益；旧协议保留但batch/RNG/quality条件不同，不能将更轻噪声的更小误差直接当胜过D28。[运行与口径](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)。

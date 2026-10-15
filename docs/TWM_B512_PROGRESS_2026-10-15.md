@@ -44,3 +44,6 @@ ordinary/noisy未来腕误差：1s最高概率整段mode为103.568mm，restored-
 原始run：`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015`；本次checks：同根`evaluations/twm_b512_progress_20261015_0521/{review.json,review_source.py,curves.png}`。所有权重与原日志保留远程，[W&B12cc0781](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)仍用于本轮跟踪。
 
 当前结论：已经学到当前旋转去噪，但尚未验证有效的腕位置校正。保持用户要求的10k训练继续；后续按同口径检查腕位置、准确输入退化、分库与预测表现，不把加大batch/步数本身当成改进证据。
+
+
+随后按用户要求完成[腕位置原因诊断](TWM_WRIST_DIAGNOSIS_2026-10-15.md)：使用冻结4,400步小样本，不是本页4k全固定验证；模型对当前位置偏移的残差响应很弱，head梯度连通，原因仍需单因素训练对照。本页验证数值保持原口径。
