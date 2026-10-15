@@ -5,12 +5,30 @@ Events share direction/peak over a short interval, with clean/near boundaries.
 This is synthetic augmentation, not a calibrated HaWoR error distribution.
 """
 from __future__ import annotations
+import math
 import torch
 from handloop import geometry as g
-from .corruption import CASE_NAMES, _profile_tables
+from .corruption import CASE_NAMES, LEVEL_NAMES
 
 PATTERN_NAMES = ('jitter', 'plateau', 'ramp', 'scattered')
 SPATIAL_NAMES = ('translation_only', 'wrist_pose', 'fingers', 'whole_hand')
+
+
+def causal_fill_history(states, available):
+    """Carry forward each group's most recent observed past value.
+
+    Caller provides a fully observed initial seed. No future values or
+    uncertainty labels are consulted. Also used by validation baselines.
+    """
+    if not bool(available[:,0].all()): raise ValueError('Observed initial seed required')
+    b=states.shape[0]
+    filled=[]; previous=states[:,0]
+    for t in range(states.shape[1]):
+        now=states[:,t]; mask=available[:,t]
+        previous=torch.cat((torch.where(mask[:,:1],now[:,:3],previous[:,:3]),
+            torch.where(mask[:,1:,None],now[:,3:].reshape(b,16,6),previous[:,3:].reshape(b,16,6)).flatten(1)),-1)
+        filled.append(previous)
+    return torch.stack(filled,1)
 
 
 def sample_temporal_batch(batch, generator, mode='mixed', *, condition_on_beta=False,
@@ -23,8 +41,24 @@ def sample_temporal_batch(batch, generator, mode='mixed', *, condition_on_beta=F
     dt = batch['dt'].float()
     if dt.shape != (b,length) or not bool(torch.isfinite(dt).all() and (dt>0).all()):
         raise ValueError('Positive physical dt required')
-    probabilities, ranges, *_ = _profile_tables(profile, device)
+    cases={entry['name']:entry['probability'] for entry in profile['window_cases']}
+    if set(cases)!=set(CASE_NAMES): raise ValueError('Expected five explicit window cases')
+    probabilities=[cases[name] for name in CASE_NAMES]
+    range_rows=[]
+    for level in LEVEL_NAMES:
+        row=[]
+        for key,scale,ceiling in (('translation_norm_mm',.001,math.inf),
+                                  ('root_angle_deg',math.pi/180,180),
+                                  ('finger_angle_deg',math.pi/180,180)):
+            bounds=profile['levels'][level][key]
+            if len(bounds)!=2 or not all(math.isfinite(x) for x in bounds) or not 0<=bounds[0]<=bounds[1]<=ceiling:
+                raise ValueError(f'Invalid amplitude bounds: {level}.{key}')
+            row.append([x*scale for x in bounds])
+        range_rows.append(row[:2]+[row[2]]*15)
+    ranges=torch.tensor(range_rows,device=device,dtype=torch.float32)
     spec = profile['events']
+    for key in ('jitter_frame_probability','medium_probability','near_background_probability'):
+        if not 0<=spec[key]<=1: raise ValueError(f'Invalid {key}')
     def rand(*shape): return torch.rand(*shape, device=device, generator=generator)
     def cat(prob):
         p = torch.tensor(prob,device=device,dtype=torch.float32)
@@ -100,14 +134,7 @@ def sample_temporal_batch(batch, generator, mode='mixed', *, condition_on_beta=F
     if mode=='history_only': available[:,-1]=False
     # All groups have an observed initial seed. Causal fill never reads a
     # hidden/missing reference, including when selecting the wrist anchor.
-    filled=[]
-    previous=corrupted[:,0]
-    for t in range(length):
-        now=corrupted[:,t]; mask=available[:,t]
-        previous=torch.cat((torch.where(mask[:,:1],now[:,:3],previous[:,:3]),
-            torch.where(mask[:,1:,None],now[:,3:].reshape(b,16,6),previous[:,3:].reshape(b,16,6)).flatten(1)),-1)
-        filled.append(previous)
-    filled=torch.stack(filled,1)
+    filled=causal_fill_history(corrupted,available)
     anchor=filled[:,h-1]; ra=g.state_to_rotmat(anchor)[:,0]
     def to_anchor(states):
         extra=states.ndim-2

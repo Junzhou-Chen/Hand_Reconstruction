@@ -41,7 +41,8 @@ def main():
         angles=g.geodesic_angle(g.state_to_rotmat(actual),g.state_to_rotmat(batch['past_current']))
         assert torch.allclose(angles,d['sampled_amplitudes'][...,1:],atol=.002),mode
         outside=~d['event_groups']
-        assert bool((d['sampled_amplitudes'][outside]<=.018).all())  # max near rotation 1deg
+        assert bool((d['sampled_amplitudes'][...,0][outside[...,0]]<=.001001).all())
+        assert bool((d['sampled_amplitudes'][...,1:][outside[...,1:]]<=.017454).all())
         assert not bool((kwargs['quality'][kwargs['availability']]>=0).any())
         assert kwargs['history_quality'] is None and not bool(kwargs['beta_valid'].any())
         if mode=='clean': assert errors.max()<3e-6 and torch.allclose(candidate,target,atol=3e-6)
@@ -50,7 +51,9 @@ def main():
             assert bool((d['event_groups'][...,1:]==False).all())
             selected=d['episode_mask']
             vectors=actual[...,:3]-batch['past_current'][...,:3]
-            assert torch.allclose(vectors[selected],(d['directions'][...,0,:]*d['sampled_amplitudes'][...,0,None])[selected],atol=3e-6)
+            expected=(d['directions'][:,0,0,:]*d['peak_amplitudes'][:,0,None])[:,None].expand_as(vectors)
+            assert torch.allclose(vectors[selected],expected[selected],atol=3e-6)
+            assert torch.allclose(angles,torch.zeros_like(angles),atol=.002)
         # Changing future values must not change any model input or current label.
         changed={**batch,'future':g.state_apply_delta(batch['future'],torch.randn_like(batch['future'][...,:51])*.01)}
         other,_=sample(changed,mode)
@@ -64,7 +67,13 @@ def main():
             other,_=sample(changed,mode)
             for a,c in zip(inputs[:3],other[:3]): assert torch.allclose(a,c,atol=5e-6)
             for key in ('history_availability','availability'): assert torch.equal(kwargs[key],other[3][key])
-        cases[mode]={'cases':torch.bincount(d['case_id'],minlength=5).cpu().tolist(),
+        enclosed=0
+        bad=errors>.006
+        for run_length in (3,4):
+            for begin in range(1,30-run_length):
+                enclosed+=int(((~bad[:,begin-1])&bad[:,begin:begin+run_length].all(-1)&(~bad[:,begin+run_length])).sum())
+        if mode=='mixed': assert enclosed>0
+        cases[mode]={'enclosed_3_or_4_runs_over_6mm':enclosed,'cases':torch.bincount(d['case_id'],minlength=5).cpu().tolist(),
             'patterns':torch.bincount(d['pattern_id'],minlength=4).cpu().tolist(),
             'current_event_age_histogram':torch.bincount(d['event_age_at_current'].clamp_min(0)).cpu().tolist(),
             'history_missing_groups':int((~kwargs['history_availability']).sum()),

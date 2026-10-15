@@ -144,10 +144,14 @@ class WandbTracker:
         self.metadata.update(entity=self.run.entity, project=self.run.project,
                              url=self.url, state="running")
         self._write_state()
-        # Use an explicit optimizer-step axis: train and validation can log at
-        # the same step without W&B dropping one of the records as out-of-order.
+        # Explicit metric axes let train and validation share a progress value
+        # without W&B dropping one record as an out-of-order internal step.
         self.run.define_metric("optimizer_step")
-        self.run.define_metric("*", step_metric="optimizer_step")
+        if metadata.get("config", {}).get("training_unit") == "epoch":
+            self.run.define_metric("epoch_progress")
+            self.run.define_metric("*", step_metric="epoch_progress")
+        else:
+            self.run.define_metric("*", step_metric="optimizer_step")
 
     def _write_state(self) -> None:
         if self._state_path is None:

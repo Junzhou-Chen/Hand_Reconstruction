@@ -76,75 +76,27 @@
       ]
     }
   },
-  "amplitude_sampling": "Uniform radius/angle within selected range; isotropic random direction; group rotations composed on SO(3)",
+  "amplitude_sampling": "Peak norm/angle uniform within light/medium or rare strong range; direction shared within plateau/ramp/scattered, per-frame independent for jitter",
   "window_cases": [
     {
       "name": "clean_motion",
-      "probability": 0.2,
-      "current_levels": {
-        "clean": 1.0
-      },
-      "history_levels": {
-        "clean": 1.0
-      }
+      "probability": 0.2
     },
     {
       "name": "current_reanchors_history",
-      "probability": 0.2,
-      "current_levels": {
-        "clean": 0.5,
-        "near": 0.5
-      },
-      "history_levels": {
-        "medium": 1.0
-      }
+      "probability": 0.2
     },
     {
       "name": "ordinary_restoration",
-      "probability": 0.35,
-      "current_levels": {
-        "light": 0.5,
-        "medium": 0.5
-      },
-      "history_levels": {
-        "clean": 0.3333333333333333,
-        "light": 0.3333333333333333,
-        "medium": 0.3333333333333333
-      },
-      "severity_relation": "independent history/current draws"
+      "probability": 0.35
     },
     {
       "name": "partial_missing",
-      "probability": 0.2,
-      "current_levels": {
-        "near": 0.5,
-        "light": 0.5
-      },
-      "history_levels": {
-        "light": 0.5,
-        "medium": 0.5
-      },
-      "missing_cases": {
-        "one_whole_finger": 0.7,
-        "one_to_three_state_groups": 0.2,
-        "whole_current_hand": 0.1
-      },
-      "candidate_fill": "causal previous completed history only"
+      "probability": 0.2
     },
     {
       "name": "rare_local_failure",
-      "probability": 0.05,
-      "current_levels": {
-        "light": 1.0
-      },
-      "history_levels": {
-        "light": 0.5,
-        "medium": 0.5
-      },
-      "strong_override": {
-        "wrist_translation_and_root": 0.5,
-        "one_or_two_fingers": 0.5
-      }
+      "probability": 0.05
     }
   ],
   "temporal_noise": {
@@ -157,20 +109,24 @@
     "availability_is_separate": true,
     "oracle_quality": "optional separately labeled ablation only; not the default condition"
   },
-  "source_sampling": "retain current four-source split and sampling; no new images required",
+  "source_sampling": "finite full traversal of original four-source train windows; no new images required",
   "evaluation": {
     "fixed_cases": [
-      "clean_history_clean_current",
-      "noisy_history_clean_current",
-      "clean_history_light_current",
-      "noisy_history_light_current",
-      "noisy_history_medium_or_local_current",
-      "rare_strong_current",
-      "partial_and_whole_missing",
-      "history_only_control"
+      "clean",
+      "reanchor",
+      "noisy",
+      "missing",
+      "strong",
+      "single",
+      "burst3",
+      "burst4",
+      "position_burst4",
+      "scattered3",
+      "ramp4",
+      "history_only"
     ],
     "retain_legacy_stress_profile": true,
-    "paired_corruption_seed": true,
+    "paired_corruption_seed": "noisy/history_only use matching draws; fixed duration modes can change RNG schedule",
     "metrics": [
       "input_hold_output_wrist_mm_root_deg_finger_deg",
       "median_and_p95_by_source",
@@ -211,5 +167,5 @@
     "medium_probability": 0.4,
     "near_background_probability": 0.5
   },
-  "window_cases_description": "Only case names/probabilities and range table inherited from v2; v3 ignores legacy current/history level draws, missing_cases and strong_override. Reanchor: event ends 1..4 frames before current; other nonclean cases current in event."
+  "window_cases_description": "Reanchor event ends 1..4 frames before current; other nonclean cases include current in error/missing event. All clean case is exact."
 }

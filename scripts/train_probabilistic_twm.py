@@ -31,7 +31,7 @@ from handloop.data.trajectory import SourceBalancedSampler
 from handloop.data.epoch_sampling import CoverageEpochSampler
 from handloop.data.forecast_trajectory import ForecastTrajectoryWindows
 from handloop.data.corruption import sample_mixed_batch
-from handloop.data.temporal_corruption import sample_temporal_batch
+from handloop.data.temporal_corruption import sample_temporal_batch, causal_fill_history
 from handloop.models.probabilistic_twm import (
     ProbabilisticTWM, ProbabilisticTWMConfig,
     current_distribution_log_prob, forecast_distribution_log_prob,
@@ -176,7 +176,8 @@ def evaluate(model, loaders, device, config):
                 _,losses = objective(result,target,future,valid,batch['future_dt'],config)
                 n = len(target)
                 for key,value in losses.items(): add(key,value.expand(n))
-                for name,state in [('candidate',candidate),('history_hold',history[:,-1]),('restored',result['state'])]:
+                baseline_history=causal_fill_history(history,kwargs['history_availability'])
+                for name,state in [('candidate',candidate),('history_hold',baseline_history[:,-1]),('restored',result['state'])]:
                     for key,value in state_errors(state,target).items():
                         add(name+'/'+key,value)
                         tails.setdefault(name+'/'+key,[]).append(value.detach().float().cpu())
@@ -184,8 +185,8 @@ def evaluate(model, loaders, device, config):
                 restored_wrist = state_errors(result['state'],target)['wrist_mm']
                 add('wrist_degradation_over_1mm',(restored_wrist>input_wrist+1).float())
                 last_delta_time = batch['dt'][:, -2].clamp_min(1e-5)
-                hist_rotations = g.state_to_rotmat(history)
-                hist_dp = (history[:,-1,:3]-history[:,-2,:3])/last_delta_time[:,None]
+                hist_rotations = g.state_to_rotmat(baseline_history)
+                hist_dp = (baseline_history[:,-1,:3]-baseline_history[:,-2,:3])/last_delta_time[:,None]
                 hist_dr = g.so3_log_map(hist_rotations[:,-1]@hist_rotations[:,-2].transpose(-1,-2)).flatten(-2)/last_delta_time[:,None]
                 velocity = torch.cat((hist_dp,hist_dr),-1)
                 constant_velocity = g.state_apply_delta(result['state'][:,None],velocity[:,None]*batch['future_dt'][...,None])
@@ -488,7 +489,7 @@ def main():
                        'moe_load':{str(i):float(value) for i,value in enumerate(loads)},'wandb_url':tracker.url}
                 atomic_json(args.output/'status.json',event)
                 with (args.output/'metrics.jsonl').open('a') as stream: stream.write(json.dumps(event)+'\n')
-                tracker.log(flatten_numbers(event,'train'),step=step); print(json.dumps(event),flush=True)
+                tracker.log({**flatten_numbers(event,'train'),**progress(step)},step=step); print(json.dumps(event),flush=True)
         if step%config['eval_every']==0 or (epoch_training and step%steps_per_epoch==0): latest_val=validate(step)
         if step%config['save_every']==0 or step==start_step+config['log_every'] or (epoch_training and step%steps_per_epoch==0): save(step)
     save(step)

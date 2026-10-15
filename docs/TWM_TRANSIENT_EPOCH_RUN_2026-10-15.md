@@ -44,3 +44,6 @@ LR2e-4、warmup0.1epoch自动推导63次更新，cosine按两轮结束降至10%L
 Epoch sampler保存epoch/batch cursor，resume先恢复相同permutation再跳过已消费的index（跳过发生在dataset IO之前）；num_workers=0，rank RNG保存。一般奇数N时DistributedSampler至多补world−1索引，metadata记录；本轮N可被2整除，无padding/重复/丢弃。
 
 远程仅复用已授权Pod与GPU0/1，Torch2.10/cu130＋官方Mamba runtime；不创建或删除Job。新输出`data10/.../runs/twm_four_sources_moe_transient_v3_epoch2_20261015`，旧run不resume。Pod16:37 UTC到期，16:25UTC保守截止仍有效。正式启动源码版本/语义检查/DDP更新、续跑和checkpoint数值同步审计见后续验收摘要；此处初版不宣称训练已启动或精度改善。
+
+
+06:44UTC：SSH短暂被入口拒绝后恢复；原远程checkout的pull因另一聊天两份untracked视觉源码而安全拒绝。保留原目录，改用独立detached源码worktree `data10/.../code/twm_transient_v3_20261015`；训练与launcher显式指向这里。新验证的history-hold/constant-velocity基线对missing history只做因果carry-forward，避免把placeholder当有效运动。
