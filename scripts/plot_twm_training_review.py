@@ -66,8 +66,8 @@ def main():
     curve(ax, scores, "Current checkpoint score", blue)
     ax.set_title("A  Weighted restoration score")
     ax.set_ylabel("Geometric loss (dimensionless)")
-    ax.text(.03, .96, "0.20 clean + 0.20 reanchor + 0.35 noisy\n+ 0.20 missing + 0.05 strong",
-            transform=ax.transAxes, va="top", fontsize=8, color="#46536B")
+    ax.text(.03, .06, "0.20 clean + 0.20 reanchor + 0.35 noisy\n+ 0.20 missing + 0.05 strong",
+            transform=ax.transAxes, va="bottom", fontsize=8, color="#46536B")
     ax.legend(loc="best")
 
     ax = axes[0, 1]
