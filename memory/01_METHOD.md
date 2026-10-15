@@ -178,8 +178,14 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 
 官方Mamba实际drive为ΔBu；pre-LN＋冻结有限参数可在精确运算下证明内部SSM有界/初始状态遗忘，不能推出完整head/candidate/anchor反馈收缩。允许常数translation bias的漂移反例；K30小增益条件尚未认证。关节限位、迭代下降与真实动力学仍未采纳/实现。
 
-## 2026-10-14（纽约）视觉接入与联合训练复核（建议）
+## 2026-10-14（纽约）视觉接入与联合训练复核（历史建议，后续D33调整）
 
 用户询问TWM训练后如何接入视觉baseline与联合训练。新增[可实施协议§10](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)：先冻结HaWoR/TWM，在pre-infiller数值输出与相同相机链之间验99D adapter及零适配baseline；再用train录制真实预测/reference适配TWM，保留motion replay；随后训练图像evidence/w/q与现行Corrector并选择性微调TWM，加入自身历史rollout；最后单列部分解冻HaWoR head/时序模块。独立C与统一TWM数值测量adapter仍为待比较选择，现checkpoint未有2D/相机观测输入。
 
 重点边界：实际wrist J0/hand mean/列6D/左右手/β约定与投影往返先验收；GT质量/β/历史不进入部署输入。冻结参数与输入detach分开，旧no_grad/CPU inference脚本不可直接反传；解冻模块输出不复用旧缓存。长future训练可回传当前，过去forecast待新视觉到达才有可检验意义；当前TWM已读Z，不能再与同Z似然当独立Bayes相乘，σ/κ也不是最终q。HaWoR非因果上下文须匹配，HOT27/Dex test持续留出。本轮未改代码、现行模块决定或D32训练。
+
+## D33：视觉侧实际读取校正反馈，首版只训练一个最终目标（建议）
+
+用户要求在官方HaWoR权重上加反馈接口，拒绝多项手工带权loss。本轮[§11推荐](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)：原ViT/IAM/MANO/PAM的16帧双向路径固定并缓存F/Z0；新增PAM之后的小视觉读出插件，逐帧读F、raw和已完成校正历史，产生51D切向残差candidate，再由冻结纯数值TWM输出最终状态及同一次读出的σ/κ。原始Z0不覆盖，当前输出只在下一帧成为历史；不把逐帧变化的反馈直接塞入原双向PAM。仍有原片段lookahead，不宣称在线。
+
+视觉阶段首版只用最终current Gaussian×16个isotropic matrix-Fisher NLL；不再默认叠2D/joint/mesh/velocity/cycle/quality/replay各项。两主干冻结但保留TWM到candidate的输入梯度，先训练插件；若candidate通道梯度/利用不足，再联合少量current读出参数，同一目标。长60步预测保留为预训练能力并单独复测，不宣称冻结后新输入下能力不变。状态NLL要求完整reference可用，不伪造joint-only旋转标签；归一化似然不是无任何统计假设的“自动消除权重”。具体结构未实现、未替代D32正在用的多目标预训练，也未永久决定删除Corrector。

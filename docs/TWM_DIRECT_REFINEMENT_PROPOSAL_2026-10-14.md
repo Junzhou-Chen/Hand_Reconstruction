@@ -187,6 +187,8 @@ D29双卡于00:36:36 UTC（纽约20:36）共同保存停止在814步，rank4039/
 
 ## 10. 2026-10-14（纽约）：TWM接入HaWoR评估与联合训练建议
 
+**后续D33已调整本节默认建议：** 用户要求让HaWoR视觉侧实际读取TWM校正反馈，并明确不接受堆叠多项带权loss。§11给出读出侧反馈插件＋最终当前单一NLL的新推荐；本节的接口/公平评测检查保留，多项loss清单与新增独立Corrector不再作为首版默认。
+
 用户询问TWM训练结束后如何接入视觉baseline并联合训练。本节为结合D32概率MoE模型、当前代码及官方训练/评测协议的实施建议；不代表已实现视觉闭环、已采纳删除Corrector、已解冻HaWoR或已授权本轮另启训练。D32当前训练不作修改。
 
 ### 接入点与第一组实验
@@ -229,7 +231,7 @@ HaWoR官方README仍称训练代码待发布；现`inference()`是no_grad推理�
 
 ### 联合目标与递归训练
 
-建议目标族：
+历史候选目标族（D33之后不再作为首版视觉反馈默认，见§11）：
 
 \[
 L=\sum_{k=1}^{N}\alpha_k L_{3D}(S_t^{(k)},S_t^*)
@@ -259,3 +261,87 @@ HOT27评测源录制继续排除，Dex s0 test不用于预训练、真实误差�
 可先利用已有DexYCB train/val做camera-space工程接入；world主结论仍需HOT27完整录制。当前纯轨迹四库下载完整，不代表HOT27 RGB/SLAM评测资源已齐；349个相关clip只覆盖25/27个源录制且未下载，不能替代原full-recording协议。具体入口/缺口见[HaWoR对比协议](HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)。
 
 官方HOT evaluator的GT crop/visibility、右手、有效段与W/WA尺度对齐应先原样复核，再在完全相同条件比较；自动detector、双手、遮挡出视野/重入和非对齐误差另报。指标至少包含camera/world wrist与joint误差、root/finger旋转、准确输入退化、H错/C准、动作突变、遮挡长度和再可见恢复，不能以平滑度或PA指标单独证明收益。当前代码尚无HaWoR adapter、视觉baseline推理和上述联合trainer，本轮只形成可实施协议。
+
+## 11. D33：预训练HaWoR读出侧反馈插件与单一视觉训练目标
+
+纽约2026-10-14，用户进一步要求：使用HaWoR官方权重，加一个接口使视觉侧除片段图像外还读到TWM校正信息，认真检查循环和实现逻辑；不接受用许多手工权重堆叠loss。**这是用户方向与偏好；下述具体插点、单NLL及冻结方案是本轮建议，尚未实现/训练，不改变D32运行。** 本节替代§10首版多loss默认推荐，独立大Corrector是否永久删除仍未作用户决定。
+
+### 11.1 推荐计算图：固定原视觉片段，新增分支逐帧读反馈
+
+官方HaWoR可下载`hawor.ckpt`与配置，原路径顺序为ViT→16帧image temporal attention→逐帧MANO decoder/head→16帧pose temporal attention（PAM）；PAM不是简单identity residual。[权重入口](https://github.com/ThunderVVV/HaWoR#download-the-model-weights)、[官方代码](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/lib/models/hawor.py)
+
+如果把同一轮逐帧最终校正立即写入这个双向模块，同时又要求整块一起更新，会形成较早/较晚状态相互依赖的隐式固定点；即使展开多轮可消除计算环，也必须另定更新顺序与延迟。首版采用更明确的有向计算图：
+
+\[
+(F_B,Z^0_B)=V_{\theta_0}(I_B),\qquad B=[b,b+15].
+\]
+
+原16帧路径不读反馈、权重固定，缓存真实patch特征F和PAM后的raw状态Z0。随后按t从b至b+15顺序计算：
+
+\[
+H_t=\{\hat S_s:s<t\}_{\rm 最近30帧},\quad
+\Delta_t=A_\psi(F_t,Z_t^0,E(H_t)),\quad
+C_t=Z_t^0\oplus\Delta_t,
+\]
+\[
+(\mathcal Q_t,\mathcal P_{t+1:t+60})=W_{\phi_0}(H_t,Z_t^0,C_t,M_t,\Delta t),
+\qquad \hat S_t=\operatorname{meanstate}(\mathcal Q_t).
+\]
+
+这里\(\mathcal Q_t\)表示最终当前状态分布；现有TWM输出的是mean、xyz std和rotation concentration，没有实现另一个“最终状态合格概率q”头。每帧只将最终mean state及带来源的分布描述写入历史一次，下一帧adapter再读取。新adapter可编码这些不确定性描述，但不能把σ/κ直接冒充已有接口的quality；其数值语义与校准须单独验收。首版不把当前输出送回本帧、也不将未来生成状态填成已完成历史。
+
+**插点明确位于原双向PAM之后的新视觉读出分支。** 它读取缓存IAM图像patch/可选原pose token，输出几何candidate；这些image features不进入TWM。原ViT/IAM/PAM本身仍只处理图像，新增的HaWoR视觉输出插件同时读图像与校正历史。这让视觉侧输出真正随反馈变化，不假称官方HaWoR已内置该能力。
+
+轻量实现可用16个joint queries，以历史状态和当前raw初始化query，再对当前图像patch做cross-attention，最后输出51D切向残差。当前IAM缓存每帧192个1280维patch；宽度/层数待实现成本验收，不为概念完整复制整套ViT或另加大Corrector。51D增量在固定anchor/父关节坐标中经SO(3)复合回99D；β保持视觉估计与该帧迭代固定。TWM现有raw/candidate分槽可直接承接Z0/C，最终读出仍由TWM给出。
+
+一个更深的候选插点是原MANO decoder的1024维query embedding之后；但其后还有双向PAM。要逐帧反馈，必须固定其他时刻raw、只重算目标frame的必要路径，或在整个block期间固定memory，不能直接把不断变化的逐帧memory并行塞入全16帧。原`token_dim=1`的zero token入口也不能直接替换99D。本轮优先读出侧新分支，深层query hook留作后续结构对照。
+
+### 11.2 零初始化、坐标、原始证据与缺测
+
+- 只将adapter最后的残差输出投影和bias初始化为零，其余层正常初始化，避免门和输出同时零造成无梯度。初始化时C=Z0（以同一99D codec的数值容差验收），整个系统等价于“原HaWoR＋冻结TWM”基线；不等于整个系统回到无TWM的HaWoR。单纯添加零value token仍会改变attention softmax分母，不能用来证明严格identity。[ControlNet §3.1](https://arxiv.org/html/2302.05543v3)支持零输出连接的初始化原则，不证明训练后不退化或闭环收缩。
+- Z0始终保存为原始视觉输出，C是已含反馈的candidate；C不成为第二份独立测量，不覆盖Z0，不进行独立概率乘法。相同图像/历史可能被多次使用，整个系统按一个条件网络训练，不宣称独立Bayes融合。
+- 历史world腕/手先通过当前相机和crop变换形成图像查询；TWM的H/Z0/C使用同一固定anchor，finger local rotations保留父关节语义。原点J0/hand mean/列6D/左右手及shape差异按§10先验收，初版固定整段SLAM gauge。
+- 无历史、身份切换与长gap需要显式mask/reset和raw暖启动；不可把占位当可靠完成状态。检测缺失与bbox插值分别记录，图像不可用时mask视觉支路，候选可用过去状态填充但不修改raw availability。
+- 原HaWoR patch来自既定crop：反馈attention可重读crop内信息，不能恢复crop之外从未编码的像素。首版固定crop以检验反馈本身；若后续改crop或增加全图features，单列版本与输入覆盖，不能把额外视野收益都归因于反馈。
+
+此调度按t递归定义，有向计算图可顺序求值。它仍有原HaWoR的16帧lookahead：H中的较早完成状态也可能看过当前/后续图像；“没有计算环”不等于严格信息因果，整条SLAM/跟踪延迟也不能由15帧上界代表。按同chunk、同相机上下文公平比较；若要求严格实时，另设尾随窗口和因果相机链。
+
+### 11.3 先把视觉反馈训练收敛到一个最终当前NLL
+
+旧§10把多种候选约束一起写进总loss，没有作足够取舍。首版推荐**只监督最终当前状态的proper likelihood**：
+
+\[
+L_{\rm feedback}(\psi)
+=-\frac1{|\mathcal V|}\sum_{t\in\mathcal V}
+\log q_{\phi_0}(S_t^*\mid H_t,Z_t^0,C_{\psi,t}),
+\]
+\[
+q(S_t)=\mathcal N(p_t;\mu_t,\operatorname{diag}\sigma_t^2)
+\prod_{j=0}^{15}\operatorname{MF}_{\rm iso}(R_{t,j};\bar R_{t,j},\kappa_{t,j}).
+\]
+
+这是当前已经实现的R³×SO(3)^16分布，监督完整51个局部自由度所对应的腕位置与16个旋转；不对冗余99D做独立Gaussian/MSE。末尾仍由TWM同时给mean和σ/κ，分布与最终状态一致，不将早期不确定性贴到后级改变后的状态上。Matrix-Fisher归一化的NLL先例见[NeurIPS2020 §3.2](https://proceedings.neurips.cc/paper/2020/file/33cc2b872dfe481abef0f61af181dfcf-Paper.pdf)。
+
+本阶段不再并列加入2D、joint/mesh、速度、平滑、循环一致性、MoE balance、逐轮loss或额外w/q头。joint/mesh几何、覆盖率、准确输入退化与motion能力先作验证指标。σ/κ及其normalizer是模型输出分布的一部分，确实决定各残差的梯度尺度；这不是“完全没有建模权衡”，也不以自动task weighting隐藏同一串lambda。必须单独检查真实几何误差与校准，不能仅据NLL下降认定更准。
+
+该完整state NLL仅适用于真实完整MANO/reference groups可用的样本；只有joints的样本可另作单一几何监督对照，但不能伪造twist/完整99D参数。单joint loss不能唯一识别所有局部旋转，是本轮选state NLL的理由。shape不作为消解pose误差的可调自由量。
+
+### 11.4 参数与梯度安排，保留长预测任务边界
+
+第一步冻结HaWoR原权重与TWM权重，只训练Aψ。虽然Wϕ参数固定，仍要保留从最终NLL经TWM到candidate/adapter的autograd；ViT/IAM/raw可以no_grad缓存。官方inference wrapper不能直接作为训练入口，需要可微Torch codec和新wrapper；训练时可增加current-only执行开关跳过不参与目标的future decoder，原60步接口保持可用。
+
+冻结方案有明确前提：最终current读出对candidate存在可用梯度。D28旧模型曾表现出忽视当前观测，不能假定D32已解决。先检查candidate输入梯度及小规模实际误差变化；若这一通道失效，先联合微调少量current读出参数，而非继续训练一个无法影响最终输出的adapter，也不立刻堆中间监督项。
+
+随后只有在验证需要时，才让adapter与TWM少量current readout/uncertainty参数共同优化，继续用同一个最终current NLL；核心motion encoder和future头先固定。若进一步研究原HaWoR head微调，必须保留不受反馈污染的原权重raw参考支路，缓存与可微范围重新验收，不一开始同时解冻所有层。
+
+历史来自自身顺序输出，先在帧间detach，再尝试短clip截断BPTT；detach仅截断梯度，不消除错误反馈。用空历史/错误历史/当前准历史错等输入条件训练，允许新图像推翻先验，不另加“必须与TWM一致”的loss。第一版每帧一次视觉candidate＋一次TWM恢复，避免一开始再叠帧内多轮和逐轮权重。
+
+60步长预测继续是TWM预训练能力，本视觉阶段先保留并独立复测，不再次叠future辅助loss。冻结参数不能保证新candidate分布下未来误差不变，须报告纯motion与视觉条件下的future指标。视觉条件已看过块尾图像，forecast尤其要区分已见图像覆盖内与覆盖外时域。如果未来决定解冻TWM并共同学习current＋future，需另定义任务侧重；把1个current和60个future合成一个公式不等于没有隐式权衡。
+
+**当前代码事实：** D32正在使用的预训练目标仍是restore＋0.05 current NLL＋0.3 future NLL＋0.2 best-geometry＋0.05 velocity＋0.01 MoE balance，restore内部还有位置缩放与root系数。上述单NLL是新版视觉反馈阶段建议，没有静默改动当前run的目标/预算或停止实验。
+
+### 11.5 验收只回答反馈是否帮助真实恢复
+
+先比较同数据/预算下：原HaWoR＋TWM、同尺寸视觉插件但不给校正历史、正常校正反馈、打乱/错误反馈。初始化identity、raw分槽与mask、冻结TWM输入梯度是代码检查；主要结果是wrist/joint/旋转真实误差、准确输入退化、H错/C准、突变与再可见恢复、NLL/coverage及未来能力。未来GT不选部署mode、历史不用GT代替；“跟运动先验更一致”不能替代真实几何改善。
+
+参考机制：[WHAM §3.2–3.3](https://arxiv.org/html/2312.07531v2)支持先学motion再融合视觉的阶段思路，[PyMAF-X §III](https://arxiv.org/html/2207.06400v3)支持候选相关图像读取；两者任务/输入不同，不是本项目闭环收益或唯一插点的证明。所有上述新反馈能力仍待代码和远程验收。

@@ -149,6 +149,8 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 ## 已识别的主要风险与验证路径
 
+**D33视觉反馈与简化目标（纽约2026-10-14）：** 用户进一步要求反馈进入HaWoR视觉侧，并反对堆多项手工加权loss。[§11新推荐](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)为：固定原16帧双向路径，在PAM后新增读图像特征和已完成校正历史的小插件，raw/candidate分槽交TWM最终恢复；先冻结两主干，仅训练插件，单一最终current state NLL。候选输入梯度、坐标/原始观测、空/错历史、固定crop覆盖和lookahead分别验收；σ/κ不能冒充质量q，未来预测保留但需在新candidate分布复测。具体方案未实现，原§10多loss/额外模块不再默认，D32未改或重启，本轮没有新增实验结果。
+
 **2026-10-14（纽约）视觉接入/联合训练复核：** 用户询问TWM之后如何结合视觉baseline。已读实际TWM接口及HaWoR官方代码/论文，给出[分阶段实施建议§10](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)：冻结前端pre-infiller→99D adapter/evaluator验收→真实prediction/reference适配→视觉证据/质量/校正联合与自身历史→可选前端局部解冻。HaWoR adapter、视觉baseline、evidence/w/q/Corrector及联合trainer仍未实现；不能说TWM长头已在视觉生效，不能将同Z条件后验当独立prior再次相乘。本轮仅文档/研究，未修改或重新启动D32，也未采纳删除C。HOT27资源与Dex推理入口缺口保留，详细读[对比协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)。
 
 2026-10-13完成[WestWorld与视觉手重建方法精读](../docs/WESTWORLD_AND_HAND_RECONSTRUCTION_REVIEW.md)，含原论文方法/附录及关键源码。DIP补入直接条件恢复基线；DIR/WiLoR/GeoHand补入视觉迭代前作。确认HaWoR非因果及missing-only infiller、HMP局部prior、StableHand增强版差异和W/WA对齐口径。仅更新文献事实与实验约束，未改用户主线、运行模型或新增性能结果。
