@@ -147,7 +147,7 @@ class WandbTracker:
         # Explicit metric axes let train and validation share a progress value
         # without W&B dropping one record as an out-of-order internal step.
         self.run.define_metric("optimizer_step")
-        if metadata.get("config", {}).get("training_unit") == "epoch":
+        if (metadata or {}).get("config", {}).get("training_unit") == "epoch":
             self.run.define_metric("epoch_progress")
             self.run.define_metric("*", step_metric="epoch_progress")
         else:

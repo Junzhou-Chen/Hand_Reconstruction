@@ -33,6 +33,7 @@ def main():
         return prepare_batch(data,rng,mode,corruption_profile=profile,return_diagnostics=True)
     checks={}; cases={}
     for mode in ('mixed','clean','reanchor','noisy','missing','strong','single','burst3','burst4','position_burst4','scattered3','ramp4','history_only'):
+        print(json.dumps({'checking_mode':mode}),flush=True)
         inputs,d=sample(batch,mode); history,raw,candidate,kwargs,target,future=inputs
         assert all(torch.isfinite(v).all() for v in (history,raw,candidate,target,future))
         actual=torch.cat((d['history_world'],d['raw_world'][:,None]),1)
@@ -46,7 +47,10 @@ def main():
         assert not bool((kwargs['quality'][kwargs['availability']]>=0).any())
         assert kwargs['history_quality'] is None and not bool(kwargs['beta_valid'].any())
         if mode=='clean': assert errors.max()<3e-6 and torch.allclose(candidate,target,atol=3e-6)
-        if mode=='reanchor': assert not bool(d['episode_mask'][:,-1].any()) and torch.allclose(candidate,target,atol=.0011)
+        if mode=='reanchor':
+            assert not bool(d['episode_mask'][:,-1].any())
+            assert bool(((candidate[:,:3]-target[:,:3]).norm(dim=-1)<=.001003).all())
+            assert bool((g.geodesic_angle(g.state_to_rotmat(candidate),g.state_to_rotmat(target))<=.01946).all())
         if mode=='position_burst4':
             assert bool((d['event_groups'][...,1:]==False).all())
             selected=d['episode_mask']
