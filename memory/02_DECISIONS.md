@@ -54,6 +54,8 @@
 
 | D37 | 新Pod从头训练10,000 step；之前训练checkpoint仅保留best | 2026-10-15用户最新明确指令，替代D36两epoch预算与旧latest/暂停快照全保留策略。新Pod jchen57-fineturn-tl4zr；保留v3噪声、位置feature尺度、四库GT/split、full-coverage循环采样、每卡512/global1024。fresh10k/warmup500/eval500/save100为本次执行配置；87a2bcc正式已验收到40/10k，checkpoint finite/两rank同步及W&B服务器标量通过；历史18best保留/22非best删除，清理SHA通过。已确认D36两轮03:53纽约完成，但局部漂移/clean仍有失败，不保证加步数解决。[执行协议](../docs/TWM_TRANSIENT_10K_RUN_2026-10-15.md)。 |
 
+**D38（2026-10-15，用户明确决定）：损失调整留到下个版本，本轮先检查目前效果。** D37继续原六项加权目标与10k预算；不将损失调研中的候选自动应用到当前run，也不据此启动下一版。下一版本的具体目标、系数、梯度隔离和是否采用flow尚未最终选择。[候选与边界](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
+
 ## 已替代的历史路线
 
 | 历史方案 | 当前处理 | 替代依据 |

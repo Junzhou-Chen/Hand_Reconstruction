@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-15 22:22UTC：D38用户明确loss放下版，本轮只查效果。D37训练8010/10k、完整验证8000：普通腕4.652→2.881mm，clean0→0.601mm/>1mm退化12.60%，reanchor0.267→1.296mm/30.96%；5k→8k score下降21.05%。1s/2s腕96.954/140.930mm，长期仍弱且旋转不全改善；两份汇总同validation SHA、聚合/固定输入核验通过，远程CPU绘图，无改训/新推理。[报告](../docs/TWM_TRANSIENT_8K_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_progress_comparison_20261015_2220.json)。
+
 2026-10-15 20:24UTC：按用户要求完成12篇损失/训练协议与关键官方实现对照，纠正“主流都单loss”“StableHand单FM”“WestWorld为MoE balance背书”等潜在误读。建议概率主线＋同架构逐项辅助/初值梯度消融，生成路线另需采样及可靠性接口重设；全部标未采纳/未实施，D37原配置保持，未添加新损失或运行实验。[完整调研](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
 
 2026-10-15 20:09UTC：用户要求专项查看未来预测。D37完整验证5000，腕0.1/0.5/1/2s相对hold改善35.6/25.5/14.2/1.2%；2s仅三源，HOT/Ume退化，干净输入亦仅改善3.7%，low_motion比hold差。新增只读forecast汇总/绘图脚本，核宏平均与时域counts，所有分析远程CPU；报告ADE/oracle加权差异、逐轴coverage与宽区间、多模态未证实和非闭环边界，训练继续。[专项报告](../docs/TWM_FORECAST_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_forecast_progress_20261015_2012.json)。
