@@ -93,30 +93,46 @@ def metrics(output, batch):
     valid = batch['frame_valid'].bool() & batch['target_valid'].bool().all(-1)
     if not bool(valid.any()):
         raise ValueError('A clip batch has no complete valid current reference')
-    target = batch['target_world'].float()
-    result = {'valid_states': int(valid.sum())}
+    target = torch.where(valid[..., None], batch['target_world'].float(),
+                         g.identity_state(*valid.shape, device=valid.device))
+    result = {'valid_states': int(valid.sum()), 'metric_counts': {}}
+    def add(name, values, mask):
+        count = int(mask.sum())
+        result['metric_counts'][name] = count
+        if count:
+            result[name] = float(values[mask].mean())
     for name, state in (('raw', batch['raw_world']), ('candidate', output['candidate_world']),
                         ('final', output['state_world'])):
+        groups = (batch['availability'].bool() if name == 'raw' else
+                  torch.ones_like(batch['availability'], dtype=torch.bool))
+        # Missing raw values may be NaN; they are not observations or metrics.
+        position = torch.where(groups[..., :1], state[..., :3], 0.0)
+        rotation = torch.where(groups[..., 1:, None], state[..., 3:].reshape(*valid.shape, 16, 6),
+                               g.identity_rotation_6d(device=state.device))
+        state = torch.cat((position, rotation.flatten(-2)), -1)
         angles = g.geodesic_angle(g.state_to_rotmat(state), g.state_to_rotmat(target)) * (180 / math.pi)
-        result[name + '/wrist_mm'] = float((state[..., :3] - target[..., :3]).norm(dim=-1)[valid].mean() * 1000)
-        result[name + '/root_deg'] = float(angles[..., 0][valid].mean())
-        result[name + '/finger_deg'] = float(angles[..., 1:].mean(-1)[valid].mean())
+        add(name + '/wrist_mm', (state[..., :3] - target[..., :3]).norm(dim=-1) * 1000,
+            valid & groups[..., 0])
+        add(name + '/root_deg', angles[..., 0], valid & groups[..., 1])
+        add(name + '/finger_deg', angles[..., 1:], valid[..., None] & groups[..., 2:])
     xyz_error = torch.linalg.vector_norm(output['state_world'][..., :3] - target[..., :3], dim=-1)
     raw_error = torch.linalg.vector_norm(batch['raw_world'][..., :3] - target[..., :3], dim=-1)
-    result['wrist_degradation_over_1mm'] = float(((xyz_error - raw_error)[valid] > .001).float().mean())
+    add('wrist_degradation_over_1mm', ((xyz_error - raw_error) > .001).float(),
+        valid & batch['availability'][..., 0].bool())
     # Evaluate the same anchor-space distribution that defines the objective.
     from handloop.models.visual_feedback import transform_state, inverse_rigid
     target_anchor = transform_state(target, inverse_rigid(output['anchor_world']))
     standardized = (target_anchor[..., :3] - output['state'][..., :3]) / output['state_translation_std']
-    result['xyz_90pct_ellipsoid_coverage'] = float((standardized.square().sum(-1)[valid] <= 6.251388631170325).float().mean())
-    result['xyz_std_mm'] = float(output['state_translation_std'][valid].mean() * 1000)
+    add('xyz_90pct_ellipsoid_coverage',
+        (standardized.square().sum(-1) <= 6.251388631170325).float(), valid)
+    add('xyz_std_mm', output['state_translation_std'].mean(-1) * 1000, valid)
     return result
 
 
 @torch.no_grad()
 def evaluate(system, loader, device, max_batches, *, use_adapter=True, adapter_history=True):
     system.eval()
-    totals, count = {}, 0
+    totals, metric_counts, count = {}, {}, 0
     for index, batch in enumerate(loader):
         if index >= max_batches:
             break
@@ -124,13 +140,18 @@ def evaluate(system, loader, device, max_batches, *, use_adapter=True, adapter_h
         output = forward_batch(system, batch, use_adapter=use_adapter, adapter_history=adapter_history)
         value = metrics(output, batch)
         n = value.pop('valid_states')
+        counts = value.pop('metric_counts')
         value['current_nll'] = float(feedback_current_nll(output, batch['target_world'], batch['target_valid']))
+        counts['current_nll'] = n
+        for key, eligible in counts.items():
+            metric_counts[key] = metric_counts.get(key, 0) + eligible
         for key, number in value.items():
-            totals[key] = totals.get(key, 0.) + number * n
+            totals[key] = totals.get(key, 0.) + number * counts[key]
         count += n
     if not count:
         raise ValueError('Validation is empty')
-    return {**{key: number / count for key, number in totals.items()}, 'valid_states': count}
+    return {**{key: number / metric_counts[key] for key, number in totals.items()},
+            'valid_states': count, 'metric_counts': metric_counts}
 
 
 def main():
@@ -231,9 +252,16 @@ def main():
     started, step = time.monotonic(), start_step
     exit_code = 1
     try:
-        baseline = evaluate(system, val_loader, device, config['eval_batches'], use_adapter=False)
+        baseline_path = args.output / 'baseline_validation.json'
+        if args.resume:
+            if not baseline_path.exists():
+                raise ValueError('Resume needs the original saved baseline_validation.json')
+            baseline = json.loads(baseline_path.read_text())
+        else:
+            baseline = evaluate(system, val_loader, device, config['eval_batches'], use_adapter=False)
         tracker.log({'baseline_validation': baseline}, step)
-        atomic_json(args.output / 'baseline_validation.json', baseline)
+        if not args.resume:
+            atomic_json(baseline_path, baseline)
         iterator = iter(train_loader)
         while step < config['steps']:
             if args.stop_after_updates is not None and step - start_step >= args.stop_after_updates:

@@ -32,7 +32,7 @@ def module_hash(module):
     digest = hashlib.sha256()
     for key, value in sorted(module.state_dict().items()):
         digest.update(key.encode())
-        digest.update(value.detach().cpu().contiguous().view(torch.uint8).numpy().tobytes())
+        digest.update(value.detach().cpu().contiguous().reshape(-1).view(torch.uint8).numpy().tobytes())
     return digest.hexdigest()
 
 

@@ -83,6 +83,7 @@ def main():
         'track_json_sha256': file_sha256(args.track_json),
         'coordinate_frame': document['coordinate_frame'],
         'timestamp_source': document['timestamp_source'],
+        'input_protocol': document.get('input_protocol', 'external supplied detections and cameras'),
         'translation_units': 'metres', 'rotation_encoding': 'first two columns; c0xyz+c1xyz',
         'uncertainty': 'std and NLL in per-frame anchor; full covariance also exported in world axes',
         'lookahead': 'original nonoverlapping 16-frame HaWoR blocks; not strictly online',
