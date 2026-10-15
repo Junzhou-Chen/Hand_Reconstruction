@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-15 22:32UTC HaWoR合并现状复核：** 用户要求查另一个聊天的搭建，已核“梳理项目记忆文档”、D35源码/报告与远程文件stat。首版确已运行：冻结HaWoR真实patch/raw→视觉反馈插件→纯数值TWM最终当前恢复→跨帧历史；每帧一轮。σ/κ目前只回视觉插件，TWM quality仍unknown，未来/state_features不回灌。旧视觉best内嵌D32 step3110，尚未接D37；新接入须读取完整config（含位置尺度）并新开run，不可换reference冒充resume。step20 best、缓存、RGB预测、HaWoR权重仍在；旧latest/独立D32参考按best-only已删除，best自包含不受影响。无模型执行、精度重测或训练变更；全量TWM适配仍是既有建议而非已实现。[框架勘误](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[审计](../reports/visual_feedback_integration_audit_20261015.json)。
+
 **D37最新效果／D38延后loss（2026-10-15纽约18:22）：** 用户明确loss调整留到下版本，本轮原六项不变，未启动新方案。训练快照8,010/10k，完整验证8,000；同run固定val普通腕4.652→2.881mm/root1.990→1.316°/finger1.058→0.637°，位置四帧6.520→4.539mm。5k→8k score0.00731648→0.00577622（下降21.05%），仍改善但放缓。clean0→0.601mm、12.60% >1mm退化；近准当前/错误历史0.267→1.296mm、30.96% >1mm退化，仍未解决。未来腕1s96.954对hold119.461mm、2s140.930对147.506mm；2s仅三源，HOT已略优、Ume仍退化；1s root及2s finger较5k略退。当前90%xyz覆盖普通78.81%/位置事件54.49%，未校准。最近1000更新2.799s/步，剩1990约93min，估计纽约19:55（吞吐持续条件）。只读远程CPU汇总绘图，当前/未来同一validation SHA、宏平均和固定输入检查通过；仍是拟合MANO/合成观测历史，非闭环或真实HaWoR。[8k报告与曲线](../docs/TWM_TRANSIENT_8K_PROGRESS_2026-10-15.md)、[对照摘要](../reports/twm_progress_comparison_20261015_2220.json)。
 
 **2026-10-15 loss研究完成，训练未改：** 用户要求广泛论文对照，已核12篇及关键官方实现并保存建议；StableHand本身FM＋0.1 smooth＋5 wrist，Dreamer/TD-MPC2也带权，WestWorld CE没有为当前六项/负载均衡提供整套依据。当前建议优先同架构conditional NLL主线与辅助项/初值梯度消融，DF/条件RFM为较大改动候选。尚无新实验、最佳系数或用户采纳，D37原10k继续，现有合成结果不能归因于loss数量。[完整报告](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。

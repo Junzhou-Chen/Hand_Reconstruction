@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-15 22:32UTC：按用户要求复核另一聊天“梳理项目记忆文档”搭建的D35 HaWoR反馈首版。确认每帧一次插件/一次TWM、σ/κ只回插件、旧视觉best内嵌D32且未接D37；核远程best/缓存/RGB预测/HaWoR仍在，旧latest及独立参考已按best-only删除。补源码与产物存续说明，无训练/模型执行/精度重测或新设计决定。[框架](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[审计摘要](../reports/visual_feedback_integration_audit_20261015.json)。
+
 2026-10-15 22:22UTC：D38用户明确loss放下版，本轮只查效果。D37训练8010/10k、完整验证8000：普通腕4.652→2.881mm，clean0→0.601mm/>1mm退化12.60%，reanchor0.267→1.296mm/30.96%；5k→8k score下降21.05%。1s/2s腕96.954/140.930mm，长期仍弱且旋转不全改善；两份汇总同validation SHA、聚合/固定输入核验通过，远程CPU绘图，无改训/新推理。[报告](../docs/TWM_TRANSIENT_8K_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_progress_comparison_20261015_2220.json)。
 
 2026-10-15 20:24UTC：按用户要求完成12篇损失/训练协议与关键官方实现对照，纠正“主流都单loss”“StableHand单FM”“WestWorld为MoE balance背书”等潜在误读。建议概率主线＋同架构逐项辅助/初值梯度消融，生成路线另需采样及可靠性接口重设；全部标未采纳/未实施，D37原配置保持，未添加新损失或运行实验。[完整调研](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。

@@ -1,0 +1,75 @@
+{
+  "checked_at_utc": "2026-10-15T22:32:37.115912+00:00",
+  "audited_code_version": "0b4ec2ab36eda55ecc762a95d252e061c6351125",
+  "scope": "Read-only source/prior experiment audit and remote file stat; no model execution, checkpoint loading, training change, new accuracy measurement or new checkpoint hash.",
+  "related_thread": {
+    "title": "梳理项目记忆文档",
+    "id": "01a13b33-860a-7353-b662-96be202d91d5"
+  },
+  "implementation": {
+    "visual_prototype": "D35",
+    "frozen_twm_source": "D32 step3110, code 0d83a54",
+    "current_d37_integrated": false,
+    "passes_per_frame": {
+      "visual_adapter": 1,
+      "twm": 1
+    },
+    "history": "Completed current world99D, availability, timestamps, handedness, translation std and rotation concentration; no future trajectories/state_features",
+    "uncertainty_feedback": "Adapter only; TWM quality/history_quality remain unknown",
+    "default_trainable": "Visual adapter; frozen TWM retains candidate input gradient",
+    "full_twm_finetuning_implemented": false,
+    "automatic_detector_slam_entrypoint": false,
+    "strictly_causal_visual_backbone": false
+  },
+  "checkpoint_policy_evidence": {
+    "source": "reports/twm_best_only_cleanup_20261015.json",
+    "retained_visual_best_step": 20,
+    "retained_visual_best_sha256_at_cleanup": "2375662f5b59ad88b32e114d00525774be17f1e726dfc715b960e9911bb71ee5",
+    "self_contained": true
+  },
+  "remote_files": {
+    "visual_best": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015/best.pt",
+      "exists": true,
+      "bytes": 83852269
+    },
+    "visual_latest_historical": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015/latest.pt",
+      "exists": false
+    },
+    "old_d32_reference_historical": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/reference/twm_d32_step3110.pt",
+      "exists": false
+    },
+    "rgb_predictions": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/rgb_predictions16.pt",
+      "exists": true,
+      "bytes": 2361091
+    },
+    "visual_cache_manifest": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_cache_v1/manifest.json",
+      "exists": true,
+      "bytes": 9572
+    },
+    "hawor_weights": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/hawor_v1/weights/hawor.ckpt",
+      "exists": true,
+      "bytes": 3267481572
+    },
+    "visual_code": {
+      "path": "/sciclone/home/jchen57/project/HandLoop_Feedback_20261015/scripts/train_visual_feedback.py",
+      "exists": true,
+      "bytes": 18526
+    }
+  },
+  "sources": [
+    "src/handloop/models/visual_feedback.py",
+    "src/handloop/visual/hawor.py",
+    "src/handloop/visual/codec.py",
+    "src/handloop/visual/pipeline.py",
+    "scripts/train_visual_feedback.py",
+    "scripts/run_visual_feedback.py",
+    "reports/visual_feedback_framework_20261015.json",
+    "reports/twm_best_only_cleanup_20261015.json"
+  ]
+}

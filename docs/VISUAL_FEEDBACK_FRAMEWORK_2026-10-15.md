@@ -4,6 +4,12 @@
 
 ## 实现范围
 
+**2026-10-15 22:32UTC再次审计：** 已核另一个聊天“梳理项目记忆文档”的搭建记录、现行源码和远程文件。D35是已运行的首版，但其中TWM仍为D32 step3110，尚未接入本轮D37新权重。旧视觉checkpoint保存完整TWM＋插件，直接加载不会自动换用新预训练模型；训练入口可从新checkpoint的完整config重建TWM，但应创建新run，不能更换reference后当作旧run resume。D37的`position_feature_scale=0.05`属于配置而非新增权重，远程旧视觉checkout也须同步支持它的源码。这里仅说明接入要求，没有启动迁移或新训练。
+
+源码进一步明确：历史中最终当前state同时回到视觉插件和TWM；σ/κ只进入视觉插件，当前调用并未向TWM传`quality/history_quality`，因此不能写成可靠性已全面反馈给TWM。未来轨迹和`state_features`未存入历史；每帧一次candidate＋一次TWM，尚无帧内多轮取证。
+
+按此前用户要求的best-only清理，旧`latest.pt`和独立D32参考文件已删除；远程再次确认`runs/visual_feedback_framework_smoke_v1_20261015/best.pt`（step20，83,852,269 bytes）、真实RGB预测、缓存和官方HaWoR权重仍在。保留的best自包含原TWM，不依赖已删除的参考文件；本次只查文件stat，未重新加载或hash权重，也未重新测精度。下面的latest/SHA及原参考路径是历史验收记录。[本次审计摘要](../reports/visual_feedback_integration_audit_20261015.json)、[清理清单](../reports/twm_best_only_cleanup_20261015.json)。
+
 模型链为：真实RGB裁剪 → 官方冻结HaWoR ViT/IAM/head/PAM → 缓存真实图像patch和不可覆盖的raw状态 → 新视觉反馈插件读取已完成历史 → 51D几何candidate → 纯数值TWM最终当前分布 → 下一帧历史。第一版每帧一次candidate/一次TWM，不新增独立大Corrector或w/q头。
 
 - HaWoR固定官方版本`66c7d4108d58a716deccd192cb7645170cdc7bd7`，loader验证10个关键Git blob。原16帧双向路径不接反馈；新分支位于其读出之后。官方motion infiller不调用。
