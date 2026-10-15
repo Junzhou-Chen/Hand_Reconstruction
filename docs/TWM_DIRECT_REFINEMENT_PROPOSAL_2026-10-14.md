@@ -184,3 +184,78 @@ D29双卡于00:36:36 UTC（纽约20:36）共同保存停止在814步，rank4039/
 
 
 **D32执行补充：** 用户随后明确要求按上述设置跑起。现已实现[active profile](../config/twm_corruption_mixed_v2.json)与独立sampler并从头启动双卡新run，语义、真实更新、checkpoint及在线W&B验收通过；D31的proposal保留为历史。原D29/D28仍暂停，不是恢复它们。[实际配置与验收](TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)。
+
+## 10. 2026-10-14（纽约）：TWM接入HaWoR评估与联合训练建议
+
+用户询问TWM训练结束后如何接入视觉baseline并联合训练。本节为结合D32概率MoE模型、当前代码及官方训练/评测协议的实施建议；不代表已实现视觉闭环、已采纳删除Corrector、已解冻HaWoR或已授权本轮另启训练。D32当前训练不作修改。
+
+### 接入点与第一组实验
+
+推荐第一条可验收路径：`RGB → frozen HaWoR pre-infiller → 99D adapter → frozen TWM一次恢复 → 相同MANO/evaluator`。保留HaWoR相机轨迹和cam-to-world转换；官方`hawor_infiller()`里还包含world变换，不能删除整函数后丢掉参考系。固定原始Z、raw detection/availability，原infiller生成的状态不作为原始视觉观测。
+
+接入前验收：实际解剖wrist J0与MANO transl区分，root/15局部旋转的hand mean只处理一次，6D采用前两列c0xyz+c1xyz；核左右手、米、MANO tree顺序、camera/world外参方向、crop/去畸变/图像旋转和实际时间戳。HaWoR→99D→其兼容decoder的joint/mesh应往返一致，另做投影叠图，不能只查99D维数。β另存、从视觉侧估计且同一手track/帧内固定，继续保持TWM beta conditioning关闭；不把GTβ、GT腕或GT历史送入测试输入。
+
+TWM保留现有`history/raw/candidate`及三类mask；candidate由raw和过去自身完成状态初始化，quality无预测器时unknown。anchor来自自身完成的腕状态，同帧所有迭代固定，未来query按真实秒数。评估时只有完成输出可写回history；GT历史仅为单列oracle诊断。
+
+| 对照 | 目的 |
+|---|---|
+| HaWoR pre-infiller | 固定原始视觉估计基线 |
+| HaWoR full（原infiller） | 作者原有补全能力，单独标明非因果上下文 |
+| pre-infiller＋冻结TWM | 测纯轨迹预训练的零下游适配迁移 |
+| pre-infiller＋真实前端误差适配TWM | 测model-specific适配收益 |
+| 再加入视觉取证、迭代和自身历史 | 完整方法，分项消融其增益 |
+
+同视频、同视觉权重/crop/检测/相机轨迹、同GT-valid覆盖及evaluator；缺预测不能通过删困难帧抬指标。模型参数和额外预训练数据也需披露，不能将联合微调收益全算成motion prior收益。
+
+### 分阶段训练与梯度路径
+
+| 阶段 | 固定部分 | 优化部分与输入 |
+|---|---|---|
+| A：接入验收 | HaWoR、TWM | 不更新参数；真实视觉输出检验adapter及零适配误差 |
+| B：真实误差适配 | HaWoR视觉与相机链 | train录制上缓存真实HaWoR Z/reference；先TWM状态head，再按验证需要更新后层/MoE。保留未来分布和原motion replay |
+| C：视觉后端联合 | 初版仍固定HaWoR | candidate投影读取真实图像features；训练evidence、原观测w、最终q和Corrector，TWM先冻结再选择性小步微调 |
+| D：自身历史rollout | 同C的视觉前端 | 连续clip中逐步以自身最终状态/q取代GT或单纯带噪GT历史；帧内展开多轮、跨帧截断反传 |
+| E：可选前端联合 | 先保持ViT、检测/跟踪、SLAM固定 | 单列版本解冻HaWoR MANO head/IAM/PAM等必要部分，后端共同优化；保留原视觉输出监督并检查前端误差分布改变 |
+
+B阶段是后续域适配，不将真实HaWoR统计重新设为当前D32开工前置。真实预测/reference的适配先例见[DIP §3.4与附录A](https://arxiv.org/html/2508.01835v1)、[PAD-Hand §3.3](https://arxiv.org/html/2603.26068v2)；先例不证明本系统必然受益。
+
+C阶段先沿用当前方法分工：图像头输出真正图像支持的2D测量/heatmap、创新量、可见性及不确定性；Corrector结合这些证据、TWM建议、原始Z与candidate，产生51D平移/旋转增量，再复合回99D。TWM不接RGB/features。仅一个quality标量不提供修正方向。
+
+若后续采纳§3的统一TWM直接恢复方案，应另实现数值2D测量、相机/投影等adapter，使TWM能使用这些几何条件。现有checkpoint的forward并没有这组输入；不能将RGB features改名“数值证据”塞入，也不能说独立Corrector已被删除。独立C和统一恢复应按同证据输入比较。
+
+候选引导图像查询有[DIR](https://openaccess.thecvf.com/content/ICCV2023/html/Ren_Decoupled_Iterative_Refinement_Framework_for_Interacting_Hands_Reconstruction_from_a_ICCV_2023_paper.html)先例；最新[JoHan §2.2及Appendix A.1](https://arxiv.org/html/2610.10512v1)联合建模2D/3D，并在视频条件下训练，但其生成器从头训练、输入包含视频特征，不是本项目纯轨迹预训练接口的现成实现。[StableHand §3.2–3.3](https://arxiv.org/html/2605.18553v1)的质量监督可参考，不能照搬其image-conditioned generator边界。
+
+HaWoR官方README仍称训练代码待发布；现`inference()`是no_grad推理与CPU导出路径，不能直接以demo/export脚本端到端反传。E阶段需要训练wrapper调用可微forward，保留Torch版MANO/99D/投影；任何解冻模块的输出都不能沿用旧缓存，仍冻结的ViT输出可缓存。冻结参数不等于对输入detach：若梯度需要穿过冻结TWM传回candidate/测量头，不能把该路径包在no_grad中。[官方README](https://github.com/ThunderVVV/HaWoR)、[模型源码](https://github.com/ThunderVVV/HaWoR/blob/66c7d4108d58a716deccd192cb7645170cdc7bd7/lib/models/hawor.py)
+
+### 联合目标与递归训练
+
+建议目标族：
+
+\[
+L=\sum_{k=1}^{N}\alpha_k L_{3D}(S_t^{(k)},S_t^*)
++\lambda_{2D}L_{image}+\lambda_vL_{GT\ velocity}
++\lambda_uL_{current\ NLL}+\lambda_fL_{trajectory\ NLL}
++\lambda_wL_w+\lambda_qL_q+\lambda_rL_{motion\ replay}.
+\]
+
+3D项包括实际腕位置、root/finger SO(3)及MANO解码的local/world joints；只监督真实可用GT，不由joint-only标签伪造twist/完整99D。图像项使用真实图像测量或reference投影及可见性，不能把candidate自己的投影当作独立监督；学习的测量头也需独立监督，避免与状态头自证。速度比较GT速度及dt，不是把速度压零。具体权重、冻结层数、replay比例和轮数均待内部val选择。
+
+future项沿用当前整段模式边缘化：对有效future帧先累计每个mode的log density，再对4个mode做logsumexp，最后按51×有效帧数归一。训练辅助best-of-K与oracle诊断必须单列；部署不能用future GT逐帧选轨迹。
+
+帧内固定Z/H/anchor/β，建议从2轮与1/3轮对照起步，候选间保留梯度并逐轮监督。跨帧先将过去完成状态detach作为输入，再尝试短clip截断BPTT，边界detach；约8–16帧是工程候选，非已定超参。每帧只提交最终状态一次，中间candidate与预测未来不能写入已完成history。参考只用于损失与oracle诊断，实际评估必须用自身历史。
+
+### 长预测、不确定性与信息重复计数
+
+长预测有两条明确路径：训练时future NLL经可微积分回传到当前恢复头及共享encoder（现代码未detach）；部署时保留过去发出的预测，待真实新帧出现后检验该时刻落点/模式，提供缺测proposal或temporal regularizer，并重预测。当前代码还未实现跨调用维护forecast分布及其视觉融合；长头存在不等于已经改善视觉。
+
+本帧自生成未来不是本帧新增观测；不将多模态动作均值强加给当前，也不把多个重叠预测窗当独立测量相乘。HaWoR本身使用非因果时间上下文，正式离线评测须匹配；若声称真实提前预测/严格在线，视觉输入也必须截止预测起点，另设同上下文基线。
+
+当前TWM是`q(S_t | H_t,Z_t,candidate,M,w)`，已条件当前观测。再乘同一观测的视觉likelihood不能声称是独立Bayes更新。建议先用监督的后验/状态校正；若要严格概率融合，须另定义history-only prior、测量似然及相关性。σ/κ是条件分布参数，MoE gate是路由，均非自动校准的原观测w或最终q。原始w标签取固定Z的真实误差，最终q取最终输出误差并detach标签；Corrector改变状态后，TWM前级σ/κ不自动成为最终状态不确定性。真实留出集检查NLL、coverage和误差—可靠性关系。
+
+### 数据与评测门槛
+
+HOT27评测源录制继续排除，Dex s0 test不用于预训练、真实误差拟合、质量标定或调参；先按原recording/subject划分再滑窗，多视角同动作不能跨split。原motion validation是独立保留的能力检查，不转成下游replay训练数据。
+
+可先利用已有DexYCB train/val做camera-space工程接入；world主结论仍需HOT27完整录制。当前纯轨迹四库下载完整，不代表HOT27 RGB/SLAM评测资源已齐；349个相关clip只覆盖25/27个源录制且未下载，不能替代原full-recording协议。具体入口/缺口见[HaWoR对比协议](HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)。
+
+官方HOT evaluator的GT crop/visibility、右手、有效段与W/WA尺度对齐应先原样复核，再在完全相同条件比较；自动detector、双手、遮挡出视野/重入和非对齐误差另报。指标至少包含camera/world wrist与joint误差、root/finger旋转、准确输入退化、H错/C准、动作突变、遮挡长度和再可见恢复，不能以平滑度或PA指标单独证明收益。当前代码尚无HaWoR adapter、视觉baseline推理和上述联合trainer，本轮只形成可实施协议。

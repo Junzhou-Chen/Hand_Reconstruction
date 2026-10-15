@@ -305,6 +305,13 @@
 - 00:54:45UTC正式启动新run twm_four_sources_moe_mixed_v2_20261015，launcher4496/ranks4501/4502，2卡每卡256。00:57:06UTC实际50步/25600样本、四库与五类均参与，loss/grad finite；正式审计checkpoint10 finite/两rank一致，不与运行步数混同。
 - W&B cd487764服务端state=running、optimizer_step40与train/loss/grad实际可读；私有key不打印/入Git。计划50k、16:25UTC共同保存早于Job时限，不自动新建Job。[协议及边界](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)、[小型摘要](../reports/twm_mixed_v2_20261015_launch.json)。尚无训练后最终效果或真实视觉纠错结果。
 
+## 2026-10-14（纽约）：TWM之后的视觉baseline接入与联合训练讨论
+
+- 用户询问如何接入HaWoR及联合训练；核实际D32模型接口、现行/直接恢复两方案与官方HaWoR、DIP、HMP、StableHand、PAD-Hand、DIR和最新JoHan主来源。新增[直接恢复讨论§10](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)的可实施协议，不把建议当用户已定或代码事实。
+- 明确pre-infiller接入仍保留cam-to-world，先验99D几何/投影、固定前端零适配与公平evaluator，再做真实预测适配、视觉evidence/w/q/校正联合、自身历史rollout及可选HaWoR部分解冻；记录no_grad/CPU导出与缓存的梯度边界。
+- 保留长future辅助当前的训练/跨帧两条路径、整段mode与future/GT不作当前实测；当前TWM已读Z，不能再用同Z似然当独立Bayes相乘。σ/κ、原观测w、最终q分别监督/校准，HaWoR非因果上下文与GT crop/对齐条件单列。
+- 更新方法/进展/决定说明；视觉adapter和联合trainer仍未实现，未改模型源码、D32运行、数据split或启动新实验，独立Corrector是否合并仍待用户决定。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

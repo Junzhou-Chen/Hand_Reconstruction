@@ -177,3 +177,9 @@ TWM可直接返回下一候选完整99D，状态head与融合职责移入同一�
 条件信息不增加理想最优恢复风险；局部MSE及高斯条件协方差可解释可信部分帮助隐藏部分，但现SmoothL1/chordal有限训练网络不等于MMSE或校准posterior。chordal与平方角误差有常数界，同β内部FK可导出腕/旋转到joint误差上界，不能替代MPJPE。
 
 官方Mamba实际drive为ΔBu；pre-LN＋冻结有限参数可在精确运算下证明内部SSM有界/初始状态遗忘，不能推出完整head/candidate/anchor反馈收缩。允许常数translation bias的漂移反例；K30小增益条件尚未认证。关节限位、迭代下降与真实动力学仍未采纳/实现。
+
+## 2026-10-14（纽约）视觉接入与联合训练复核（建议）
+
+用户询问TWM训练后如何接入视觉baseline与联合训练。新增[可实施协议§10](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md)：先冻结HaWoR/TWM，在pre-infiller数值输出与相同相机链之间验99D adapter及零适配baseline；再用train录制真实预测/reference适配TWM，保留motion replay；随后训练图像evidence/w/q与现行Corrector并选择性微调TWM，加入自身历史rollout；最后单列部分解冻HaWoR head/时序模块。独立C与统一TWM数值测量adapter仍为待比较选择，现checkpoint未有2D/相机观测输入。
+
+重点边界：实际wrist J0/hand mean/列6D/左右手/β约定与投影往返先验收；GT质量/β/历史不进入部署输入。冻结参数与输入detach分开，旧no_grad/CPU inference脚本不可直接反传；解冻模块输出不复用旧缓存。长future训练可回传当前，过去forecast待新视觉到达才有可检验意义；当前TWM已读Z，不能再与同Z似然当独立Bayes相乘，σ/κ也不是最终q。HaWoR非因果上下文须匹配，HOT27/Dex test持续留出。本轮未改代码、现行模块决定或D32训练。
