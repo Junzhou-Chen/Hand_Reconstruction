@@ -67,6 +67,16 @@ def target_velocity(current, future, times):
     return torch.cat((dp, dr), -1)
 
 
+def mixture_translation_uncertainty(output):
+    weights = output['mixture_weights'].float()[:, :, None, None]
+    means = output['forecast_modes'][..., :3].float()
+    component_variance = output['forecast_translation_std'].float().square()
+    mean = (weights*means).sum(1,keepdim=True)
+    within = (weights*component_variance).sum(1)
+    total = (weights*(component_variance+(means-mean).square())).sum(1)
+    return within.sqrt(), total.sqrt()
+
+
 def objective(output, current, future, valid, times, config):
     """Exact mixture trajectory likelihood, normalized AFTER logsumexp.
 
@@ -98,6 +108,7 @@ def objective(output, current, future, valid, times, config):
     per_mode_velocity = (velocity*mask).sum(-1)/steps[:, None]
     velocity_loss = (per_mode_velocity*responsibilities).sum(-1).mean()
     balance = output['moe_balance_loss'].float()
+    within_std,total_std = mixture_translation_uncertainty(output)
     loss = (restore+config['current_nll_weight']*current_nll
             +config['forecast_nll_weight']*future_nll
             +config['forecast_geometry_weight']*best_geometry
@@ -108,8 +119,8 @@ def objective(output, current, future, valid, times, config):
                   'velocity_loss':velocity_loss, 'moe_balance_loss':balance,
                   'mode_entropy':-(logits.exp()*logits).sum(-1).mean(),
                   'current_xyz_std_mm':output['state_translation_std'].float().mean()*1000,
-                  'future_xyz_std_mm':(output['forecast_translation_std'].float().mean(-1)*mask).sum()
-                                      /(mask.sum()*output['forecast_modes'].shape[1])*1000}
+                  'future_within_mode_xyz_std_mm':(within_std.mean(-1)*valid).sum()/valid.sum()*1000,
+                  'future_total_xyz_std_mm':(total_std.mean(-1)*valid).sum()/valid.sum()*1000}
 
 
 def state_errors(pred, target):
@@ -173,6 +184,7 @@ def evaluate(model, loaders, device, config):
                 standardized = (future[:,None,:,:3]-result['forecast_modes'][...,:3])/result['forecast_translation_std']
                 component_cdf = 0.5*(1+torch.erf(standardized/math.sqrt(2)))
                 mixture_cdf = (component_cdf*result['mixture_weights'][:,:,None,None]).sum(1)
+                within_std,total_std = mixture_translation_uncertainty(result)
                 add('calibration/future_xyz_90pct_marginal',((mixture_cdf>=.05)&(mixture_cdf<=.95)).float().mean(-1),valid)
                 for seconds in config['eval_horizons_seconds']:
                     difference = (batch['future_dt']-seconds).abs().masked_fill(~valid,float('inf'))
@@ -182,7 +194,8 @@ def evaluate(model, loaders, device, config):
                     label = f'{seconds:g}s'
                     for group,errors in [('map',forecast_errors),('restored_hold',hold_errors),('constant_velocity',cv_errors)]:
                         for key,value in errors.items(): add(f'future_{label}/{group}/{key}',value[rows,slot],eligible)
-                    add(f'future_{label}/xyz_std_mm',result['forecast_translation_std'].mean((1,3))[rows,slot]*1000,eligible)
+                    add(f'future_{label}/within_mode_xyz_std_mm',within_std.mean(-1)[rows,slot]*1000,eligible)
+                    add(f'future_{label}/total_xyz_std_mm',total_std.mean(-1)[rows,slot]*1000,eligible)
             values = {key:totals[key]/counts[key] for key in totals}
             values['samples'] = counts.get('restored/wrist_mm',0)
             values['counts'] = {f'{seconds:g}s':counts.get(f'future_{seconds:g}s/map/wrist_mm',0)
