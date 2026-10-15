@@ -1,0 +1,1462 @@
+{
+  "title": "Paused four-source TWM: frozen checkpoint validation and input controls",
+  "date_new_york": "2026-10-14",
+  "scope": "User requested pause/checkpoint retention and assessment; training remains stopped, no automatic resume.",
+  "pause": {
+    "utc": "2026-10-15T00:01:38.751542+00:00",
+    "pause_status": {
+      "phase": "stopped",
+      "step": 32783,
+      "utc": "2026-10-14T23:53:53.052375+00:00"
+    },
+    "training_resume_authorized": false,
+    "source_run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014",
+    "checkpoints": {
+      "latest": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/latest.pt",
+        "source_path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014/latest.pt",
+        "step": 32783,
+        "sha256": "43d789c5b88c24ea9697790cbf22194bee9c173ac1ac75ae94407f891a31913e",
+        "bytes": 76213899,
+        "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+        "model_and_optimizer_finite": true,
+        "rank_state_count": 2
+      },
+      "best": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/best.pt",
+        "source_path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014/best.pt",
+        "step": 28000,
+        "sha256": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+        "bytes": 76211985,
+        "code_version": "10aa98327eeaa3ff0afb49eef1e6ff73879c7d22",
+        "model_and_optimizer_finite": true,
+        "rank_state_count": 2
+      }
+    },
+    "evaluations": {
+      "latest": {
+        "pid": 3220,
+        "gpu": 0,
+        "command": [
+          "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+          "-u",
+          "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/evaluate_twm_checkpoint.py",
+          "--checkpoint",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/latest.pt",
+          "--manifest",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+          "--output",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/latest",
+          "--code-version",
+          "c8e9a8db533233321d27ab3a1d3543f0f60c45ee",
+          "--protocol",
+          "both"
+        ],
+        "output": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/latest"
+      },
+      "best": {
+        "pid": 3231,
+        "gpu": 1,
+        "command": [
+          "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+          "-u",
+          "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/evaluate_twm_checkpoint.py",
+          "--checkpoint",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/best.pt",
+          "--manifest",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+          "--output",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/best",
+          "--code-version",
+          "c8e9a8db533233321d27ab3a1d3543f0f60c45ee",
+          "--protocol",
+          "both"
+        ],
+        "output": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/best"
+      }
+    },
+    "code_version": "c8e9a8db533233321d27ab3a1d3543f0f60c45ee"
+  },
+  "training_best_reproduction": {
+    "best_training_validation_step": 28000,
+    "max_abs_difference_selected_fixed_metrics": 0,
+    "passed": true
+  },
+  "models": {
+    "latest": {
+      "step": 32783,
+      "checkpoint_sha256": "43d789c5b88c24ea9697790cbf22194bee9c173ac1ac75ae94407f891a31913e",
+      "code_version": "c8e9a8db533233321d27ab3a1d3543f0f60c45ee",
+      "evaluator_sha256": "8301bead8d986bdafd1d97d0fc6b31d964daf738eb54a6f4542588c00cdbbcec",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+      "source_revisions": {
+        "dexycb": [
+          "64551b001d360ad83bc383157a559ec248fb9100"
+        ],
+        "hot3d": [
+          "30fe9674782f32e1e5edba98476b6ff4300132c5"
+        ],
+        "oakink2": [
+          "21705616140d726607027e70d58b7837f442ffd8"
+        ],
+        "umetrack": [
+          "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+        ]
+      },
+      "elapsed_seconds": 214.67920947633684,
+      "protocols": {
+        "fixed": {
+          "equal_source_mean": {
+            "noisy": {
+              "loss": 0.012291275266078382,
+              "baseline_wrist_mm": 49.54248159125372,
+              "baseline_root_deg": 22.746584753699715,
+              "baseline_finger_deg": 15.481458291335759,
+              "history_hold_wrist_mm": 9.06134242046303,
+              "history_hold_root_deg": 3.25636233829983,
+              "history_hold_finger_deg": 2.807391645566461,
+              "restored_wrist_mm": 5.47609328875687,
+              "restored_root_deg": 2.2825218486944734,
+              "restored_finger_deg": 1.8028392554709907,
+              "forecast_wrist_mm": 12.361058036498914,
+              "forecast_root_deg": 5.087768886550354,
+              "forecast_finger_deg": 3.416364892797195,
+              "restored_wrist_median_mm": 4.870511770248413,
+              "restored_wrist_p95_mm": 11.300970554351807,
+              "restored_wrist_worse_than_input_by_1mm_percent": 0.09765625,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.45374870300293,
+              "samples": 3466
+            },
+            "missing": {
+              "loss": 0.012344464639931278,
+              "baseline_wrist_mm": 37.89744737880484,
+              "baseline_root_deg": 16.775727884115906,
+              "baseline_finger_deg": 11.06986544413615,
+              "history_hold_wrist_mm": 9.06134242046303,
+              "history_hold_root_deg": 3.25636233829983,
+              "history_hold_finger_deg": 2.807391645566461,
+              "restored_wrist_mm": 5.457952537266585,
+              "restored_root_deg": 2.2834674504486285,
+              "restored_finger_deg": 1.8167589442416798,
+              "forecast_wrist_mm": 12.359128920862517,
+              "forecast_root_deg": 5.093063260660256,
+              "forecast_finger_deg": 3.4348488209608394,
+              "restored_wrist_median_mm": 4.846994876861572,
+              "restored_wrist_p95_mm": 11.221764087677002,
+              "restored_wrist_worse_than_input_by_1mm_percent": 3.3833924531936646,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.80533790588379,
+              "samples": 3466
+            },
+            "clean": {
+              "loss": 0.0003321722869604636,
+              "baseline_wrist_mm": 0,
+              "baseline_root_deg": 9.855867521357231e-09,
+              "baseline_finger_deg": 7.189264877634998e-08,
+              "history_hold_wrist_mm": 5.3173914158593885,
+              "history_hold_root_deg": 1.8256351338122703,
+              "history_hold_finger_deg": 1.044049969689949,
+              "restored_wrist_mm": 0.454816228011623,
+              "restored_root_deg": 0.2344661876783815,
+              "restored_finger_deg": 0.1522257945135113,
+              "forecast_wrist_mm": 5.156721464949211,
+              "forecast_root_deg": 2.9802619923794937,
+              "forecast_finger_deg": 2.419266946013393,
+              "restored_wrist_median_mm": 0.34595299512147903,
+              "restored_wrist_p95_mm": 1.1877922713756561,
+              "restored_wrist_worse_than_input_by_1mm_percent": 6.970772743225098,
+              "restored_wrist_better_than_hold_by_1mm_percent": 68.96142387390137,
+              "samples": 3466
+            }
+          },
+          "batch_size": 64,
+          "windows_by_dataset": {
+            "dexycb": 394,
+            "hot3d": 1024,
+            "oakink2": 1024,
+            "umetrack": 1024
+          },
+          "indices_sha256_by_dataset": {
+            "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+            "hot3d": "cd5eed0bc36211d337d2a85539aa620c834b42a1d4fe4728080033b9aa1ecaa7",
+            "oakink2": "9cf3c7bfae5e54174d06cf43b3d8fc6cadb9b01a0225bce7a00dd9376a447e87",
+            "umetrack": "eb7b771fc58196dddc5d3b145dc93d92bc238230e3b92458fe5f999d1255c7c9"
+          },
+          "corruption_seed": 20261137,
+          "aggregation": "equal source mean; within-source mean weighted by sample count"
+        },
+        "full": {
+          "by_dataset": {
+            "dexycb": {
+              "noisy": {
+                "loss": 0.0178162749043576,
+                "baseline_wrist_mm": 50.89970131694968,
+                "baseline_root_deg": 23.37129775884793,
+                "baseline_finger_deg": 15.662536441977254,
+                "history_hold_wrist_mm": 9.663355478780524,
+                "history_hold_root_deg": 3.6830152896455095,
+                "history_hold_finger_deg": 3.124945231500616,
+                "restored_wrist_mm": 5.774820671468822,
+                "restored_root_deg": 2.8671065611282582,
+                "restored_finger_deg": 2.320330636755464,
+                "forecast_wrist_mm": 12.5581714610763,
+                "forecast_root_deg": 5.9601058003866125,
+                "forecast_finger_deg": 4.106883605724664,
+                "samples": 394,
+                "restored_wrist_median_mm": 5.313478946685791,
+                "restored_wrist_p95_mm": 10.999178886413574,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0,
+                "restored_wrist_better_than_hold_by_1mm_percent": 73.60405731201172
+              },
+              "missing": {
+                "loss": 0.01795197116107051,
+                "baseline_wrist_mm": 37.93763864584986,
+                "baseline_root_deg": 17.397077386149295,
+                "baseline_finger_deg": 11.306969439317733,
+                "history_hold_wrist_mm": 9.663355478780524,
+                "history_hold_root_deg": 3.6830152896455095,
+                "history_hold_finger_deg": 3.124945231500616,
+                "restored_wrist_mm": 5.74858503293265,
+                "restored_root_deg": 2.8806627813329553,
+                "restored_finger_deg": 2.3669259941517398,
+                "forecast_wrist_mm": 12.549296016015377,
+                "forecast_root_deg": 5.977085364046435,
+                "forecast_finger_deg": 4.139151260937531,
+                "samples": 394,
+                "restored_wrist_median_mm": 5.298465728759766,
+                "restored_wrist_p95_mm": 10.872814178466797,
+                "restored_wrist_worse_than_input_by_1mm_percent": 4.060913562774658,
+                "restored_wrist_better_than_hold_by_1mm_percent": 73.35025787353516
+              },
+              "clean": {
+                "loss": 0.0011149264711338251,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 1.1931981367982923e-08,
+                "baseline_finger_deg": 6.297971920852039e-08,
+                "history_hold_wrist_mm": 6.794400341014572,
+                "history_hold_root_deg": 2.5826853459256554,
+                "history_hold_finger_deg": 1.6888716623262705,
+                "restored_wrist_mm": 0.7257864475250244,
+                "restored_root_deg": 0.44216556204151986,
+                "restored_finger_deg": 0.17684352541635484,
+                "forecast_wrist_mm": 5.612305311987242,
+                "forecast_root_deg": 3.825835748372344,
+                "forecast_finger_deg": 3.4974889246945455,
+                "samples": 394,
+                "restored_wrist_median_mm": 0.4691799283027649,
+                "restored_wrist_p95_mm": 2.342958450317383,
+                "restored_wrist_worse_than_input_by_1mm_percent": 19.28934097290039,
+                "restored_wrist_better_than_hold_by_1mm_percent": 85.02538299560547
+              }
+            },
+            "hot3d": {
+              "noisy": {
+                "loss": 0.013332272063833209,
+                "baseline_wrist_mm": 47.9817261062582,
+                "baseline_root_deg": 23.101678125376463,
+                "baseline_finger_deg": 15.366496636798688,
+                "history_hold_wrist_mm": 9.702066833516119,
+                "history_hold_root_deg": 3.5741233875745237,
+                "history_hold_finger_deg": 2.7016271798942344,
+                "restored_wrist_mm": 6.128511648853933,
+                "restored_root_deg": 2.542185394907874,
+                "restored_finger_deg": 1.693290091562146,
+                "forecast_wrist_mm": 15.320350543345054,
+                "forecast_root_deg": 6.698164988189857,
+                "forecast_finger_deg": 3.426056562008194,
+                "samples": 15240,
+                "restored_wrist_median_mm": 5.552734375,
+                "restored_wrist_p95_mm": 12.45218276977539,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.36745405197143555,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.1692886352539
+              },
+              "missing": {
+                "loss": 0.013370210029615035,
+                "baseline_wrist_mm": 37.19863546977206,
+                "baseline_root_deg": 17.68298636609175,
+                "baseline_finger_deg": 10.897179490437345,
+                "history_hold_wrist_mm": 9.702066833516119,
+                "history_hold_root_deg": 3.5741233875745237,
+                "history_hold_finger_deg": 2.7016271798942344,
+                "restored_wrist_mm": 6.128307964795531,
+                "restored_root_deg": 2.5443345068633714,
+                "restored_finger_deg": 1.693499701292183,
+                "forecast_wrist_mm": 15.346739969228508,
+                "forecast_root_deg": 6.706934306627809,
+                "forecast_finger_deg": 3.435379607032916,
+                "samples": 15240,
+                "restored_wrist_median_mm": 5.542900085449219,
+                "restored_wrist_p95_mm": 12.516985893249512,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.7204723358154297,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.28083801269531
+              },
+              "clean": {
+                "loss": 7.542353946889147e-05,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 1.269141289571041e-08,
+                "baseline_finger_deg": 8.255905113801084e-08,
+                "history_hold_wrist_mm": 6.18538237531667,
+                "history_hold_root_deg": 2.254389759561834,
+                "history_hold_finger_deg": 0.8856516296156435,
+                "restored_wrist_mm": 0.4062681563257232,
+                "restored_root_deg": 0.1889220184072109,
+                "restored_finger_deg": 0.1323802639649609,
+                "forecast_wrist_mm": 6.366182909487426,
+                "forecast_root_deg": 3.7340385822486377,
+                "forecast_finger_deg": 2.1208160461716137,
+                "samples": 15240,
+                "restored_wrist_median_mm": 0.3480782210826874,
+                "restored_wrist_p95_mm": 0.8709957599639893,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.1758532524108887,
+                "restored_wrist_better_than_hold_by_1mm_percent": 74.73097229003906
+              }
+            },
+            "oakink2": {
+              "noisy": {
+                "loss": 0.005978382120271139,
+                "baseline_wrist_mm": 48.01859767053145,
+                "baseline_root_deg": 23.10816876763081,
+                "baseline_finger_deg": 15.389974266135892,
+                "history_hold_wrist_mm": 7.732339973471719,
+                "history_hold_root_deg": 2.6044921463648847,
+                "history_hold_finger_deg": 2.477129469836852,
+                "restored_wrist_mm": 4.142193210104333,
+                "restored_root_deg": 1.5619714676955498,
+                "restored_finger_deg": 1.3520557078335647,
+                "forecast_wrist_mm": 7.615737403257692,
+                "forecast_root_deg": 2.6963539731619472,
+                "forecast_finger_deg": 1.959511012200049,
+                "samples": 27728,
+                "restored_wrist_median_mm": 3.5555922985076904,
+                "restored_wrist_p95_mm": 9.02501106262207,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.13704557716846466,
+                "restored_wrist_better_than_hold_by_1mm_percent": 76.26947784423828
+              },
+              "missing": {
+                "loss": 0.005930174958171506,
+                "baseline_wrist_mm": 36.70843744030318,
+                "baseline_root_deg": 17.318461484738464,
+                "baseline_finger_deg": 10.848091223442134,
+                "history_hold_wrist_mm": 7.732339973471719,
+                "history_hold_root_deg": 2.6044921463648847,
+                "history_hold_finger_deg": 2.477129469836852,
+                "restored_wrist_mm": 4.116055077235271,
+                "restored_root_deg": 1.5519804581698833,
+                "restored_finger_deg": 1.3436274382673243,
+                "forecast_wrist_mm": 7.598760368778605,
+                "forecast_root_deg": 2.688103830614877,
+                "forecast_finger_deg": 1.953663567621723,
+                "samples": 27728,
+                "restored_wrist_median_mm": 3.517489433288574,
+                "restored_wrist_p95_mm": 9.032872200012207,
+                "restored_wrist_worse_than_input_by_1mm_percent": 2.1061742305755615,
+                "restored_wrist_better_than_hold_by_1mm_percent": 76.40291595458984
+              },
+              "clean": {
+                "loss": 3.848844976732035e-05,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 2.5898007577021907e-09,
+                "baseline_finger_deg": 6.709152992403683e-08,
+                "history_hold_wrist_mm": 2.979062291424328,
+                "history_hold_root_deg": 0.7480626760090422,
+                "history_hold_finger_deg": 0.42636539238901133,
+                "restored_wrist_mm": 0.2773890781113679,
+                "restored_root_deg": 0.12538715812661919,
+                "restored_finger_deg": 0.12549086715176969,
+                "forecast_wrist_mm": 2.783138493754172,
+                "forecast_root_deg": 1.2603779058544469,
+                "forecast_finger_deg": 1.0423828159118758,
+                "samples": 27728,
+                "restored_wrist_median_mm": 0.2359297126531601,
+                "restored_wrist_p95_mm": 0.5710853934288025,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.991777241230011,
+                "restored_wrist_better_than_hold_by_1mm_percent": 45.520774841308594
+              }
+            },
+            "umetrack": {
+              "noisy": {
+                "loss": 0.012275569694905295,
+                "baseline_wrist_mm": 47.91017774177731,
+                "baseline_root_deg": 23.065903907243754,
+                "baseline_finger_deg": 15.358433558643261,
+                "history_hold_wrist_mm": 8.74523341692802,
+                "history_hold_root_deg": 3.216850828139425,
+                "history_hold_finger_deg": 3.0531613198665446,
+                "restored_wrist_mm": 5.692615953036173,
+                "restored_root_deg": 2.2356433747663123,
+                "restored_finger_deg": 1.86560189220864,
+                "forecast_wrist_mm": 13.405575278174977,
+                "forecast_root_deg": 4.984669446415607,
+                "forecast_finger_deg": 4.105962015268062,
+                "samples": 18008,
+                "restored_wrist_median_mm": 5.133084774017334,
+                "restored_wrist_p95_mm": 11.921032905578613,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.38871610164642334,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.93047332763672
+              },
+              "missing": {
+                "loss": 0.012496364171778504,
+                "baseline_wrist_mm": 36.99516564483168,
+                "baseline_root_deg": 17.48013655443501,
+                "baseline_finger_deg": 11.034840761317724,
+                "history_hold_wrist_mm": 8.74523341692802,
+                "history_hold_root_deg": 3.216850828139425,
+                "history_hold_finger_deg": 3.0531613198665446,
+                "restored_wrist_mm": 5.685345171399246,
+                "restored_root_deg": 2.2340612679468372,
+                "restored_finger_deg": 1.8857800009408456,
+                "forecast_wrist_mm": 13.413973289720222,
+                "forecast_root_deg": 4.985825374464309,
+                "forecast_finger_deg": 4.139827761423423,
+                "samples": 18008,
+                "restored_wrist_median_mm": 5.121571063995361,
+                "restored_wrist_p95_mm": 11.962759971618652,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.9204797744750977,
+                "restored_wrist_better_than_hold_by_1mm_percent": 69.21368408203125
+              },
+              "clean": {
+                "loss": 0.00016412327929882635,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 9.280483110166911e-09,
+                "baseline_finger_deg": 7.47346906417447e-08,
+                "history_hold_wrist_mm": 4.970084117656811,
+                "history_hold_root_deg": 1.7342077729332346,
+                "history_hold_finger_deg": 1.2728858801959515,
+                "restored_wrist_mm": 0.4081072455800835,
+                "restored_root_deg": 0.18376560829603,
+                "restored_finger_deg": 0.1792457193559882,
+                "forecast_wrist_mm": 5.841203667120847,
+                "forecast_root_deg": 3.1398987280745234,
+                "forecast_finger_deg": 3.064961572373406,
+                "samples": 18008,
+                "restored_wrist_median_mm": 0.3318882882595062,
+                "restored_wrist_p95_mm": 0.9062543511390686,
+                "restored_wrist_worse_than_input_by_1mm_percent": 4.098178386688232,
+                "restored_wrist_better_than_hold_by_1mm_percent": 69.54132080078125
+              }
+            }
+          },
+          "equal_source_mean": {
+            "noisy": {
+              "loss": 0.01235062469584181,
+              "baseline_wrist_mm": 48.70255070887916,
+              "baseline_root_deg": 23.16176213977474,
+              "baseline_finger_deg": 15.444360225888774,
+              "history_hold_wrist_mm": 8.960748925674096,
+              "history_hold_root_deg": 3.2696204129310855,
+              "history_hold_finger_deg": 2.839215800274562,
+              "restored_wrist_mm": 5.434535370865815,
+              "restored_root_deg": 2.3017266996244983,
+              "restored_finger_deg": 1.8078195820899536,
+              "forecast_wrist_mm": 12.224958671463506,
+              "forecast_root_deg": 5.084823552038506,
+              "forecast_finger_deg": 3.3996032988002423,
+              "restored_wrist_median_mm": 4.888722598552704,
+              "restored_wrist_p95_mm": 11.099351406097412,
+              "restored_wrist_worse_than_input_by_1mm_percent": 0.2233039326965809,
+              "restored_wrist_better_than_hold_by_1mm_percent": 71.74332427978516,
+              "samples": 61370
+            },
+            "missing": {
+              "loss": 0.012437180080158889,
+              "baseline_wrist_mm": 37.209969300189194,
+              "baseline_root_deg": 17.46966544785363,
+              "baseline_finger_deg": 11.021770228628734,
+              "history_hold_wrist_mm": 8.960748925674096,
+              "history_hold_root_deg": 3.2696204129310855,
+              "history_hold_finger_deg": 2.839215800274562,
+              "restored_wrist_mm": 5.419573311590674,
+              "restored_root_deg": 2.3027597535782616,
+              "restored_finger_deg": 1.8224582836630234,
+              "forecast_wrist_mm": 12.227192410935679,
+              "forecast_root_deg": 5.089487218938357,
+              "forecast_finger_deg": 3.417005549253898,
+              "restored_wrist_median_mm": 4.87010657787323,
+              "restored_wrist_p95_mm": 11.096358060836792,
+              "restored_wrist_worse_than_input_by_1mm_percent": 3.4520099759101868,
+              "restored_wrist_better_than_hold_by_1mm_percent": 71.81192398071289,
+              "samples": 61370
+            },
+            "clean": {
+              "loss": 0.00034824043491721583,
+              "baseline_wrist_mm": 0,
+              "baseline_root_deg": 9.123419532890608e-09,
+              "baseline_finger_deg": 7.184124772807819e-08,
+              "history_hold_wrist_mm": 5.232232281353095,
+              "history_hold_root_deg": 1.8298363886074416,
+              "history_hold_finger_deg": 1.068443641131719,
+              "restored_wrist_mm": 0.4543877318855498,
+              "restored_root_deg": 0.235060086717845,
+              "restored_finger_deg": 0.1534900939722684,
+              "forecast_wrist_mm": 5.150707595587422,
+              "forecast_root_deg": 2.9900377411374883,
+              "forecast_finger_deg": 2.43141233978786,
+              "restored_wrist_median_mm": 0.34626903757452965,
+              "restored_wrist_p95_mm": 1.1728234887123108,
+              "restored_wrist_worse_than_input_by_1mm_percent": 6.888787463307381,
+              "restored_wrist_better_than_hold_by_1mm_percent": 68.7046127319336,
+              "samples": 61370
+            }
+          },
+          "batch_size": 64,
+          "windows_by_dataset": {
+            "dexycb": 394,
+            "hot3d": 15240,
+            "oakink2": 27728,
+            "umetrack": 18008
+          },
+          "indices_sha256_by_dataset": {
+            "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+            "hot3d": "4dfb6950d2baf8fcf44f2bec2b66a4fd7f66ec4542a2977edfed96b731898a2c",
+            "oakink2": "56f5612ea95aae05be9045b2d5a646ec4775329e4fc381f3acfa12291dbc4467",
+            "umetrack": "48909a24c8358c5b9006ba48acdc5d9b32747a12477145f4d4bdeac43fc0165d"
+          },
+          "corruption_seed": 20261137,
+          "aggregation": "equal source mean; within-source mean weighted by sample count"
+        }
+      },
+      "limitations": [
+        "Synthetic current corruption and GT plus synthetic noisy history; no real HaWoR errors or own-output rollout.",
+        "Source-fitted MANO state reference, not independent native sensor/MPJPE/mesh or physical correctness.",
+        "Overlapping held-out windows; full validation is not an independent test or confidence interval.",
+        "Fixed and full window sets differ; their corruption samples have the same distribution, not per-frame identical assignments.",
+        "Last-history hold uses only past input, with the same synthetic history noise as the model.",
+        "Source medians/p95 are within-source window statistics; their equal-source aggregate is a mean of source quantiles, not a pooled quantile."
+      ],
+      "report_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/latest/report.json",
+      "report_sha256": "682ad9ae76ec1ff093740a5ad7b51c78acfbf0f519f55b0602e7639b559931f5"
+    },
+    "best": {
+      "step": 28000,
+      "checkpoint_sha256": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+      "code_version": "c8e9a8db533233321d27ab3a1d3543f0f60c45ee",
+      "evaluator_sha256": "8301bead8d986bdafd1d97d0fc6b31d964daf738eb54a6f4542588c00cdbbcec",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+      "source_revisions": {
+        "dexycb": [
+          "64551b001d360ad83bc383157a559ec248fb9100"
+        ],
+        "hot3d": [
+          "30fe9674782f32e1e5edba98476b6ff4300132c5"
+        ],
+        "oakink2": [
+          "21705616140d726607027e70d58b7837f442ffd8"
+        ],
+        "umetrack": [
+          "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+        ]
+      },
+      "elapsed_seconds": 211.98518368788064,
+      "protocols": {
+        "fixed": {
+          "equal_source_mean": {
+            "noisy": {
+              "loss": 0.01211197370748824,
+              "baseline_wrist_mm": 49.54248159125372,
+              "baseline_root_deg": 22.746584753699715,
+              "baseline_finger_deg": 15.481458291335759,
+              "history_hold_wrist_mm": 9.06134242046303,
+              "history_hold_root_deg": 3.25636233829983,
+              "history_hold_finger_deg": 2.807391645566461,
+              "restored_wrist_mm": 5.446080395412929,
+              "restored_root_deg": 2.2599474073477506,
+              "restored_finger_deg": 1.8572704228974386,
+              "forecast_wrist_mm": 12.228414953397918,
+              "forecast_root_deg": 5.052328093194871,
+              "forecast_finger_deg": 3.4859004064278705,
+              "restored_wrist_median_mm": 4.86953341960907,
+              "restored_wrist_p95_mm": 11.170367002487183,
+              "restored_wrist_worse_than_input_by_1mm_percent": 0.09765625,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.65364646911621,
+              "samples": 3466
+            },
+            "missing": {
+              "loss": 0.012200165835080956,
+              "baseline_wrist_mm": 37.89744737880484,
+              "baseline_root_deg": 16.775727884115906,
+              "baseline_finger_deg": 11.06986544413615,
+              "history_hold_wrist_mm": 9.06134242046303,
+              "history_hold_root_deg": 3.25636233829983,
+              "history_hold_finger_deg": 2.807391645566461,
+              "restored_wrist_mm": 5.436769102506226,
+              "restored_root_deg": 2.2647368586173062,
+              "restored_finger_deg": 1.8672618949360351,
+              "forecast_wrist_mm": 12.239779584412345,
+              "forecast_root_deg": 5.061096717901339,
+              "forecast_finger_deg": 3.5040854308754206,
+              "restored_wrist_median_mm": 4.889451384544373,
+              "restored_wrist_p95_mm": 11.197362899780273,
+              "restored_wrist_worse_than_input_by_1mm_percent": 3.4078065156936646,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.48274803161621,
+              "samples": 3466
+            },
+            "clean": {
+              "loss": 0.0002817668143352952,
+              "baseline_wrist_mm": 0,
+              "baseline_root_deg": 9.855867521357231e-09,
+              "baseline_finger_deg": 7.189264877634998e-08,
+              "history_hold_wrist_mm": 5.3173914158593885,
+              "history_hold_root_deg": 1.8256351338122703,
+              "history_hold_finger_deg": 1.044049969689949,
+              "restored_wrist_mm": 0.5504668692320699,
+              "restored_root_deg": 0.2862819414940393,
+              "restored_finger_deg": 0.21680149997981635,
+              "forecast_wrist_mm": 6.314992996736377,
+              "forecast_root_deg": 3.202822059553665,
+              "forecast_finger_deg": 2.478431719279645,
+              "restored_wrist_median_mm": 0.40603914111852646,
+              "restored_wrist_p95_mm": 1.456640511751175,
+              "restored_wrist_worse_than_input_by_1mm_percent": 11.052878379821777,
+              "restored_wrist_better_than_hold_by_1mm_percent": 68.0093994140625,
+              "samples": 3466
+            }
+          },
+          "batch_size": 64,
+          "windows_by_dataset": {
+            "dexycb": 394,
+            "hot3d": 1024,
+            "oakink2": 1024,
+            "umetrack": 1024
+          },
+          "indices_sha256_by_dataset": {
+            "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+            "hot3d": "cd5eed0bc36211d337d2a85539aa620c834b42a1d4fe4728080033b9aa1ecaa7",
+            "oakink2": "9cf3c7bfae5e54174d06cf43b3d8fc6cadb9b01a0225bce7a00dd9376a447e87",
+            "umetrack": "eb7b771fc58196dddc5d3b145dc93d92bc238230e3b92458fe5f999d1255c7c9"
+          },
+          "corruption_seed": 20261137,
+          "aggregation": "equal source mean; within-source mean weighted by sample count"
+        },
+        "full": {
+          "by_dataset": {
+            "dexycb": {
+              "noisy": {
+                "loss": 0.016213109712045506,
+                "baseline_wrist_mm": 50.89970131694968,
+                "baseline_root_deg": 23.37129775884793,
+                "baseline_finger_deg": 15.662536441977254,
+                "history_hold_wrist_mm": 9.663355478780524,
+                "history_hold_root_deg": 3.6830152896455095,
+                "history_hold_finger_deg": 3.124945231500616,
+                "restored_wrist_mm": 5.514607703020125,
+                "restored_root_deg": 2.6945100102932926,
+                "restored_finger_deg": 2.355296915557784,
+                "forecast_wrist_mm": 11.61952027935667,
+                "forecast_root_deg": 5.561560549711818,
+                "forecast_finger_deg": 4.131297538728278,
+                "samples": 394,
+                "restored_wrist_median_mm": 5.122776508331299,
+                "restored_wrist_p95_mm": 10.254150390625,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0,
+                "restored_wrist_better_than_hold_by_1mm_percent": 76.64974212646484
+              },
+              "missing": {
+                "loss": 0.016489032497582247,
+                "baseline_wrist_mm": 37.93763864584986,
+                "baseline_root_deg": 17.397077386149295,
+                "baseline_finger_deg": 11.306969439317733,
+                "history_hold_wrist_mm": 9.663355478780524,
+                "history_hold_root_deg": 3.6830152896455095,
+                "history_hold_finger_deg": 3.124945231500616,
+                "restored_wrist_mm": 5.5167971431906455,
+                "restored_root_deg": 2.719888550981047,
+                "restored_finger_deg": 2.393561202862541,
+                "forecast_wrist_mm": 11.63829398276237,
+                "forecast_root_deg": 5.586135437040765,
+                "forecast_finger_deg": 4.16392970085144,
+                "samples": 394,
+                "restored_wrist_median_mm": 5.140380382537842,
+                "restored_wrist_p95_mm": 10.502376556396484,
+                "restored_wrist_worse_than_input_by_1mm_percent": 4.060913562774658,
+                "restored_wrist_better_than_hold_by_1mm_percent": 76.64974212646484
+              },
+              "clean": {
+                "loss": 0.0005851510045269911,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 1.1931981367982923e-08,
+                "baseline_finger_deg": 6.297971920852039e-08,
+                "history_hold_wrist_mm": 6.794400341014572,
+                "history_hold_root_deg": 2.5826853459256554,
+                "history_hold_finger_deg": 1.6888716623262705,
+                "restored_wrist_mm": 0.6885911029607511,
+                "restored_root_deg": 0.4029866402524377,
+                "restored_finger_deg": 0.23082283245125398,
+                "forecast_wrist_mm": 6.1488531785568,
+                "forecast_root_deg": 3.8271457186810256,
+                "forecast_finger_deg": 3.530561268027059,
+                "samples": 394,
+                "restored_wrist_median_mm": 0.5239394307136536,
+                "restored_wrist_p95_mm": 1.7278530597686768,
+                "restored_wrist_worse_than_input_by_1mm_percent": 18.52791976928711,
+                "restored_wrist_better_than_hold_by_1mm_percent": 83.75634765625
+              }
+            },
+            "hot3d": {
+              "noisy": {
+                "loss": 0.01356329266813014,
+                "baseline_wrist_mm": 47.9817261062582,
+                "baseline_root_deg": 23.101678125376463,
+                "baseline_finger_deg": 15.366496636798688,
+                "history_hold_wrist_mm": 9.702066833516119,
+                "history_hold_root_deg": 3.5741233875745237,
+                "history_hold_finger_deg": 2.7016271798942344,
+                "restored_wrist_mm": 6.144778453146066,
+                "restored_root_deg": 2.5605752002535844,
+                "restored_finger_deg": 1.7652871720121288,
+                "forecast_wrist_mm": 15.448020024937907,
+                "forecast_root_deg": 6.7481764202668595,
+                "forecast_finger_deg": 3.5083310052165837,
+                "samples": 15240,
+                "restored_wrist_median_mm": 5.5397725105285645,
+                "restored_wrist_p95_mm": 12.558826446533203,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.4199475049972534,
+                "restored_wrist_better_than_hold_by_1mm_percent": 67.74278259277344
+              },
+              "missing": {
+                "loss": 0.01361078854767591,
+                "baseline_wrist_mm": 37.19863546977206,
+                "baseline_root_deg": 17.68298636609175,
+                "baseline_finger_deg": 10.897179490437345,
+                "history_hold_wrist_mm": 9.702066833516119,
+                "history_hold_root_deg": 3.5741233875745237,
+                "history_hold_finger_deg": 2.7016271798942344,
+                "restored_wrist_mm": 6.153063725298784,
+                "restored_root_deg": 2.5623895238390744,
+                "restored_finger_deg": 1.7608661666629821,
+                "forecast_wrist_mm": 15.48322702893435,
+                "forecast_root_deg": 6.756118136628719,
+                "forecast_finger_deg": 3.5133899143048786,
+                "samples": 15240,
+                "restored_wrist_median_mm": 5.53970193862915,
+                "restored_wrist_p95_mm": 12.654255867004395,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.9041996002197266,
+                "restored_wrist_better_than_hold_by_1mm_percent": 67.6115493774414
+              },
+              "clean": {
+                "loss": 0.00019379400915840245,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 1.269141289571041e-08,
+                "baseline_finger_deg": 8.255905113801084e-08,
+                "history_hold_wrist_mm": 6.18538237531667,
+                "history_hold_root_deg": 2.254389759561834,
+                "history_hold_finger_deg": 0.8856516296156435,
+                "restored_wrist_mm": 0.546358291417595,
+                "restored_root_deg": 0.3068483093748568,
+                "restored_finger_deg": 0.20158552109725833,
+                "forecast_wrist_mm": 8.149306768132007,
+                "forecast_root_deg": 4.233850415047073,
+                "forecast_finger_deg": 2.19327603525377,
+                "samples": 15240,
+                "restored_wrist_median_mm": 0.4152437746524811,
+                "restored_wrist_p95_mm": 1.4115533828735352,
+                "restored_wrist_worse_than_input_by_1mm_percent": 11.023621559143066,
+                "restored_wrist_better_than_hold_by_1mm_percent": 74.00262451171875
+              }
+            },
+            "oakink2": {
+              "noisy": {
+                "loss": 0.006081633001890525,
+                "baseline_wrist_mm": 48.01859767053145,
+                "baseline_root_deg": 23.10816876763081,
+                "baseline_finger_deg": 15.389974266135892,
+                "history_hold_wrist_mm": 7.732339973471719,
+                "history_hold_root_deg": 2.6044921463648847,
+                "history_hold_finger_deg": 2.477129469836852,
+                "restored_wrist_mm": 4.140774565353878,
+                "restored_root_deg": 1.5817954657191977,
+                "restored_finger_deg": 1.393934929157638,
+                "forecast_wrist_mm": 7.674572284828358,
+                "forecast_root_deg": 2.7664541565333223,
+                "forecast_finger_deg": 2.0191360368800177,
+                "samples": 27728,
+                "restored_wrist_median_mm": 3.536290168762207,
+                "restored_wrist_p95_mm": 9.090132713317871,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.14065204560756683,
+                "restored_wrist_better_than_hold_by_1mm_percent": 76.01702117919922
+              },
+              "missing": {
+                "loss": 0.0060532556266878045,
+                "baseline_wrist_mm": 36.70843744030318,
+                "baseline_root_deg": 17.318461484738464,
+                "baseline_finger_deg": 10.848091223442134,
+                "history_hold_wrist_mm": 7.732339973471719,
+                "history_hold_root_deg": 2.6044921463648847,
+                "history_hold_finger_deg": 2.477129469836852,
+                "restored_wrist_mm": 4.133887424953261,
+                "restored_root_deg": 1.574445080289384,
+                "restored_finger_deg": 1.383778360766341,
+                "forecast_wrist_mm": 7.68235986382715,
+                "forecast_root_deg": 2.7572062491545153,
+                "forecast_finger_deg": 2.010814314141689,
+                "samples": 27728,
+                "restored_wrist_median_mm": 3.518129825592041,
+                "restored_wrist_p95_mm": 9.111041069030762,
+                "restored_wrist_worse_than_input_by_1mm_percent": 2.3045296669006348,
+                "restored_wrist_better_than_hold_by_1mm_percent": 75.9665298461914
+              },
+              "clean": {
+                "loss": 7.459905695328228e-05,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 2.5898007577021907e-09,
+                "baseline_finger_deg": 6.709152992403683e-08,
+                "history_hold_wrist_mm": 2.979062291424328,
+                "history_hold_root_deg": 0.7480626760090422,
+                "history_hold_finger_deg": 0.42636539238901133,
+                "restored_wrist_mm": 0.35927291669325545,
+                "restored_root_deg": 0.15765742068509456,
+                "restored_finger_deg": 0.1849359787411588,
+                "forecast_wrist_mm": 3.3646504497913288,
+                "forecast_root_deg": 1.3938513617947552,
+                "forecast_finger_deg": 1.0495692793165956,
+                "samples": 27728,
+                "restored_wrist_median_mm": 0.2813584506511688,
+                "restored_wrist_p95_mm": 0.8626548647880554,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.321552276611328,
+                "restored_wrist_better_than_hold_by_1mm_percent": 44.66243362426758
+              }
+            },
+            "umetrack": {
+              "noisy": {
+                "loss": 0.01265386263051731,
+                "baseline_wrist_mm": 47.91017774177731,
+                "baseline_root_deg": 23.065903907243754,
+                "baseline_finger_deg": 15.358433558643261,
+                "history_hold_wrist_mm": 8.74523341692802,
+                "history_hold_root_deg": 3.216850828139425,
+                "history_hold_finger_deg": 3.0531613198665446,
+                "restored_wrist_mm": 5.754437637668035,
+                "restored_root_deg": 2.2711239438330213,
+                "restored_finger_deg": 1.9386685732363171,
+                "forecast_wrist_mm": 13.656835673809686,
+                "forecast_root_deg": 5.093153636861197,
+                "forecast_finger_deg": 4.228815087102774,
+                "samples": 18008,
+                "restored_wrist_median_mm": 5.168567657470703,
+                "restored_wrist_p95_mm": 12.115300178527832,
+                "restored_wrist_worse_than_input_by_1mm_percent": 0.34429141879081726,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.71390533447266
+              },
+              "missing": {
+                "loss": 0.012886771883423303,
+                "baseline_wrist_mm": 36.99516564483168,
+                "baseline_root_deg": 17.48013655443501,
+                "baseline_finger_deg": 11.034840761317724,
+                "history_hold_wrist_mm": 8.74523341692802,
+                "history_hold_root_deg": 3.216850828139425,
+                "history_hold_finger_deg": 3.0531613198665446,
+                "restored_wrist_mm": 5.754364324855254,
+                "restored_root_deg": 2.2693474878474693,
+                "restored_finger_deg": 1.9554485983448207,
+                "forecast_wrist_mm": 13.680251130841668,
+                "forecast_root_deg": 5.092527227473757,
+                "forecast_finger_deg": 4.263847498722153,
+                "samples": 18008,
+                "restored_wrist_median_mm": 5.164708614349365,
+                "restored_wrist_p95_mm": 12.139336585998535,
+                "restored_wrist_worse_than_input_by_1mm_percent": 3.9815638065338135,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.52510070800781
+              },
+              "clean": {
+                "loss": 0.00031149577469304735,
+                "baseline_wrist_mm": 0,
+                "baseline_root_deg": 9.280483110166911e-09,
+                "baseline_finger_deg": 7.47346906417447e-08,
+                "history_hold_wrist_mm": 4.970084117656811,
+                "history_hold_root_deg": 1.7342077729332346,
+                "history_hold_finger_deg": 1.2728858801959515,
+                "restored_wrist_mm": 0.5866513628659912,
+                "restored_root_deg": 0.2744479853674763,
+                "restored_finger_deg": 0.2606476231290732,
+                "forecast_wrist_mm": 7.471173500601634,
+                "forecast_root_deg": 3.3766190387153032,
+                "forecast_finger_deg": 3.1805981265762444,
+                "samples": 18008,
+                "restored_wrist_median_mm": 0.40671470761299133,
+                "restored_wrist_p95_mm": 1.6047269105911255,
+                "restored_wrist_worse_than_input_by_1mm_percent": 11.100622177124023,
+                "restored_wrist_better_than_hold_by_1mm_percent": 68.1808090209961
+              }
+            }
+          },
+          "equal_source_mean": {
+            "noisy": {
+              "loss": 0.012127974503145872,
+              "baseline_wrist_mm": 48.70255070887916,
+              "baseline_root_deg": 23.16176213977474,
+              "baseline_finger_deg": 15.444360225888774,
+              "history_hold_wrist_mm": 8.960748925674096,
+              "history_hold_root_deg": 3.2696204129310855,
+              "history_hold_finger_deg": 2.839215800274562,
+              "restored_wrist_mm": 5.388649589797026,
+              "restored_root_deg": 2.277001155024774,
+              "restored_finger_deg": 1.863296897490967,
+              "forecast_wrist_mm": 12.099737065733157,
+              "forecast_root_deg": 5.042336190843299,
+              "forecast_finger_deg": 3.4718949169819133,
+              "restored_wrist_median_mm": 4.841851711273193,
+              "restored_wrist_p95_mm": 11.004602432250977,
+              "restored_wrist_worse_than_input_by_1mm_percent": 0.22622274234890938,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.28086280822754,
+              "samples": 61370
+            },
+            "missing": {
+              "loss": 0.012259962138842317,
+              "baseline_wrist_mm": 37.209969300189194,
+              "baseline_root_deg": 17.46966544785363,
+              "baseline_finger_deg": 11.021770228628734,
+              "history_hold_wrist_mm": 8.960748925674096,
+              "history_hold_root_deg": 3.2696204129310855,
+              "history_hold_finger_deg": 2.839215800274562,
+              "restored_wrist_mm": 5.389528154574486,
+              "restored_root_deg": 2.281517660739244,
+              "restored_finger_deg": 1.873413582159171,
+              "forecast_wrist_mm": 12.121033001591385,
+              "forecast_root_deg": 5.0479967625744395,
+              "forecast_finger_deg": 3.4879953570050404,
+              "restored_wrist_median_mm": 4.8407301902771,
+              "restored_wrist_p95_mm": 11.101752519607544,
+              "restored_wrist_worse_than_input_by_1mm_percent": 3.5628016591072083,
+              "restored_wrist_better_than_hold_by_1mm_percent": 72.18823051452637,
+              "samples": 61370
+            },
+            "clean": {
+              "loss": 0.00029125996133293083,
+              "baseline_wrist_mm": 0,
+              "baseline_root_deg": 9.123419532890608e-09,
+              "baseline_finger_deg": 7.184124772807819e-08,
+              "history_hold_wrist_mm": 5.232232281353095,
+              "history_hold_root_deg": 1.8298363886074416,
+              "history_hold_finger_deg": 1.068443641131719,
+              "restored_wrist_mm": 0.5452184184843982,
+              "restored_root_deg": 0.2854850889199663,
+              "restored_finger_deg": 0.21949798885468608,
+              "forecast_wrist_mm": 6.283495974270442,
+              "forecast_root_deg": 3.207866633559539,
+              "forecast_finger_deg": 2.4885011772934176,
+              "restored_wrist_median_mm": 0.4068140909075737,
+              "restored_wrist_p95_mm": 1.4016970545053482,
+              "restored_wrist_worse_than_input_by_1mm_percent": 10.993428945541382,
+              "restored_wrist_better_than_hold_by_1mm_percent": 67.6505537033081,
+              "samples": 61370
+            }
+          },
+          "batch_size": 64,
+          "windows_by_dataset": {
+            "dexycb": 394,
+            "hot3d": 15240,
+            "oakink2": 27728,
+            "umetrack": 18008
+          },
+          "indices_sha256_by_dataset": {
+            "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+            "hot3d": "4dfb6950d2baf8fcf44f2bec2b66a4fd7f66ec4542a2977edfed96b731898a2c",
+            "oakink2": "56f5612ea95aae05be9045b2d5a646ec4775329e4fc381f3acfa12291dbc4467",
+            "umetrack": "48909a24c8358c5b9006ba48acdc5d9b32747a12477145f4d4bdeac43fc0165d"
+          },
+          "corruption_seed": 20261137,
+          "aggregation": "equal source mean; within-source mean weighted by sample count"
+        }
+      },
+      "limitations": [
+        "Synthetic current corruption and GT plus synthetic noisy history; no real HaWoR errors or own-output rollout.",
+        "Source-fitted MANO state reference, not independent native sensor/MPJPE/mesh or physical correctness.",
+        "Overlapping held-out windows; full validation is not an independent test or confidence interval.",
+        "Fixed and full window sets differ; their corruption samples have the same distribution, not per-frame identical assignments.",
+        "Last-history hold uses only past input, with the same synthetic history noise as the model.",
+        "Source medians/p95 are within-source window statistics; their equal-source aggregate is a mean of source quantiles, not a pooled quantile."
+      ],
+      "report_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/best/report.json",
+      "report_sha256": "35eda56b5a41faa77c0610e8f7b1bc68f87a30b3bb542c5fcd7e2e311b68f511"
+    }
+  },
+  "controls": {
+    "latest": {
+      "phase": "complete",
+      "utc": "2026-10-15T00:07:41.058873+00:00",
+      "code_version": "9b20493",
+      "checkpoint_step": 32783,
+      "checkpoint_sha256": "43d789c5b88c24ea9697790cbf22194bee9c173ac1ac75ae94407f891a31913e",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+      "batch_size": 64,
+      "corruption_seed": 20261137,
+      "by_dataset": {
+        "dexycb": {
+          "normal_noisy": {
+            "wrist_mm": 5.774820671468822,
+            "root_deg": 2.8671065611282582,
+            "finger_deg": 2.320330636755464,
+            "input_wrist_mm": 50.89970131694968,
+            "input_root_deg": 23.37129775884793,
+            "input_finger_deg": 15.662536441977254,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 394
+          },
+          "history_only": {
+            "wrist_mm": 5.716347425722229,
+            "root_deg": 2.894607201445526,
+            "finger_deg": 2.414249153911765,
+            "input_wrist_mm": 9.663355478780524,
+            "input_root_deg": 3.6830152896455095,
+            "input_finger_deg": 3.124945231500616,
+            "change_from_normal_wrist_mm": 1.0589703766222534,
+            "change_from_normal_root_deg": 0.48279033457567244,
+            "change_from_normal_finger_deg": 0.9092383009528145,
+            "samples": 394
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.6003927409951455,
+            "root_deg": 2.8431992228261107,
+            "finger_deg": 2.151478825486856,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 0.9935842343998439,
+            "change_from_normal_root_deg": 0.4488814836226139,
+            "change_from_normal_finger_deg": 0.7321595800709604,
+            "samples": 394
+          }
+        },
+        "hot3d": {
+          "normal_noisy": {
+            "wrist_mm": 6.136315256357193,
+            "root_deg": 2.5326584577560425,
+            "finger_deg": 1.692555509507656,
+            "input_wrist_mm": 49.09007501602173,
+            "input_root_deg": 22.538347005844116,
+            "input_finger_deg": 15.421098947525024,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 6.160097599029541,
+            "root_deg": 2.5271040201187134,
+            "finger_deg": 1.6952008455991745,
+            "input_wrist_mm": 9.796571433544159,
+            "input_root_deg": 3.5750111043453217,
+            "input_finger_deg": 2.6622969806194305,
+            "change_from_normal_wrist_mm": 1.2456330433487892,
+            "change_from_normal_root_deg": 0.5098084546625614,
+            "change_from_normal_finger_deg": 0.6716939099133015,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.987030267715454,
+            "root_deg": 2.4519038647413254,
+            "finger_deg": 1.5810759663581848,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 1.1577199846506119,
+            "change_from_normal_root_deg": 0.48182292468845844,
+            "change_from_normal_finger_deg": 0.5282796658575535,
+            "samples": 1024
+          }
+        },
+        "oakink2": {
+          "normal_noisy": {
+            "wrist_mm": 4.13315786421299,
+            "root_deg": 1.5713769644498825,
+            "finger_deg": 1.3751635998487473,
+            "input_wrist_mm": 49.09007525444031,
+            "input_root_deg": 22.538347244262695,
+            "input_finger_deg": 15.421098947525024,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 4.07697094976902,
+            "root_deg": 1.5416338220238686,
+            "finger_deg": 1.3495319858193398,
+            "input_wrist_mm": 7.948725700378418,
+            "input_root_deg": 2.615105554461479,
+            "input_finger_deg": 2.4774037450551987,
+            "change_from_normal_wrist_mm": 0.9451122656464577,
+            "change_from_normal_root_deg": 0.3258621022105217,
+            "change_from_normal_finger_deg": 0.49853112548589706,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 4.01803757250309,
+            "root_deg": 1.5310924127697945,
+            "finger_deg": 1.316530205309391,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 0.8591817207634449,
+            "change_from_normal_root_deg": 0.3025506157428026,
+            "change_from_normal_finger_deg": 0.3445101361721754,
+            "samples": 1024
+          }
+        },
+        "umetrack": {
+          "normal_noisy": {
+            "wrist_mm": 5.860079362988472,
+            "root_deg": 2.1589454114437103,
+            "finger_deg": 1.8233072757720947,
+            "input_wrist_mm": 49.09007477760315,
+            "input_root_deg": 22.538347005844116,
+            "input_finger_deg": 15.421098828315735,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 5.8511094599962234,
+            "root_deg": 2.1563405245542526,
+            "finger_deg": 1.8522062748670578,
+            "input_wrist_mm": 8.836717069149017,
+            "input_root_deg": 3.1523174047470093,
+            "input_finger_deg": 2.964920625090599,
+            "change_from_normal_wrist_mm": 1.2432079277932644,
+            "change_from_normal_root_deg": 0.46599872410297394,
+            "change_from_normal_finger_deg": 0.8243282549083233,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.663382589817047,
+            "root_deg": 2.1046734005212784,
+            "finger_deg": 1.6655611917376518,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 1.1618499048054218,
+            "change_from_normal_root_deg": 0.4327742885798216,
+            "change_from_normal_finger_deg": 0.6252225767821074,
+            "samples": 1024
+          }
+        }
+      },
+      "equal_source_mean": {
+        "normal_noisy": {
+          "wrist_mm": 5.47609328875687,
+          "root_deg": 2.2825218486944734,
+          "finger_deg": 1.8028392554709907,
+          "input_wrist_mm": 49.54248159125372,
+          "input_root_deg": 22.746584753699715,
+          "input_finger_deg": 15.481458291335759,
+          "change_from_normal_wrist_mm": 0,
+          "change_from_normal_root_deg": 0,
+          "change_from_normal_finger_deg": 0,
+          "samples": 3466
+        },
+        "history_only": {
+          "wrist_mm": 5.451131358629254,
+          "root_deg": 2.27992139203559,
+          "finger_deg": 1.8277970650493343,
+          "input_wrist_mm": 9.06134242046303,
+          "input_root_deg": 3.25636233829983,
+          "input_finger_deg": 2.807391645566461,
+          "change_from_normal_wrist_mm": 1.1232309033526913,
+          "change_from_normal_root_deg": 0.4461149038879324,
+          "change_from_normal_finger_deg": 0.7259478978150841,
+          "samples": 3466
+        },
+        "correct_current_noisy_history": {
+          "wrist_mm": 5.317210792757685,
+          "root_deg": 2.2327172252146275,
+          "finger_deg": 1.678661547223021,
+          "input_wrist_mm": 0,
+          "input_root_deg": 0,
+          "input_finger_deg": 0,
+          "change_from_normal_wrist_mm": 1.0430839611548306,
+          "change_from_normal_root_deg": 0.4165073281584241,
+          "change_from_normal_finger_deg": 0.5575429897206992,
+          "samples": 3466
+        }
+      },
+      "optimizer_updates": 0,
+      "scope": "Fixed training-val subset; synthetic interventions with identical noisy history. Correct-current uses oracle current target and quality=1 as a diagnostic, not deployable extra GT or proof of physics.",
+      "indices_sha256_by_dataset": {
+        "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+        "hot3d": "cd5eed0bc36211d337d2a85539aa620c834b42a1d4fe4728080033b9aa1ecaa7",
+        "oakink2": "9cf3c7bfae5e54174d06cf43b3d8fc6cadb9b01a0225bce7a00dd9376a447e87",
+        "umetrack": "eb7b771fc58196dddc5d3b145dc93d92bc238230e3b92458fe5f999d1255c7c9"
+      }
+    },
+    "best": {
+      "phase": "complete",
+      "utc": "2026-10-15T00:07:41.039339+00:00",
+      "code_version": "9b20493",
+      "checkpoint_step": 28000,
+      "checkpoint_sha256": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+      "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+      "batch_size": 64,
+      "corruption_seed": 20261137,
+      "by_dataset": {
+        "dexycb": {
+          "normal_noisy": {
+            "wrist_mm": 5.514607703020125,
+            "root_deg": 2.6945100102932926,
+            "finger_deg": 2.355296915557784,
+            "input_wrist_mm": 50.89970131694968,
+            "input_root_deg": 23.37129775884793,
+            "input_finger_deg": 15.662536441977254,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 394
+          },
+          "history_only": {
+            "wrist_mm": 5.4915139566218185,
+            "root_deg": 2.7277784801376654,
+            "finger_deg": 2.433068484824321,
+            "input_wrist_mm": 9.663355478780524,
+            "input_root_deg": 3.6830152896455095,
+            "input_finger_deg": 3.124945231500616,
+            "change_from_normal_wrist_mm": 1.1560587580433956,
+            "change_from_normal_root_deg": 0.5156024485675211,
+            "change_from_normal_finger_deg": 0.9423619042798347,
+            "samples": 394
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.3443661486436875,
+            "root_deg": 2.635581447388315,
+            "finger_deg": 2.1759763774532956,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 1.1042059115346918,
+            "change_from_normal_root_deg": 0.4857620633193079,
+            "change_from_normal_finger_deg": 0.7549421587571274,
+            "samples": 394
+          }
+        },
+        "hot3d": {
+          "normal_noisy": {
+            "wrist_mm": 6.124908894300461,
+            "root_deg": 2.546629101037979,
+            "finger_deg": 1.7660393938422203,
+            "input_wrist_mm": 49.09007501602173,
+            "input_root_deg": 22.538347005844116,
+            "input_finger_deg": 15.421098947525024,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 6.158982843160629,
+            "root_deg": 2.5380077213048935,
+            "finger_deg": 1.7536619007587433,
+            "input_wrist_mm": 9.796571433544159,
+            "input_root_deg": 3.5750111043453217,
+            "input_finger_deg": 2.6622969806194305,
+            "change_from_normal_wrist_mm": 1.269511666148901,
+            "change_from_normal_root_deg": 0.5229758266359568,
+            "change_from_normal_finger_deg": 0.7446432299911976,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.9308262169361115,
+            "root_deg": 2.447176367044449,
+            "finger_deg": 1.6329718381166458,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 1.2084639072418213,
+            "change_from_normal_root_deg": 0.49948043562471867,
+            "change_from_normal_finger_deg": 0.5744161158800125,
+            "samples": 1024
+          }
+        },
+        "oakink2": {
+          "normal_noisy": {
+            "wrist_mm": 4.206606552004814,
+            "root_deg": 1.59346554428339,
+            "finger_deg": 1.4165610149502754,
+            "input_wrist_mm": 49.09007525444031,
+            "input_root_deg": 22.538347244262695,
+            "input_finger_deg": 15.421098947525024,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 4.176790773868561,
+            "root_deg": 1.5655107721686363,
+            "finger_deg": 1.3844592049717903,
+            "input_wrist_mm": 7.948725700378418,
+            "input_root_deg": 2.615105554461479,
+            "input_finger_deg": 2.4774037450551987,
+            "change_from_normal_wrist_mm": 0.9359860755503178,
+            "change_from_normal_root_deg": 0.31774646043777466,
+            "change_from_normal_finger_deg": 0.5557324774563313,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 4.085495188832283,
+            "root_deg": 1.5407874286174774,
+            "finger_deg": 1.3392250165343285,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 0.8438736870884895,
+            "change_from_normal_root_deg": 0.2946127010509372,
+            "change_from_normal_finger_deg": 0.3862897288054228,
+            "samples": 1024
+          }
+        },
+        "umetrack": {
+          "normal_noisy": {
+            "wrist_mm": 5.938198432326317,
+            "root_deg": 2.2051849737763405,
+            "finger_deg": 1.8911843672394753,
+            "input_wrist_mm": 49.09007477760315,
+            "input_root_deg": 22.538347005844116,
+            "input_finger_deg": 15.421098828315735,
+            "change_from_normal_wrist_mm": 0,
+            "change_from_normal_root_deg": 0,
+            "change_from_normal_finger_deg": 0,
+            "samples": 1024
+          },
+          "history_only": {
+            "wrist_mm": 5.908379375934601,
+            "root_deg": 2.194113165140152,
+            "finger_deg": 1.9182826206088066,
+            "input_wrist_mm": 8.836717069149017,
+            "input_root_deg": 3.1523174047470093,
+            "input_finger_deg": 2.964920625090599,
+            "change_from_normal_wrist_mm": 1.2558450289070606,
+            "change_from_normal_root_deg": 0.4835390467196703,
+            "change_from_normal_finger_deg": 0.9028372764587402,
+            "samples": 1024
+          },
+          "correct_current_noisy_history": {
+            "wrist_mm": 5.709441766142845,
+            "root_deg": 2.129047878086567,
+            "finger_deg": 1.7141087353229523,
+            "input_wrist_mm": 0,
+            "input_root_deg": 0,
+            "input_finger_deg": 0,
+            "change_from_normal_wrist_mm": 1.2140372805297375,
+            "change_from_normal_root_deg": 0.4546432252973318,
+            "change_from_normal_finger_deg": 0.6707524955272675,
+            "samples": 1024
+          }
+        }
+      },
+      "equal_source_mean": {
+        "normal_noisy": {
+          "wrist_mm": 5.446080395412929,
+          "root_deg": 2.2599474073477506,
+          "finger_deg": 1.8572704228974386,
+          "input_wrist_mm": 49.54248159125372,
+          "input_root_deg": 22.746584753699715,
+          "input_finger_deg": 15.481458291335759,
+          "change_from_normal_wrist_mm": 0,
+          "change_from_normal_root_deg": 0,
+          "change_from_normal_finger_deg": 0,
+          "samples": 3466
+        },
+        "history_only": {
+          "wrist_mm": 5.433916737396403,
+          "root_deg": 2.256352534687837,
+          "finger_deg": 1.8723680527909154,
+          "input_wrist_mm": 9.06134242046303,
+          "input_root_deg": 3.25636233829983,
+          "input_finger_deg": 2.807391645566461,
+          "change_from_normal_wrist_mm": 1.1543503821624188,
+          "change_from_normal_root_deg": 0.45996594559023074,
+          "change_from_normal_finger_deg": 0.7863937220465259,
+          "samples": 3466
+        },
+        "correct_current_noisy_history": {
+          "wrist_mm": 5.267532330138732,
+          "root_deg": 2.188148280284202,
+          "finger_deg": 1.7155704918568055,
+          "input_wrist_mm": 0,
+          "input_root_deg": 0,
+          "input_finger_deg": 0,
+          "change_from_normal_wrist_mm": 1.092645196598685,
+          "change_from_normal_root_deg": 0.43362460632307387,
+          "change_from_normal_finger_deg": 0.5966001247424575,
+          "samples": 3466
+        }
+      },
+      "optimizer_updates": 0,
+      "scope": "Fixed training-val subset; synthetic interventions with identical noisy history. Correct-current uses oracle current target and quality=1 as a diagnostic, not deployable extra GT or proof of physics.",
+      "indices_sha256_by_dataset": {
+        "dexycb": "0e8f280d3074de5697f960e62852d5752e5944b864487f6065054af269a0bc54",
+        "hot3d": "cd5eed0bc36211d337d2a85539aa620c834b42a1d4fe4728080033b9aa1ecaa7",
+        "oakink2": "9cf3c7bfae5e54174d06cf43b3d8fc6cadb9b01a0225bce7a00dd9376a447e87",
+        "umetrack": "eb7b771fc58196dddc5d3b145dc93d92bc238230e3b92458fe5f999d1255c7c9"
+      }
+    }
+  },
+  "summary": {
+    "latest_full_noisy_wrist_mm": 5.434535370865815,
+    "latest_full_noisy_finger_deg": 1.8078195820899536,
+    "latest_full_clean_wrist_mm": 0.4543877318855498,
+    "latest_full_clean_wrist_worse_by_1mm_percent_macro": 6.888787463307381,
+    "fixed_normal_noisy_wrist_mm": 5.47609328875687,
+    "fixed_history_only_wrist_mm": 5.451131358629254,
+    "fixed_correct_current_noisy_history_wrist_mm": 5.317210792757685,
+    "interpretation": "Temporal restoration improves over last-history hold, but these input controls indicate dominant reliance on history and inadequate preservation of accurate current observations when the history is noisy. This is not proof of zero current-input dependence.",
+    "cause_hypothesis": "Training code gives histories 4mm/1.5deg noise vs current 25mm/12deg/8deg, clean cases remove both noises together, and quality hints are not calibrated to actual errors. These settings may favor the history; no corrective retraining was performed."
+  },
+  "coverage": {
+    "fixed_windows_per_model_per_mode": 3466,
+    "full_windows_per_model_per_mode": 61370,
+    "full_by_source": {
+      "oakink2": 27728,
+      "hot3d": 15240,
+      "umetrack": 18008,
+      "dexycb": 394
+    },
+    "modes": [
+      "noisy",
+      "missing",
+      "clean"
+    ],
+    "aggregation": "Within-source sample mean, then equal mean of four sources; percent and quantile macro averages are not pooled proportions/quantiles."
+  },
+  "artifacts": {
+    "remote_root": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1",
+    "figure": "reports/figures/twm_paused_20261014.png",
+    "plot_code_version": "9b204935a840112b05cfb6239e94b9e15fab7e26",
+    "initial_launch_failure": "First controller mkdir lacked parents=True; failed before snapshots or inference; repaired directory creation and launched once."
+  },
+  "limits": [
+    "Synthetic corruption and GT-based histories, not real HaWoR estimates or own-history closed-loop rollout.",
+    "Fitted MANO reference wrist/rotations, not independent raw-sensor accuracy or joint/mesh reconstruction.",
+    "Full validation overlaps and is used for tuning; no independent test claim or confidence interval.",
+    "Correct-current/noisy-history is a deliberately privileged diagnostic intervention, not inference using unavailable GT.",
+    "Earlier best has slightly lower selection loss, while latest has lower mean finger and clean errors; no universal winner or deployment approval."
+  ],
+  "completion_verification": {
+    "utc": "2026-10-15T00:12:06.098904+00:00",
+    "training_phase": "stopped",
+    "training_step": 32783,
+    "STOP_retained": true,
+    "checkpoints": {
+      "latest": {
+        "step": 32783,
+        "unchanged_source_and_snapshot": true,
+        "sha256": "43d789c5b88c24ea9697790cbf22194bee9c173ac1ac75ae94407f891a31913e",
+        "report_sha256": "682ad9ae76ec1ff093740a5ad7b51c78acfbf0f519f55b0602e7639b559931f5",
+        "controls_sha256": "1027fc4baae1cbacbe33245d6c52c47279b79e3edb8459817f46bd409d26e4b5"
+      },
+      "best": {
+        "step": 28000,
+        "unchanged_source_and_snapshot": true,
+        "sha256": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+        "report_sha256": "35eda56b5a41faa77c0610e8f7b1bc68f87a30b3bb542c5fcd7e2e311b68f511",
+        "controls_sha256": "d305fde0d884eef2c5c92d5db0dfbb3d268d185c5a97a0fffdcc12a865d1c85d"
+      }
+    },
+    "gpu_compute_apps": "",
+    "evaluation_pids_finished": {
+      "3220": true,
+      "3231": true,
+      "3304": true,
+      "3305": true
+    }
+  }
+}

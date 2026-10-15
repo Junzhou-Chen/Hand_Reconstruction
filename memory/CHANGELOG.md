@@ -261,6 +261,15 @@
 - 19:52:33 UTC正式actualstep26450（新增104更新），四源累计实际106,496=104×1024样本，各rank53,248且四源均正；loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态比较。updated checkpoint26350已CPU读取，163个model/489个AdamW浮点张量finite、Adam step26350，CPU重算完整模型hash与两rank/replica audit一致。19:52:47 UTC两卡瞬时util100%、显存38,172/36,686MiB，PID2968/2969；不是稳态或峰值结论。保存checkpoint步数与后续running快照分开，尚未完成50k。[双卡运行记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json)。
 - 仅更新MEMORY、决策、进展、开发远程与CHANGELOG五份记忆，将active run统一为D27双卡；未修改数学文档、模型任务或数据协议。
 
+## 2026-10-14 D28暂停旧dense TWM与冻结效果验证
+
+- 用户要求暂停当前运行、保留checkpoint并先验证效果；通过STOP共同保存在32,783步停止，rank2968/2969退出，不自动resume。仅针对D27旧dense 6.33M结构化Mamba，未修改其他并行模型或用户Job。
+- latest32,783/best28,000模型与AdamW finite，原文件及评测快照SHA一致；00:12:06 UTC复核STOP/暂停状态、4个只读评测进程结束及GPU无活跃计算，原产物保留。
+- 新增冻结评测c8e9a8d、控制/绘图9b20493，全部Pod执行；固定3,466窗、全量61,370窗/模式，best原fixed选定指标复现差0、控制normal与fixed逐库一致，未读test或改split。
+- latest全量noisy腕48.703→5.435mm、finger15.444→1.808°，hold8.961mm/2.839°；clean腕0→0.454mm，四库宏平均6.89%窗增加>1mm。best full noisy腕5.389mm略好，finger/clean较差，两者有取舍。
+- 固定干预normal5.476mm、当前全缺5.451mm、当前GT＋带噪历史5.317mm；模型能改变输出但平均GT误差对当前可靠观测利用不足，主要历史先验。记录训练噪声/质量提示设计的原因假设，不当已验证修复、真实HaWoR收益或物理失败定理。
+- 保存[完整报告](../docs/TWM_PAUSED_EVAL_2026-10-14.md)、[小型JSON](../reports/twm_paused_eval_20261014.json)与[实测图](../reports/figures/twm_paused_20261014.png)，更新当前记忆，未恢复训练。初次包装器缺评测父目录导致mkdir前置失败，修复后首次启动，无评测数据丢失。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

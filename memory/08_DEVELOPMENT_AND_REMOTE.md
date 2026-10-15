@@ -2,6 +2,10 @@
 
 更新日期：2026-10-14。D13/D14为原GitHub与远程分工约定；最新D19因hongfei GPU占用改用ssh ds，并明确授权复用用户预申请Pod。已定约定与下文建议路径分别标注。
 
+**当前D28：** 用户主动要求暂停并先验证效果。正式DDP run在32,783步通过STOP共同保存，23:53:53 UTC停止，rank2968/2969已退出，launcher僵尸不算活跃训练；checkpoint原目录保留。禁止当故障自动resume/删STOP/重启Job，效果验证单独在`data10/Hand_Reconstruction/evaluations/twm_paused_20261014_v1`保存快照与结果。
+
+**D28验证完成：** `evaluations/twm_paused_20261014_v1/snapshots/{latest,best}.pt`分别32,783/28,000步，SHA43d789c5…/b2319b83…，模型与AdamW finite；00:12:06 UTC复核与原文件hash一致、STOP保留，4个评测PID已退出、GPU无活跃计算。`{latest,best}/{report.json,controls.json}`、`pause_and_launch.json`与`completion_verification.json`保存完整结果。冻结普通评测c8e9a8d、输入干预9b20493，原训练10aa983；项目Torch2.10 runtime推理，既有zhou只绘图，没有本地模型运算/optimizer更新。best原训练fixed选定指标复现差0，控制normal与fixed逐库一致；full每模式61,370窗。latest全量noisy腕5.435mm、clean退化0.454mm，GT当前＋带噪历史5.317mm暴露历史主导；这不是其他并行模型的效果。[暂停实测](../docs/TWM_PAUSED_EVAL_2026-10-14.md)、[小型汇总](../reports/twm_paused_eval_20261014.json)。
+
 ## GitHub与版本管理
 
 - 远程：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`。

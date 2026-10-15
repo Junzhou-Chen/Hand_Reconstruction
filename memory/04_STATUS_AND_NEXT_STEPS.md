@@ -2,6 +2,8 @@
 
 更新日期：2026-10-14。该状态仅适用于当前工作区 `/Users/junzhou/Project/Visual_Hand_Reconstruction`。
 
+**D28当前优先状态：** 用户要求暂停并保留checkpoint、先验证效果。D27正式双卡已在32,783步共同保存退出（23:53:53 UTC/纽约19:53），STOP保留，不自动resume；冻结latest/best的固定＋全量61,370个val窗口及输入干预已完成；latest全量noisy腕5.435mm，去掉当前观测的固定窗5.451mm≈正常5.476mm，当前GT＋带噪历史仍5.317mm。证据见[暂停评测](../docs/TWM_PAUSED_EVAL_2026-10-14.md)。后文双卡启动/26,450快照属于历史，不表示当前仍在训练。
+
 ## 已有和未有的产物
 
 | 项目 | 当前状态 | 证据 |
@@ -18,7 +20,7 @@
 | DexYCB / ARCTIC获取 | Dex13包127.61GB已complete，全verified/failed0；D22 ARCTIC暂缓 | [完成与安排](../docs/COMPARISON_DATA_DOWNLOADS.md)；ARCTIC保留清单、无数据包下载 |
 | 四库实际标注与TWM适用检查 | 字段抽查后已完成Meta官方18帧decoder等价、Dex左右各6帧与bounded train/val FK对照、Oak full每序列32帧编码FK往返；真实四库3步smoke finite | [审计](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)、[adapter摘要](../reports/twm_four_source_adapters_20261014.json)；实现一致性不是独立GT精度；四库正式训练已启动，尚非50k完成 |
 | D26四库全量准备与单卡历史 | 四库均complete，8,418手序列，train/val状态2,788,135/271,100；旧单卡已SIGTERM保存停止于26,346步 | [四库协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)、[单卡启动验收](../reports/twm_four_source_20261014_launch.json)；19:07数据/验证快照保留为历史，不再是active run |
-| 当前D27双GPU、大batch训练 | 10aa983于19:47:53 UTC迁移启动；每卡512/global1024，19:52:33 UTC实际26,450步，尚未完成50k | [双卡运行记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json)；正式26,350 checkpoint两rank完整模型hash相等，CPU检查163个model及489个AdamW浮点张量finite；smoke/resume/单rank停机验收已过 |
+| D27双GPU、大batch训练历史（D28已暂停32,783步） | 10aa983于19:47:53 UTC迁移启动；每卡512/global1024，19:52:33 UTC实际26,450步，尚未完成50k | [双卡运行记录](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[验收摘要](../reports/twm_dual_gpu_20261014.json)；正式26,350 checkpoint两rank完整模型hash相等，CPU检查163个model及489个AdamW浮点张量finite；smoke/resume/单rank停机验收已过 |
 | 合法MANO资产与shape约定 | 用户自行官网注册、确认许可并授权下载；原始/派生模型SHA与数值兼容通过。跨源左手shape约定审计已发现差异，本轮工程配置关闭β conditioning | [资产/adapter摘要](../reports/twm_four_source_adapters_20261014.json)；β及真实validity仍另存，99D动态状态不变，不是用户指定永久关闭 |
 | HaWoR训练与对比数据复核 | 主定量HOT Aria27 validation与DexYCB test；四库视觉训练、单HOT infiller、EPIC定性已核 | [数据与协议](../docs/HAWOR_DATA_AND_COMPARISON_PROTOCOL.md)；GT crop/右手/100帧及Dex s0入口要固定，尚无baseline推理 |
 | 产业数采数据扩查 | 已补充首轮遗漏的公司/联盟/聚合资源 | [补充调查](09_INDUSTRY_HAND_DATASETS_2026-10-13.md)，按公开程度和人体字段筛选 |
@@ -36,9 +38,11 @@
 | ds计算环境 | 已核用户Pod12CPU/128Gi/两张Blackwell；zhou CUDA两卡tiny check通过，默认镜像环境失败 | [操作记录](../docs/DS_SERVER_OPERATIONS.md)；D23已用zhou在GPU0训练TWM |
 | 模型源码、训练依赖、权重、训练就绪数据 | 首版821,516参数TWM/Oak64train与8val子集/远程数值检查及训练已建立；旧run按D24暂停28,213步；D25新6.33M结构化Mamba实现并正常完成50k | [新模型最终记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)；新378deda/旧4cb1da8，checkpoint仅data10 |
 | anchor codec、HaWoR adapter、TWM、Corrector | Oak quaternion→99D、受损历史anchor与TWM已有pilot实现；HaWoR adapter/独立Corrector/视觉取证未实现 | [训练入口](../scripts/train_twm.py)、[模型](../src/handloop/models/twm.py)；不存在完整视觉闭环结果 |
-| 实验和性能、投稿和录用 | D25 Oak合成受损恢复50k最终结果已核；D26单卡已停止26,346步，D27双卡正在继续，完整方法/论文尚未完成 | [D25结果](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)同时报告clean退化；双卡启动/恢复验收不当真实HaWoR收益或50k最终结果 |
+| 实验和性能、投稿和录用 | D25 Oak合成受损恢复50k最终结果已核；D26单卡已停止26,346步，D27双卡已按D28保存停止32,783步并完成冻结验证，完整方法/论文尚未完成 | [D25结果](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)同时报告clean退化；双卡启动/恢复验收不当真实HaWoR收益或50k最终结果 |
 
 ## 第一项可反驳问题
+
+**D28实测（旧dense结构化Mamba）：** latest32,783/best28,000都已冻结评测，3,466固定窗、61,370全量窗/模式。best原fixed选定指标复现差0；latest全量noisy腕48.703→5.435mm、root23.162→2.302°、finger15.444→1.808°，last-history hold为8.961mm/3.270°/2.839°。clean腕退化0.454mm、四库等权平均6.89%窗口增加>1mm腕误差。固定输入干预：normal5.476mm、整手当前缺失5.451mm、GT当前＋同一带噪历史5.317mm；后两者root2.280/2.233°、finger1.828/1.679°。这提示历史主导和可靠当前观测利用不足，而非完全零输入依赖（去掉当前预测仍变化1.123mm/0.446°/0.726°）。best full noisy腕5.389mm略小，但finger/clean更差，不是全指标赢家。原因假设来自history4mm/1.5° vs current25mm/12°/8°、clean同时去噪、quality未按真实误差标定；未改训练验证该假设。仅合成与拟合MANO参考，不是native传感器或真实HaWoR/闭环/物理保证。[报告与路径](../docs/TWM_PAUSED_EVAL_2026-10-14.md)。
 
 在统一时间戳、骨架、坐标与 GT 条件下，**独立轨迹预训练的 current-state restoration 能否改善真实 HaWoR errors，并超过 smoothing/Kalman/普通 temporal model？**
 
@@ -48,7 +52,7 @@
 
 D23先跑Oak64 train/8 val子集，D24主动暂停旧flat于28,213步，best27,500保留；D25结构化Mamba以378deda在纽约08:57正常完成50k，latest50k/best49.5k可读且finite。最终合成noisy腕4.594mm/finger1.254°、clean退化1.276mm/0.500°，仅参考历史＋合成错误恢复；旧run不恢复。[D25最终记录](../docs/TWM_STRUCTURED_MAMBA_RUN_2026-10-14.md)。
 
-**当前执行是D27双GPU、大batch的四库联合预训练。** 用户要求“两张卡一起跑、batch调高”；它替代D26的单卡执行配置，不改变已授权的Oak/HOT/Ume/Dex范围、结构化Mamba、99D当前恢复、β另存/conditioning暂关、源GT及split。旧单卡源码2b40aa9790c1d18651d6ac810d23a72d3c7a5922从头训练阶段已保存停止于26,346步，run与历史验证保留；新双卡10aa98327eeaa3ff0afb49eef1e6ff73879c7d22迁移模型、AdamW和绝对步数，重建rank RNG/采样。库间等概率、库内窗口均匀、固定分库验证/宏平均和每卡512均为工程选择，非最优结论；trainer仍只接完整17组参考GT，native/raw joints未补造成完整99D。
+**当前D28已暂停D27旧dense run并完成冻结验证；以下D27为训练历史。** 用户要求“两张卡一起跑、batch调高”；它替代D26的单卡执行配置，不改变已授权的Oak/HOT/Ume/Dex范围、结构化Mamba、99D当前恢复、β另存/conditioning暂关、源GT及split。旧单卡源码2b40aa9790c1d18651d6ac810d23a72d3c7a5922从头训练阶段已保存停止于26,346步，run与历史验证保留；新双卡10aa98327eeaa3ff0afb49eef1e6ff73879c7d22迁移模型、AdamW和绝对步数，重建rank RNG/采样。库间等概率、库内窗口均匀、固定分库验证/宏平均和每卡512均为工程选择，非最优结论；trainer仍只接完整17组参考GT，native/raw joints未补造成完整99D。
 
 已验收的事实与范围：
 
@@ -69,7 +73,7 @@ D23先跑Oak64 train/8 val子集，D24主动暂停旧flat于28,213步，best27,5
 | 四库smoke | `runs/twm_four_sources_smoke_20261014`；`audits/four_source_smoke_20261014/receipt.json` |
 | 四库collection | `prepared/twm_four_sources_99d_v1/manifest.json`，完整检查通过且四个leaf SHA匹配 |
 | D26单卡历史run | `runs/twm_four_sources_structured_mamba_20261014`；已saved/stopped26346，旧coordinator为`audits/four_source_training_coordinator_20261014/status.json` |
-| 当前D27双卡正式run | `runs/twm_four_sources_structured_mamba_ddp_20261014`；launcher2963、ranks2968/2969、GPU0/1 |
+| D27双卡run（D28已暂停） | `runs/twm_four_sources_structured_mamba_ddp_20261014`；launcher2963、ranks2968/2969、GPU0/1 |
 | 双卡smoke/恢复验收 | `runs/twm_ddp_smoke_20261014_v1`；对应`audits/twm_ddp_smoke_20261014_v1` |
 | GPU1 batch探针 | `audits/twm_batch_gpu1_20261014_v1/{receipt.json,process.json,benchmark.log}` |
 | 正式双卡CPU验收receipt | `audits/twm_ddp_formal_20261014/launch_receipt.json`；checkpoint26350模型/AdamW finite，CPU完整模型hash与两rank一致 |
@@ -91,17 +95,17 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 **D26单卡历史快照19:07:32 UTC：** step18,550/50,000、phase=training，约4.21step/s；742条training记录loss/梯度有限，四源累计样本Dex297154/HOT296754/Oak295896/Ume297396。step18,000固定val子集共3,466窗/模式，四库等权noisy腕49.542→6.155mm、root22.747→2.512°、finger15.481→2.153°；missing腕37.897→6.066mm。clean退化腕2.925mm、root1.456°、finger1.388°，必须同报。此为合成受损当前恢复的中途快照，不是最终50k、独立joint/mesh精度或真实HaWoR结果；分库与forecast数值在启动JSON。19:02 checkpoint CPU读取检查仍单独按当时17000/16000记录。
 
-**D27双卡最新执行与验收：** GPU1 batch128/256/512/768/1024探针均finite；512/卡峰值allocated34.16GiB/reserved34.79GiB、240.7样本/s，768/1024为237.3/229.2样本/s。工程选512/卡、global1024；上述是排除loader/DDP的单卡探针，不是正式端到端吞吐。验证仍`eval_batch_size=64`、`eval_batches=16`，保留原窗口集合与corruption批次切分，Dex实际394窗。LR与原50,000优化步计划保持，剩余23,654×1024=24,221,696样本抽取，是旧batch64剩余预算的16倍。
+**D27双卡运行历史与验收（D28已暂停）：** GPU1 batch128/256/512/768/1024探针均finite；512/卡峰值allocated34.16GiB/reserved34.79GiB、240.7样本/s，768/1024为237.3/229.2样本/s。工程选512/卡、global1024；上述是排除loader/DDP的单卡探针，不是正式端到端吞吐。验证仍`eval_batch_size=64`、`eval_batches=16`，保留原窗口集合与corruption批次切分，Dex实际394窗。LR与原50,000优化步计划保持，剩余23,654×1024=24,221,696样本抽取，是旧batch64剩余预算的16倍。
 
 双卡smoke实际26346→26446共100更新，随后真实DDP resume并仅对rank1发SIGTERM，两rank共同保存stopped26498；CPU检查163个model浮点张量及499个Adam递归浮点项（含超参，非499个张量）finite，两rank完整模型state的keys/dtype/shape/bytes SHA一致。正式迁移源是旧单卡latest26346，SHA256 `09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f`，不是smoke26498。正式run于19:47:53 UTC启动，launcher2963，rank0/1为2968/2969并使用GPU0/1；19:52:33 UTC actual step26450（迁移后104更新），四源实际累计抽取106,496=104×1024样本，各rank53,248且四源均正；该step loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态吞吐比较。updated checkpoint26350已独立CPU读取，163个model及489个AdamW浮点张量finite、Adam step26350；CPU重算完整模型hash与两rank及replica audit相等。19:52:47 UTC两卡瞬时util100%、显存38,172/36,686MiB，PID2968/2969；这不是长期利用率或峰值显存结论。严格逐样本resume未成立，sampler预取块/loader游标仍未完整保存。[运行与验收](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[摘要](../reports/twm_dual_gpu_20261014.json)。
 
-下一步按真实状态检查D27 run是否完成、后续checkpoint与分库noisy/missing/clean表现；不自动重启下载、准备或已运行训练。50k最终结果尚未核验，也不能把D25的50k挪作D26结果。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
+下一步按D28保持旧dense run暂停，先复查当前观测/历史可靠性与corruption设计，再考虑真实HaWoR验证。D27未完成50k；不自动重启下载、准备或训练。50k最终结果尚未核验，也不能把D25的50k挪作D26结果。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
 | P0 传感器split与状态契约 | D26四库full/collection工程验收已完成；后续glove source/session与native/raw joint几何桥接 | 分组split、单位/dt、源解码/FK残差、完整GT mask与provenance；不混淆roundtrip和独立精度 |
 | P1 视觉与参考对齐 | 导出 pre-infiller 原状态、raw mask、时间戳、相机/crop 变换；保留 world 转换；构造 canonical GT | 投影图与 roundtrip 通过；原始视觉误差可计算；full/pre-infiller 分开 |
-| P2 纯轨迹恢复 baseline | D25已完成50k；D26单卡停止26,346步，D27双卡继续，尚未完成50k；current restoration主任务＋0.1s短预测 | 后续checkpoint检查、分库clean/noisy/missing、宏平均与累计样本量；真实前端误差/自身rollout、GRU公平对照待补 |
+| P2 纯轨迹恢复 baseline | D25已完成50k；D26单卡停止26,346步，D27已暂停32,783步，冻结评测完成，尚未完成50k；current restoration主任务＋0.1s短预测 | 后续checkpoint检查、分库clean/noisy/missing、宏平均与累计样本量；真实前端误差/自身rollout、GRU公平对照待补 |
 | P3 最小真实视觉修正 | 冻结视觉和 TWM；先做一次状态修正 | 相同训练/GT 条件下真实几何误差变化，含准确点退化；此步不声称完成视觉重取证贡献 |
 | P4 有效帧内迭代 | 实现真实 image evidence 读取与可靠性重估，候选改变查询位置 | 1/2/3 轮、有无独立重取证、固定 gate 对照；记录计算开销 |
 | P5 时间反馈训练 | 最终状态与质量一次回灌，短序列自身输出 rollout | feedback/no-feedback 与 rollout/no-rollout；再可见恢复、突发动作、误差累积 |
@@ -150,4 +154,4 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 **2026-10-14数学讨论新增：** 用户再次要求证明当前Mamba的物理/数学性质。已完成源码2b40aa9与官方Mamba scan核查及条件性推导，见[物理证明§8–12](../docs/TWM_PHYSICAL_GUARANTEES_AND_VALIDATION_2026-10-14.md#8-2026-10-14当前mamba-twm的证明范围复核)。SO(3)更新已实现；固定β内部FK与anchor-wrapper等变各有限定；条件恢复理想风险、旋转→内部joint误差界和pre-LN Mamba内部boundedness可推导。完整反馈收缩、真实HaWoR收益与独立物理正确性未证明。本轮没有远程数值实验或训练修改，四库执行状态仍以其真实运行记录为准。
 
-> 先读MEMORY.md、docs/TWM_DUAL_GPU_RUN_2026-10-14.md与reports/twm_dual_gpu_20261014.json；四库数据/单卡历史另见docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md。D25 Oak结构化Mamba50k已完成、旧flat stopped28,213、D26四库单卡saved/stopped26,346，均保留不重启。当前D27按用户要求使用两卡，每卡512/global1024；10aa983于19:47:53 UTC在现有Pod启动launcher2963、ranks2968/2969/GPU0/1，新run为data10项目根runs/twm_four_sources_structured_mamba_ddp_20261014。19:52:33 UTC actualstep26,450，迁移后104更新/106,496样本；正式checkpoint26,350的163个model/489个AdamW浮点张量CPU检查finite，Adam step26350、两rank完整模型hash与CPU重算一致。smoke26346→26446及实际resume后仅rank1 SIGTERM共同保存stopped26498已验；仍不宣称逐样本精确续跑。LR与50k优化步计划未变，剩余样本预算16倍；验证64×16上限、Dex实际394窗保持。先只读查询现有双卡run，不重启下载/转换/训练。99D、源GT/split、β另存与conditioning暂关、D18精度优先、D22 ARCTIC暂缓均不变。数据/资产/权重/raw logs仅远程data10，代码/小摘要同步Git。
+> 先读MEMORY.md、docs/TWM_PAUSED_EVAL_2026-10-14.md及reports/twm_paused_eval_20261014.json。D28按用户要求暂停旧6.33M dense DDP，STOP保存停止32,783步，禁止自动resume；latest32,783和best28,000原件及评测快照hash相同，模型/AdamW finite。固定3,466窗、full61,370窗/模式与输入干预全部完成，原best fixed指标复现差0。latest full noisy腕48.703→5.435mm、finger15.444→1.808°，但固定normal5.476mm≈整手当前缺失5.451mm，当前GT＋带噪历史仍5.317mm，提示历史主导及可靠当前观测利用不足；原因假设需另行验证，未重新训练。全部模型评测已退出，不当真实HaWoR/独立GT/物理保证。远程产物在data10项目根evaluations/twm_paused_20261014_v1，旧run仍runs/twm_four_sources_structured_mamba_ddp_20261014。D25已完成50k、D26停止26,346及D27启动记录保留为历史；本条不涉及其他并行模型。

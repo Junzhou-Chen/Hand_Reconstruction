@@ -8,7 +8,9 @@
 
 ## 当前真实进展
 
-工作区原有材料为5份Markdown研究文档和1张早期PNG方法图；当前已增加研究记忆、数据获取/转换与模型训练源码，进入**D27双GPU、大batch的四库联合纯轨迹预训练**。旧flat模型按D24暂停于28,213步；D25的Oak子集结构化Mamba已正常完成50,000步。D26四库单卡阶段已SIGTERM保存并停止于26,346步；D27以10aa983迁移模型、AdamW与绝对步数至独立双卡run，每卡512、global batch1024。2026-10-14 19:52:33 UTC实际26,450步，尚未完成计划50k；正式checkpoint26,350已保存且两rank完整模型hash相等，CPU检查163个model及489个AdamW浮点张量finite。双卡smoke/resume/单rank信号共同停机与正式checkpoint的CPU检查均已通过，运行进度和被检查checkpoint步数分开记录。已有MANO编码/FK一致性验收，但没有独立GT的模型joint/mesh指标、真实HaWoR纠错或完整视觉闭环结果。GitHub为`origin/main`：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；同步状态见[开发与远程约定](memory/08_DEVELOPMENT_AND_REMOTE.md)。
+**最新执行状态D28（2026-10-14）：用户要求暂停当前运行、保留checkpoint并先验证效果。** 已通过STOP共同保存，双卡训练于23:53:53 UTC（纽约19:53）停止在32,783步，rank2968/2969退出，原latest/best保留；不自动resume。冻结checkpoint固定/全量validation及当前输入干预均已完成；结果与限制见下文和暂停评测报告。下文D27启动快照保留为历史。
+
+工作区已有研究记忆、四库数据转换、结构化Mamba训练与冻结评测源码，当前为**D28暂停并验证**。D27 dense TWM已在32,783步保存停止，latest与best28,000均finite且另存快照；不自动resume。两模型固定3,466窗及全量61,370窗/模式评测完成，best原训练fixed指标复现最大差0。latest全量noisy腕48.703→5.435mm（上一历史保持8.961mm）、finger15.444→1.808°，clean腕退化0.454mm；但固定窗中不提供当前观测为5.451mm，与正常5.476mm近似，当前GT＋带噪历史仍有5.317mm腕误差。结果提示历史先验占主导、可靠当前观测利用不足，未证明真实HaWoR、独立joint/mesh或物理正确性。旧D23/D25/D26产物保留；[暂停与评测](docs/TWM_PAUSED_EVAL_2026-10-14.md)、[摘要](reports/twm_paused_eval_20261014.json)。GitHub为origin/main：`https://github.com/Junzhou-Chen/Hand_Reconstruction.git`；本轮不涉及其他并行开发模型。
 
 **已定工作分工：本机写代码、论文和文档，实验全部远程。最新D19改用`ssh ds`的SciClone Kubernetes，用户已授权复用Pod `jchen57-debug-mpd5p`；hongfei原checkout保留备用。** 代码、论文、记忆和小型结果同步GitHub，数据集、权重与大文件依`.gitignore`排除。
 
@@ -140,7 +142,7 @@ flowchart TD
 
 **在统一时间戳、骨架、坐标和 GT 条件下，纯轨迹条件恢复能否降低真实 HaWoR 输出的几何误差，并优于 smoothing/Kalman/普通 temporal model？**
 
-D25的Oak子集结构化Mamba已完成50k并保留clean退化结果；D26四库单卡已保存停止于26,346步，当前D27双卡以每卡512继续。19:52:33 UTC实际26,450步，正式26,350 checkpoint两rank完整模型hash一致，CPU检查163个model及489个AdamW浮点张量finite；50k完成与最终分库效果仍待真实记录。随后补真实HaWoR误差、自身历史及独立几何验证，再增加视觉取证与反馈。完整步骤和阻塞项见[下一步](memory/04_STATUS_AND_NEXT_STEPS.md)。6层、`d=256`、4 heads是本轮实现的起始配置，非最优结论；`K=8`、`N=2`、约16帧rollout仍是后续建议。
+D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
 
 ## 记忆的效力与维护
 
