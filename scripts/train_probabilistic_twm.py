@@ -294,6 +294,8 @@ def main():
         np.random.set_state(state['numpy_rng']); sampler.load_state_dict(state['sampler'])
     run = {'started_utc':utc(),'code_version':args.code_version,'pid':os.getpid(),'world_size':world,
            'global_batch_size':config['batch_size'],'per_gpu_batch_size':local_batch,'config':config,
+           'config_file_sha256':hashlib.sha256(args.config.read_bytes()).hexdigest(),
+           'resolved_config_sha256':hashlib.sha256(json.dumps(config,sort_keys=True).encode()).hexdigest(),
            'manifest':str(args.manifest),'manifest_sha256':manifest_hash,'source_revisions':train.source_revisions,
            'parameters':sum(p.numel() for p in model.parameters()),'torch':torch.__version__,
            'gpu':torch.cuda.get_device_name(device),'dataset_names':train.dataset_names,
@@ -306,6 +308,11 @@ def main():
            'scope':'synthetic corruption pure-motion current restoration and multi-modal trajectory forecast; no visual correction evidence yet',
            'resume_limit':'rank RNG saved; sampler prefetched chunks/loader cursor not bitwise replay',
            'likelihood':'xyz diagonal Gaussian in m; isotropic matrix Fisher on SO3 normalized Haar; trajectory-wide categorical mixture'}
+    source_root=Path(__file__).resolve().parents[1]
+    run['source_sha256']={name:hashlib.sha256((source_root/name).read_bytes()).hexdigest() for name in (
+        'scripts/train_probabilistic_twm.py','scripts/train_twm.py','src/handloop/geometry.py',
+        'src/handloop/models/probabilistic_twm.py','src/handloop/models/structured_mamba.py',
+        'src/handloop/data/trajectory.py','src/handloop/data/forecast_trajectory.py','src/handloop/tracking.py')}
     tracker = WandbTracker(config=config['tracking'],output_dir=args.output,metadata=run,rank=rank,resume=bool(args.resume))
     if rank==0:
         run.update(wandb=tracker.metadata,val_windows_by_dataset=val.windows_by_dataset,

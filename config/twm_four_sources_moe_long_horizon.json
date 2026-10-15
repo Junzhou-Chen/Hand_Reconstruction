@@ -52,6 +52,7 @@
     "mode": "online",
     "require_online": true,
     "project": "handloop-twm",
+    "entity": "black-ant",
     "name": "twm-moe-long-horizon-v1",
     "group": "four-source-current-and-future",
     "tags": ["mamba", "dense-moe4", "trajectory-modes4", "future60", "current-restoration"]

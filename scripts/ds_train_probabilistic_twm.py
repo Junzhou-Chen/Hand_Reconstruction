@@ -17,6 +17,8 @@ def main():
     parser.add_argument('--config', default='config/twm_four_sources_moe_long_horizon.json')
     parser.add_argument('--output', default='/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015')
     parser.add_argument('--gpus', default='0,1')
+    parser.add_argument('--wandb-key-file', default='/sciclone/data10/jchen57/Hand_Reconstruction/private/wandb_api_key',
+                        help='Private remote file; only passed through the child environment')
     initial=parser.add_mutually_exclusive_group()
     initial.add_argument('--resume', action='store_true')
     parser.add_argument('--stop-after-updates', type=int)
@@ -54,6 +56,11 @@ if CONFIG['action']=='start' and not alive:
     if CONFIG['stop_after_updates']: command+=['--stop-after-updates',str(CONFIG['stop_after_updates'])]
     env=os.environ.copy(); threads=str(protocol.get('cpu_threads',4))
     env.update(CUDA_VISIBLE_DEVICES=CONFIG['gpus'],OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS=threads,OMP_NUM_THREADS=threads)
+    secret=Path(CONFIG['wandb_key_file']) if CONFIG.get('wandb_key_file') else None
+    if secret:
+        if not secret.is_file() or secret.stat().st_mode & 0o077:
+            raise RuntimeError('W&B credential file must exist with private 600 permissions')
+        env['WANDB_API_KEY']=secret.read_text().strip()
     with (out/'train.log').open('ab',buffering=0) as log:
         process=subprocess.Popen(command,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,
                                  env=env,cwd=CONFIG['code'],start_new_session=True)

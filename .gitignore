@@ -28,6 +28,9 @@ dist/
 *.key
 credentials*.json
 secrets*.json
+wandb_api_key
+.wandb_api_key
+/private/
 .ssh/
 .aws/
 .codex/
