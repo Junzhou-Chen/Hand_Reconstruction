@@ -38,3 +38,5 @@ D36原任务06:52:11→07:53:55 UTC（纽约02:52→03:53）正常完成1,244更
 [小型清理清单](../reports/twm_best_only_cleanup_20261015.json)保存完整best SHA和删除路径/大小；远程完整dry-run/apply receipt（含文件stat）在audits/transient_v3_10k_20261015/best_only_{plan,receipt}.json。旧记忆中的latest路径与“保留所有快照”是当时事实，已被本次用户决定替代；后续恢复请使用剩余best，不能再假定oldlatest存在。
 
 本次仅确认启动、数值/同步/采样和清理完成，10k仍是目标；未宣称收敛、腕恢复成功或真实HaWoR改进。原D36固定验证失败已归档，新的效果要以当前run后续验证为准。
+
+19:48UTC后续只读检查：训练4,700/10,000步、最近完整验证4,500；已见部分腕纠错，但clean/reanchor仍有退化，详细记录见[中途效果及曲线](TWM_TRANSIENT_10K_PROGRESS_2026-10-15.md)。训练配置不变，继续运行。

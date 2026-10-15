@@ -26,7 +26,7 @@ def compact_metrics(row):
         for baseline in ('map', 'restored_hold', 'constant_velocity'):
             for metric in ('wrist_mm', 'root_deg', 'finger_deg'):
                 keys.add(f'future_{horizon}/{baseline}/{metric}')
-    keys.update(('samples', 'counts', 'future_nll_per_dof', 'mode_entropy',
+    keys.update(('samples', 'counts', 'forecast_nll_per_dof', 'mode_entropy',
                  'calibration/future_xyz_90pct_marginal'))
     return {key: row[key] for key in sorted(keys) if key in row}
 
@@ -57,7 +57,8 @@ def main():
             if isinstance(row, dict) and 'validation' in row and row.get('step', maximum_step+1) <= maximum_step:
                 validation[row['step']] = row
     initial = read(args.run / 'initial_validation.json')
-    validation[initial['step']] = initial
+    if initial['step'] <= maximum_step:
+        validation[initial['step']] = initial
     validation[maximum_step] = latest
     weights = metadata['config']['best_selection_weights']
     assert math.isclose(sum(weights.values()), 1.0)
@@ -68,8 +69,8 @@ def main():
         assert math.isfinite(score)
         row = {'step': step, 'utc': event['utc'], 'weighted_current_score': score,
                'best_score_so_far': event['best_validation_loss']}
-        row.update({mode: {key: values[mode][key] for key in CURRENT_KEYS if key in values[mode]}
-                    for mode in ('clean', 'reanchor', 'noisy', 'missing', 'strong', 'history_only')})
+        row.update({mode: {key: item[key] for key in CURRENT_KEYS if key in item}
+                    for mode,item in values.items() if mode!='by_dataset' and isinstance(item,dict)})
         row['forecast_1s'] = {key: value for key, value in values['noisy'].items() if key.startswith('future_1s/')}
         curve.append(row)
     values = latest['validation']
