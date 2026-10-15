@@ -281,7 +281,14 @@ class ProbabilisticTWM(TWM):
                 beta: Optional[Tensor], handedness: Tensor,
                 history_quality: Optional[Tensor] = None, quality: Optional[Tensor] = None,
                 forecast_dt: Optional[Tensor] = None,
-                beta_valid: Optional[Tensor] = None) -> dict[str, Tensor]:
+                beta_valid: Optional[Tensor] = None,
+                return_forecast: bool = True) -> dict[str, Tensor]:
+        """Restore current state; optionally skip only the future decoder.
+
+        ``return_forecast=False`` preserves the exact current readout and its
+        autograd graph. The default retains all existing training/inference
+        outputs and does not change saved weights or their state-dict keys.
+        """
         if history.ndim != 3 or history.shape[-1] != 99:
             raise ValueError("history must be (B,H,99)")
         b, h, _ = history.shape
@@ -347,6 +354,9 @@ class ProbabilisticTWM(TWM):
                   "state_rotation_concentration": self._concentration(
                       self.state_rotation_concentration_head(features).squeeze(-1)),
                   "moe_balance_loss": moe_balance, "moe_load": moe_load}
+        self._finite(state, "restored state")
+        if not return_forecast:
+            return output
 
         c, f, k = self.config, self.config.forecast_horizon, self.config.num_modes
         if forecast_dt is None:

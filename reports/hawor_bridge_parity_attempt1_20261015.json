@@ -1,0 +1,14 @@
+{
+  "date_utc": "2026-10-15",
+  "date_user_timezone": "2026-10-14 America/New_York",
+  "status": "failed_before_model_load",
+  "device_requested": "cuda:0",
+  "stage": "MANO asset pickle imports scipy before numerical GPU checks",
+  "error_type": "ImportError",
+  "error": "libscipy_openblas-68440149.so: cannot open shared object file: No such file or directory",
+  "cause": "Separate dependency installation was still copying SciPy into isolated hawor_extra; scipy.libs had not been copied. Root confirmed a parallel import created __pycache__ during pip target copying and interrupted that installation.",
+  "remediation": "Install complete extras into separate staging and atomically switch after completion; do not modify existing TWM runtime or official HaWoR source.",
+  "model_forward_ran": false,
+  "training_modified": false,
+  "previous_cpu_codec_result": "hawor_bridge_codec_20261015.json"
+}

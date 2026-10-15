@@ -1,0 +1,27 @@
+{
+  "torch": "2.10.0+cu130",
+  "device": "cpu",
+  "codec": {
+    "passed": true,
+    "geometry_max_abs_errors": {
+      "shaped_root_vs_MANOLayer_J0_m": 2.2351741790771484e-08,
+      "state_to_MANO_vertices_m": 5.960464477539063e-08,
+      "state_to_MANO_joints_m": 2.9802322387695312e-08,
+      "MANO_translation_roundtrip_m": 7.450580596923828e-09,
+      "SE3_state_roundtrip": 2.05356627702713e-07,
+      "SE3_FK_commutation_m": 1.1920928955078125e-07,
+      "left_SRS_involution": 0.0,
+      "left_SRS_vs_official_axis_angle": 1.1920928955078125e-07
+    },
+    "candidate_gradient_max_abs": 20322.71484375,
+    "candidate_all_points_positive_depth": true,
+    "codec": {
+      "state": "wrist_J0_metres+root_columns6D+15_local_columns6D",
+      "hand_mean": "absolute rotation matrices; never added twice",
+      "left_pose_unflip": "S R S with S=diag(-1,1,1)",
+      "left_shapedirs_fix": true,
+      "left_shapedirs_fix_type": "unconditional official HaWoR renderer",
+      "position_conversion": "J0=MANO_transl+J_regressor0(v_shaped)"
+    }
+  }
+}

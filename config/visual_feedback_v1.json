@@ -1,0 +1,43 @@
+{
+  "seed": 20261015,
+  "steps": 20,
+  "batch_size": 1,
+  "clip_length": 16,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.01,
+  "grad_clip": 1.0,
+  "eval_every": 5,
+  "save_every": 5,
+  "log_every": 1,
+  "eval_batches": 2,
+  "cpu_threads": 1,
+  "num_workers": 0,
+  "train_current_readout": false,
+  "adapter": {
+    "image_feature_dim": 1280,
+    "patch_grid_height": 16,
+    "patch_grid_width": 12,
+    "d_model": 256,
+    "nhead": 4,
+    "num_layers": 2,
+    "dim_feedforward": 512,
+    "dropout": 0.0,
+    "history_length": 30,
+    "max_gap_seconds": 0.25,
+    "default_dt": 0.03333333333333333,
+    "translation_delta_scale": 0.1,
+    "rotation_delta_scale": 0.5,
+    "detach_history": true,
+    "condition_on_beta": false
+  },
+  "tracking": {
+    "enabled": true,
+    "mode": "online",
+    "require_online": true,
+    "project": "handloop-twm",
+    "entity": "black-ant",
+    "name": "visual-feedback-framework-smoke-v1",
+    "group": "hawor-visual-feedback",
+    "tags": ["real-rgb", "frozen-hawor", "frozen-twm", "single-current-nll", "integration-smoke"]
+  }
+}
