@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-15 20:09UTC：用户要求专项查看未来预测。D37完整验证5000，腕0.1/0.5/1/2s相对hold改善35.6/25.5/14.2/1.2%；2s仅三源，HOT/Ume退化，干净输入亦仅改善3.7%，low_motion比hold差。新增只读forecast汇总/绘图脚本，核宏平均与时域counts，所有分析远程CPU；报告ADE/oracle加权差异、逐轴coverage与宽区间、多模态未证实和非闭环边界，训练继续。[专项报告](../docs/TWM_FORECAST_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_forecast_progress_20261015_2012.json)。
+
 2026-10-15 19:48UTC：D37只读效果检查，运行4,700/10k、完整验证4,500。普通腕4.652→3.331mm/位置四帧6.520→5.244mm，3.5k→4.5k score下降32.9%；clean0→0.884mm且30.66% >1mm退化、近准当前/错误历史0.267→1.471mm，仍有失败。14模式candidate跨验证不变及等源聚合通过，修复reviewer漏读forecast NLL/漏收模式/续跑initial时间边界，远程CPU汇总绘图；不改训练。[结果](../docs/TWM_TRANSIENT_10K_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_transient_v3_progress_20261015_1944.json)。
 
 2026-10-15 16:10UTC：D37新Pod正式87a2bcc从头10k已验收到40更新，checkpoint10 finite/CPU与双rank hash相等，W&B a9cb4888服务器到40；full-coverage循环/step budget的3→6更新跨三遍历、尾批次/resume通过。历史18best保留、22非best已删除2.51GB并SHA检查，source/data/metadata/logs留存。[运行](../reports/twm_transient_v3_10k_launch_20261015.json)、[清理](../reports/twm_best_only_cleanup_20261015.json)。
