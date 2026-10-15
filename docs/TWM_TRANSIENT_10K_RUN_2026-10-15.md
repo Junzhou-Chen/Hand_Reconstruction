@@ -23,3 +23,18 @@ D36原任务06:52:11→07:53:55 UTC（纽约02:52→03:53）正常完成1,244更
 只处理本项目data10下`runs/`、`audits/`、`evaluations/`的历史训练checkpoint，排除新正式run、新smoke验收目录以及两份visual RGB inference预测`.pt`（它们是评测产物而非模型权重）。下载权重、MANO、原数据、源码、配置、日志和小型指标摘要保留。每目录优先canonical `best.pt`，没有canonical则保留明确best别名；两个无best的旧smoke目录经逐项审阅可删除其latest。先加载所有将保留best做CPU finite与SHA前后检查，dry-run完整manifest经审阅后再apply并逐文件记录。
 
 清理新策略会让旧文档中的latest/暂停快照路径不再存在，历史数值与当时审计不改写；保留下来的best和本次清理清单成为后续可恢复来源。新run训练中保留latest用于中断恢复，用户本次“之前所有”不指向正在训练的新run。
+
+
+## 启动与清理验收通过（16:10:38UTC，纽约12:10）
+
+新源码87a2bcce50eb01075e6f5e6959ec536e26f1be58；16:06:44UTC在新Pod启动，launcher200、rank205/206。正式实际40/10,000更新/40,960窗口，四库五case均正，两个GPU peak allocated63.924/63.913GB。metadata实际预算step10000、warmup500、full-coverage622-update循环、无DDP padding；新Job停止时间05:10UTC/Oct20正确，非旧16:25UTC。文件hash逐项匹配运行metadata，未加载旧模型或smoke权重。
+
+正式checkpoint10的322个model/963个AdamW浮点张量finite，AdamW step=10，CPU与两rank完整模型hash一致：`f153aeccd2a48d733c5865bbed1f29981a390a320018850de7c834613387c235`。[W&B新run](https://wandb.ai/black-ant/handloop-twm/runs/a9cb4888)服务端实际收到10/20/30/40、target_steps10000及训练loss；是参数更新验收，不把进程存在或step0当作跑起。完整[启动摘要](../reports/twm_transient_v3_10k_launch_20261015.json)含配置、数据/代码hash、进程、checkpoint和服务器曲线。
+
+步数/full-coverage双卡小样本集成：复用四源各3train窗口的remote测试manifest，global8，先3更新保存，再resume到6更新；跨3个完整遍历、实际36窗口使用，每源累计9。尾global4正确，checkpoint模型不同、两阶段model/AdamW finite且CPU/两rank一致；该检查不代表正式精度。摘要在remote audits/transient_v3_10k_20261015/step_smoke_summary.json，原数据不改。
+
+历史清理已实际完成：18份best、1,853,472,472bytes保留；22份非best、2,511,839,588bytes删除，涉及旧latest、暂停latest快照和旧D32 frozen参考副本。两个无best的历史smoke latest经明确逐项审阅删除，未伪造best。所有保留best在dry-run/apply前做CPU finite/前后SHA，删除后再核SHA；正式验收另确认18路径均存在、22删除路径均不存在。配置、日志、源码和指标等729个非checkpoint文件/77,849,288bytes保留，两份visual预测.pt明确排除。新run和本次新smoke审计目录排除；新run恢复用latest不属于“之前所有”。
+
+[小型清理清单](../reports/twm_best_only_cleanup_20261015.json)保存完整best SHA和删除路径/大小；远程完整dry-run/apply receipt（含文件stat）在audits/transient_v3_10k_20261015/best_only_{plan,receipt}.json。旧记忆中的latest路径与“保留所有快照”是当时事实，已被本次用户决定替代；后续恢复请使用剩余best，不能再假定oldlatest存在。
+
+本次仅确认启动、数值/同步/采样和清理完成，10k仍是目标；未宣称收敛、腕恢复成功或真实HaWoR改进。原D36固定验证失败已归档，新的效果要以当前run后续验证为准。

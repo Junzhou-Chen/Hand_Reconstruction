@@ -1,5 +1,7 @@
 # D36：短时错误增广修复与两轮训练
 
+**后续状态（2026-10-15）：** 本轮已于纽约03:53正常完成2/2epochs；用户随后改为[D37从头10k及历史best-only](TWM_TRANSIENT_10K_RUN_2026-10-15.md)。此run的best.pt保留，latest/暂停快照已按授权清理。下文“已启动/旧入口/仅0.08epoch”保留为启动当时记录，非当前仍在训练；[完成审计](../reports/twm_transient_epoch2_completed_20261015.json)。
+
 2026-10-15，用户明确要求修复噪声生成及相关问题，重新运行，以epoch而非任意万步为预算，先设两轮、允许中途保存停止。D34已于06:28:48 UTC保存停止在5,519步；原latest/best/STOP保留在原目录，CPU审计322个model/963个AdamW浮点张量finite、两rank与CPU hash一致（44a930a53cc5942a80f12cfa901b26bc055c560acef890249e17adb4a602f8d0）。这替代D34继续10k的执行安排，不修改D35视觉插件框架。
 
 ## 修改依据及范围

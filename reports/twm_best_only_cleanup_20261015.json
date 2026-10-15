@@ -1,0 +1,273 @@
+{
+  "schema": "handloop.best_only_checkpoint_cleanup.v1",
+  "mode": "apply",
+  "created_at_utc": "2026-10-15T16:05:25.560969+00:00",
+  "finished_at_utc": "2026-10-15T16:05:37.351667+00:00",
+  "scope": {
+    "allow_no_best": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_smoke_20261014",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_structured_mamba_smoke_20261014"
+    ],
+    "excludes": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_10k_20261015",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/rgb_predictions16.history.pt",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/rgb_predictions16.pt",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_b512_10k_20261015"
+    ],
+    "roots": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/audits",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs"
+    ]
+  },
+  "policy": "Keep best.pt per directory, or best aliases where no best.pt exists; preserve all non-checkpoint files and exclusions",
+  "summary": {
+    "keep_best_bytes": 1853472472,
+    "keep_best_files": 18,
+    "preserved_other_bytes": 77849288,
+    "preserved_other_files": 729,
+    "remove_bytes": 2511839588,
+    "remove_files": 22
+  },
+  "pre_delete_checks_completed_at_utc": "2026-10-15T16:05:33.989163+00:00",
+  "completed": true,
+  "removed_bytes": 2511839588,
+  "kept_best": [
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_epoch2_20261015/ddp_smoke/resume_run/best.pt",
+      "checkpoint_step": 0,
+      "floating_tensors": 322,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "eb16942701319feba3f454f37bdb872805884729c93363489e3bdd3e6f5dfa2e",
+      "sha256_after": "eb16942701319feba3f454f37bdb872805884729c93363489e3bdd3e6f5dfa2e"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_epoch2_20261015/ddp_smoke/stop_run/best.pt",
+      "checkpoint_step": 0,
+      "floating_tensors": 322,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "ca4f1c6770590bff2e7b75c4324e02587fad8f026ce7fca18387ea534c6f6cd7",
+      "sha256_after": "ca4f1c6770590bff2e7b75c4324e02587fad8f026ce7fca18387ea534c6f6cd7"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/moe_long_horizon_checks_20261015/ddp_smoke/best.pt",
+      "checkpoint_step": 3,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "6dfc72ea67bd6b11802bee146db92ae3ca0e3ad575604607ee6d57e526839d2a",
+      "sha256_after": "6dfc72ea67bd6b11802bee146db92ae3ca0e3ad575604607ee6d57e526839d2a"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_batch512_10k_20261015/previous_snapshots/best.pt",
+      "checkpoint_step": 3000,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a",
+      "sha256_after": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_moe_pause_20261015_v1/snapshots/best.pt",
+      "checkpoint_step": 500,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "3bb8292a63a531ff99c76e4db18110935d01df8e9b0eaa2fb14ce317afc8bfa1",
+      "sha256_after": "3bb8292a63a531ff99c76e4db18110935d01df8e9b0eaa2fb14ce317afc8bfa1"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/best.pt",
+      "checkpoint_step": 28000,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+      "sha256_after": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_ddp_smoke_20261014_v1/best.pt",
+      "checkpoint_step": 26446,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "3a549e4d3df658d033d7a414b789204d91d1efd57aa67b2f094dc24d253b7a1c",
+      "sha256_after": "3a549e4d3df658d033d7a414b789204d91d1efd57aa67b2f094dc24d253b7a1c"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015/best.pt",
+      "checkpoint_step": 500,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "3bb8292a63a531ff99c76e4db18110935d01df8e9b0eaa2fb14ce317afc8bfa1",
+      "sha256_after": "3bb8292a63a531ff99c76e4db18110935d01df8e9b0eaa2fb14ce317afc8bfa1"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015/best.pt",
+      "checkpoint_step": 3000,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a",
+      "sha256_after": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015/best.pt",
+      "checkpoint_step": 5500,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "870ed40cb4a69124f45bb87b0b5a3f33200cdf52e9f80d08bb988c8fbc5f56f3",
+      "sha256_after": "870ed40cb4a69124f45bb87b0b5a3f33200cdf52e9f80d08bb988c8fbc5f56f3"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015/best.pt",
+      "checkpoint_step": 1244,
+      "floating_tensors": 1285,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "1da62130a3ea8d41fa375bc1d9b57a7de75b4be88382ab835e1e3425cec0e4f5",
+      "sha256_after": "1da62130a3ea8d41fa375bc1d9b57a7de75b4be88382ab835e1e3425cec0e4f5"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_smoke_20261014/best.pt",
+      "checkpoint_step": 3,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "47799f2508c78f28ee6938e4efc67ab6e0f8e98b20d666ba00496e8efd87c534",
+      "sha256_after": "47799f2508c78f28ee6938e4efc67ab6e0f8e98b20d666ba00496e8efd87c534"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014/best.pt",
+      "checkpoint_step": 26000,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "e3304b46d3ae097feb72a2ac4c55effcb8bae2d650a605d0bd02485b878089fe",
+      "sha256_after": "e3304b46d3ae097feb72a2ac4c55effcb8bae2d650a605d0bd02485b878089fe"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014/best.pt",
+      "checkpoint_step": 28000,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298",
+      "sha256_after": "b2319b8399bcc8a073d64b1e185aae21e20848136e73871d4ec82a1f97be6298"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_moe_mixed_v2_smoke_20261015_v1/best.pt",
+      "checkpoint_step": 0,
+      "floating_tensors": 322,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "32fdee2ba644cb9fb4ec5632562557f3a2d21792dcdacf57c7365f5150ac9815",
+      "sha256_after": "32fdee2ba644cb9fb4ec5632562557f3a2d21792dcdacf57c7365f5150ac9815"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014/best.pt",
+      "checkpoint_step": 27500,
+      "floating_tensors": 284,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "9b9e82b709b49f8ecd295ceed4440411b359d9a54a530e68b2b7cf5b7fef9552",
+      "sha256_after": "9b9e82b709b49f8ecd295ceed4440411b359d9a54a530e68b2b7cf5b7fef9552"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_structured_mamba_20261014/best.pt",
+      "checkpoint_step": 49500,
+      "floating_tensors": 652,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "34562b490136b611d00e21cb692210f86499aa1a82c8290e8c1d7cb69a8f3ead",
+      "sha256_after": "34562b490136b611d00e21cb692210f86499aa1a82c8290e8c1d7cb69a8f3ead"
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015/best.pt",
+      "checkpoint_step": 20,
+      "floating_tensors": 611,
+      "all_floating_tensors_finite": true,
+      "sha256_before": "2375662f5b59ad88b32e114d00525774be17f1e726dfc715b960e9911bb71ee5",
+      "sha256_after": "2375662f5b59ad88b32e114d00525774be17f1e726dfc715b960e9911bb71ee5"
+    }
+  ],
+  "removed": [
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_epoch2_20261015/ddp_smoke/resume_run/latest.pt",
+      "bytes": 162798961
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_epoch2_20261015/ddp_smoke/stop_run/latest.pt",
+      "bytes": 162798001
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/moe_long_horizon_checks_20261015/ddp_smoke/latest.pt",
+      "bytes": 162803571
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_batch512_10k_20261015/previous_snapshots/latest.pt",
+      "bytes": 162809587
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_moe_pause_20261015_v1/snapshots/latest.pt",
+      "bytes": 162803955
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_paused_20261014_v1/snapshots/latest.pt",
+      "bytes": 76213899
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_feedback_framework_20261015/reference/twm_d32_step3110.pt",
+      "bytes": 162809587
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_ddp_smoke_20261014_v1/latest.pt",
+      "bytes": 76213835
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_long_horizon_20261015/latest.pt",
+      "bytes": 162803955
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015/latest.pt",
+      "bytes": 162809587
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015/latest.pt",
+      "bytes": 162809715
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_epoch2_20261015/latest.pt",
+      "bytes": 162799089
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_smoke_20261014/latest.pt",
+      "bytes": 76186123
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_20261014/latest.pt",
+      "bytes": 76186315
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_structured_mamba_ddp_20261014/latest.pt",
+      "bytes": 76213899
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_moe_mixed_v2_smoke_20261015_v1/latest.pt",
+      "bytes": 162809395
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_pilot_20261014/latest.pt",
+      "bytes": 9951435
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_smoke_20261014/latest.pt",
+      "bytes": 9951691
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_structured_mamba_20261014/latest.pt",
+      "bytes": 76179339
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_oakink2_structured_mamba_smoke_20261014/latest.pt",
+      "bytes": 76179595
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015/latest.pt",
+      "bytes": 83854155
+    },
+    {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_framework_smoke_v1_20261015/latest.step3.pt",
+      "bytes": 83853899
+    }
+  ],
+  "full_remote_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_10k_20261015/best_only_receipt.json",
+  "scope_note": "Historical project training checkpoints only. Current new formal run and current audit/smoke directory excluded; two visual prediction .pt files preserved as inference outputs. Source data/downloaded weights/MANO outside scope; metadata/logs and summaries retained."
+}

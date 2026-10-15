@@ -50,7 +50,7 @@
 
 | D36 | 修复短时噪声生成及相关问题，重新运行；预算改为2个epoch，可中途保存停止 | 2026-10-15用户明确要求。D34已保存停止5,519步，旧checkpoint/STOP保留，替代继续10k安排。工程实现：window-local局部plateau/ramp/scattered/jitter＋因果缺失填充，encoder位置尺度0.05m，完整遍历636,610窗/epoch（用户于2026-10-15异步回复明确选择：每个窗口一次，先跑2个epoch），每卡512。比例/幅度/尺度为待验证工程假设；D35框架不改。25fee71正式两卡已实际0.080426/2epoch，语义/跨epoch续跑/尾批次/STOP/正式checkpoint finite及同步通过，仍非精度改善证明。[运行协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)。 |
 
-| D37 | 新Pod从头训练10,000 step；之前训练checkpoint仅保留best | 2026-10-15用户最新明确指令，替代D36两epoch预算与旧latest/暂停快照全保留策略。新Pod jchen57-fineturn-tl4zr；保留v3噪声、位置feature尺度、四库GT/split、full-coverage循环采样、每卡512/global1024。fresh10k/warmup500/eval500/save100为本次执行配置；启动与清理待实测验收。已确认D36两轮03:53纽约完成，但局部漂移/clean仍有失败，不保证加步数解决。[执行协议](../docs/TWM_TRANSIENT_10K_RUN_2026-10-15.md)。 |
+| D37 | 新Pod从头训练10,000 step；之前训练checkpoint仅保留best | 2026-10-15用户最新明确指令，替代D36两epoch预算与旧latest/暂停快照全保留策略。新Pod jchen57-fineturn-tl4zr；保留v3噪声、位置feature尺度、四库GT/split、full-coverage循环采样、每卡512/global1024。fresh10k/warmup500/eval500/save100为本次执行配置；87a2bcc正式已验收到40/10k，checkpoint finite/两rank同步及W&B服务器标量通过；历史18best保留/22非best删除，清理SHA通过。已确认D36两轮03:53纽约完成，但局部漂移/clean仍有失败，不保证加步数解决。[执行协议](../docs/TWM_TRANSIENT_10K_RUN_2026-10-15.md)。 |
 
 ## 已替代的历史路线
 

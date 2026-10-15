@@ -190,3 +190,6 @@ D25复用原Oak64train/8val准备数据、fixed1024val窗口/模式与corruption
 
 
 **D36启动验收（06:56UTC）：** full shuffled coverage每epoch636,610窗（Oak346,860/HOT132,008/Ume151,390/Dex6,352），无DDP padding、每卡512、尾353，622updates/epoch；改为自然数据比例，非等源25%。v3在每模式1024抽样上范数/角/未来隔离/隐藏值不泄露/unknown quality检查通过；mixed出现28个>6mm历史enclosed3/4run，reanchor79。初次checker把6D旋转也用position容差对比导致失败，改成分别几何单位后通过；未改变sampler来迎合检查。真实tiny片段两卡1→4更新跨epoch/partial batch/resume与独立STOP保存通过。正式验收到50更新/0.080426epoch/51,200窗口，各源/五case均正；checkpoint10 finite与CPU/双rank hash一致，W&B服务端到50。尚只有启动/初始验证，不宣称腕纠错已改善或真实HaWoR收益。GT/split/米单位/rotation codec仍同原四库拟合MANO；详见[协议](../docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)、[摘要](../reports/twm_transient_epoch2_20261015.json)。
+
+
+**D36完成及D37替代（2026-10-15）：** 两epoch已1244更新/1,273,220窗口使用，四源次数准确×2；best/latest当时同1244且finite，W&B58f012f8 finished。四库各256窗宏平均固定v3 val：ordinary腕4.652→4.217mm，burst4全组5.042→5.237mm、position-only6.520→6.329mm，clean0→1.457mm/59.28% >1mm退化，root/finger多数略退化，不能称短时纠错成功。源拟合MANO/合成条件，非真实HaWoR。用户随后明确从头10k，新Pod两卡512、原v3与full-coverage保留；64clip新冻结对照暂缓，未冒称已完成。历史best-only清理18保留/22删除（含oldlatest，best仍可用），记录见[完成审计](../reports/twm_transient_epoch2_completed_20261015.json)、[清理](../reports/twm_best_only_cleanup_20261015.json)。

@@ -1,5 +1,7 @@
 # ds / SciClone Kubernetes服务器操作记录
 
+**2026-10-15当前资源更新：** 用户已切换`jchen57-fineturn-tl4zr`，旧debug Pod不再存在；12CPU/200Gi/两张97887MiB Blackwell。新Job `jchen57-fineturn` 的status.startTime=2026-10-15T05:24:05Z，activeDeadlineSeconds432000，到期10-20 05:24:05UTC（纽约01:24），即使容器15:51才启动也不从容器重新计时。D37配置05:10UTC保守停止；Torch2.10/cu130两卡CUDA探针通过。下文旧Pod/旧时限为历史记录，不能继续作为默认入口；[新运行协议](TWM_TRANSIENT_10K_RUN_2026-10-15.md)。
+
 核验日期：2026-10-13。用户改用`ssh ds`并授权使用其昨天申请的`jchen57-debug-mpd5p`。先完成运维和极小CUDA检查；随后按D20建立持久checkout并在Pod启动三库后台下载。没有创建/删除Job、修改VLM_KD或安装依赖，未运行模型、转换轨迹或训练。[数据下载记录](TWM_DATA_DOWNLOADS.md)
 
 来源：用户提供的`kubectl_server_request_bundle_20260930.tar.gz`（只读tar内容）；ds上`/sciclone/home/jchen57/project/VLM_KD/{how_to_use.md,MIGRATION.md,config/project.env,conda.sh,script/*.sh}`中的运维部分；实时kubectl/NVIDIA/Python检查。未读取旧项目method。原包、完整配置、凭据、内部NFS地址与其他用户任务信息不提交Git。

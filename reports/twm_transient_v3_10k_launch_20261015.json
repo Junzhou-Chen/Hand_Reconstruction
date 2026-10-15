@@ -1,0 +1,515 @@
+{
+  "utc": "2026-10-15T16:10:38.614059+00:00",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_b512_10k_20261015",
+  "pod": "jchen57-fineturn-tl4zr",
+  "code_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_10k_20261015",
+  "code_version": "87a2bcce50eb01075e6f5e6959ec536e26f1be58",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "source_sha256_verified": {
+    "scripts/train_probabilistic_twm.py": "4e080c58becf3d70fa692920f04becefb2bc85f058369d7bb18d32a33bcba267",
+    "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+    "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+    "src/handloop/models/probabilistic_twm.py": "5459d1e396a09b657619d2029e19b46ea553ba744e09afb22125ed8238992804",
+    "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+    "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+    "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+    "src/handloop/tracking.py": "aeb1c73564c6306579caa4e8a7dde8b01af60711c5b98e37419dbbca8cb41ab0",
+    "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce",
+    "src/handloop/data/temporal_corruption.py": "67de303b65ba0634bfabe850a0958c978bc85d7ac45f01fbd43b7bbd09e8dfac",
+    "src/handloop/data/epoch_sampling.py": "ed8c320266c2bc1e82a2bd4253cdb3dea0da946c34f76e3df7087c29a0b527e1",
+    "src/handloop/models/twm.py": "f75a736c200e572cd6acb5159cb8bc1ad45eec7f3133193e63cd0404afa02262"
+  },
+  "config": {
+    "seed": 20261015,
+    "history_frames": 30,
+    "min_future_frames": 3,
+    "window_stride": 4,
+    "batch_size": 1024,
+    "learning_rate": 0.0002,
+    "weight_decay": 0.01,
+    "save_every": 100,
+    "log_every": 10,
+    "eval_batch_size": 32,
+    "eval_batches": 8,
+    "eval_horizons_seconds": [
+      0.1,
+      0.5,
+      1.0,
+      2.0
+    ],
+    "current_nll_weight": 0.05,
+    "forecast_nll_weight": 0.3,
+    "forecast_geometry_weight": 0.2,
+    "velocity_weight": 0.05,
+    "moe_balance_weight": 0.01,
+    "model": {
+      "backbone": "structured_mamba",
+      "d_model": 256,
+      "num_layers": 6,
+      "nhead": 4,
+      "dim_feedforward": 512,
+      "dropout": 0.1,
+      "forecast_horizon": 60,
+      "translation_scale": 0.1,
+      "rotation_scale": 0.5,
+      "check_finite": false,
+      "mamba_state_size": 64,
+      "mamba_conv": 4,
+      "mamba_expand": 2,
+      "num_experts": 4,
+      "num_modes": 4,
+      "future_decoder_layers": 1,
+      "future_joint_width": 64,
+      "time_frequencies_hz": [
+        0.25,
+        0.5,
+        1.0,
+        2.0,
+        4.0,
+        8.0
+      ],
+      "position_feature_scale": 0.05
+    },
+    "required_datasets": [
+      "oakink2",
+      "hot3d",
+      "umetrack",
+      "dexycb"
+    ],
+    "source_sampling": "full_coverage",
+    "cache_sequences": 8192,
+    "cache_bytes": 4294967296,
+    "condition_on_beta": false,
+    "world_size": 2,
+    "cpu_threads": 4,
+    "stop_before_utc": "2026-10-20T05:10:00+00:00",
+    "tracking": {
+      "enabled": true,
+      "mode": "online",
+      "require_online": true,
+      "project": "handloop-twm",
+      "entity": "black-ant",
+      "name": "twm-moe-transient-v3-b512-10k",
+      "group": "four-source-mixed-current-and-future",
+      "tags": [
+        "mamba",
+        "dense-moe4",
+        "trajectory-modes4",
+        "future60",
+        "current-restoration",
+        "current-reanchor",
+        "quality-unknown",
+        "per-gpu512",
+        "global1024",
+        "transient-v3",
+        "position-scale-0.05",
+        "fresh-10k",
+        "full-coverage-cycles",
+        "new-pod-fineturn"
+      ]
+    },
+    "corruption_profile_path": "config/twm_corruption_transient_v3.json",
+    "eval_corruption_modes": [
+      "noisy",
+      "missing",
+      "clean",
+      "reanchor",
+      "strong",
+      "single",
+      "burst3",
+      "burst4",
+      "position_burst4",
+      "scattered3",
+      "ramp4",
+      "history_only",
+      "legacy_noisy",
+      "legacy_missing"
+    ],
+    "best_selection_weights": {
+      "clean": 0.2,
+      "reanchor": 0.2,
+      "noisy": 0.35,
+      "missing": 0.2,
+      "strong": 0.05
+    },
+    "best_selection_description": "Current geometry weighted clean/reanchor/noisy/missing/local-strong 20/20/35/20/5, diagnostic strata rather than exact mixture risk; transient cases and legacy stress also reported.",
+    "training_unit": "step",
+    "steps": 10000,
+    "warmup_steps": 500,
+    "eval_every": 500,
+    "corruption_profile": {
+      "profile": "transient_motion_restoration_v3",
+      "status": "active",
+      "architecture_independent": true,
+      "target_policy": "All current and future targets remain uncorrupted source reference trajectories",
+      "amplitude_convention": "event peak actual norm/angle within severity band; ramp instantaneous amplitude can be below peak lower bound; other groups/frames clean or <=1mm/degree; no additive full errors",
+      "levels": {
+        "clean": {
+          "translation_norm_mm": [
+            0,
+            0
+          ],
+          "root_angle_deg": [
+            0,
+            0
+          ],
+          "finger_angle_deg": [
+            0,
+            0
+          ]
+        },
+        "near": {
+          "translation_norm_mm": [
+            0,
+            1
+          ],
+          "root_angle_deg": [
+            0,
+            1
+          ],
+          "finger_angle_deg": [
+            0,
+            1
+          ]
+        },
+        "light": {
+          "translation_norm_mm": [
+            1,
+            6
+          ],
+          "root_angle_deg": [
+            0,
+            4
+          ],
+          "finger_angle_deg": [
+            0,
+            3
+          ]
+        },
+        "medium": {
+          "translation_norm_mm": [
+            6,
+            15
+          ],
+          "root_angle_deg": [
+            3,
+            10
+          ],
+          "finger_angle_deg": [
+            2,
+            8
+          ]
+        },
+        "strong": {
+          "translation_norm_mm": [
+            20,
+            50
+          ],
+          "root_angle_deg": [
+            10,
+            35
+          ],
+          "finger_angle_deg": [
+            8,
+            25
+          ]
+        }
+      },
+      "amplitude_sampling": "Peak norm/angle uniform within light/medium or rare strong range; direction shared within plateau/ramp/scattered, per-frame independent for jitter",
+      "window_cases": [
+        {
+          "name": "clean_motion",
+          "probability": 0.2
+        },
+        {
+          "name": "current_reanchors_history",
+          "probability": 0.2
+        },
+        {
+          "name": "ordinary_restoration",
+          "probability": 0.35
+        },
+        {
+          "name": "partial_missing",
+          "probability": 0.2
+        },
+        {
+          "name": "rare_local_failure",
+          "probability": 0.05
+        }
+      ],
+      "temporal_noise": {
+        "process": "window-local jitter, fixed-vector plateau, ramp or scattered events; one to four frames; current covers onset/continuation and reanchor covers recovery",
+        "limitations": "events are redrawn across independently sampled overlapping windows, not recording-persistent or learned rollout errors"
+      },
+      "quality": {
+        "default": "unknown_for_available_state_groups",
+        "unknown_value": -1,
+        "availability_is_separate": true,
+        "oracle_quality": "optional separately labeled ablation only; not the default condition"
+      },
+      "source_sampling": "finite full traversal of original four-source train windows; no new images required",
+      "evaluation": {
+        "fixed_cases": [
+          "clean",
+          "reanchor",
+          "noisy",
+          "missing",
+          "strong",
+          "single",
+          "burst3",
+          "burst4",
+          "position_burst4",
+          "scattered3",
+          "ramp4",
+          "history_only"
+        ],
+        "retain_legacy_stress_profile": true,
+        "paired_corruption_seed": "noisy/history_only use matching draws; fixed duration modes can change RNG schedule",
+        "metrics": [
+          "input_hold_output_wrist_mm_root_deg_finger_deg",
+          "median_and_p95_by_source",
+          "wrist_degradation_over_1mm",
+          "input_severity_bins",
+          "current_removal_effect",
+          "forecast_per_horizon_with_valid_counts"
+        ]
+      },
+      "limitations": [
+        "Mixture, durations, amplitudes and feature scale are engineering hypotheses, not fitted to HaWoR",
+        "No future observations or oracle event/quality labels fed to model",
+        "References remain fitted MANO; not independent physical ground truth",
+        "Window-local error process is not a closed-loop deployment distribution"
+      ],
+      "execution_policy": "Explicitly selected by a fresh training run; old checkpoints/runs remain preserved",
+      "version": 3,
+      "events": {
+        "pattern_probabilities": [
+          0.3,
+          0.45,
+          0.15,
+          0.1
+        ],
+        "duration_probabilities": [
+          0.15,
+          0.15,
+          0.35,
+          0.35
+        ],
+        "spatial_probabilities": [
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "jitter_frame_probability": 0.3,
+        "medium_probability": 0.4,
+        "near_background_probability": 0.5
+      },
+      "window_cases_description": "Reanchor event ends 1..4 frames before current; other nonclean cases include current in error/missing event. All clean case is exact."
+    },
+    "corruption_profile_sha256": "7dea2b94c5080c11eb86154837157a248902c6f7dda2fd81def609269078c4bb"
+  },
+  "sampling_schedule": {
+    "budget_unit": "step",
+    "target_steps": 10000,
+    "windows_per_epoch": 636610,
+    "steps_per_epoch": 622,
+    "ddp_padding_per_epoch": 0
+  },
+  "status_snapshot": {
+    "utc": "2026-10-15T16:10:33.220487+00:00",
+    "phase": "training",
+    "step": 40,
+    "epoch_progress": 0.06434080520255729,
+    "completed_epochs": 0,
+    "target_steps": 10000,
+    "step_progress": 0.004,
+    "windows_seen": 40960,
+    "updates_per_epoch": 622,
+    "batch_in_epoch": 40,
+    "loss": -0.4015406370162964,
+    "restoration_loss": 0.021045604720711708,
+    "current_nll_per_dof": -2.6944568157196045,
+    "forecast_nll_per_dof": -1.7575339078903198,
+    "best_trajectory_geometry_loss": 1.1896965503692627,
+    "velocity_loss": 0.017203055322170258,
+    "moe_balance_loss": 0.0597321093082428,
+    "mode_entropy": 1.385915994644165,
+    "current_xyz_std_mm": 46.770626068115234,
+    "future_within_mode_xyz_std_mm": 99.01341247558594,
+    "future_total_xyz_std_mm": 99.09124755859375,
+    "grad_norm": 2.325221061706543,
+    "lr": 1.6000000000000003e-05,
+    "elapsed_seconds": 115.83313641976565,
+    "samples_per_second": 353.6121119224967,
+    "ranks": [
+      {
+        "rank": 0,
+        "pid": 205,
+        "device": 0,
+        "peak_allocated_gb": 63.924979712,
+        "peak_reserved_gb": 64.709722112
+      },
+      {
+        "rank": 1,
+        "pid": 206,
+        "device": 1,
+        "peak_allocated_gb": 63.913988608,
+        "peak_reserved_gb": 64.699236352
+      }
+    ],
+    "samples_by_dataset": {
+      "dexycb": 372,
+      "hot3d": 8437,
+      "oakink2": 22495,
+      "umetrack": 9656
+    },
+    "corruption_samples_by_case": {
+      "clean_motion": 8229,
+      "current_reanchors_history": 8154,
+      "ordinary_restoration": 14191,
+      "partial_missing": 8284,
+      "rare_local_failure": 2102
+    },
+    "temporal_samples_by_pattern": {
+      "jitter": 12288,
+      "plateau": 18496,
+      "ramp": 6056,
+      "scattered": 4120
+    },
+    "spatial_samples_by_pattern": {
+      "translation_only": 10293,
+      "wrist_pose": 10205,
+      "fingers": 10179,
+      "whole_hand": 10283
+    },
+    "moe_load": {
+      "0": 0.2619028091430664,
+      "1": 0.2579953670501709,
+      "2": 0.2512129545211792,
+      "3": 0.2288888841867447
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/a9cb4888"
+  },
+  "launcher": {
+    "pid": 200,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_10k_20261015/scripts/train_probabilistic_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_transient_v3_10k_20261015/config/twm_four_sources_moe_transient_v3_b512_10k.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_b512_10k_20261015",
+      "--code-version",
+      "87a2bcce50eb01075e6f5e6959ec536e26f1be58"
+    ],
+    "code_version": "87a2bcce50eb01075e6f5e6959ec536e26f1be58",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-fineturn-tl4zr",
+    "started_utc": "2026-10-15T16:06:44.659847+00:00"
+  },
+  "rank_processes_alive": {
+    "0": true,
+    "1": true
+  },
+  "formal_checkpoint": {
+    "step": 10,
+    "code_version": "87a2bcce50eb01075e6f5e6959ec536e26f1be58",
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "model_and_optimizer_finite": true,
+    "model_state_sha256": "f153aeccd2a48d733c5865bbed1f29981a390a320018850de7c834613387c235",
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "world_size": 2,
+    "adamw_steps": [
+      10.0
+    ],
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_transient_v3_b512_10k_20261015",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "parameters": 13530032,
+    "scope": "CPU checkpoint numerical/synchronization audit, not model quality evidence"
+  },
+  "ddp_smoke": {
+    "code_version": "87a2bcc",
+    "first": {
+      "step": 3,
+      "model_and_optimizer_finite": true,
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "model_state_sha256": "166012a8da8f163fa3558e81587135a780f59593070ef845cebcc9fd4b1b02aa",
+      "progress": {
+        "target_steps": 6,
+        "step_progress": 0.5,
+        "epoch_progress": 1.6666666666666665,
+        "completed_epochs": 1,
+        "windows_seen": 20
+      }
+    },
+    "resumed": {
+      "step": 6,
+      "model_and_optimizer_finite": true,
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "model_state_sha256": "ab00ce361df136453d93bd3a784afbafb05f61f21be58c417735d9db461188b1",
+      "progress": {
+        "target_steps": 6,
+        "step_progress": 1.0,
+        "epoch_progress": 3.0,
+        "completed_epochs": 3,
+        "windows_seen": 36
+      }
+    },
+    "checks": {
+      "fixed_step_budget": true,
+      "full_coverage_across_three_cycles": true,
+      "resume": true,
+      "last_partial_batch": true,
+      "finite_and_synced_two_gpus": true
+    },
+    "scope": "tiny real-reference DDP integration, not model quality evidence"
+  },
+  "wandb_server_verified": {
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/a9cb4888",
+    "state": "running",
+    "training_rows": [
+      {
+        "optimizer_step": 10,
+        "target_steps": 10000,
+        "train/loss": -0.1004159227013588
+      },
+      {
+        "optimizer_step": 20,
+        "target_steps": 10000,
+        "train/loss": -0.2860361337661743
+      },
+      {
+        "optimizer_step": 30,
+        "target_steps": 10000,
+        "train/loss": -0.37546437978744507
+      },
+      {
+        "optimizer_step": 40,
+        "target_steps": 10000,
+        "train/loss": -0.4015406370162964
+      }
+    ]
+  },
+  "cleanup": {
+    "retained_best_count": 18,
+    "removed_count": 22,
+    "removed_bytes": 2511839588,
+    "removed_paths_absent": true,
+    "retained_best_paths_present": true,
+    "full_remote_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/transient_v3_10k_20261015/best_only_receipt.json"
+  },
+  "scope": "Fresh fixed10k-step launch with repaired v3 noise and full-coverage cycling; no convergence or quality claim. Historical best-only retention explicitly requested; old checkpoint snapshots removed, logs/metrics retained."
+}

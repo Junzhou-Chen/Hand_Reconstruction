@@ -1,5 +1,9 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-15 16:10UTC：D37新Pod正式87a2bcc从头10k已验收到40更新，checkpoint10 finite/CPU与双rank hash相等，W&B a9cb4888服务器到40；full-coverage循环/step budget的3→6更新跨三遍历、尾批次/resume通过。历史18best保留、22非best已删除2.51GB并SHA检查，source/data/metadata/logs留存。[运行](../reports/twm_transient_v3_10k_launch_20261015.json)、[清理](../reports/twm_best_only_cleanup_20261015.json)。
+
+2026-10-15：D36两轮正常完成及固定验证失败如实归档；用户改D37为新Pod从头10k，并明确历史只留best。新step-budget/full-coverage双卡3→6更新/resume/三遍历通过，正式已发起待实际更新验收。历史18best finite/SHA通过，22非best删除约2.51GB，元数据/日志/推理结果保留。
+
 2026-10-15：收到D36异步回复，完整遍历每个窗口一次/先跑2epochs从默认工程选择更新为用户明确确认；配置与已运行任务一致，无需重启。用户可登录ds，先前连接问题已恢复。
 
 2026-10-15 06:56UTC：D36正式25fee71从头两卡每卡512按2个完整epoch启动，验收到50更新/0.080426epoch/51,200窗口；四源五case参与、首checkpoint有限/两rank同步，W&B服务器曲线通过。语义、全索引覆盖、跨epoch续跑、尾批次和STOP集成检查通过；保留初次checker单位错误及SSH/pull失败修正。原目录untracked视觉文件未动，独立data10源码worktree运行，D35不改。[验收](../reports/twm_transient_epoch2_20261015.json)。
