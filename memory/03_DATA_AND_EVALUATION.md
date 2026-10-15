@@ -22,6 +22,8 @@
 
 **D31混合训练澄清：** 用户不要求本轮先做真实HaWoR标定，要求暂停当前训练并考虑干净/有噪条件混合、严重少量。D29已暂停814步；建议20%全净、20%当前近准/历史中噪、35%双方独立轻中噪、20%局部缺失、5%局部强异常。幅度改为实际位移范数近0–1/轻1–6/中6–15/强20–50mm、SO(3)总角，避免每轴σ带来隐含长尾；默认quality unknown，所有监督GT不受损。配置仅草案，尚未接入trainer或证明适配HaWoR，具体比例/幅度待验。[设置与验收](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。
 
+**D34训练执行更新（2026-10-15UTC）：** 保留D32四源参考/recording split、12模式固定validation与20/20/35/20/5 mixed_v2；旧run停3,110步，新run每卡512/global1024、从头10k。目标10.24M次样本抽取，非独立新样本数；batch/调度改变后不能只按同step比较。旧1k→3k weighted current score0.02225→0.01281、root3.871→2.573°、finger3.215→1.773°，但noisy腕输出7.287→7.210mm仍高于输入7.158mm；clean/reanchor退化及未来误差在摘要同报。指标为四库均值的等权宏平均、源拟合MANO wrist mm/局部SO(3)角，非独立joint/mesh或真实HaWoR；未宣称已收敛。[曲线与设置](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[小型摘要](../reports/twm_batch512_10k_20261015.json)。
+
 **D32实施：** 已按用户要求接入mixed v2，源GT/split未变；20/20/35/20/5、有界位移范数/总角、quality unknown，旧sample_batch保留。4096窗远程语义检查通过，9种新fixed modes加3种legacy共12种，best按clean/reanchor/noisy/missing/strong加权0.2/0.2/0.35/0.2/0.05的current restoration loss选择。reanchor固定当前clean，是诊断分层，不等于mixed内clean/near各半的精确期望风险。新正式run已实际更新，尚无新模型最终恢复收益；旧协议保留但batch/RNG/quality条件不同，不能将更轻噪声的更小误差直接当胜过D28。[运行与口径](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)。
 
 **四个已下载来源的后续审计：** 字段条件允许用于pure-motion TWM，建议MoCap三库核心＋Dex train补充，不按四库等精度/等权监督。Oak raw_mano有16 quaternion/tsl/beta；HOT/Ume MANO为PCA15＋root axis-angle/transl，Dex为PCA45＋非flat mean的51D，需源模型展开后编码99D。Ume样本native与MANO可独立缺失；HOT有真实ref timestamps，Ume抽查包仅frame IDs；Dex TAR顺序乱序且多view共享motion。固定train后排序、mask、时间与腕原点/FK验收仍待做，不能把全包含val/test都用于训练。[代码与样本范围](../docs/TWM_FOUR_DATASETS_AUDIT_2026-10-14.md)

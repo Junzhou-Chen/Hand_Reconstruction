@@ -1,0 +1,1159 @@
+{
+  "ready": true,
+  "utc": "2026-10-15T02:12:13.931674+00:00",
+  "code_version": "7d53fa4a1b14f31e08f41ba545556e59adadd31f",
+  "formal_run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015",
+  "launch": {
+    "pid": 4672,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/scripts/train_probabilistic_twm.py",
+      "--manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--config",
+      "/sciclone/home/jchen57/project/Hand_Reconstruction/config/twm_four_sources_moe_mixed_v2_b512_10k.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015",
+      "--code-version",
+      "7d53fa4a1b14f31e08f41ba545556e59adadd31f"
+    ],
+    "code_version": "7d53fa4a1b14f31e08f41ba545556e59adadd31f",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-debug-mpd5p",
+    "started_utc": "2026-10-15T02:09:50.156267+00:00"
+  },
+  "parameters": 13530032,
+  "initialization": "from scratch",
+  "world_size": 2,
+  "global_batch_size": 1024,
+  "per_gpu_batch_size": 512,
+  "target_optimizer_steps": 10000,
+  "target_sample_draws": 10240000,
+  "config_file_sha256": "9fc566ab9711eff489c7acb4d0bc001f12e4b86883db698f4ea779c79a20a3eb",
+  "resolved_config_sha256": "2601079fe0bc178ca8ee81bc1999eb74b4cc651c28a6ea285aa46d338ae5ab53",
+  "corruption_profile_sha256": "6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "source_sha256": {
+    "scripts/train_probabilistic_twm.py": "c64396f33e8a11103dd610bef6a92175a2eb6e0373a9104f3c7f0a3a18157c69",
+    "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+    "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+    "src/handloop/models/probabilistic_twm.py": "032f454ed4426a0e6554f4d509b916bd8f2ef63b8f1656ae7178e52bc91c5b86",
+    "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+    "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+    "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+    "src/handloop/tracking.py": "64b11cf6de95d49cb10cfd85478e42f1ba1dde72d0764915748824af64948e65",
+    "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce"
+  },
+  "effective_stop_before_utc": "2026-10-15T16:25:00+00:00",
+  "batch512_probe": {
+    "phase": "complete",
+    "started_utc": "2026-10-15T02:07:31.750486+00:00",
+    "python": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+    "torch": "2.10.0+cu130",
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+    "cuda_visible_devices": "1",
+    "total_vram_bytes": 101974081536,
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+    "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "config": {
+      "seed": 20261015,
+      "history_frames": 30,
+      "min_future_frames": 3,
+      "window_stride": 4,
+      "batch_size": 1024,
+      "steps": 10000,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.01,
+      "warmup_steps": 500,
+      "eval_every": 500,
+      "save_every": 100,
+      "log_every": 10,
+      "eval_batch_size": 32,
+      "eval_batches": 8,
+      "eval_horizons_seconds": [
+        0.1,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "current_nll_weight": 0.05,
+      "forecast_nll_weight": 0.3,
+      "forecast_geometry_weight": 0.2,
+      "velocity_weight": 0.05,
+      "moe_balance_weight": 0.01,
+      "model": {
+        "backbone": "structured_mamba",
+        "d_model": 256,
+        "num_layers": 6,
+        "nhead": 4,
+        "dim_feedforward": 512,
+        "dropout": 0.1,
+        "forecast_horizon": 60,
+        "translation_scale": 0.1,
+        "rotation_scale": 0.5,
+        "check_finite": false,
+        "mamba_state_size": 64,
+        "mamba_conv": 4,
+        "mamba_expand": 2,
+        "num_experts": 4,
+        "num_modes": 4,
+        "future_decoder_layers": 1,
+        "future_joint_width": 64,
+        "time_frequencies_hz": [
+          0.25,
+          0.5,
+          1.0,
+          2.0,
+          4.0,
+          8.0
+        ]
+      },
+      "required_datasets": [
+        "oakink2",
+        "hot3d",
+        "umetrack",
+        "dexycb"
+      ],
+      "source_sampling": "equal_source",
+      "cache_sequences": 8192,
+      "cache_bytes": 4294967296,
+      "condition_on_beta": false,
+      "world_size": 2,
+      "cpu_threads": 4,
+      "stop_before_utc": "2026-10-15T16:25:00+00:00",
+      "tracking": {
+        "enabled": true,
+        "mode": "online",
+        "require_online": true,
+        "project": "handloop-twm",
+        "entity": "black-ant",
+        "name": "twm-moe-mixed-v2-b512-10k",
+        "group": "four-source-mixed-current-and-future",
+        "tags": [
+          "mamba",
+          "dense-moe4",
+          "trajectory-modes4",
+          "future60",
+          "current-restoration",
+          "bounded-corruption-v2",
+          "current-reanchor",
+          "quality-unknown",
+          "per-gpu512",
+          "global1024",
+          "fresh-10k"
+        ]
+      },
+      "corruption_profile_path": "config/twm_corruption_mixed_v2.json",
+      "eval_corruption_modes": [
+        "noisy",
+        "missing",
+        "clean",
+        "reanchor",
+        "light_clean_history",
+        "light_noisy_history",
+        "medium",
+        "strong",
+        "history_only",
+        "legacy_noisy",
+        "legacy_missing",
+        "legacy_clean"
+      ],
+      "best_selection_weights": {
+        "clean": 0.2,
+        "reanchor": 0.2,
+        "noisy": 0.35,
+        "missing": 0.2,
+        "strong": 0.05
+      },
+      "best_selection_description": "Weighted current-restoration loss over five fixed strata; reanchor uses exact current reference as a diagnostic. Clean and legacy stress metrics also reported separately.",
+      "corruption_profile": {
+        "profile": "mixed_motion_restoration_v2",
+        "status": "active",
+        "architecture_independent": true,
+        "target_policy": "All current and future targets remain uncorrupted source reference trajectories",
+        "amplitude_convention": "Translation is actual 3D displacement norm in mm; rotation is actual SO(3) geodesic angle in degrees, never per-axis std or noise added to rot6d",
+        "levels": {
+          "clean": {
+            "translation_norm_mm": [
+              0,
+              0
+            ],
+            "root_angle_deg": [
+              0,
+              0
+            ],
+            "finger_angle_deg": [
+              0,
+              0
+            ]
+          },
+          "near": {
+            "translation_norm_mm": [
+              0,
+              1
+            ],
+            "root_angle_deg": [
+              0,
+              1
+            ],
+            "finger_angle_deg": [
+              0,
+              1
+            ]
+          },
+          "light": {
+            "translation_norm_mm": [
+              1,
+              6
+            ],
+            "root_angle_deg": [
+              0,
+              4
+            ],
+            "finger_angle_deg": [
+              0,
+              3
+            ]
+          },
+          "medium": {
+            "translation_norm_mm": [
+              6,
+              15
+            ],
+            "root_angle_deg": [
+              3,
+              10
+            ],
+            "finger_angle_deg": [
+              2,
+              8
+            ]
+          },
+          "strong": {
+            "translation_norm_mm": [
+              20,
+              50
+            ],
+            "root_angle_deg": [
+              10,
+              35
+            ],
+            "finger_angle_deg": [
+              8,
+              25
+            ]
+          }
+        },
+        "amplitude_sampling": "Uniform radius/angle within selected range; isotropic random direction; group rotations composed on SO(3)",
+        "window_cases": [
+          {
+            "name": "clean_motion",
+            "probability": 0.2,
+            "current_levels": {
+              "clean": 1.0
+            },
+            "history_levels": {
+              "clean": 1.0
+            }
+          },
+          {
+            "name": "current_reanchors_history",
+            "probability": 0.2,
+            "current_levels": {
+              "clean": 0.5,
+              "near": 0.5
+            },
+            "history_levels": {
+              "medium": 1.0
+            }
+          },
+          {
+            "name": "ordinary_restoration",
+            "probability": 0.35,
+            "current_levels": {
+              "light": 0.5,
+              "medium": 0.5
+            },
+            "history_levels": {
+              "clean": 0.3333333333333333,
+              "light": 0.3333333333333333,
+              "medium": 0.3333333333333333
+            },
+            "severity_relation": "independent history/current draws"
+          },
+          {
+            "name": "partial_missing",
+            "probability": 0.2,
+            "current_levels": {
+              "near": 0.5,
+              "light": 0.5
+            },
+            "history_levels": {
+              "light": 0.5,
+              "medium": 0.5
+            },
+            "missing_cases": {
+              "one_whole_finger": 0.7,
+              "one_to_three_state_groups": 0.2,
+              "whole_current_hand": 0.1
+            },
+            "candidate_fill": "causal previous completed history only"
+          },
+          {
+            "name": "rare_local_failure",
+            "probability": 0.05,
+            "current_levels": {
+              "light": 1.0
+            },
+            "history_levels": {
+              "light": 0.5,
+              "medium": 0.5
+            },
+            "strong_override": {
+              "wrist_translation_and_root": 0.5,
+              "one_or_two_fingers": 0.5
+            }
+          }
+        ],
+        "temporal_noise": {
+          "affected_window_modes": {
+            "independent": 0.5,
+            "correlated": 0.5
+          },
+          "latent_direction_correlation_seconds": [
+            0.1,
+            0.3
+          ],
+          "history_current_joint_process": "shared continuous noise where case permits; explicit reset at current time in current_reanchors_history",
+          "bounded_rule": "Normalize direction after any mixing, then multiply by bounded radius/angle. Do not add multiple full-amplitude errors.",
+          "actual_correlation": "Must be measured after direction normalization; latent OU rho is not the final error correlation"
+        },
+        "quality": {
+          "default": "unknown_for_available_state_groups",
+          "unknown_value": -1,
+          "availability_is_separate": true,
+          "oracle_quality": "optional separately labeled ablation only; not the default condition"
+        },
+        "source_sampling": "retain current four-source split and sampling; no new images required",
+        "evaluation": {
+          "fixed_cases": [
+            "clean_history_clean_current",
+            "noisy_history_clean_current",
+            "clean_history_light_current",
+            "noisy_history_light_current",
+            "noisy_history_medium_or_local_current",
+            "rare_strong_current",
+            "partial_and_whole_missing",
+            "history_only_control"
+          ],
+          "retain_legacy_stress_profile": true,
+          "paired_corruption_seed": true,
+          "metrics": [
+            "input_hold_output_wrist_mm_root_deg_finger_deg",
+            "median_and_p95_by_source",
+            "wrist_degradation_over_1mm",
+            "input_severity_bins",
+            "current_removal_effect",
+            "forecast_per_horizon_with_valid_counts"
+          ]
+        },
+        "limitations": [
+          "Not fitted to HaWoR empirical error distribution; all amplitudes and mixture weights are unvalidated starting hypotheses",
+          "Five percent strong-case sampling is not a guarantee that only five percent of candidate/model joint errors are large; missing-value hold and rotation/FK coupling can add error",
+          "Clean restoration may be copied; future labels and dedicated restoration conditions remain necessary",
+          "Architecture-independent input corruption. The legacy sampler and old checkpoints remain unchanged."
+        ],
+        "execution_policy": "Explicitly selected by a fresh training run; old checkpoints/runs remain preserved"
+      },
+      "corruption_profile_sha256": "6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518"
+    },
+    "source_revisions": {
+      "dexycb": [
+        "64551b001d360ad83bc383157a559ec248fb9100"
+      ],
+      "hot3d": [
+        "30fe9674782f32e1e5edba98476b6ff4300132c5"
+      ],
+      "oakink2": [
+        "21705616140d726607027e70d58b7837f442ffd8"
+      ],
+      "umetrack": [
+        "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+      ]
+    },
+    "base_indices_by_source": {
+      "dexycb": [
+        630258
+      ],
+      "hot3d": [
+        346860
+      ],
+      "oakink2": [
+        0
+      ],
+      "umetrack": [
+        478868
+      ]
+    },
+    "base_valid_future_frames": [
+      32,
+      60,
+      60,
+      60
+    ],
+    "batch_sizes": [
+      512
+    ],
+    "iterations": 3,
+    "warmup": 0,
+    "scope": "Full probabilistic objective on repeated real windows; excludes loading/DDP; not quality/calibration evidence",
+    "mask_invariance": {
+      "passed": true,
+      "masked_labels": 228,
+      "input_max_abs": 0.0,
+      "current_output_max_abs": 0.0,
+      "forecast_output_max_abs": 0.0,
+      "full_objective_abs_difference": 0.0,
+      "objective_term_max_abs": 0.0
+    },
+    "results": [
+      {
+        "batch_size": 512,
+        "status": "passed",
+        "measurements": [
+          {
+            "loss": 0.2888832986354828,
+            "grad_norm": 21.317594528198242,
+            "terms": {
+              "loss": 0.2888832986354828,
+              "restoration_loss": 0.022819623351097107,
+              "current_nll_per_dof": -2.6449429988861084,
+              "forecast_nll_per_dof": -0.5215275287628174,
+              "best_trajectory_geometry_loss": 2.7657551765441895,
+              "velocity_loss": 0.01610928401350975,
+              "moe_balance_loss": 0.0812535285949707,
+              "mode_entropy": 1.3862943649291992,
+              "current_xyz_std_mm": 49.78706741333008,
+              "future_within_mode_xyz_std_mm": 100.57263946533203,
+              "future_total_xyz_std_mm": 100.7010269165039
+            },
+            "seconds": 2.843330859206617
+          },
+          {
+            "loss": 3.631744384765625,
+            "grad_norm": 140.9990234375,
+            "terms": {
+              "loss": 3.631744384765625,
+              "restoration_loss": 0.025118717923760414,
+              "current_nll_per_dof": -2.658580780029297,
+              "forecast_nll_per_dof": 9.37129020690918,
+              "best_trajectory_geometry_loss": 4.629245758056641,
+              "velocity_loss": 0.02994447760283947,
+              "moe_balance_loss": 0.0821174830198288,
+              "mode_entropy": 1.3860487937927246,
+              "current_xyz_std_mm": 48.255279541015625,
+              "future_within_mode_xyz_std_mm": 100.57263946533203,
+              "future_total_xyz_std_mm": 100.61797332763672
+            },
+            "seconds": 2.516614342108369
+          },
+          {
+            "loss": 2.1054039001464844,
+            "grad_norm": 123.21185302734375,
+            "terms": {
+              "loss": 2.1054039001464844,
+              "restoration_loss": 0.03562182933092117,
+              "current_nll_per_dof": -2.6722216606140137,
+              "forecast_nll_per_dof": 4.979122161865234,
+              "best_trajectory_geometry_loss": 3.5381226539611816,
+              "velocity_loss": 0.022969216108322144,
+              "moe_balance_loss": 0.08834245055913925,
+              "mode_entropy": 1.3858190774917603,
+              "current_xyz_std_mm": 46.95476150512695,
+              "future_within_mode_xyz_std_mm": 101.32535552978516,
+              "future_total_xyz_std_mm": 101.34748077392578
+            },
+            "seconds": 2.5117010986432433
+          }
+        ],
+        "parameters": 13530032,
+        "samples_per_second": 195.1307187173985,
+        "peak_allocated_bytes": 63481519104,
+        "peak_reserved_bytes": 64122519552,
+        "all_gradients_used_finite": true,
+        "parameters_optimizer_finite": true,
+        "free_vram_before_bytes": 101234573312
+      }
+    ],
+    "updated_utc": "2026-10-15T02:08:03.452115+00:00",
+    "completed_utc": "2026-10-15T02:08:03.842991+00:00",
+    "untested_batch_sizes": []
+  },
+  "formal_checkpoint": {
+    "step": 10,
+    "code_version": "7d53fa4a1b14f31e08f41ba545556e59adadd31f",
+    "parameters": 13530032,
+    "model_and_optimizer_finite": true,
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "model_state_sha256": "e6ce7cbc0dd3b437fe4e6de18b0f47e045e7845aafdb0325eb6a7e8622a314ce",
+    "world_size": 2,
+    "adamw_steps": [
+      10.0
+    ]
+  },
+  "previous_checkpoint": {
+    "step": 3110,
+    "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a",
+    "parameters": 13530032,
+    "model_and_optimizer_finite": true,
+    "model_float_tensors": 322,
+    "adamw_float_tensors": 963,
+    "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+    "model_state_sha256": "add2d8fa103bf7976cb8129789a842c629b979d801abfb4f3ed0fc4766ef9e21",
+    "world_size": 2,
+    "adamw_steps": [
+      3110.0
+    ]
+  },
+  "previous_run_review": {
+    "ready": true,
+    "utc": "2026-10-15T02:04:35.653034+00:00",
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015",
+    "stop_status": {
+      "phase": "stopped",
+      "step": 3110,
+      "utc": "2026-10-15T02:02:24.032654+00:00",
+      "best_validation_loss": 0.01280963489361966
+    },
+    "STOP": true,
+    "processes": {
+      "4496": {
+        "exists": true,
+        "active_training": false
+      },
+      "4501": {
+        "exists": false,
+        "active_training": false
+      },
+      "4502": {
+        "exists": false,
+        "active_training": false
+      }
+    },
+    "latest_checkpoint_audit": {
+      "step": 3110,
+      "model_and_optimizer_finite": true,
+      "model_state_sha256": "add2d8fa103bf7976cb8129789a842c629b979d801abfb4f3ed0fc4766ef9e21",
+      "model_float_tensors": 322,
+      "adamw_float_tensors": 963,
+      "all_saved_rank_hashes_equal_cpu_checkpoint": true,
+      "code_version": "0d83a5478bc261fe138c43b109f7621206d34e4a"
+    },
+    "checkpoints": {
+      "latest.pt": {
+        "bytes": 162809587,
+        "sha256": "bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed",
+        "snapshot_sha256": "bc89a078a1328e26fa8329212a58d671960a9a092a7d68e8426ba5566c8b16ed",
+        "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_batch512_10k_20261015/previous_snapshots/latest.pt"
+      },
+      "best.pt": {
+        "bytes": 162806471,
+        "sha256": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a",
+        "snapshot_sha256": "56e506f9a6beba7012db53c24982eefc486ad3663ed39e51f3680b45adeae61a",
+        "snapshot": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/twm_batch512_10k_20261015/previous_snapshots/best.pt"
+      }
+    },
+    "fixed_validation_curve": [
+      {
+        "step": 0,
+        "utc": "2026-10-15T00:55:54.603920+00:00",
+        "best_score_so_far": 0.023204906820320424,
+        "clean": {
+          "restoration_loss": 2.012662977762872e-15,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.0,
+          "restored/root_deg": 2.0084123464325643e-07,
+          "restored/finger_deg": 9.389423216710213e-08,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "reanchor": {
+          "restoration_loss": 2.1394645577381143e-15,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.0,
+          "restored/root_deg": 2.605311546499678e-07,
+          "restored/finger_deg": 9.389423216710213e-08,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "noisy": {
+          "restoration_loss": 0.028125870681833476,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.158319294452667,
+          "restored/root_deg": 3.999256454408169,
+          "restored/finger_deg": 3.2242978885769844,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "missing": {
+          "restoration_loss": 0.008520634190062992,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.0684177055954933,
+          "restored/root_deg": 1.6060288809239864,
+          "restored/finger_deg": 1.7092016339302063,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "strong": {
+          "restoration_loss": 0.23313450487330556,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.421681374311447,
+          "restored/root_deg": 10.62582115828991,
+          "restored/finger_deg": 3.996307484805584,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "history_only": {
+          "restoration_loss": 0.03276643331628293,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.639713749289513,
+          "restored/root_deg": 3.723328337073326,
+          "restored/finger_deg": 2.7094469480216503,
+          "wrist_degradation_over_1mm": 0.0
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 161.9442113348093,
+          "future_1s/restored_hold/wrist_mm": 120.26788161696103,
+          "future_1s/constant_velocity/wrist_mm": 240.47262787462765
+        }
+      },
+      {
+        "step": 500,
+        "utc": "2026-10-15T01:06:45.485654+00:00",
+        "best_score_so_far": 0.023204906820320424,
+        "clean": {
+          "restoration_loss": 0.0005951120638201246,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 1.961703885346651,
+          "restored/root_deg": 0.28511471301317215,
+          "restored/finger_deg": 0.31530544348061085,
+          "wrist_degradation_over_1mm": 1.0
+        },
+        "reanchor": {
+          "restoration_loss": 0.0005960118687653448,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 1.9623522758483887,
+          "restored/root_deg": 0.2857994372025132,
+          "restored/finger_deg": 0.3153144931420684,
+          "wrist_degradation_over_1mm": 1.0
+        },
+        "noisy": {
+          "restoration_loss": 0.02848328568506986,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.407848909497261,
+          "restored/root_deg": 4.009295240044594,
+          "restored/finger_deg": 3.2362759858369827,
+          "wrist_degradation_over_1mm": 0.298828125
+        },
+        "missing": {
+          "restoration_loss": 0.00899940775707364,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.891835279762745,
+          "restored/root_deg": 1.6651728712022305,
+          "restored/finger_deg": 1.7594646215438843,
+          "wrist_degradation_over_1mm": 0.548828125
+        },
+        "strong": {
+          "restoration_loss": 0.23216840741224587,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.643901586532593,
+          "restored/root_deg": 10.601031601428986,
+          "restored/finger_deg": 4.017829887568951,
+          "wrist_degradation_over_1mm": 0.298828125
+        },
+        "history_only": {
+          "restoration_loss": 0.032883784762816504,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.88572384417057,
+          "restored/root_deg": 3.7446726262569427,
+          "restored/finger_deg": 2.7426947467029095,
+          "wrist_degradation_over_1mm": 0.3359375
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 149.31595468993072,
+          "future_1s/restored_hold/wrist_mm": 120.1474185674033,
+          "future_1s/constant_velocity/wrist_mm": 240.49791826047758
+        }
+      },
+      {
+        "step": 1000,
+        "utc": "2026-10-15T01:17:24.471248+00:00",
+        "best_score_so_far": 0.022254976823023753,
+        "clean": {
+          "restoration_loss": 0.0005872406727576163,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 1.5148193500936031,
+          "restored/root_deg": 0.588639885187149,
+          "restored/finger_deg": 0.39392899349331856,
+          "wrist_degradation_over_1mm": 1.0
+        },
+        "reanchor": {
+          "restoration_loss": 0.0007918481496744789,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 1.5106296204030514,
+          "restored/root_deg": 0.782723356038332,
+          "restored/finger_deg": 0.39425161108374596,
+          "wrist_degradation_over_1mm": 1.0
+        },
+        "noisy": {
+          "restoration_loss": 0.02675806573824957,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.286981582641602,
+          "restored/root_deg": 3.871235467493534,
+          "restored/finger_deg": 3.2150741815567017,
+          "wrist_degradation_over_1mm": 0.2001953125
+        },
+        "missing": {
+          "restoration_loss": 0.008934110068366863,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.6080146208405495,
+          "restored/root_deg": 1.8366084061563015,
+          "restored/finger_deg": 1.7757510989904404,
+          "wrist_degradation_over_1mm": 0.421875
+        },
+        "strong": {
+          "restoration_loss": 0.21654028072953224,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.531571567058563,
+          "restored/root_deg": 10.071663960814476,
+          "restored/finger_deg": 3.9943190962076187,
+          "wrist_degradation_over_1mm": 0.19140625
+        },
+        "history_only": {
+          "restoration_loss": 0.03259611630346626,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.7517398446798325,
+          "restored/root_deg": 3.78691416233778,
+          "restored/finger_deg": 2.7563080862164497,
+          "wrist_degradation_over_1mm": 0.26171875
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 157.15011344673198,
+          "future_1s/restored_hold/wrist_mm": 120.09094439633157,
+          "future_1s/constant_velocity/wrist_mm": 240.46230028556334
+        }
+      },
+      {
+        "step": 1500,
+        "utc": "2026-10-15T01:28:05.269292+00:00",
+        "best_score_so_far": 0.01713720260613627,
+        "clean": {
+          "restoration_loss": 0.0008174345466613886,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.7230235626921058,
+          "restored/root_deg": 0.6882784813642502,
+          "restored/finger_deg": 0.6620957404375076,
+          "wrist_degradation_over_1mm": 0.2177734375
+        },
+        "reanchor": {
+          "restoration_loss": 0.0018667414296942297,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.8348854873329401,
+          "restored/root_deg": 1.2552891820669174,
+          "restored/finger_deg": 0.7173049673438072,
+          "wrist_degradation_over_1mm": 0.3271484375
+        },
+        "noisy": {
+          "restoration_loss": 0.022787586058257148,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.226917579770088,
+          "restored/root_deg": 3.478389911353588,
+          "restored/finger_deg": 2.861780993640423,
+          "wrist_degradation_over_1mm": 0.0576171875
+        },
+        "missing": {
+          "restoration_loss": 0.009155091916909441,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.2880657389760017,
+          "restored/root_deg": 2.0083657912909985,
+          "restored/finger_deg": 1.8484318144619465,
+          "wrist_degradation_over_1mm": 0.0771484375
+        },
+        "strong": {
+          "restoration_loss": 0.13587387814186513,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.53281205892563,
+          "restored/root_deg": 6.472069442272186,
+          "restored/finger_deg": 3.4761201590299606,
+          "wrist_degradation_over_1mm": 0.134765625
+        },
+        "history_only": {
+          "restoration_loss": 0.03165825770702213,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.669943258166313,
+          "restored/root_deg": 3.7594481632113457,
+          "restored/finger_deg": 2.789310082793236,
+          "wrist_degradation_over_1mm": 0.083984375
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 123.71154112857911,
+          "future_1s/restored_hold/wrist_mm": 120.21057641175432,
+          "future_1s/constant_velocity/wrist_mm": 240.51370747964964
+        }
+      },
+      {
+        "step": 2000,
+        "utc": "2026-10-15T01:38:46.534101+00:00",
+        "best_score_so_far": 0.014269658321609313,
+        "clean": {
+          "restoration_loss": 0.0007255550472109462,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.7963504586368799,
+          "restored/root_deg": 0.6568065183237195,
+          "restored/finger_deg": 0.29024536814540625,
+          "wrist_degradation_over_1mm": 0.2236328125
+        },
+        "reanchor": {
+          "restoration_loss": 0.0015243249745253706,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.8483278974890709,
+          "restored/root_deg": 0.923978466540575,
+          "restored/finger_deg": 0.3611205229535699,
+          "wrist_degradation_over_1mm": 0.2978515625
+        },
+        "noisy": {
+          "restoration_loss": 0.018783391366014257,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.249855697154999,
+          "restored/root_deg": 2.8817905597388744,
+          "restored/finger_deg": 2.0888623036444187,
+          "wrist_degradation_over_1mm": 0.06640625
+        },
+        "missing": {
+          "restoration_loss": 0.008357549348147586,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.3347146958112717,
+          "restored/root_deg": 1.8419672399759293,
+          "restored/finger_deg": 1.5520238541066647,
+          "wrist_degradation_over_1mm": 0.0732421875
+        },
+        "strong": {
+          "restoration_loss": 0.11147970939055085,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.535506933927536,
+          "restored/root_deg": 5.097370401024818,
+          "restored/finger_deg": 2.53627447783947,
+          "wrist_degradation_over_1mm": 0.109375
+        },
+        "history_only": {
+          "restoration_loss": 0.02976588628371246,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.719742104411125,
+          "restored/root_deg": 3.5850369930267334,
+          "restored/finger_deg": 2.465365245938301,
+          "wrist_degradation_over_1mm": 0.0498046875
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 114.75108817868866,
+          "future_1s/restored_hold/wrist_mm": 120.225706963653,
+          "future_1s/constant_velocity/wrist_mm": 240.52182524988996
+        }
+      },
+      {
+        "step": 2500,
+        "utc": "2026-10-15T01:49:26.968796+00:00",
+        "best_score_so_far": 0.013313077549355512,
+        "clean": {
+          "restoration_loss": 0.0006395212212737533,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.8194924779236317,
+          "restored/root_deg": 0.5448908898979425,
+          "restored/finger_deg": 0.31823385087773204,
+          "wrist_degradation_over_1mm": 0.2373046875
+        },
+        "reanchor": {
+          "restoration_loss": 0.001394445454934612,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.8719839174300432,
+          "restored/root_deg": 0.7155173821374774,
+          "restored/finger_deg": 0.39423083886504173,
+          "wrist_degradation_over_1mm": 0.2861328125
+        },
+        "noisy": {
+          "restoration_loss": 0.017318990256171674,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.256906569004059,
+          "restored/root_deg": 2.5957875065505505,
+          "restored/finger_deg": 1.884674608707428,
+          "wrist_degradation_over_1mm": 0.0693359375
+        },
+        "missing": {
+          "restoration_loss": 0.00803379196440801,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.338329330086708,
+          "restored/root_deg": 1.733911756426096,
+          "restored/finger_deg": 1.4940394945442677,
+          "wrist_degradation_over_1mm": 0.05859375
+        },
+        "strong": {
+          "restoration_loss": 0.10475758463144302,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.501408755779266,
+          "restored/root_deg": 4.591194368898869,
+          "restored/finger_deg": 2.2468018904328346,
+          "wrist_degradation_over_1mm": 0.115234375
+        },
+        "history_only": {
+          "restoration_loss": 0.02856968715786934,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.633836194872856,
+          "restored/root_deg": 3.4420790299773216,
+          "restored/finger_deg": 2.3220109567046165,
+          "wrist_degradation_over_1mm": 0.0107421875
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 116.76916685044398,
+          "future_1s/restored_hold/wrist_mm": 120.26581010807719,
+          "future_1s/constant_velocity/wrist_mm": 240.4665671020496
+        }
+      },
+      {
+        "step": 3000,
+        "utc": "2026-10-15T02:00:07.233074+00:00",
+        "best_score_so_far": 0.01280963489361966,
+        "clean": {
+          "restoration_loss": 0.0004764973868986999,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.6632000226527452,
+          "restored/root_deg": 0.49547010473906994,
+          "restored/finger_deg": 0.22421389631927013,
+          "wrist_degradation_over_1mm": 0.0751953125
+        },
+        "reanchor": {
+          "restoration_loss": 0.0009997401539294515,
+          "candidate/wrist_mm": 0.0,
+          "restored/wrist_mm": 0.6584099940955639,
+          "restored/root_deg": 0.6780632231384516,
+          "restored/finger_deg": 0.33905616495758295,
+          "wrist_degradation_over_1mm": 0.0966796875
+        },
+        "noisy": {
+          "restoration_loss": 0.016845647856825963,
+          "candidate/wrist_mm": 7.158319294452667,
+          "restored/wrist_mm": 7.2104954570531845,
+          "restored/root_deg": 2.5733421333134174,
+          "restored/finger_deg": 1.7730623073875904,
+          "wrist_degradation_over_1mm": 0.0205078125
+        },
+        "missing": {
+          "restoration_loss": 0.0076144207050674595,
+          "candidate/wrist_mm": 3.0684177055954933,
+          "restored/wrist_mm": 3.2326341941952705,
+          "restored/root_deg": 1.6921095177531242,
+          "restored/finger_deg": 1.450208131223917,
+          "wrist_degradation_over_1mm": 0.0224609375
+        },
+        "strong": {
+          "restoration_loss": 0.101910529891029,
+          "candidate/wrist_mm": 18.421681374311447,
+          "restored/wrist_mm": 18.48237246274948,
+          "restored/root_deg": 4.315636076033115,
+          "restored/finger_deg": 2.07213656231761,
+          "wrist_degradation_over_1mm": 0.1025390625
+        },
+        "history_only": {
+          "restoration_loss": 0.027804791694507003,
+          "candidate/wrist_mm": 7.639713749289513,
+          "restored/wrist_mm": 7.614466950297356,
+          "restored/root_deg": 3.362152799963951,
+          "restored/finger_deg": 2.261466506868601,
+          "wrist_degradation_over_1mm": 0.0185546875
+        },
+        "forecast_1s": {
+          "future_1s/map/wrist_mm": 112.30350234299213,
+          "future_1s/restored_hold/wrist_mm": 120.15580048953811,
+          "future_1s/constant_velocity/wrist_mm": 240.42405531169246
+        }
+      }
+    ],
+    "train_window_means": [
+      {
+        "step_range": [
+          510,
+          1000
+        ],
+        "records": 50,
+        "loss": -0.6905427145957946,
+        "restoration_loss": 0.025472744517028332,
+        "grad_norm": 6.520640459060669,
+        "forecast_nll_per_dof": -2.5298836517333982
+      },
+      {
+        "step_range": [
+          1010,
+          1500
+        ],
+        "records": 50,
+        "loss": -0.7209020519256591,
+        "restoration_loss": 0.02123489070683718,
+        "grad_norm": 6.293331737518311,
+        "forecast_nll_per_dof": -2.593675818443298
+      },
+      {
+        "step_range": [
+          1510,
+          2000
+        ],
+        "records": 50,
+        "loss": -0.7944430112838745,
+        "restoration_loss": 0.01649363949894905,
+        "grad_norm": 9.665486645698547,
+        "forecast_nll_per_dof": -2.69086519241333
+      },
+      {
+        "step_range": [
+          2010,
+          2500
+        ],
+        "records": 50,
+        "loss": -0.840948133468628,
+        "restoration_loss": 0.01451047308743,
+        "grad_norm": 11.936629571914672,
+        "forecast_nll_per_dof": -2.7600214099884033
+      },
+      {
+        "step_range": [
+          2510,
+          3000
+        ],
+        "records": 50,
+        "loss": -0.8627081990242005,
+        "restoration_loss": 0.013914257567375899,
+        "grad_norm": 13.228187847137452,
+        "forecast_nll_per_dof": -2.788772873878479
+      },
+      {
+        "step_range": [
+          3010,
+          3110
+        ],
+        "records": 11,
+        "loss": -0.8696591583165255,
+        "restoration_loss": 0.013609453951093283,
+        "grad_norm": 13.261215903542258,
+        "forecast_nll_per_dof": -2.8052813573317095
+      }
+    ],
+    "scope": "Existing mixed-v2 synthetic validation; not real HaWoR accuracy or proof of convergence"
+  },
+  "running_snapshot": {
+    "utc": "2026-10-15T02:12:00.890220+00:00",
+    "phase": "training",
+    "step": 20,
+    "loss": -0.24822184443473816,
+    "restoration_loss": 0.027153175324201584,
+    "current_nll_per_dof": -2.6563894748687744,
+    "forecast_nll_per_dof": -1.4593616724014282,
+    "best_trajectory_geometry_loss": 1.4672541618347168,
+    "velocity_loss": 0.024542514234781265,
+    "moe_balance_loss": 0.057500891387462616,
+    "mode_entropy": 1.3862652778625488,
+    "current_xyz_std_mm": 49.01519012451172,
+    "future_within_mode_xyz_std_mm": 100.57264709472656,
+    "future_total_xyz_std_mm": 100.66935729980469,
+    "grad_norm": 7.760849952697754,
+    "lr": 8.000000000000001e-06,
+    "elapsed_seconds": 61.299970713444054,
+    "samples_per_second": 334.09477625587857,
+    "ranks": [
+      {
+        "rank": 0,
+        "pid": 4677,
+        "device": 0,
+        "peak_allocated_gb": 63.916322816,
+        "peak_reserved_gb": 64.6971392
+      },
+      {
+        "rank": 1,
+        "pid": 4678,
+        "device": 1,
+        "peak_allocated_gb": 63.907272704,
+        "peak_reserved_gb": 64.690847744
+      }
+    ],
+    "samples_by_dataset": {
+      "dexycb": 5092,
+      "hot3d": 5110,
+      "oakink2": 5100,
+      "umetrack": 5178
+    },
+    "corruption_samples_by_case": {
+      "clean_motion": 3988,
+      "current_reanchors_history": 4143,
+      "ordinary_restoration": 7179,
+      "partial_missing": 4148,
+      "rare_local_failure": 1022
+    },
+    "moe_load": {
+      "0": 0.2646503746509552,
+      "1": 0.25471237301826477,
+      "2": 0.25220146775245667,
+      "3": 0.22843578457832336
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/12cc0781"
+  },
+  "wandb_server": {
+    "state": "running",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/12cc0781",
+    "optimizer_step": 20,
+    "train_loss": -0.24822184443473816,
+    "train_grad_norm": 7.760849952697754
+  },
+  "initial_validation": {
+    "step": 0,
+    "modes": [
+      "noisy",
+      "missing",
+      "clean",
+      "reanchor",
+      "light_clean_history",
+      "light_noisy_history",
+      "medium",
+      "strong",
+      "history_only",
+      "legacy_noisy",
+      "legacy_missing",
+      "legacy_clean"
+    ],
+    "samples_by_source": {
+      "dexycb": 256,
+      "hot3d": 256,
+      "oakink2": 256,
+      "umetrack": 256
+    },
+    "scope": "Initialization only, not trained model quality"
+  },
+  "previous_runs": {
+    "twm_four_sources_moe_mixed_v2_20261015": {
+      "phase": "stopped",
+      "step": 3110,
+      "STOP": true
+    },
+    "twm_four_sources_moe_long_horizon_20261015": {
+      "phase": "stopped",
+      "step": 814,
+      "STOP": true
+    },
+    "twm_four_sources_structured_mamba_ddp_20261014": {
+      "phase": "stopped",
+      "step": 32783,
+      "STOP": true
+    }
+  },
+  "scope": "Verified fresh 10k target run with synchronized finite training, not convergence or final accuracy evidence"
+}

@@ -45,6 +45,7 @@
 | D31 | 先暂停目前训练；架构在另一聊天修改；混合高质量纯轨迹与受损条件，误差以轻中度为主、严重可有但少量 | 纽约2026-10-14用户直接指令与对D30的澄清。不必先完成真实HaWoR误差标定才能推进，后续真实视觉验证仍保留。D29已STOP共同保存停止814步，latest814/best500及额外快照通过finite/hash核验；不自动resume、不修改另一聊天架构。20/20/35/20/5与范数分档、unknown quality是本轮工程建议，尚未接入trainer、未获实验验证。[暂停摘要](../reports/twm_moe_pause_20261015.json)、[混合方案§9](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。 |
 | D32 | 按D31当前混合设置实现并启动训练 | 纽约2026-10-14用户明确指令“很好，按照你目前的设置，跑起来”。采纳20/20/35/20/5、有界位移范数/总旋转角、quality unknown方向；0d83a54已接入独立active profile与12种验证，原架构/GT/split保持。工程选择新run从头，每卡256/global512，旧D29/D28保持暂停。4096窗语义检查＋双卡3更新/CPU hash通过，正式00:57:06UTC实际50步、checkpoint10 finite/两rank一致、W&B server step40同步；收益未验。[运行](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d32混合有界噪声训练已启动)、[摘要](../reports/twm_mixed_v2_20261015_launch.json)。 |
 | D33 | 在HaWoR预训练权重上增加视觉侧校正反馈接口；重新梳理循环与实现逻辑，避免堆叠多项手工带权loss | 纽约2026-10-14用户直接要求。替代§10多loss菜单作为默认建议；保留TWM纯数值、raw/candidate/history分开。具体“PAM之后小型视觉读出插件＋最终当前单NLL＋冻结两主干”是本轮工程推荐，尚未实现或验证；不自动解冻HaWoR、不永久定案删除独立Corrector、不修改D32训练。[新建议§11](../docs/TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#11-d33预训练hawor读出侧反馈插件与单一视觉训练目标)。 |
+| D34 | 检查当前约3k步收敛；batch翻倍为每卡512/global1024，独立从头训练10,000步 | 纽约2026-10-14用户明确要求，仅替代D32训练执行配置，不替代D33视觉方向。旧D32于02:02:24.032654UTC保存停止3,110步，latest与best均保留、额外快照SHA一致，模型/AdamW有限且CPU完整模型hash与两rank一致。旧1k→3k实际加权恢复score下降0.022255→0.012810，但noisy腕7.210mm仍高于input7.158mm，不能称全面收敛。7d53fa4a1b14f31e08f41ba545556e59adadd31f新配置保留模型、GT/split、mixed_v2、LR2e-4/warmup500，cosine终点改10k，目标10.24M样本抽取；02:12:13.931674UTC新run实际20步/20,480样本，独立检查checkpoint10有限且CPU与两rankhash一致，W&B12cc0781服务器step20同步。启动验收通过，不当10k完成或真实HaWoR收益。[执行记录](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[本轮摘要](../reports/twm_batch512_10k_20261015.json)。 |
 
 ## 已替代的历史路线
 
@@ -75,7 +76,7 @@
 
 数据建议演进：v0 HOT＋Re→v1 HOT＋Oak及Re/EgoDex扩展→D18用户纠正为传感器精度主导。[v2计划](../docs/TWM_PRETRAIN_PLAN.md)恢复GRAB/ARCTIC/Oak/HOT高优先，新增UmeTrack、提升HumanTouch/DexWild主要glove；Re/EgoDex后续单列。随后D26明确本轮联合Oak/HOT/Ume/Dex四库，替代旧单库执行；**精度优先原则已定，等库采样比例仍是本轮工程假设**。后续glove验收及ARCTIC暂缓不变。[专题证据](11_SENSOR_FIRST_PRETRAIN_2026-10-13.md)
 
-HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。D25已用独立Torch2.10/cu130 runtime完成50k；D26四库准备与单卡中途checkpoint验收通过，旧run保存停止于26,346步。当前D27双卡运行，计划50k尚未完成；DDP实际resume与仅rank1信号共同停机已验，但sampler预取块/loader游标未完整保存，不宣称逐样本精确续跑。正式双卡checkpoint26350的CPU finite检查已过；50k最终效果、独立GT精度与后续Job续跑仍按实际证据验收。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
+HaWoR及本地/远程分工已选定；D19选ds用户Pod，D20开始三库获取。D25已用独立Torch2.10/cu130 runtime完成50k；D26四库准备与单卡中途checkpoint验收通过，旧run保存停止于26,346步。D27双卡阶段随后按D28保存停止于32,783步，未完成其50k计划，旧run保持STOP；DDP实际resume与仅rank1信号共同停机已验，但sampler预取块/loader游标未完整保存，不宣称逐样本精确续跑。正式双卡checkpoint26350的CPU finite检查属于历史验收，不能代替当前D34新run的启动或最终效果验收。独立GT精度与后续Job安排仍按实际证据记录。完整缺口见[进展与下一步](04_STATUS_AND_NEXT_STEPS.md)。
 
 [完整方法框架](../docs/METHOD_FRAMEWORK.md)给出了统一TWM输入、anchor残差、最终q、首帧缺测及单手共享参数的具体建议。它们是为消除歧义提出的候选契约，不因写入框架而升级为用户已定或实验已验证。
 

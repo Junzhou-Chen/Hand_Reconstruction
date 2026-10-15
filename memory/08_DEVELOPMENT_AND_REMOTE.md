@@ -1,6 +1,8 @@
 # 开发、GitHub同步和远程实验约定
 
-**当前D32（2026-10-15 UTC）：** 用户要求按混合设置实现并跑起。0d83a54新run在原Pod/GPU0/1从头启动，输出data10项目根`runs/twm_four_sources_moe_mixed_v2_20261015`，每卡256/global512，launcher4496/ranks4501/4502；00:57:06UTC实际50步，W&B cd487764服务端step40可读。正式checkpoint10模型322/AdamW963浮点张量finite，CPU与两rank完整hash一致。语义4096窗和双卡global512三更新smoke通过；原D29/D28 STOP均保留。默认ds_train_probabilistic_twm.py已改指新config/output；只查status，不重复start。16:25UTC共同保存，原Job不重建；资产/权重/raw logs仅远程。[实测摘要](../reports/twm_mixed_v2_20261015_launch.json)。
+**最新D34：每卡512、global1024，从头训练10,000步。** 用户要求检查约3k步曲线并加大batch重新跑；D32已于02:02:24UTC共同保存停止3,110步，latest/best原件及额外快照保留，模型/AdamW finite、CPU与两rank hash一致。新run `twm_four_sources_moe_mixed_v2_b512_10k_20261015` 以7d53fa4于02:09:50UTC在原GPU0/1从头启动；02:12:13UTC验收实际20步/20,480样本、四库与五类均参与，W&B12cc0781服务端step20已收到标量。正式checkpoint10的322个model/963个AdamW浮点张量finite、两rank与CPU一致；当时每卡峰值allocated约63.9GB。保留13.53M架构、四库GT/split和mixed_v2；LR2e-4/warmup500不变，cosine改10k结束。旧1k→3k加权恢复score0.02225→0.01281、finger3.22→1.77°仍改善，但腕位置输出7.21mm未优于输入7.16mm，不能保证仅加步数解决。10k是目标、非完成；本轮不改D33视觉方案。 [运行与操作](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)、[摘要](../reports/twm_batch512_10k_20261015.json)。默认`ds_train_probabilistic_twm.py status/stop`现指D34，查旧run须显式`--output`；16:25UTC共同保存，原Job不重建，不重复start。
+
+**D32历史（D34已停止3,110步；2026-10-15 UTC）：** 用户要求按混合设置实现并跑起。0d83a54新run在原Pod/GPU0/1从头启动，输出data10项目根`runs/twm_four_sources_moe_mixed_v2_20261015`，每卡256/global512，launcher4496/ranks4501/4502；00:57:06UTC实际50步，W&B cd487764服务端step40可读。正式checkpoint10模型322/AdamW963浮点张量finite，CPU与两rank完整hash一致。语义4096窗和双卡global512三更新smoke通过；原D29/D28 STOP均保留。本段D32启动时默认helper曾指该run，随后D34已另改；旧run保持STOP。16:25UTC共同保存，原Job不重建；资产/权重/raw logs仅远程。[实测摘要](../reports/twm_mixed_v2_20261015_launch.json)。
 
 **D31暂停历史：** 用户要求暂停当前训练，架构在另一聊天修改。D29于00:36:36UTC（纽约20:36）STOP共同保存停止814步，rank4039/4040退出；latest814/best500权重322/AdamW963浮点张量finite，CPU完整模型hash与两rank一致，原件和快照SHA一致。独立备份在data10项目根`evaluations/twm_moe_pause_20261015_v1/snapshots`，原run保留。00:37:42UTC核验，随后GPU无计算进程。保持STOP，不当故障自动resume；本轮混合corruption仅草案，未改架构/训练入口或用户Job。[暂停摘要](../reports/twm_moe_pause_20261015.json)。
 
@@ -29,7 +31,7 @@
 | 编辑代码、论文、文档、Git同步、静态检查 | 本机 `/Users/junzhou/Project/Visual_Hand_Reconstruction` |
 | 当前远程登录入口 | `ssh ds` → `cm.geo.sciclone.wm.edu`（Kubernetes登录节点） |
 | 当前计算资源 | 用户明确授权的Pod `jchen57-debug-mpd5p`，namespace `jchen57` |
-| 当前GPU/CPU/RAM | 已分配2×约96GiB Blackwell、12CPU、128Gi；D32新混合run使用GPU0/1；旧D29仍暂停 |
+| 当前GPU/CPU/RAM | 已分配2×约96GiB Blackwell、12CPU、128Gi；D34每卡512新run使用GPU0/1；D32停止3,110步、旧D29仍暂停 |
 | 当前ds代码checkout | `/sciclone/home/jchen57/project/Hand_Reconstruction`，D20已从GitHub clone/sync |
 | 当前大数据目录 | `/sciclone/data10/jchen57/Hand_Reconstruction/datasets`，D20已建立三库子目录；其他产物以后按用途分目录 |
 | 原hongfei checkout | `/data/hongfei/zhou/Hand_Reconstruction`保留备用，不再是当前唯一入口 |

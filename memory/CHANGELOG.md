@@ -319,6 +319,16 @@
 - 推荐视觉阶段冻结两主干、仅训练插件，单一最终current state NLL；候选通道输入梯度不足才微调少量current读出。保留长future能力并独立复测，不以单个公式掩盖current/future隐式权衡或用σ/κ冒充质量q。
 - 更新MEMORY与方法/决策/进展；D33用户方向和具体工程建议分开。没有改源码、运行配置、D32训练或启动视觉实验；无新增性能结果。
 
+## 2026-10-15 UTC D34收敛复核与每卡512从头10k
+
+- 用户要求检查当前约3k步的训练情况，将batch翻倍为每卡512/global1024，并独立从头训练10,000步；本次只替代D32执行配置，D33视觉侧反馈方向及其尚未实现的边界完整保留，没有启动视觉训练。
+- 旧D32于02:02:24.032654UTC共同保存停止3,110步，latest与best均保留并另存快照；原件/快照SHA相等，322个model与963个AdamW浮点张量有限，CPU完整模型hash与两rank一致。旧run不自动resume，不覆盖checkpoint。
+- 固定合成验证1,000→3,000步的实际20/20/35/20/5加权restoration score为0.022254976823→0.012809634894，noisy手指误差3.21507418→1.77306231°；noisy腕输出7.28698158→7.21049546mm，仍高于candidate输入7.15831929mm，不能据此称全面收敛。曲线使用当前checkpoint实测score，不使用best-so-far冒充当前值；step0零初始化copy-input单列，不当训练收益。指标为四库等权均值、合成受损与源拟合MANO参考，不是实际HaWoR纠错或独立sensor精度。
+- 单卡真实512样本三次完整更新finite，峰值allocated63,481,519,104bytes（59.12GiB），仅为探针测量，不当正式DDP峰值或稳态吞吐；完整mask objective invariance检查通过。
+- 新配置[每卡512/10k](../config/twm_four_sources_moe_mixed_v2_b512_10k.json)，代码7d53fa4a1b14f31e08f41ba545556e59adadd31f；模型/GT/split/mixed_v2不变，LR2e-4和warmup500保留，cosine终点改为10k。目标10,240,000次样本抽取，不与旧global512的相同步数作为公平样本预算比较。新run `twm_four_sources_moe_mixed_v2_b512_10k_20261015` 于02:09:50.156267UTC由launcher4672发起，从头初始化；rank4677/4678在GPU0/1训练，10k仍是目标。
+- 02:12:13.931674UTC正式运行验收为step20、累计20,480样本，GPU0/1峰值allocated分别63.9163/63.9073GB；单独审计的是checkpoint10，其322个model/963个AdamW浮点张量有限、CPU完整模型hash与两rank一致，不能把step10权重审计冒充step20权重检查。[W&B12cc0781](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)服务端state=running，step20的loss与grad实际可读；正式启动验收已通过，未完成10k或最终效果验证。
+- 运行与后续实测见[训练记录D34](../docs/TWM_MOE_LONG_HORIZON_RUN_2026-10-15.md#d34每卡512从头训练10000步)与[小型摘要](../reports/twm_batch512_10k_20261015.json)。同时修正决策记忆中“当前D27双卡运行”的过时表述，明确其已按D28停止32,783步。
+
 ## 后续记录要求
 
 每次记录日期、实质变化、依据和相关产物。实验失败和决定撤回同样记录；不要把计划完成、代码完成和实验验证完成混为一个状态。

@@ -1,6 +1,8 @@
 # D29：当前恢复、MoE 与长轨迹概率预测
 
-**最新D32：** 用户已要求按混合设置跑起；新run `twm_four_sources_moe_mixed_v2_20261015` 已通过双卡训练/checkpoint/W&B验收，旧D29/D28仍暂停。当前执行见[文末D32](#d32混合有界噪声训练已启动)，下文D29是架构与启动历史。
+**最新D34：** 用户要求每卡512、global1024、重新从头跑10,000步。旧D32已保存停止3,110步；7d53fa4新run在02:09:50UTC启动，实际训练/checkpoint/W&B验收已通过。当前执行见[文末D34](#d34每卡512从头训练10000步)，原架构与D33视觉讨论保持。
+
+**D32启动历史（D34已暂停3,110步）：** 用户已要求按混合设置跑起；新run `twm_four_sources_moe_mixed_v2_20261015` 已通过双卡训练/checkpoint/W&B验收，旧D29/D28仍暂停。该次执行见[文末D32](#d32混合有界噪声训练已启动)，下文D29是架构与启动历史。
 
 **随后D31暂停（00:36:36UTC）：** 用户要求先停当前训练，架构在另一聊天修改。已共同保存停止814步，latest814/best500原件与额外快照SHA一致，模型/AdamW finite、两rank hash一致；STOP保留不自动resume。[暂停核验](../reports/twm_moe_pause_20261015.json)、[混合训练建议](TWM_DIRECT_REFINEMENT_PROPOSAL_2026-10-14.md#9-d31先暂停混合干净轨迹与适量受损条件)。下文配置与运行快照为D29历史，不表示当前仍在跑。
 
@@ -196,6 +198,48 @@ legacy保持原强噪、质量提示和anchor过程，作为历史压力参考�
 | 正式checkpoint审计 | 检查的是step10，模型322/AdamW963浮点张量finite，Adam step10，两rank完整hash与CPU一致，SHA=d4255a88873b51248d9811575fef5a70e951446e17ab9c96c2f1e7639c12be10；不混为更晚step50权重检查 |
 | W&B服务端 | [cd487764](https://wandb.ai/black-ant/handloop-twm/runs/cd487764)，state=running，已收到optimizer_step40及train/loss、grad；不是仅生成URL或offline |
 
-正式目录：`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015`。默认`ds_train_probabilistic_twm.py status`现指此新run；旧run查询须明确output。每100步checkpoint、500步验证、10步记录；私有W&B key仍只在远程600文件经child环境传入，不进入Git/config。已有正式训练在运行，不重复start。
+正式目录：`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_20261015`。D32启动时helper默认曾指此run；D34后默认已指另一新run，查询此历史run须明确output。每100步checkpoint、500步验证、10步记录；私有W&B key仍只在远程600文件经child环境传入，不进入Git/config。本段为D32启动快照；随后D34已STOP保存本run，不恢复。
 
 以上证明新混合数据路径和实际训练已跑通，**尚无训练后最终精度、同架构噪声消融、真实HaWoR纠错或物理正确性结果**。初始validation为step0，不能把零初始化的准确输入保持当成训练后验收。
+
+
+## D34：每卡512，从头训练10,000步
+
+2026-10-15UTC（纽约10-14），用户要求查看约3k步训练、把每卡batch翻倍到512，重新跑10k。此次只替代D32执行配置，不改变D33视觉侧反馈讨论、纯轨迹任务、模型或数据。新权重与AdamW从头初始化、新W&B；不从3,110步续训。
+
+### 旧曲线、停止与保留
+
+分析直接读取旧run记录的固定validation，重算每个checkpoint的加权当前恢复score，**没有用best-so-far冒充收敛曲线**。每模式每库256窗，四库等权宏平均；wrist为源MANO腕位置欧氏距离mm，root/finger为SO(3)测地角度。step0的准确当前输入来自零初始化copy-input，图中空心点单列，不当成训练收益。
+
+| 优化步 | 加权恢复score | noisy腕mm | noisy root° | noisy finger° | clean腕退化mm | reanchor腕退化mm |
+|---|---|---|---|---|---|---|
+| 1000 | 0.022255 | 7.287 | 3.871 | 3.215 | 1.515 | 1.511 |
+| 2000 | 0.014270 | 7.250 | 2.882 | 2.089 | 0.796 | 0.848 |
+| 3000 | 0.012810 | 7.210 | 2.573 | 1.773 | 0.663 | 0.658 |
+
+1k→3k的score下降约42.4%，说明仍在学习，不能仅凭总loss未到0判断未收敛：目标含可为负的NLL。noisy腕输入固定为7.158mm，3k输出7.210mm，尚未纠正腕位置；加大batch/步数是否解决仍须实测。3k的clean/reanchor超过1mm退化比例分别7.52%/9.67%；missing腕3.068→3.233mm，strong腕18.422→18.482mm。noisy未来1s MAP腕112.304mm，restored hold120.156mm、常速度240.424mm；不是最终精度或真实HaWoR评测。
+
+![D32固定合成验证曲线](../reports/figures/twm_mixed_v2_0_3000_20261015.png)
+
+旧D32于02:02:24.032654UTC共同保存停止3,110步，两rank4501/4502退出，launcher僵尸不当活跃训练。latest的322个model/963个AdamW浮点张量finite，CPU完整hash与两rank保存hash一致。原latest/best及额外快照文件SHA一一相同；快照在data10项目根`evaluations/twm_batch512_10k_20261015/previous_snapshots/`。D32/D29/D28的STOP均保留，不自动resume。
+
+### 新配置和启动验收
+
+配置为[twm_four_sources_moe_mixed_v2_b512_10k.json](../config/twm_four_sources_moe_mixed_v2_b512_10k.json)。四库GT、recording split、99D、β conditioning关闭、模型13,530,032参数、混合profile和12条件validation都不变。`batch_size=1024`表示global，两rank各512，目标10,000次优化更新。LR峰值2e-4、warmup500保持，cosine总长度改为10k，末端2e-5，不按batch线性放大LR。目标10,240,000次样本抽取，有放回；这比旧已完成3,110×512=1,592,320抽取多，但不是把旧计划50k延长：旧计划预算25.6M，新预算10.24M。
+
+`benchmark_probabilistic_twm.py`修复了此前没有读取mixed profile的问题：解析并嵌入active profile及SHA，完整更新/未来mask检查均使用相同profile；训练模型源码未改。GPU1实际512样本、3次完整objective/backward/AdamW通过，梯度/模型/optimizer finite，扰乱无效future标签后输入、输出与完整目标差均0；峰值allocated63.482GB（59.12GiB）、reserved64.123GB。这是单卡probe，不当正式吞吐或最优batch结论。
+
+| 启动验收 | 实际证据 |
+|---|---|
+| 正式代码/时间 | 7d53fa4a1b14f31e08f41ba545556e59adadd31f；02:09:50.156267UTC（纽约22:09），from scratch，无resume |
+| 进程 | 原Pod `jchen57-debug-mpd5p`，launcher4672，rank4677/4678，GPU0/1；未创建/删除Job |
+| 实际更新 | 02:12:13UTC验收时status20步，20,480抽取：Dex5092/HOT5110/Oak5100/Ume5178 |
+| 五类计数 | clean3988/reanchor4143/ordinary7179/missing4148/strong1022，合计20,480 |
+| 训练数值/显存 | step20 loss=-0.2482218、未裁剪grad norm7.76085，finite；rank峰值allocated63.916/63.907GB，reserved64.697/64.691GB |
+| 保存checkpoint | 单独审计的是step10，322model/963AdamW浮点张量finite、Adam step10；完整模型CPU hash与两rank一致，SHA=e6ce7cbc0dd3b437fe4e6de18b0f47e045e7845aafdb0325eb6a7e8622a314ce |
+| W&B服务器 | [12cc0781](https://wandb.ai/black-ant/handloop-twm/runs/12cc0781)，state running、optimizer_step20、loss及grad已收到；不是仅有本地URL |
+| 配置/数据审计 | config SHA9fc566ab…；profile SHA6ad62731…、manifest SHAf733aa15…与D32相同；完整SHA见JSON |
+
+新run在`/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_four_sources_moe_mixed_v2_b512_10k_20261015`。helper默认status/stop已指该run；每100步checkpoint、500步验证、10步记录。执行cutoff仍为16:25UTC，早于原Pod约16:37UTC时限；10k为训练目标，未完成不能宣称完成，不自动新建Job。
+
+小型可复核记录：[启动、旧曲线、有限性与SHA摘要](../reports/twm_batch512_10k_20261015.json)。完整checks在data10项目根`evaluations/twm_batch512_10k_20261015`，含`launch_audit.py`、`formal_checkpoint_audit.json`、`batch512_probe.json`、`previous_run_review.json`及图。权重、原始logs、MANO资产与私有key均不入Git。此次证明训练确实启动且数值/同步正常，未证明已收敛、增加batch有效、真实HaWoR纠错或物理正确。
