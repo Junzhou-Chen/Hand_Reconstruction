@@ -54,6 +54,12 @@ def main():
     device = torch.device("cuda:0")
     torch.cuda.set_device(device)
     config = json.loads(args.config.read_text())
+    if config.get("corruption_profile_path"):
+        profile_path = Path(__file__).resolve().parents[1] / config["corruption_profile_path"]
+        config["corruption_profile"] = json.loads(profile_path.read_text())
+        config["corruption_profile_sha256"] = hashlib.sha256(profile_path.read_bytes()).hexdigest()
+        if config["corruption_profile"].get("status") != "active":
+            raise ValueError("Batch probe needs an explicitly active corruption profile")
     dataset = ForecastTrajectoryWindows(
         args.manifest, "train", history=config["history_frames"],
         forecast_frames=config["model"]["forecast_horizon"],
@@ -89,7 +95,8 @@ def main():
         for batch in (original, altered):
             rng = torch.Generator(device=device).manual_seed(config["seed"] + 991)
             history,raw,candidate,kwargs,current,future = prepare_batch(
-                batch,rng,condition_on_beta=config.get("condition_on_beta",False))
+                batch,rng,condition_on_beta=config.get("condition_on_beta",False),
+                corruption_profile=config.get("corruption_profile"))
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 prediction = model(history,raw,candidate,**kwargs)
             loss, values = objective(prediction,current,future,batch["future_valid"],batch["future_dt"],config)
@@ -130,7 +137,8 @@ def main():
 
         def step():
             history,raw,candidate,kwargs,current,future = prepare_batch(
-                batch,generator,condition_on_beta=config.get("condition_on_beta",False))
+                batch,generator,condition_on_beta=config.get("condition_on_beta",False),
+                corruption_profile=config.get("corruption_profile"))
             optimizer.zero_grad(set_to_none=True)
             with torch.autocast("cuda",dtype=torch.bfloat16):
                 prediction = model(history,raw,candidate,**kwargs)
