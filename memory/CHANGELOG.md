@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-16 00:59UTC（纽约10-15）：D40按用户要求RGB每卡4→8，旧65步共同保存停止并归档，eb8d0b9显式允许单项batch变化完整resume，保持clip32/motion32/LR/3:1/总1000。实际76步、checkpoint69双rankhash一致；73步两rank14组finite/非零seen/代表参数改变全通过，每卡峰值allocated63.498GiB、单时刻nvidia-smi79446MiB。W&B同run3abfc864服务端running/75、runtimebatch8/resume_start65；optimizer/scheduler/RNG恢复，loader游标重建。实现新增配置守卫、执行metadata历史、运行batch scalar、续跑首8梯度检查/第4次early保存；无精度或吞吐改善断言。[摘要](../reports/visual_joint_batch8_resume_20261016.json)、[协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
+
 2026-10-16 00:43UTC（纽约10-15）：D39按用户双主干低LR全量决定，以eeac1fc正式双卡每卡4×32帧/motion32实际10/1000更新、37.742GiB峰值，14组梯度/参数改变两rank通过、latest4模型hash相同，W&B3abfc864服务端running/step8。在线RGB＋两轮MANO16候选取证，1128train/577val帧；D37已complete10k/best10000固定。CPU/AMP/真实RGB、smoke4→8恢复、1076model/3135Adam finite和trained16RGB当前/未来接口通过。保留初次AMP失败、同inode临时别名修复及初始化两轮几何差于raw的负面基线；尚无训练后fixedval提升、不改D38loss。[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)、[启动摘要](../reports/visual_joint_launch_20261016.json)。
 
 2026-10-15 22:32UTC：按用户要求复核另一聊天“梳理项目记忆文档”搭建的D35 HaWoR反馈首版。确认每帧一次插件/一次TWM、σ/κ只回插件、旧视觉best内嵌D32且未接D37；核远程best/缓存/RGB预测/HaWoR仍在，旧latest及独立参考已按best-only删除。补源码与产物存续说明，无训练/模型执行/精度重测或新设计决定。[框架](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[审计摘要](../reports/visual_feedback_integration_audit_20261015.json)。

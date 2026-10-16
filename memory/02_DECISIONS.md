@@ -56,6 +56,8 @@
 
 **D38（2026-10-15，用户明确决定）：损失调整留到下个版本，本轮先检查目前效果。** D37继续原六项加权目标与10k预算；不将损失调研中的候选自动应用到当前run，也不据此启动下一版。下一版本的具体目标、系数、梯度隔离和是否采用flow尚未最终选择。[候选与边界](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
 
+**D40（2026-10-16 UTC／纽约10-15，用户明确执行决定）：** 用户观察占用后要求联合训练每卡8段并重新跑，替代D39的每卡4段执行配置。RGB batch改8、clip仍32、双卡常规global16；在第65步完整共同保存后续跑至原总预算1000，学习率、两主干全量范围、motion每卡32及3:1更新序列保持。新增显式`--allow-rgb-batch-size-change`仅放行RGB batch差异，optimizer/scheduler/RNG/step恢复；loader/sampler游标仍重建，非逐样本精确续跑。其余配置、输入/资产SHA和world size保持严格校验；增大batch不构成吞吐或精度改善的实验证据。[配置变更与实测记录](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md#每卡-8-段配置变更用户后续决定2026-10-16-utc)。
+
 ## 已替代的历史路线
 
 **D39（2026-10-16 UTC／纽约10-15，用户明确执行决定）：** 用户要求HaWoR与TWM两个主干以低学习率全量微调，与新增插件协调；使用已完成D37预训练，并先实现当前讨论框架、跑起来看效果。此决定替代D35视觉阶段双主干冻结的首版执行范围及“先固定HaWoR”的后续默认建议。保留TWM纯数值、99D＋β另存、raw/candidate/history分离；本轮具体两轮candidate-guided取证、adapter/TWM/HaWoR学习率1e-4/1e-5/1e-6、3:1独立motion replay与1000更新pilot属于工程配置，非已证最优。独立w/q校准未因本次要求自动变成已实现；D38延后loss重设计保留，视觉阶段沿单一current NLL、motion replay沿D37原目标。[新协议与实际验收](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。

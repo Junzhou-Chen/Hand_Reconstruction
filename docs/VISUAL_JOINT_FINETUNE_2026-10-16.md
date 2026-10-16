@@ -1,6 +1,8 @@
 # D39：HaWoR／TWM 全量联合微调 pilot 协议
 
-记录日期：2026-10-16 UTC（纽约 2026-10-15）。**状态：双主干全量联合训练 smoke 的 checkpoint／续跑／梯度与真实 RGB 推理验收完成；正式双卡 pilot 已实际训练至 10／1,000 updates（00:43:19 UTC 快照），两主干均已更新。首次固定训练后验证为 step50，尚未到达，不能声称效果改善。** 下列预算、学习率和混合比例是工程 pilot 设置，不是已验证最优值。代码／数据事实、失败修复与效果边界见文末及[启动摘要](../reports/visual_joint_launch_20261016.json)。
+记录日期：2026-10-16 UTC（纽约 2026-10-15）。**当前状态：每卡 4 段阶段已在 step65 共同保存停止，源码 `eb8d0b9` 从该断点完整恢复为双卡每卡 8 段 × 32 帧；00:59:46 UTC 快照已实际训练至 76／1,000 updates。新阶段 checkpoint69 已保存且两个 rank 参数 hash 一致；step73 的 14 组梯度与代表参数变化均已验，单卡 peak allocated 约 63.498 GiB。** 本次确认 batch 变更、两主干更新和恢复保存链路，不据此声称精度改善。下列预算、学习率和混合比例是工程 pilot 设置，不是已验证最优值。代码／数据事实、失败修复与效果边界见文末及[原启动摘要](../reports/visual_joint_launch_20261016.json)、[每卡 8 段恢复摘要](../reports/visual_joint_batch8_resume_20261016.json)。
+
+**后续配置变更：** 用户随后要求视觉每卡由 4 段提高至 8 段。本文原每卡 4 段的启动快照保留为历史；新配置、受控断点恢复约定与已完成远程验收见文末“每卡 8 段配置变更”。
 
 ## 用户决定与保留的边界
 
@@ -76,7 +78,7 @@ motion replay 沿用原 D37 train 分区、受损条件与原六项 objective，
 
 该数据扩展仍是 **GT-crop、固定相机的联合训练 pilot**，不是头戴移动相机 SLAM、自动 detector 或完整 HaWoR benchmark 验证。D35 的 63 train／64 val 帧和 20 次更新只作为历史工程结果，不自动成为本轮基线。
 
-正式 pilot 预算为 **1,000 次 optimizer update**，按 `3:1` 序列约 750 次视觉、250 次 motion replay。双 GPU smoke 从视觉每卡 batch 1、clip 16 起，实测单卡 peak allocated 约 **17.77 GiB**。在完成该 smoke 后，正式配置增至**视觉每卡 batch 4、clip 32，motion replay 仍每卡 batch 32**，另开正式 run；实际 step10 快照与约 **37.742 GiB／卡**峰值已验收。正式视觉 global batch 为 8 clips，每 clip 32 个含 mask 的帧位置；motion global batch 为 64 windows，它们不是同一种样本计数。smoke 的 8 次更新不计为正式 1,000 次已完成。
+正式 pilot 预算为 **1,000 次 optimizer update**，按 `3:1` 序列约 750 次视觉、250 次 motion replay。双 GPU smoke 从视觉每卡 batch 1、clip 16 起，实测单卡 peak allocated 约 **17.77 GiB**。在完成该 smoke 后，正式配置曾增至**视觉每卡 batch 4、clip 32，motion replay 仍每卡 batch 32**，另开正式 run；实际 step10 快照与约 **37.742 GiB／卡**峰值已验收。该历史配置的视觉 global batch 为 8 clips，每 clip 32 个含 mask 的帧位置；motion global batch 为 64 windows，它们不是同一种样本计数。用户后续将视觉每卡改为 8 段，见文末；smoke 的 8 次更新不计为正式 1,000 次已完成。
 
 本轮 replay 初始实现使用四库等概率、库内窗口有放回的 `SourceBalancedSampler`；这与 D37 的 `full_coverage` 有限遍历不同。相同 train 分区、噪声和 objective 不等于相同采样协议；本轮不承诺遍历完整运动池。训练过程按 optimizer update 计数，实际视觉／运动样本暴露量分别记录。
 
@@ -126,3 +128,24 @@ NLL 降低可能来自增大 σ 或减小 κ，不足以证明几何变准；预
 - **W&B：** [3abfc864](https://wandb.ai/black-ant/handloop-twm/runs/3abfc864)，服务端已验 running／optimizer_step8；服务端标量有异步滞后，与远程 step10 快照分别记录。
 - **保留负面 step0 基线：** 固定 8 个 val clips、210 个有效 states，原 HaWoR raw 的腕／root／finger 为 **88.250 mm／11.729°／9.747°**；初始化两轮联合 final 为 **121.616 mm／27.489°／15.793°**，xyz 90% coverage 为 **0**。这是训练前明显失配的初始化结果，不能与随机训练 batch 的指标直接比较，也不能当成本轮已改善。首次训练后 fixed validation 在 step50，当前尚未到达。
 - 训练后的固定视觉 state／joint／mesh 几何与 motion 能力保持结论：待验证；当前只确认正式训练、双主干更新和保存链路已运行，尚无本轮精度提升结论。小型记录见[启动摘要](../reports/visual_joint_launch_20261016.json)。
+
+## 每卡 8 段配置变更（用户后续决定；2026-10-16 UTC）
+
+用户观察 GPU 占用后，明确要求“每卡 8 段，重新跑”。本次以源码 **`eb8d0b9`** 将 [联合训练配置](../config/visual_joint_v2.json)的 `per_gpu_rgb_batch_size` 从 **4 改为 8**；clip length 仍为 **32**，双卡常规视觉 global batch 从 8 改为 **16 clips，即 512 个带 mask 的帧位置**。有效监督帧数由真实帧及标签 mask 决定，不能把 512 当成每步有效 GT 数。motion replay 仍每卡 **32 windows／全局 64 windows**，HaWoR／TWM／adapter 目标 LR 仍分别为 **`1e-6`／`1e-5`／`1e-4`**，任务次序仍每四次更新三次视觉、一次 motion；不因 batch 增大自动放大学习率。
+
+预算继续为**总计 1,000 次 optimizer update**，保留已完成更新，从共同保存的 latest checkpoint 继续；不是从原始预训练重新初始化，也不是追加 1,000 次。保存停止后再更换执行代码与配置，保留旧阶段的配置、日志、验证与权重来源。总更新数不变而剩余视觉 batch 增大，剩余视觉样本暴露量会增加；更新比例 `3:1` 不等于视觉帧与 motion windows 的相同比例。现有 train 共 46 clips，DistributedSampler 每 rank 23 clips；未启用 `drop_last`，每 rank 的新一轮 batch 为 `8+8+7`，末批的全局样本数相应少于 16。
+
+[trainer](../scripts/train_visual_joint.py)与 [ds launcher](../scripts/ds_train_visual_joint.py)新增显式 `--allow-rgb-batch-size-change`，只可与 `--resume` 联用。恢复时仅允许配置中的 `per_gpu_rgb_batch_size` 改变，旧／新值必须为正整数；其余配置、数据及资产 SHA、world size 仍须一致。模型、optimizer、scheduler、总 step、best score 与各 rank RNG 从 checkpoint 恢复，新 batch 由当前配置构建 DataLoader；schedule 与 `step % 4` 的任务相位延续，不能重新 warmup 或退回官方旧 HaWoR／原 D37 权重。
+
+恢复记录写入 `run_metadata.json` 的 `resume` 字段及后续 checkpoint 的 `resume_transition`。旧 metadata 与新执行 metadata 存入 run 下的 `execution_metadata/`，并向 W&B 记录当前视觉／motion batch 和 `resume_start_step` 的 runtime scalar。由此区分同一 run 的 batch 4 与 batch 8 阶段，不能只依据服务端历史 config 判断本次 batch。既有实现的限制仍保留：**RGB epoch／loader cursor 与 motion sampler cursor 从头重建，恢复 RNG 不等于逐样本精确续跑**。
+
+每次执行开始后的前 **8 次新增更新**重新记录两个 rank 的梯度与代表参数变化，并带 `execution_start_step`、当前 batch、peak allocated；相应逐步日志也按新增更新计数。早期 checkpoint 改为本次执行后的第 **4 次新增更新**（`start_step + 4`），正常每 50 步与停止时保存继续保留。验收需实际完成新 batch 的视觉前向、反向和 optimizer 更新，并确认新 checkpoint 与双卡参数一致；仅恢复加载成功不算 batch 8 跑起。
+
+**远程实测验收（2026-10-16 UTC）：** 每卡 4 段阶段于 **00:52:37.602614 UTC** 共同保存停止在 **step65**，两个 rank 的模型 hash 为 `29b7ac7e457591eec434acf3a6ac2298d349df82d26a51c4f5c2763b6bba7d9a`。旧阶段的小型记录与权重硬链接归档在原 run 下 `batch4_before_batch8_20261016/`；原始结果保留。源码 **`eb8d0b98f5e2e27fae9ed6f664399d1eca6f2dae`** 于 **00:53:43.749509 UTC** 从 step65 在同一 run 完整恢复，每卡 batch8，未重置 optimizer／scheduler／总更新计数。
+
+- **实际更新与显存：** **00:59:46.061830 UTC** 快照为 `training`，**76／1,000 updates**，即恢复后已完成 11 次新增更新。step73 两个 rank 的 14 个参数组均记录 finite 梯度、非零梯度 seen 与代表参数实际改变；每卡 peak allocated 为 **63.498240470886 GiB**。同次 `nvidia-smi` 两卡各 **79,446 MiB**，单时刻 utilization 为 100%／60%；这是采样瞬间，不能解释为稳态吞吐率或稳定利用率。
+- **新阶段 checkpoint：** 本次第 4 次新增更新保存 **step69**，配置 batch8，大小 **8,510,565,551 bytes**；两个 rank 模型 hash 均为 `9455c4b976f5e1c5d58e044cdd5de0022f57b79646d8d5d96d9fd25d2e7ec4c9`，与旧阶段不同。保存的 scheduler `last_epoch=69`，第一个 HaWoR optimizer parameter 的 `step=52`；各参数只在参与其任务并有梯度时累计 Adam step，不能把该局部计数误当总 optimizer 更新数。
+- **服务端进度：** 沿用 [W&B 3abfc864](https://wandb.ai/black-ant/handloop-twm/runs/3abfc864)，服务端已验 `running`／`optimizer_step=75`，runtime 记录 batch8／`resume_start_step=65`。服务端异步进度与远程 step76 快照分别记录。
+- **产物：** run 仍为 `/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016`；远程汇总为 `/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_joint_v2_20261016/batch8_resume_summary.json`，小型本地摘要见[每卡 8 段恢复记录](../reports/visual_joint_batch8_resume_20261016.json)。
+
+以上证据确认新 batch 的前向、反向、参数更新和保存已运行；没有新增关于几何精度或能力保持的验证结论。每卡 4 段历史峰值 **37.742 GiB** 与本次 batch8 的 **63.498 GiB** 分别保留，不混用。

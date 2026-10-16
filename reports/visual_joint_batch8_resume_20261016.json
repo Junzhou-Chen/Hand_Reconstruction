@@ -1,0 +1,325 @@
+{
+  "checked_at_utc": "2026-10-16T00:59:46.061830+00:00",
+  "run_path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016",
+  "code_version": "eb8d0b98f5e2e27fae9ed6f664399d1eca6f2dae",
+  "status": {
+    "phase": "training",
+    "step": 76,
+    "target_steps": 1000,
+    "task": "motion",
+    "training": {
+      "best_trajectory_geometry_loss": 0.8162656426429749,
+      "current/finger_deg": 0.8047305345535278,
+      "current/root_deg": 1.3380115032196045,
+      "current/wrist_mm": 3.213613748550415,
+      "current_nll_per_dof": -3.9886276721954346,
+      "current_xyz_std_mm": 9.629718780517578,
+      "elapsed_seconds": 179.47434680629522,
+      "forecast_nll_per_dof": -2.7609291076660156,
+      "future_total_xyz_std_mm": 72.06739807128906,
+      "future_within_mode_xyz_std_mm": 67.61229705810547,
+      "gradient_norms": {
+        "adapter": 0,
+        "hawor": 0,
+        "twm": 6.502315998077393
+      },
+      "loss": -0.8565324544906616,
+      "mode_entropy": 1.3263628482818604,
+      "moe_balance_loss": 0.10002236068248749,
+      "peak_allocated_gb": 63.49824047088623,
+      "per_gpu_rgb_batch_size": 8,
+      "restoration_loss": 0.0056114187464118,
+      "velocity_loss": 0.026259329169988632
+    },
+    "utc": "2026-10-16T00:59:36.486783+00:00",
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/3abfc864"
+  },
+  "ready": true,
+  "config": {
+    "adapter": {
+      "candidate_guided_queries": true,
+      "condition_on_beta": false,
+      "d_model": 256,
+      "default_dt": 0.03333333333333333,
+      "detach_history": true,
+      "dim_feedforward": 512,
+      "dropout": 0,
+      "history_length": 30,
+      "image_feature_dim": 1280,
+      "local_patch_sigma": 0.25,
+      "max_gap_seconds": 0.25,
+      "nhead": 4,
+      "num_layers": 2,
+      "patch_grid_height": 16,
+      "patch_grid_width": 12,
+      "refinement_steps": 2,
+      "rotation_delta_scale": 0.5,
+      "translation_delta_scale": 0.1
+    },
+    "adapter_learning_rate": 0.0001,
+    "clip_length": 32,
+    "cpu_threads": 2,
+    "eval_batches": 8,
+    "eval_every": 50,
+    "grad_clip": 1,
+    "gradient_checkpointing": true,
+    "hawor_learning_rate": 0.000001,
+    "initial_checkpoint_step": 4,
+    "log_every": 5,
+    "motion_replay_every": 4,
+    "num_workers": 0,
+    "per_gpu_motion_batch_size": 32,
+    "per_gpu_rgb_batch_size": 8,
+    "save_every": 50,
+    "seed": 20261016,
+    "steps": 1000,
+    "stop_before_utc": "2026-10-20T05:10:00+00:00",
+    "tracking": {
+      "enabled": true,
+      "entity": "black-ant",
+      "group": "visual-feedback-joint-finetune",
+      "mode": "online",
+      "name": "visual-joint-v2-full-hawor-twm",
+      "project": "handloop-twm",
+      "require_online": true,
+      "tags": [
+        "full-finetune",
+        "online-rgb",
+        "hawor",
+        "d37-best",
+        "refinement2",
+        "motion-replay",
+        "gt-crop",
+        "pilot"
+      ]
+    },
+    "twm_learning_rate": 0.00001,
+    "warmup_steps": 20,
+    "weight_decay": 0.01,
+    "world_size": 2
+  },
+  "identity": {
+    "hawor_checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+    "hawor_config_sha256": "edfe12dc14ce371d698da722b59acfed5b4a38a7f8f5116cbc1fce459a07dd2d",
+    "mano_asset_sha256": {
+      "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+      "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+    },
+    "motion_manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "source_manifest_sha256": "67462dced45615c9e0ea8d761da58094d03f8b8cadc47370c06f126751259d3e",
+    "twm_source_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c"
+  },
+  "resume": {
+    "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016/latest.pt",
+    "config_changes": {
+      "per_gpu_rgb_batch_size": {
+        "current": 8,
+        "previous": 4
+      }
+    },
+    "start_step": 65
+  },
+  "trainable_parameters": 708688515,
+  "previous_stage": {
+    "archive": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016/batch4_before_batch8_20261016",
+    "status": {
+      "phase": "stopped",
+      "step": 65,
+      "target_steps": 1000,
+      "utc": "2026-10-16T00:52:37.602614+00:00",
+      "validation": {
+        "candidate/finger_deg": 8.283597537449428,
+        "candidate/root_deg": 12.982529985337031,
+        "candidate/wrist_mm": 37.64279180254255,
+        "clips": 8,
+        "current_nll": -36.17915235246931,
+        "final/finger_deg": 8.360192703065419,
+        "final/root_deg": 16.562968826293947,
+        "final/wrist_mm": 53.141492571149556,
+        "geometry_score": 0.6366278761909121,
+        "metric_counts": {
+          "candidate/finger_deg": 3150,
+          "candidate/root_deg": 210,
+          "candidate/wrist_mm": 210,
+          "current_nll": 210,
+          "final/finger_deg": 3150,
+          "final/root_deg": 210,
+          "final/wrist_mm": 210,
+          "geometry_score": 210,
+          "raw/finger_deg": 3150,
+          "raw/root_deg": 210,
+          "raw/wrist_mm": 210,
+          "wrist_degradation_over_1mm": 210,
+          "xyz_90pct_ellipsoid_coverage": 210,
+          "xyz_std_mm": 210
+        },
+        "raw/finger_deg": 7.979798203422909,
+        "raw/root_deg": 10.49044006892613,
+        "raw/wrist_mm": 40.71533010573614,
+        "valid_states": 210,
+        "wrist_degradation_over_1mm": 0.5476190481867109,
+        "xyz_90pct_ellipsoid_coverage": 0.838095239798228,
+        "xyz_std_mm": 35.50768708728609
+      },
+      "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/3abfc864"
+    },
+    "replica_checkpoint_audit": {
+      "byte_equal": true,
+      "model_sha256": "29b7ac7e457591eec434acf3a6ac2298d349df82d26a51c4f5c2763b6bba7d9a",
+      "step": 65,
+      "utc": "2026-10-16T00:52:21.398664+00:00"
+    }
+  },
+  "current_replica_checkpoint_audit": {
+    "byte_equal": true,
+    "model_sha256": "9455c4b976f5e1c5d58e044cdd5de0022f57b79646d8d5d96d9fd25d2e7ec4c9",
+    "step": 69,
+    "utc": "2026-10-16T00:58:34.618480+00:00"
+  },
+  "rank_audits": {
+    "0": {
+      "step": 73,
+      "execution_start_step": 65,
+      "batch": 8,
+      "finite_by_group": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_gib": 63.49824047088623
+    },
+    "1": {
+      "step": 73,
+      "execution_start_step": 65,
+      "batch": 8,
+      "finite_by_group": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_gib": 63.49824047088623
+    }
+  },
+  "gpu_snapshot": "0, 79446 MiB, 97887 MiB, 100 %\n1, 79446 MiB, 97887 MiB, 60 %",
+  "notes": [
+    "Only RGB per-card batch changed from4 to8. clip32,motion32,LRs,3:1 task sequence,total1000 unchanged.",
+    "Optimizer/scheduler/rank RNG restored at65; RGB epoch and data loader/sampler cursors restart; not sample-exact resume.",
+    "Peak allocated is distinct from nvidia-smi usage; utilization snapshot is not a steady throughput benchmark.",
+    "Model geometry/accuracy improvement is not asserted by this launch check."
+  ],
+  "saved_checkpoint": {
+    "step": 69,
+    "config_batch": 8,
+    "code_version": "eb8d0b98f5e2e27fae9ed6f664399d1eca6f2dae",
+    "resume_transition": {
+      "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016/latest.pt",
+      "start_step": 65,
+      "config_changes": {
+        "per_gpu_rgb_batch_size": {
+          "previous": 4,
+          "current": 8
+        }
+      }
+    },
+    "scheduler_last_epoch": 69,
+    "first_optimizer_parameter_step": 52,
+    "replica_model_hashes": [
+      "9455c4b976f5e1c5d58e044cdd5de0022f57b79646d8d5d96d9fd25d2e7ec4c9",
+      "9455c4b976f5e1c5d58e044cdd5de0022f57b79646d8d5d96d9fd25d2e7ec4c9"
+    ],
+    "bytes": 8510565551
+  },
+  "wandb_server": {
+    "state": "running",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/3abfc864",
+    "optimizer_step": 75,
+    "runtime_rgb_batch": 8,
+    "runtime_resume_start_step": 65
+  }
+}
