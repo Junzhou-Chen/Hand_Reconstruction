@@ -53,3 +53,21 @@ W&B项目为`black-ant/handloop-twm`，正式三run共用group **`dexycb-s0-full
 启动验收包括独立SciPy／FreiHAND PA与PCK公式、反射诊断、原官方EvalUtil、MANO自身β／左右手、masked NaN、恢复／合并分母，以及三模型真实RGB同输入推理。首次checker失败来自FP32工具生成的“精确旋转”fixture与NumPy2移除trapz；只修测试fixture精度及checker局部兼容别名，不放宽容差，不改正式指标。失败报告保留。
 
 实际启动PID、W&B URL、CPU checkpoint／数值与真实RGB验收结果以后续小型启动报告为准；本页协议本身不代表已经得到完整测试结果。
+
+## 已实际启动并在线验收
+
+2026-10-16 **22:40UTC／纽约18:40**快照：完整测试controller PID5276为`testing`，三个worker命令身份核对均存活，W&B API查得三个正式run均`running`，服务端已有真实测试进度及MPJPE／PA／三种AUC标量。不是仅提交任务或初始化成功。
+
+| 正式模型 | 本地已完成视角／有效状态 | W&B |
+|---|---:|---|
+| 官方baseline | 31／2091 | [85qboyf8](https://wandb.ai/black-ant/handloop-twm/runs/85qboyf8) |
+| best4200 | 11／790 | [wb42qkka](https://wandb.ai/black-ant/handloop-twm/runs/wb42qkka) |
+| last4311 | 11／790 | [f2fzfdu6](https://wandb.ai/black-ant/handloop-twm/runs/f2fzfdu6) |
+
+W&B服务端在同一查询期间较本地略滞后，分别已收到24／8／8个视角的指标；三个分母不同，**不能把这次启动快照的累计均值当作配对模型优劣或最终结果**。结束后仍严格核对全1280视角及逐帧键集合。
+
+完整源准备后台PID5200，快照1042／1280视角、64425有效状态，仍`preparing`且error为空；剩余视角继续在原任务中准备，已发布的immutable视角同时用于测试。当前计数不是完整test最终帧数，不以它替代1280视角目标。
+
+best／last CPU模型与optimizer有限性及saved-rank hash一致性均通过。独立数值checker v3共14项通过，包含真实左右手参考；原两份失败报告保留。三模型真实RGB smoke分别完成相同2视角／6clips／142状态，逐视角manifest SHA、frame-ID hash与分母完全一致，保存`real_rgb_smoke_acceptance.json`；正式测试使用另外三个run，不把smoke数据累计两遍。
+
+[小型启动报告](../reports/dexycb_full_test_launch_20261016.json)保存冻结权重SHA／step、代码基底3b0574e＋overlay488769b及脚本SHA、全部验收、源准备与进程／W&B服务端证据。三模型进程与controller均由Pod内脱离SSH的持久进程运行，结束当前聊天不会停止测试。未改训练权重或按测试结果选best；没有承诺自动追加新实验。
