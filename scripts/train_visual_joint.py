@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Remote-only online RGB joint adaptation of HaWoR, adapter and motion TWM.
 
-Visual updates use one final-current proper NLL. Separate motion replay updates
-retain the source checkpoint's original current/future training objective.
-They are alternating tasks, not a new weighted sum of visual auxiliaries.
+Visual updates retain final-current NLL and optionally add absolute raw wrist
+and final landmark supervision. Separate motion replay updates retain the
+source checkpoint's original current/future training objective.
 """
 from __future__ import annotations
 
@@ -28,13 +28,16 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, DistributedSampler, Subset
 
 from handloop.data.visual_clips import file_sha256
-from handloop.data.visual_rgb import VisualFeedbackRGBDataset
+from handloop.data.visual_rgb import VisualFeedbackRGBDataset, reference_geometry_metadata
 from handloop.data.forecast_trajectory import ForecastTrajectoryWindows
 from handloop.data.trajectory import SourceBalancedSampler
 from handloop.models.probabilistic_twm import ProbabilisticTWM, ProbabilisticTWMConfig
 from handloop.models.visual_feedback import VisualFeedbackConfig, VisualFeedbackSystem, feedback_current_nll
 from handloop.visual.hawor import FrozenHaWoRBridge
 from handloop.visual.pipeline import HandLoopFeedbackPipeline
+from handloop.visual.losses import (
+    VisualGeometryLossConfig, visual_loss_terms, reduce_visual_loss_terms,
+)
 from handloop.tracking import WandbTracker
 from train_probabilistic_twm import prepare_batch, objective, state_geometry_loss, state_errors
 from train_visual_feedback import metrics
@@ -117,10 +120,12 @@ def gradient_stats(pipeline):
 
 
 class JointTaskModel(nn.Module):
-    def __init__(self, pipeline, replay_config):
+    def __init__(self, pipeline, replay_config, visual_loss_config=None):
         super().__init__()
         self.pipeline = pipeline
         self.replay_config = replay_config
+        self.visual_loss_config = (visual_loss_config if isinstance(visual_loss_config, VisualGeometryLossConfig)
+                                   else VisualGeometryLossConfig.from_dict(visual_loss_config))
 
     def forward(self, batch, *, task, corruption_generator=None):
         # Labels are consumed by objectives only. Pipeline and numeric TWM
@@ -128,24 +133,19 @@ class JointTaskModel(nn.Module):
         if task == 'visual':
             output = self.pipeline(batch, return_forecast=False)
             valid = output['frame_valid'].bool() & batch['target_valid'].bool().all(-1)
-            count = valid.sum().detach()
-            global_count = count.clone()
-            if dist.is_initialized():
-                dist.all_reduce(global_count)
-            if int(global_count) < 1:
-                raise ValueError('No valid RGB reference states')
-            loss = feedback_current_nll(output, batch['target_world'], batch['target_valid'])
-            # DDP averages gradients. This yields a global valid-state mean
-            # when different ranks have different tail-padding counts.
-            world = dist.get_world_size() if dist.is_initialized() else 1
-            loss = loss * (world * count / global_count)
-            measured = metrics(output, {**batch, 'raw_world': output['raw_world'],
-                                        'availability': output['availability']})
-            measured['local_current_nll'] = float(feedback_current_nll(
-                output, batch['target_world'], batch['target_valid']).detach())
-            measured['geometry_score'] = float(state_geometry_loss(
-                output['state_world'][valid], batch['target_world'][valid]).mean().detach())
-            measured['beta_norm'] = float(output['beta'].detach().norm(dim=-1)[valid].mean()) if 'beta' in output else 0.
+            terms = visual_loss_terms(output, batch, self.pipeline.frontend.codec, self.visual_loss_config)
+            loss, objective_metrics = reduce_visual_loss_terms(terms, self.visual_loss_config, distributed=True)
+            # A rank may have only partial labels. It still participates in
+            # global objective/count collectives without inventing rotations.
+            measured = (metrics(output, {**batch, 'raw_world': output['raw_world'],
+                                          'availability': output['availability']})
+                        if bool(valid.any()) else {'valid_states': 0})
+            measured.update(objective_metrics)
+            if bool(valid.any()):
+                measured['local_current_nll'] = float((terms['current_nll'][0] / terms['current_nll'][1]).detach())
+                measured['geometry_score'] = float(state_geometry_loss(
+                    output['state_world'][valid], batch['target_world'][valid]).mean().detach())
+                measured['beta_norm'] = float(output['beta'].detach().norm(dim=-1)[valid].mean()) if 'beta' in output else 0.
             measured.pop('metric_counts', None)
             return {'loss': loss, 'measurements': measured}
         if task != 'motion':
@@ -192,24 +192,34 @@ def optimizer_groups(pipeline, config):
 
 
 @torch.no_grad()
-def evaluate_rgb(pipeline, dataset, device, batches, *, use_adapter=True):
+def evaluate_rgb(pipeline, dataset, device, batches, *, use_adapter=True, visual_loss_config=None):
     pipeline.eval()
     n = min(len(dataset), batches)
     indices = sorted(set(round(i * (len(dataset)-1) / max(1, n-1)) for i in range(n)))
     loader = DataLoader(Subset(dataset, indices), batch_size=1, num_workers=0)
     totals, counts = {}, {}
+    loss_config = (visual_loss_config if isinstance(visual_loss_config, VisualGeometryLossConfig)
+                   else VisualGeometryLossConfig.from_dict(visual_loss_config))
     for batch in loader:
         batch = move(batch, device)
         with torch.autocast('cuda', dtype=torch.bfloat16):
             output = pipeline(batch, return_forecast=False, use_adapter=use_adapter)
-            value = metrics(output, {**batch, 'raw_world': output['raw_world'], 'availability': output['availability']})
             valid = output['frame_valid'].bool() & batch['target_valid'].bool().all(-1)
             amount = int(valid.sum())
-            value['current_nll'] = float(feedback_current_nll(output, batch['target_world'], batch['target_valid']))
-            value['geometry_score'] = float(state_geometry_loss(output['state_world'][valid], batch['target_world'][valid]).mean())
+            value = (metrics(output, {**batch, 'raw_world': output['raw_world'], 'availability': output['availability']})
+                     if amount else {'valid_states': 0, 'metric_counts': {}})
+            terms = visual_loss_terms(output, batch, pipeline.frontend.codec, loss_config)
+            _, objective_metrics = reduce_visual_loss_terms(terms, loss_config, distributed=False)
+            for name in terms:
+                if objective_metrics[name + '/count']:
+                    value[name] = objective_metrics[name]
+            if amount:
+                value['geometry_score'] = float(state_geometry_loss(output['state_world'][valid], batch['target_world'][valid]).mean())
         local_counts = value.pop('metric_counts')
         value.pop('valid_states')
-        local_counts.update(current_nll=amount, geometry_score=amount)
+        local_counts.update({name: objective_metrics[name + '/count'] for name in terms})
+        if amount:
+            local_counts['geometry_score'] = amount
         for key, number in value.items():
             if not math.isfinite(number):
                 raise FloatingPointError('Nonfinite validation metric: ' + key)
@@ -287,6 +297,7 @@ def main():
     if args.allow_rgb_batch_size_change and not args.resume:
         parser.error('--allow-rgb-batch-size-change requires --resume')
     config = json.loads(args.config.read_text())
+    visual_loss_config = VisualGeometryLossConfig.from_dict(config.get('visual_geometry_supervision'))
     if args.tracking_mode:
         config['tracking'].update(enabled=args.tracking_mode != 'disabled', mode=args.tracking_mode,
                                   require_online=args.tracking_mode == 'online')
@@ -354,7 +365,7 @@ def main():
     motion_sampler = SourceBalancedSampler(motion, num_samples=config['steps']*config['per_gpu_motion_batch_size'], seed=seed)
     motion_loader = DataLoader(motion, batch_size=config['per_gpu_motion_batch_size'], sampler=motion_sampler,
                                num_workers=0, pin_memory=True)
-    model = JointTaskModel(pipeline, replay_config)
+    model = JointTaskModel(pipeline, replay_config, visual_loss_config)
     parameters = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(optimizer_groups(pipeline, config), foreach=False)
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step:
@@ -392,7 +403,12 @@ def main():
         'train_recordings': [r['recording'] for r in train.records],
         'validation_recordings': [r['recording'] for r in val.records] if val is not None else [],
         'motion_windows_by_dataset': motion.windows_by_dataset,
-        'visual_objective': 'one full-state final-current NLL, global valid-state mean',
+        'visual_objective': 'final-current NLL (default coefficient1) plus explicitly enabled absolute raw-J0/final-MANO21 Euclidean metre losses divided by configured physical scales; separate global masked means',
+        'visual_geometry_supervision': asdict(visual_loss_config),
+        'geometry_reference_policy': 'source joints and masks are loss-only; prediction uses own beta/HaWoR left codec; no GT beta, PA alignment or uncertainty reweighting',
+        'visual_source_datasets': sorted({reference_geometry_metadata(train.manifest, record)['dataset'] for record in train.records}),
+        'visual_reference_contracts': [dict(values) for values in sorted({tuple(sorted(reference_geometry_metadata(train.manifest, record).items()))
+                                                                       for record in train.records})],
         'motion_objective': 'separate replay updates using unchanged source D37 six-term objective',
         'motion_sampling': 'equal source then uniform windows with replacement, independent rank seeds; not D37 full-coverage order',
         'best_selection': 'validation geometry score from existing D37 state_geometry_loss; NLL/coverage reported separately',
@@ -402,7 +418,7 @@ def main():
         'resume_limit': 'weights/optimizer/schedule/rank RNG restored; RGB and motion loader cursors restart',
         'resume': {'checkpoint': str(args.resume) if args.resume else None,
                    'start_step': start, 'config_changes': resume_changes},
-        'scope': 'bounded DexYCB GT-crop/fixed-camera-gauge pilot, fitted MANO references; not ego detector/SLAM benchmark'}
+        'scope': train.manifest.get('input_protocol', 'source-declared RGB/calibration/reference protocol; not a detector/SLAM benchmark')}
     tracker = WandbTracker(config.get('tracking'), args.output, run, rank=rank, resume=bool(args.resume))
     if rank == 0:
         run['tracking'] = tracker.metadata
@@ -468,10 +484,11 @@ def main():
     sampler.set_epoch(epoch); rgb_iterator = iter(loader); motion_iterator = iter(motion_loader)
     try:
         if rank == 0 and not args.resume:
-            baseline = evaluate_rgb(pipeline, val, device, config['eval_batches'])
+            baseline = evaluate_rgb(pipeline, val, device, config['eval_batches'], visual_loss_config=visual_loss_config)
             atomic_json(args.output/'baseline_validation.json', baseline)
             atomic_json(args.output/'baseline_adapter_bypass.json',
-                        evaluate_rgb(pipeline, val, device, config['eval_batches'], use_adapter=False))
+                        evaluate_rgb(pipeline, val, device, config['eval_batches'], use_adapter=False,
+                                     visual_loss_config=visual_loss_config))
             retention = evaluate_motion(pipeline.feedback.twm, motion_val, device, replay_config,
                                        config.get('motion_eval_samples_per_source', 16))
             atomic_json(args.output/'baseline_motion_validation.json', retention)
@@ -530,7 +547,7 @@ def main():
             if step % config['eval_every'] == 0 or step == config['steps']:
                 if world > 1: dist.barrier()
                 if rank == 0:
-                    validation = evaluate_rgb(pipeline, val, device, config['eval_batches'])
+                    validation = evaluate_rgb(pipeline, val, device, config['eval_batches'], visual_loss_config=visual_loss_config)
                     retention = evaluate_motion(pipeline.feedback.twm, motion_val, device, replay_config,
                                                config.get('motion_eval_samples_per_source', 16))
                     tracker.log({'validation': validation}, step)
@@ -553,7 +570,7 @@ def main():
             del result, loss, batch
         save(step)
         if rank == 0:
-            final = evaluate_rgb(pipeline, val, device, config['eval_batches'])
+            final = evaluate_rgb(pipeline, val, device, config['eval_batches'], visual_loss_config=visual_loss_config)
             atomic_json(args.output/'final_validation.json', final)
             atomic_json(args.output/'status.json', {'utc': utc(), 'phase': 'complete' if step == config['steps'] else 'stopped',
                 'step': step, 'target_steps': config['steps'], 'validation': final, 'wandb_url': tracker.url})

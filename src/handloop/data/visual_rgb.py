@@ -22,6 +22,53 @@ from .visual_clips import file_sha256
 
 
 SOURCE_SCHEMA = "handloop.visual_feedback_sources.v1"
+REFERENCE_ORDERS_BY_SOURCE = {
+    'dexycb': {'dex21'}, 'hot3d': {'meta21'}, 'umetrack': {'meta21'},
+}
+
+
+def reference_geometry_metadata(manifest: dict, record: dict) -> dict[str, str]:
+    """Resolve an audited loss-only landmark contract, with legacy Dex support.
+
+    Native arrays must already be reordered into the declared 21 slots. Do not
+    guess unknown skeletons, units, sources, or world transforms. This metadata
+    belongs to the external objective, not to the network.
+    """
+    def field(name, default=None):
+        return record.get(name, manifest.get(name, default))
+    dataset = field('dataset')
+    if dataset not in REFERENCE_ORDERS_BY_SOURCE:
+        raise ValueError(f'Unaudited visual geometry source: {dataset!r}')
+    legacy_dex = (dataset == 'dexycb' and field('joint_3d_order') is None
+        and str(record.get('coordinate_frame', '')).startswith('fixed_camera_')
+        and str(record.get('coordinate_frame', '')).endswith('_as_world_gauge')
+        and manifest.get('coordinate_convention') ==
+            'column vectors; original camera is identity world gauge; metres')
+    order = field('joint_3d_order', 'dex21' if legacy_dex else None)
+    units = field('joint_3d_units', 'metres' if legacy_dex else None)
+    coordinate = field('joint_3d_coordinate_frame', 'world' if legacy_dex else None)
+    source = field('reference_source')
+    if order not in REFERENCE_ORDERS_BY_SOURCE[dataset]:
+        raise ValueError(f'Unaudited {dataset} landmark mapping: {order!r}')
+    if units != 'metres' or coordinate not in ('world', 'camera'):
+        raise ValueError('Reference joints must declare metres and camera/world coordinates')
+    if not isinstance(source, str) or not source.strip():
+        raise ValueError('Reference joint annotation provenance must be explicit')
+    shape_fix = field('reference_left_shapedirs_fix', False if legacy_dex else 'unknown')
+    if shape_fix not in (True, False, 'unknown'):
+        raise ValueError('Reference left shapedirs convention must be bool or unknown')
+    validity_policy = field('joint_3d_valid_policy', 'legacy_complete_mano21' if legacy_dex else 'explicit_mask')
+    if validity_policy not in ('explicit_mask', 'legacy_complete_mano21'):
+        raise ValueError('Unknown joint reference validity policy')
+    if validity_policy == 'legacy_complete_mano21' and not (
+            dataset == 'dexycb' and order == 'dex21'
+            and str(record.get('coordinate_frame', '')).startswith('fixed_camera_')
+            and str(record.get('coordinate_frame', '')).endswith('_as_world_gauge')):
+        raise ValueError('Legacy complete-landmark policy is only audited for fixed-camera DexYCB')
+    return {'dataset': dataset, 'joint_order': order, 'units': units,
+            'coordinate_frame': coordinate, 'reference_source': source,
+            'left_shapedirs_fix': str(shape_fix).lower(), 'legacy_dex': str(legacy_dex).lower(),
+            'validity_policy': validity_policy, 'loss_coordinate_frame': 'world'}
 
 
 def _inside(root: Path, name: str) -> Path:
@@ -127,14 +174,56 @@ class VisualFeedbackRGBDataset(Dataset):
         for key, shape in expected.items():
             if key not in arrays or arrays[key].shape != shape or arrays[key].dtype.hasobject:
                 raise ValueError(f"Invalid source {key} shape/type")
+            if key == 'target_world':
+                # Missing labels may be NaN; actual labelled groups must be finite.
+                continue
             if not np.isfinite(arrays[key]).all():
                 raise ValueError(f"Nonfinite source {key}")
+        if arrays['target_valid'].dtype != np.bool_:
+            raise ValueError('target_valid must retain the source boolean mask')
+        state_mask = np.concatenate((np.repeat(arrays['target_valid'][:, :1], 3, -1),
+                                    np.repeat(arrays['target_valid'][:, 1:], 6, -1)), -1)
+        if not np.isfinite(arrays['target_world'][state_mask]).all():
+            raise ValueError('Nonfinite available source state labels')
         if arrays['timestamps'].dtype != np.float64 or (n > 1 and not np.all(np.diff(arrays['timestamps']) > 0)):
             raise ValueError("Keep strictly increasing source timestamps in float64 seconds")
         if not np.all(arrays['handedness'] == arrays['handedness'][0]):
             raise ValueError("A hand identity change must start a new recording")
         if not np.isin(arrays['handedness'], [0, 1]).all():
             raise ValueError("handedness must be 0(left) or 1(right)")
+        metadata = reference_geometry_metadata(self.manifest, record)
+        if 'joint_3d' not in arrays or arrays['joint_3d'].shape != (n, 21, 3):
+            raise ValueError('Geometry references need mapped joint_3d [N,21,3]')
+        if 'joint_3d_valid' in arrays:
+            joint_valid = arrays['joint_3d_valid']
+            if joint_valid.shape != (n, 21) or joint_valid.dtype != np.bool_:
+                raise ValueError('joint_3d_valid must be source boolean [N,21]')
+        elif metadata['validity_policy'] == 'legacy_complete_mano21':
+            if not arrays['target_valid'].all() or not np.allclose(
+                    arrays['camera_to_world'], np.eye(4)[None], atol=1e-7, rtol=0):
+                raise ValueError('Legacy mask fallback needs complete references and identity camera gauge')
+            joint_valid = np.repeat(arrays['target_valid'].all(-1)[:, None], 21, -1)
+        else:
+            raise ValueError('New visual sources require explicit joint_3d_valid masks')
+        if not np.isfinite(arrays['joint_3d'][joint_valid]).all():
+            raise ValueError('Nonfinite available reference joints')
+        joints = np.zeros((n, 21, 3), dtype=np.float32)
+        # Select before arithmetic: absent source labels may contain NaNs.
+        frames, slots = np.nonzero(joint_valid)
+        labelled = arrays['joint_3d'][frames, slots].astype(np.float32)
+        if metadata['coordinate_frame'] == 'camera':
+            transform = arrays['camera_to_world'][frames]
+            labelled = (transform[:, :3, :3] @ labelled[..., None])[..., 0] + transform[:, :3, 3]
+        elif metadata['legacy_dex'] == 'true' and not np.allclose(
+                arrays['camera_to_world'], np.eye(4)[None], atol=1e-7, rtol=0):
+            raise ValueError('Legacy Dex geometry requires audited identity world gauge')
+        joints[frames, slots] = labelled
+        wrist_valid = joint_valid[:, 0] & arrays['target_valid'][:, 0]
+        if wrist_valid.any() and not np.allclose(joints[wrist_valid, 0],
+                arrays['target_world'][wrist_valid, :3], atol=2e-5, rtol=0):
+            raise ValueError('Reference wrist does not match anatomical 99D world J0')
+        arrays['reference_joints_world'] = joints
+        arrays['reference_joints_valid'] = joint_valid.copy()
         self._arrays[index] = arrays
         while len(self._arrays) > self.max_open_records:
             self._arrays.popitem(last=False)
@@ -188,7 +277,9 @@ class VisualFeedbackRGBDataset(Dataset):
         values = dict(default_collate(cropped + [cropped[-1]] * (self.clip_length - count)))
         for key, source_key in (('timestamps', 'timestamps'), ('intrinsics', 'camera_intrinsics'),
                                 ('camera_to_world', 'camera_to_world'), ('is_right', 'handedness'),
-                                ('target_world', 'target_world'), ('target_valid', 'target_valid')):
+                                ('target_world', 'target_world'), ('target_valid', 'target_valid'),
+                                ('reference_joints_world', 'reference_joints_world'),
+                                ('reference_joints_valid', 'reference_joints_valid')):
             value = np.array(arrays[source_key][start:start + count], copy=True)
             if count < self.clip_length:
                 value = np.concatenate((value, np.repeat(value[-1:], self.clip_length - count, axis=0)))
@@ -205,6 +296,10 @@ class VisualFeedbackRGBDataset(Dataset):
             values[key] = torch.zeros(self.clip_length, dtype=torch.bool)
             values[key][:count] = torch.from_numpy(np.array(original[start:start + count], dtype=np.bool_, copy=True))
         values['target_valid'] &= values['frame_valid'][:, None]
+        values['reference_joints_world'] = values['reference_joints_world'].float()
+        values['reference_joints_valid'] = values['reference_joints_valid'].bool()
+        values['reference_joints_valid'] &= values['frame_valid'][:, None]
+        values['reference_geometry_metadata'] = reference_geometry_metadata(self.manifest, record)
         values['reset'] = torch.zeros(self.clip_length, dtype=torch.bool)
         values['reset'][0] = True
         if count < self.clip_length:

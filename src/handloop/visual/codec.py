@@ -16,6 +16,14 @@ from torch import Tensor, nn
 from handloop.geometry import state_from_rotmat, state_to_rotmat
 
 
+# Thumb-first wrist+four landmarks per finger, as audited by the DexYCB
+# geometry evaluator. Meta uses the same output slots but different mesh-tip
+# vertices; its unavailable thumb-base slot must stay masked in source data.
+MANO21_THUMB_FIRST_ORDER = (0, 13, 14, 15, 16, 1, 2, 3, 17, 4, 5, 6, 18,
+                            10, 11, 12, 19, 7, 8, 9, 20)
+SUPPORTED_REFERENCE_JOINT_ORDERS = ("dex21", "meta21")
+
+
 def invert_transform(transform: Tensor) -> Tensor:
     """Invert an SE(3) matrix, differentiably, without a generic matrix inverse."""
     if transform.shape[-2:] != (4, 4):
@@ -163,6 +171,31 @@ class MANOStateCodec(nn.Module):
         # einsum/matmul, changing precision and indexed-assignment dtypes.
         with torch.autocast(device_type=state.device.type, enabled=False):
             return self._geometry_impl(state.float(), beta.float(), is_right)
+
+    def joints21(self, state: Tensor, beta: Tensor, is_right: Tensor, *,
+                 joint_order: str = "dex21") -> Tensor:
+        """Absolute world/camera landmarks using this prediction's own beta.
+
+        This is a loss/evaluation mapping, separate from MANO16 joints used by
+        visual queries. It does not decode reference beta or change the left
+        shapedirs convention of this codec. Missing native Meta landmarks are
+        represented by the caller's validity mask, never invented as labels.
+        """
+        if joint_order not in SUPPORTED_REFERENCE_JOINT_ORDERS:
+            raise ValueError(f"Unaudited reference joint order: {joint_order!r}")
+        geometry = self.geometry(state, beta, is_right)
+        shape = state.shape[:-1]
+        vertices = geometry['vertices'].reshape(-1, 778, 3)
+        if joint_order == 'dex21':
+            tip_ids = torch.tensor([745, 317, 444, 556, 673], device=state.device)
+            tip_ids = tip_ids.expand(len(vertices), -1).clone()
+            tip_ids[~is_right.bool().reshape(-1), 2] = 445
+        else:
+            tip_ids = torch.tensor([744, 320, 443, 554, 671], device=state.device)
+            tip_ids = tip_ids.expand(len(vertices), -1)
+        tips = vertices.gather(1, tip_ids[..., None].expand(-1, -1, 3))
+        all_points = torch.cat((geometry['joints'].reshape(-1, 16, 3), tips), 1)
+        return all_points[:, MANO21_THUMB_FIRST_ORDER].reshape(*shape, 21, 3)
 
     def _geometry_impl(self, state: Tensor, beta: Tensor, is_right: Tensor) -> dict[str, Tensor]:
         shape = state.shape[:-1]

@@ -70,7 +70,7 @@ def main():
         dataset.windows = [(record_index, start, count)]
         sample = dataset[0]
         arrays, record = dataset._load_reference(record_index), dataset.records[record_index]
-        for key in ('frame_valid', 'detected', 'bbox_valid', 'image_valid', 'target_valid'):
+        for key in ('frame_valid', 'detected', 'bbox_valid', 'image_valid', 'target_valid', 'reference_joints_valid'):
             if bool(sample[key][count:].any()):
                 raise AssertionError(f'Padded {key} must be false')
         if not bool(sample['reset'][0]) or bool(sample['reset'][1:].any()):
@@ -81,7 +81,7 @@ def main():
         captured = []
         def capture(_module, positional):
             block = positional[0]
-            if 'target_world' in block or 'target_valid' in block:
+            if any(key.startswith(('target_', 'reference_')) for key in block):
                 raise AssertionError('Ground truth entered the official HaWoR forward')
             captured.append({key: value.detach().cpu().clone() for key, value in block.items()})
         handle = frontend.register_forward_pre_hook(capture)
@@ -112,6 +112,8 @@ def main():
         # Deliberately poisonous supervision must have no effect on inference.
         batch['target_world'].fill_(float('nan'))
         batch['target_valid'].zero_()
+        batch['reference_joints_world'].fill_(float('nan'))
+        batch['reference_joints_valid'].zero_()
         captured.clear()
         with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16,
                                              enabled=args.autocast_bf16):
