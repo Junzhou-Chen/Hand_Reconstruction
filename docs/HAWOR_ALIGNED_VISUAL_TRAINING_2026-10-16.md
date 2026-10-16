@@ -59,3 +59,17 @@ HOT补齐运行环境后的重试已实际320/1167 clips、635个手轨迹record
 来源检查已在Pod上对**真实已完成Dex＋HOT manifest**实测：显式要求这两源通过、历史配置无要求通过、要求HaWoR四源明确拒绝缺失ARCTIC／HO3D；无模型前向或optimizer更新。新增代码本机仅AST／JSON／diff静态检查。
 
 07:45:59UTC快照：ARCTIC仍running、verified3／failed0、已写1025251120B；HO3D行选择修复后已进入真实`downloading`、已写1913417728B，尚未完成ZIP CRC／SHA验收。HOT已340/1167 clips。小型快照见[`reports/hawor_visual_training_source_alignment_20261016.json`](../reports/hawor_visual_training_source_alignment_20261016.json)；完整下载收据／失败log留远程。不把已写字节称为完整可用训练数据。
+
+## 用户自行查询与“完整训练”的含义
+
+用户随后表示等下载完成再来，本轮仅提供查询与说明，不启动训练或调整worker。只读helper同时查看三个下载状态、校验文件数／失败数、worker是否仍活着与HOT RGB预处理进度；不读取私有账号配置。
+
+在本机执行：
+
+```bash
+ssh ds 'python3 /sciclone/data10/jchen57/Hand_Reconstruction/download_runtime/check_hawor_data_progress.py'
+```
+
+ARCTIC和HO3D各自`phase=complete`才是下载与本轮校验完成；`checking`仍在校验，`running/downloading`仍下载，`failed`需检查。HOT RGB预处理是另一阶段，单独看complete／总clips。退出查询不会停止后台进程。
+
+“作者选帧清单”指具体source／sequence／view／frame ID，不是要求本项目额外抽小样本。HaWoR公开训练帧总数不能唯一确定这个列表；可以按公开训练划分组织完整的有效训练池，无须凑成作者973K。该解释不等于当前已覆盖四库全量：Dex RGB仍单视角、HOT为已下载BOP clips，缺口与有效性剔除仍须逐源披露／补齐；val/test不能混入。5000是optimizer预算，与数据池是否完整是两个概念，不保证每个样本都遍历一次。
