@@ -1,5 +1,11 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-16 再次核对TWM原始数据规模与扩容建议
+
+- 远程实际读取四库manifest与D37原metadata，确认2788135 train手状态、636610重叠窗及分源完整60步future覆盖；输出小型[池清单](../reports/twm_data_pool_inventory_20261016.json)。不是把视觉RGB扩大当新运动，亦不把重叠窗当独立录制。
+- ARCTIC下载已complete343/343，267官方train参数计数384780双手状态，QC／单位／模板／J0／split验收前不得称新增训练净量。HumanTouch／DexWild／DexCap／DexterHand官方公开版本复核并保存[候选摘要](../reports/twm_public_candidate_review_20261016.json)；GRAB／HMP等职责复核，新资源访问未验者不抬为优先。
+- 在[现有来源报告](../docs/DATA_EXPANSION_SOURCE_AUDIT_2026-10-16.md)补最新状态与建议：先ARCTIC，glove需native标定和partial监督，输出保留99D；建议未执行，未新增训练／大包下载、改当前5k或既定模型／loss。更新传感器与状态专题，保留其他聊天文档改动。
+
 ## 2026-10-16 只读核验两库5k训练中期效果
 
 - 远程14:26UTC／纽约10:26快照1773/5000仍training；读取原始HaWoR参考和W&B全部35次fixed8验证，保存[小型进度摘要](../reports/visual_dex_hot_geometry_5k_progress_20261016.json)。源码a642e6e／原冻结清单与既定配置保持。

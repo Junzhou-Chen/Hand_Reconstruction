@@ -1,0 +1,75 @@
+{
+  "queried_utc": "2026-10-16T14:56:26.087120+00:00",
+  "official_cards": [
+    {
+      "repo": "chuqiaoLyu/Xspark-HumanTouch",
+      "revision": "81822a10cac5def2638db546eaeced581d71a8b5",
+      "private": false,
+      "gated": false,
+      "lastModified": "2026-09-06T10:31:35.000Z",
+      "readme_url": "https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/81822a10cac5def2638db546eaeced581d71a8b5/README.md",
+      "selected_lines": [
+        "HumanTouch \u662f\u4e00\u4e2a\u9762\u5411\u89c4\u6a21\u5316\u4eba\u624b\u89e6\u89c9\u91c7\u96c6\u7684\u591a\u6a21\u6001\u6570\u636e\u96c6\u3002\u5b83\u901a\u8fc7\u53cc\u624b\u67d4\u6027\u538b\u963b\u89e6\u89c9\u624b\u5957\u3001MANUS \u7535\u78c1\u573a\uff08EMF\uff09\u624b\u90e8\u8ddf\u8e2a\u30016-DoF \u624b\u8155\u4f4d\u59ff\u8ddf\u8e2a\uff0c\u4ee5\u53ca\u5934\u90e8\u573a\u666f\u76f8\u673a + \u53cc\u4fa7\u624b\u8155\u76f8\u673a\uff0c\u5728\u7edf\u4e00\u7684 **60 Hz \u53c2\u8003\u65f6\u95f4\u7ebf**\u4e0a\u540c\u6b65\u91c7\u96c6\u89e6\u89c9\u3001\u624b\u90e8\u59ff\u6001\u4e0e\u89c6\u89c9\u6570\u636e\u3002\u76f8\u6bd4 OpenTouch\u3001World In Your Hands\u3001FreeTacMan\u3001Touch in the Wild \u7b49\u73b0\u6709\u7cfb\u7edf\uff0cHumanTouch \u5177\u5907\u66f4\u5b8c\u6574\u7684\u89e6\u89c9\u8986\u76d6\u3001\u529b\u6821\u51c6\uff08\u2713\uff09\u3001\u81ea\u7136\u64cd\u4f5c\uff08\u2713\uff09\u4e0e\u591a\u5730\u90e8\u7f72\uff08\u2713\uff09\u80fd\u529b\u3002",
+        "| \u624b\u90e8\u59ff\u6001 | MANUS \u7535\u78c1\u573a\uff08EMF\uff09\u8ddf\u8e2a\uff0c\u6bcf\u624b 25 \u5173\u8282 |"
+      ],
+      "readme_chars": 2457
+    },
+    {
+      "repo": "boardd/dexwild-dataset",
+      "revision": "df5cd775f985e79036ff23ad579abbe7752b8df1",
+      "private": false,
+      "gated": false,
+      "lastModified": "2025-11-07T21:09:44.000Z",
+      "readme_url": "https://huggingface.co/datasets/boardd/dexwild-dataset/blob/df5cd775f985e79036ff23ad579abbe7752b8df1/README.md",
+      "selected_lines": [
+        "license: mit",
+        "Robotics: Science and Systems (RSS) 2025",
+        "[[Project page]](https://dexwild.github.io/) [[Video]](https://youtu.be/oMaamSkcl5E) [[ArXiv]](https://arxiv.org/abs/2505.07813) ",
+        "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]()",
+        "The DexWild dataset is one of the largest, high quality human dexterous hand datasets with a huge diversity of objects and environments. In total, we collect **9,505 Episodes across 5 tasks and 93 environments. 33+ Hours equating to 3.5M+ Transitions!**",
+        "Human - **2,323** Episodes, 1,251,649 Transitions  ",
+        "\u2502   \u251c\u2500\u2500 left_manus",
+        "\u2502   \u2502   \u2514\u2500\u2500 left_manus_full.pkl, left_manus.pkl",
+        "\u2502   \u251c\u2500\u2500 right_manus",
+        "\u2502   \u2502   \u2514\u2500\u2500 right_manus_full.pkl, right_manus.pkl",
+        "Since HuggingFace has a limit on single file size, you must recombine the data to obtain the full dataset for certain HDF5 files.",
+        "@article{tao2025dexwild,",
+        "      year={2025}}"
+      ],
+      "readme_chars": 4317
+    },
+    {
+      "repo": "chenwangj/DexCap-Data",
+      "revision": "e468f07000de0f8d3234a9c60a9d8208344675e0",
+      "private": false,
+      "gated": false,
+      "lastModified": "2024-04-15T17:28:41.000Z",
+      "readme_url": "https://huggingface.co/datasets/chenwangj/DexCap-Data/blob/e468f07000de0f8d3234a9c60a9d8208344675e0/README.md",
+      "selected_lines": [
+        "license: cc-by-4.0",
+        "This is the official dataset collected by the DexCap system to train dexterous robot manipulation using human hand motion capture data, as presented in the [paper](https://arxiv.org/abs/2403.07788). It contains 30 minutes of mocap data for the wiping task and 60 minutes of in-the-wild mocap data for the packaging task.",
+        "This dataset is released under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/legalcode) license."
+      ],
+      "readme_chars": 2547
+    },
+    {
+      "repo": "pku-mocca/DexterHand",
+      "revision": "b396b1356f2c786054e41391291172cf5d1e960d",
+      "private": false,
+      "gated": false,
+      "lastModified": "2026-01-09T10:46:54.000Z",
+      "readme_url": "https://huggingface.co/datasets/pku-mocca/DexterHand/blob/b396b1356f2c786054e41391291172cf5d1e960d/README.md",
+      "selected_lines": [
+        "license: apache-2.0"
+      ],
+      "readme_chars": 2297
+    }
+  ],
+  "dexwild_human_totals_from_five_official_task_rows": {
+    "episodes": 7917,
+    "transitions": 2924588,
+    "task_rows": 5,
+    "not_full_99d_accepted_quantity": true,
+    "not_robot_transitions": true
+  }
+}

@@ -2,6 +2,52 @@
 
 日期：2026-10-16。性质：官方资料／源码复核、来源选择建议与一个原生glove样本的远程结构验收；不是新增训练结果。
 
+## 纽约10:54–11:00再次复核：当前TWM池与可扩充来源
+
+用户要求核查TWM目前实际使用的数据、能否扩大以及改善方向；**本轮是只读调查与建议，没有启动新预训练、下载新大包、改架构／loss或改变正在运行的两库视觉5k清单**。本节取代下文历史状态中ARCTIC尚待账号／下载的描述。
+
+实际motion manifest仍为`prepared/twm_four_sources_99d_v1/manifest.json`，SHA256 `f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f`。D37完成10k后被当前联合训练载入，motion回放仍用同池；视觉训练的63652独立RGB不代表TWM预训练规模。
+
+| 已入训来源 | Train已准备手状态 | Train重叠窗口 | 参考来源 |
+|---|---:|---:|---|
+| OakInk2 | 1414552 | 346860 | MoCap拟合MANO，world腕 |
+| HOT3D | 660300 | 132008 | marker／native UmeTrack转换MANO，保留source world |
+| 独立UmeTrack | 662422 | 151390 | marker／native骨架转换MANO，real train |
+| DexYCB | 50861 | 6352 | 多视角RGB-D拟合MANO，固定一相机为参考系 |
+| 合计 | **2788135** | **636610** | 两手分别计状态；窗口重叠，不等于同量独立运动 |
+
+原val为61370窗。Oak原431 train录制、HOT已下载且排除评测来源的Aria＋Quest3、Ume real train、Dex官方s0 train均已按既有准备范围使用；更多RGB视角、Ume重渲染或重复切窗不算新的运动。D37 full coverage的窗量占比Oak54.49%、HOT20.74%、Ume23.78%、Dex1.00%；当前联合motion回放按旧配置等源有放回，二者不能混说。参数格式经工程验收不代表所有旋转均为传感器直接测量；Meta官方明确converted MANO略逊于native keypoints。
+
+**ARCTIC现在已经可进入adapter验收。** 下载12:38:03UTC／纽约08:38完成，343/343文件verified、failed0。只读ZIP目录及官方train参数核实：`raw_seqs.zip`225334351B，301条含MANO标注录制；P1/P2的267 train身份完全相同，余34是val；两协议另列38 test，不能从其他格式补入训练。本轮只读取267 train参数作维度计数，得到192390个录制时间帧、左右合计384780个手状态，约为原池13.80%的额外prepared前原始量。**这是QC／适配／切窗前计数，不是已验收新增窗口量**。初样本有左右rot、pose45、trans、shape10、fitting_err；meta含个体模板。需核source mean、trans→J0、单位、模板／β语义、时序／有效性及跨任务统一排除表后入池。纯TWM只需raw＋meta，不依赖RGB处理完成。[官方数据职责与字段](https://github.com/zc-alexfan/arctic/blob/master/docs/data/data_doc.md)。
+
+**glove仍是规模扩展的主要候选，尚未入训。** 重新读取官方固定发布：
+
+- [HumanTouch](https://huggingface.co/datasets/chuqiaoLyu/Xspark-HumanTouch/blob/81822a10cac5def2638db546eaeced581d71a8b5/README.md)仍公开免申请，首版官方口径约100h、MANUS EMF每手25点、6DoF腕、60Hz参考时间线；1000h是计划，不能当现有量。原1597帧native结构验收与约9cm tracker／native根定义差仍有效，尚无完成的MANO标定与partial训练入口。
+- [DexWild human](https://huggingface.co/datasets/boardd/dexwild-dataset/blob/df5cd775f985e79036ff23ad579abbe7752b8df1/README.md)仍公开免申请，按五个任务的人类行统计7917 episodes／2924588 transitions，排除robot行；总33+h混有人／机器人，不能全算人类运动。原人体MANUS及tracker可用于候选；既有tracker坐标处理风险未由本轮新样本解除。
+- [GRAB](https://github.com/otaheri/GRAB)提供10主体、120Hz、左右MANO及个体模板；HMP官方motion prior训练使用GRAB等并另接ARCTIC，符合数值先验职责。需另取源访问许可，目前本项目没有该库数据，不作为公开glove开工前置。[HMP训练说明](https://github.com/enesduran/HMP#training-motion-prior-optional)。
+- [Stanford DexCap](https://huggingface.co/datasets/chenwangj/DexCap-Data)的90分钟raw掌系人体点＋独立6DoF适合补充；[DexterHand](https://huggingface.co/datasets/pku-mocca/DexterHand)187MB公开参数可做小规模marker候选，其20／60Hz版本去重，完整数据仍在官方roadmap。二者不是同一库。
+
+同时扩查了EgoEMG与ACE-Data-0等新资源：[EgoEMG](https://arxiv.org/abs/2605.05712)论文报告41参与者、60手势、10+h，但未在本轮核得可直接取得完整所需参考的发布清单；[ACE官方卡片](https://huggingface.co/datasets/ACERobotics/ACE-Data-0)仍写个人审批及数据未发布，HF显示大文件统计与该文字不一致、当前未获访问以核实，不能据宣传150h或平台体积直接纳入。暂不提高为优先可执行来源。
+
+### 长未来与异构标签的实际约束
+
+读取D37原run metadata的时间戳审计，没有重跑模型：
+
+| Train源 | 有完整60步future的窗数／比例 | 实际达到至少2.0s的窗数 |
+|---|---:|---:|
+| OakInk2 | 334558／96.45% | 334558 |
+| HOT3D | 65950／49.96% | 51528 |
+| UmeTrack | 126567／83.60% | 126567 |
+| DexYCB | 0／0% | 0 |
+
+Dex这批窗口最长future仅1.5s。HOT采用实际时间戳，60帧可能略短于2.0s；上表两个计数定义不同，不据此称标签漏算。短future按mask训练，没有复制尾帧为真值。故新增长连续录制值得作为改善长预测覆盖的方向，但不能将现有预测局限唯一归因于数据不足。
+
+现`ForecastTrajectoryWindows`显式要求完整17组MANO标签；不能只加HumanTouch路径就声称入训。建议保持99D输出，另实现校准后的native joint／方向部分监督：经MANO解码只比较确实对应的几何，源腕／局部姿态分别mask，未测twist不伪造旋转真值；骨长／个体形态和rest frame差异须先处理。输入端也需要桥接：99D历史／观测可由已标定骨架方向或带残差记录的IK得到，未知分量保留availability；这些派生输入参数不自动变成完整rotation GT，监督仍回到可靠native测量。60Hz数据统一真实秒数，不能沿用60步却把两秒任务变一秒。
+
+建议下一版本先以ARCTIC完成完整参数适配，同时推进HumanTouch／DexWild小样本标定及partial监督，再作原四库、四库＋ARCTIC、再加glove的固定验证／等预算比较。来源权重尚无最优实验依据；大glove池不能按原始行数直接淹没参考更可审计的核心池。评测应包含真实视觉误差、干净输入误改、分源／左右／速度分层和1／2秒未来，预训练与视觉阶段共用原录制排除表。以上是建议，未实施新训练。
+
+来源与远程审计：[实际池与ARCTIC计数](../reports/twm_data_pool_inventory_20261016.json)、[官方候选当前发布](../reports/twm_public_candidate_review_20261016.json)；完整产物在`evaluations/twm_data_expansion_review_20261016/`。既有传感器精度判断与源转换限制继续按下文解释。
+
 ## 本轮范围与实际状态
 
 用户本轮授权推进此前建议的前两项：扩大运动预训练和视觉联合的数据，以及增加直接几何监督。此前第3项raw/candidate训练条件、第4项历史与motion回放、第5项增加训练步数暂不调整。此来源核查不改模型、受损样例构造、历史、任务比例、学习率或训练预算，也不自动把所有候选加入训练。
