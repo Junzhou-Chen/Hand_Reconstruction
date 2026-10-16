@@ -87,7 +87,15 @@ def prepare_sources(args: argparse.Namespace) -> None:
                            and (args.handedness == "both" or
                                 int(r["handedness"]) == int(args.handedness == "right"))),
                           key=lambda r: (r["subject"], r["sequence_index"]))
-        chosen.extend(eligible[:args.records_per_split])
+        per_subject = getattr(args, 'records_per_subject_' + split, 0)
+        if per_subject:
+            for subject in args.subject:
+                selected = [r for r in eligible if r['subject'] == subject][:per_subject]
+                if not selected:
+                    raise ValueError(f'No eligible {split} recording for {subject}')
+                chosen.extend(selected)
+        else:
+            chosen.extend(eligible[:args.records_per_split])
         if not eligible:
             raise ValueError(f"No eligible {split} recording")
     requested: dict[str, dict[str, Path]] = {}
@@ -306,6 +314,10 @@ def main() -> None:
     parser.add_argument("--subject", action="append", default=None)
     parser.add_argument("--serial", default=SERIAL)
     parser.add_argument("--records-per-split", type=int, default=1)
+    parser.add_argument("--records-per-subject-train", type=int, default=0,
+                        help="If positive, select this many train recordings per requested subject")
+    parser.add_argument("--records-per-subject-val", type=int, default=0,
+                        help="If positive, select this many validation recordings per requested subject")
     parser.add_argument("--min-frames", type=int, default=32)
     parser.add_argument("--max-frames", type=int, default=64)
     parser.add_argument("--handedness", choices=("both", "right", "left"), default="right")
@@ -318,7 +330,8 @@ def main() -> None:
     parser.add_argument("--feature-dtype", choices=("float32", "float16"), default="float16")
     args = parser.parse_args()
     args.subject = args.subject or ["20200709-subject-01"]
-    if args.records_per_split < 1 or args.min_frames < 1 or args.max_frames < 0:
+    if (args.records_per_split < 1 or args.min_frames < 1 or args.max_frames < 0
+            or args.records_per_subject_train < 0 or args.records_per_subject_val < 0):
         parser.error("Invalid bounded source sizes")
     required = (("dex_root", "prepared") if args.stage == "sources" else
                 ("source_manifest", "hawor_root", "hawor_checkpoint", "hawor_config", "mano_models"))
