@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-16 01:32UTC（纽约10-15 21:32）：只读D40联合训练记录/W&B，实际253/1000、最新fixedval/best250，两rankhash一致；8clips/210states/同identity，腕原raw88.250→当前raw65.478→final48.598mm，root8.591°/finger7.530°。保留训练波动、37.1%局部腕退化、90%coverage40%/std32.622mm和NLL回升。motion同四源16窗noisy当前腕2.959→3.514mm/指0.696→0.896°，1s100.370→94.874mm、2s三源152.983→172.615mm（差于hold169.452）；不能称运动能力全保持或最后候选为纯插件。远程CPU汇总、zhou生成曲线，未改训/新推理。[报告](../docs/VISUAL_JOINT_PROGRESS_2026-10-16.md)、[数值](../reports/visual_joint_progress_20261016_0132.json)。
+
 2026-10-16 00:59UTC（纽约10-15）：D40按用户要求RGB每卡4→8，旧65步共同保存停止并归档，eb8d0b9显式允许单项batch变化完整resume，保持clip32/motion32/LR/3:1/总1000。实际76步、checkpoint69双rankhash一致；73步两rank14组finite/非零seen/代表参数改变全通过，每卡峰值allocated63.498GiB、单时刻nvidia-smi79446MiB。W&B同run3abfc864服务端running/75、runtimebatch8/resume_start65；optimizer/scheduler/RNG恢复，loader游标重建。实现新增配置守卫、执行metadata历史、运行batch scalar、续跑首8梯度检查/第4次early保存；无精度或吞吐改善断言。[摘要](../reports/visual_joint_batch8_resume_20261016.json)、[协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
 
 2026-10-16 00:43UTC（纽约10-15）：D39按用户双主干低LR全量决定，以eeac1fc正式双卡每卡4×32帧/motion32实际10/1000更新、37.742GiB峰值，14组梯度/参数改变两rank通过、latest4模型hash相同，W&B3abfc864服务端running/step8。在线RGB＋两轮MANO16候选取证，1128train/577val帧；D37已complete10k/best10000固定。CPU/AMP/真实RGB、smoke4→8恢复、1076model/3135Adam finite和trained16RGB当前/未来接口通过。保留初次AMP失败、同inode临时别名修复及初始化两轮几何差于raw的负面基线；尚无训练后fixedval提升、不改D38loss。[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)、[启动摘要](../reports/visual_joint_launch_20261016.json)。
