@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-16 00:43UTC（纽约10-15）：D39按用户双主干低LR全量决定，以eeac1fc正式双卡每卡4×32帧/motion32实际10/1000更新、37.742GiB峰值，14组梯度/参数改变两rank通过、latest4模型hash相同，W&B3abfc864服务端running/step8。在线RGB＋两轮MANO16候选取证，1128train/577val帧；D37已complete10k/best10000固定。CPU/AMP/真实RGB、smoke4→8恢复、1076model/3135Adam finite和trained16RGB当前/未来接口通过。保留初次AMP失败、同inode临时别名修复及初始化两轮几何差于raw的负面基线；尚无训练后fixedval提升、不改D38loss。[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)、[启动摘要](../reports/visual_joint_launch_20261016.json)。
+
 2026-10-15 22:32UTC：按用户要求复核另一聊天“梳理项目记忆文档”搭建的D35 HaWoR反馈首版。确认每帧一次插件/一次TWM、σ/κ只回插件、旧视觉best内嵌D32且未接D37；核远程best/缓存/RGB预测/HaWoR仍在，旧latest及独立参考已按best-only删除。补源码与产物存续说明，无训练/模型执行/精度重测或新设计决定。[框架](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)、[审计摘要](../reports/visual_feedback_integration_audit_20261015.json)。
 
 2026-10-15 22:22UTC：D38用户明确loss放下版，本轮只查效果。D37训练8010/10k、完整验证8000：普通腕4.652→2.881mm，clean0→0.601mm/>1mm退化12.60%，reanchor0.267→1.296mm/30.96%；5k→8k score下降21.05%。1s/2s腕96.954/140.930mm，长期仍弱且旋转不全改善；两份汇总同validation SHA、聚合/固定输入核验通过，远程CPU绘图，无改训/新推理。[报告](../docs/TWM_TRANSIENT_8K_PROGRESS_2026-10-15.md)、[摘要](../reports/twm_progress_comparison_20261015_2220.json)。

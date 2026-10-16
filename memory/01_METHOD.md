@@ -1,5 +1,7 @@
 # HandLoop 方法与接口记忆
 
+**D39当前实现方向（2026-10-16 UTC／纽约10-15）：** 用户明确两个主干均低LR全量微调，替代D35视觉双冻结的首版范围及此前优先固定HaWoR的建议。在线HaWoR patch/raw→2轮candidate-conditioned MANO16投影取证＋数值TWM→末轮最终分布→自身跨帧历史；帧内raw/H/anchor固定、仅最终commit，帧间detach。两主干参数、插件均在可微路径上，图像/相机features仍不进TWM；σ/κ仍非已校准w/q。视觉current NLL与原motion六项回放分开更新，D38 loss改版未提前实施；实际验收状态见[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
+
 **2026-10-15 loss对照建议，未替代现行六项：** 已读12篇world model/手部恢复/生成论文，WestWorld以CE为主但Dreamer/TD-MPC2/StableHand/HMP/HaWoR均有不同带权组合。建议先统一conditional probability主线、同架构逐项消融，future起点stopgrad单独验证；NLL＋几何不天然矛盾，尚无证据定位六项为失败原因。任务采样和有效帧归约不能隐藏为“无权重”；现future从确定性current均值出发，不能称完整current–future不确定性传播。DF/条件RFM是第二路线，会改变生成头/采样/可靠性与D35解析NLL接口，尚未实施。D37仍沿原六项；D35视觉阶段单一current NLL不改。[文献与精确建议](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
 
 更新日期：2026-10-15 UTC。本文整理现行设计，完整视觉闭环尚待验证；D29已按用户新指令实现当前恢复＋MoE＋较长未来分布并启动纯轨迹训练。主依据：[START_HERE §2–4](../HandLoop_Project/START_HERE.md)、后续用户决定和[讨论 §15.23、§16](../HandLoop_Project/01_Conversation_Research_Archive.md)。

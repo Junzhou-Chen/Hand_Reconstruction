@@ -1,6 +1,6 @@
 # D39：HaWoR／TWM 全量联合微调 pilot 协议
 
-记录日期：2026-10-16 UTC（纽约 2026-10-15）。**状态：协议与实现准备中，尚未记录本轮启动或效果；下列预算、学习率和混合比例是工程 pilot 设置，不是已验证最优值。** 实际代码版本、数据规模、启动验收及结果由运行记录补充。
+记录日期：2026-10-16 UTC（纽约 2026-10-15）。**状态：双主干全量联合训练 smoke 的 checkpoint／续跑／梯度与真实 RGB 推理验收完成；正式双卡 pilot 已实际训练至 10／1,000 updates（00:43:19 UTC 快照），两主干均已更新。首次固定训练后验证为 step50，尚未到达，不能声称效果改善。** 下列预算、学习率和混合比例是工程 pilot 设置，不是已验证最优值。代码／数据事实、失败修复与效果边界见文末及[启动摘要](../reports/visual_joint_launch_20261016.json)。
 
 ## 用户决定与保留的边界
 
@@ -49,7 +49,7 @@ shape β10 仍另存。当前完整 state NLL 不直接监督 β；若 TWM β co
 +\sum_{j=0}^{15}\log p_{\rm MatrixFisher}(R_{t,j}^{\rm GT})\right].
 \]
 
-平移以米为单位，在该帧固定 anchor 中计算密度；旋转以 SO(3) 单位 Haar 测度归一化。按完整有效 state 平均，**不再除以 51**。GT 只进入外部 loss 和 metrics，不能进入模型输入、候选、参考系或历史。DDP 两 rank 的完整有效 state 数可能不同，必须按全局有效数归约，而非无条件平均两个 local mean。
+平移以米为单位，在该帧固定 anchor 中计算密度；旋转以 SO(3) 单位 Haar 测度归一化。按完整有效 state 平均，**不再除以 51**。当前／未来 99D 目标标签只进入外部 loss 和 metrics，不能作为状态填入模型输入、候选、参考系或历史。这里的标签隔离不消除本轮明确采用的 GT-derived crop 和 reference-valid 源帧筛选条件；这些输入条件仍按下一节披露。DDP 两 rank 的完整有效 state 数可能不同，必须按全局有效数归约，而非无条件平均两个 local mean。
 
 motion replay 沿用原 D37 train 分区、受损条件与原六项 objective，保持原来当前恢复及最长 60 步未来分布的训练路径。它不读取 RGB，不把视觉标签混作原四库轨迹数据，也不使用 val／test 进行回放。
 
@@ -57,7 +57,7 @@ motion replay 沿用原 D37 train 分区、受损条件与原六项 objective，
 |---|---:|
 | 当前几何恢复 | `1.0` |
 | 当前 NLL／51 | `0.05` |
-| 长轨迹 mixture NLL／有效时长／51 | `0.3` |
+| 长轨迹 mixture NLL／有效未来步数／51 | `0.3` |
 | 最佳轨迹几何项 | `0.2` |
 | 速度项 | `0.05` |
 | MoE balance | `0.01` |
@@ -66,17 +66,17 @@ motion replay 沿用原 D37 train 分区、受损条件与原六项 objective，
 
 ## 数据与运行预算
 
-准备使用已经下载的 DexYCB，沿官方 s0 recording split，在窗口化前固定训练／验证录制：
+使用已经下载的 DexYCB，沿官方 s0 recording split，在窗口化前固定训练／验证录制：
 
 - subject-01 和 subject-02，各选 8 个 train、4 个 val 录制，即目标 16 train／8 val 录制。
-- 每录制最多取 128 帧；总量上限 3,072 帧，实际可用帧与左右手分布待准备结果确认，不能把上限写成实测。
+- 每录制最多取 128 帧；总量上限 3,072 帧。源数据准备已经 complete，实际提取 **1,705 张 JPEG，其中 train 1,128、val 577；16 train／8 val 录制**。两主体分别为 8 train／4 val；全池 14 个右手、10 个左手录制。手性计数为录制数，不是左右手帧数，不能把上限写成实测。
 - 当前使用 GT 关节点投影产生 crop，使用该固定相机作为明确命名的 world gauge；时间戳为 frame index／30 的标称时间。
 - GT 来源是官方 fitted MANO／joint annotation，不称独立 glove／MoCap 真值。源 β 与 HaWoR β 约定不得未经验证混用。
 - 对帧间缺口分段，避免原 16 帧 HaWoR 块跨越不连续源时间；录制不能跨 train／val，测试录制排除。
 
 该数据扩展仍是 **GT-crop、固定相机的联合训练 pilot**，不是头戴移动相机 SLAM、自动 detector 或完整 HaWoR benchmark 验证。D35 的 63 train／64 val 帧和 20 次更新只作为历史工程结果，不自动成为本轮基线。
 
-初始预算为 **1,000 次 optimizer update**，按 `3:1` 序列约 750 次视觉、250 次 motion replay。使用双 GPU；视觉每卡 batch 1、clip 16 起，motion replay 每卡 batch 32。视觉 global batch 为 2 clips，motion global batch 为 64 windows；它们不是同一种样本计数。只有实际显存／梯度测试通过后才增加 batch，并在 run metadata 记录最终值及是否重启。
+正式 pilot 预算为 **1,000 次 optimizer update**，按 `3:1` 序列约 750 次视觉、250 次 motion replay。双 GPU smoke 从视觉每卡 batch 1、clip 16 起，实测单卡 peak allocated 约 **17.77 GiB**。在完成该 smoke 后，正式配置增至**视觉每卡 batch 4、clip 32，motion replay 仍每卡 batch 32**，另开正式 run；实际 step10 快照与约 **37.742 GiB／卡**峰值已验收。正式视觉 global batch 为 8 clips，每 clip 32 个含 mask 的帧位置；motion global batch 为 64 windows，它们不是同一种样本计数。smoke 的 8 次更新不计为正式 1,000 次已完成。
 
 本轮 replay 初始实现使用四库等概率、库内窗口有放回的 `SourceBalancedSampler`；这与 D37 的 `full_coverage` 有限遍历不同。相同 train 分区、噪声和 objective 不等于相同采样协议；本轮不承诺遍历完整运动池。训练过程按 optimizer update 计数，实际视觉／运动样本暴露量分别记录。
 
@@ -99,18 +99,30 @@ NLL 降低可能来自增大 σ 或减小 κ，不足以证明几何变准；预
 
 模型 checkpoint 应保存所有**已训练参数**，含更新后的 HaWoR、TWM 与 adapter，并记录官方 HaWoR 版本／配置、MANO 资产 hash 与预训练来源。受许可的 MANO 资产、模型权重、缓存、原始日志只存远程，不上传 GitHub。保存／恢复所需配置应随 checkpoint 保留，不以旧初始化文件仍在原路径为隐含条件；合法 MANO 运行资产仍需按明确约定提供。
 
+当前实现已使用 checkpoint 内的 TWM 模型配置、source metadata 和 replay 配置构造恢复网络，再加载联合权重，**resume 不再读取原 D37 checkpoint 文件**。远程 smoke 已在 CLI 提供不存在的 D37 路径时，从 step4 恢复并实际完成至 step8，验证了这一点。仍需提供官方 HaWoR 结构／初始化资产、代码和合法 MANO 运行资产；目前不能称整个运行环境零外部依赖。
+
+验证保存三种初始化基线：原 HaWoR 的 raw 指标、初始化两轮联合系统、初始化 adapter-bypass 系统。`best.pt` 只在训练 checkpoint 中按 validation geometry score 选择，**step0 基线单独保存、不参与 best 排序**；因此 best 表示已保存训练 checkpoint 中的最优，并不自动优于初始模型。初始与后续验证还使用四库每库最多 16 个固定窗口的纯轨迹保持集，分别记录 noisy／clean 当前几何、selected future ADE、恢复当前后 hold 对照，以及 0.1／0.5／1／2 秒误差与各指标有效 counts。该小保持集已实现，不等于其结果已通过；它不是真实 RGB 的未来预测评测。
+
 ## 参考机制与非等价处
 
 [WHAM 官方 stage2 配置](https://github.com/yohanshin/WHAM/blob/main/configs/yamls/stage2.yaml)使用新模块 `1e-4`、预训练模块 `1e-5`；[optimizer 实现](https://github.com/yohanshin/WHAM/blob/main/lib/utils/utils.py)按 integrator 与其余模块分组，[stage2 数据实现](https://github.com/yohanshin/WHAM/blob/main/lib/data/datasets/mixed_dataset.py)仍包含 AMASS。这为低 LR 适配和 motion replay 提供机制参考；WHAM 的人体状态、视觉冻结范围和任务与本项目不同，不能直接外推保持保证或最优比例。
 
 [HaWoR 原论文 §8.1](https://arxiv.org/html/2501.02973v1#S8.SS1)原训练采用 AdamW、`1e-5` 并冻结 WiLoR ViT。本轮包含 ViT 的双主干全量微调是用户最新选择的研究实验，**不是 HaWoR 官方训练协议复现**。相关旧版事实、保留与替代关系见 [D35 框架](VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)与[原微调讨论](VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md#2026-10-15twm真实误差适配与先验保持讨论建议未实施)。
 
-## 实际运行记录（待填）
+## 实际运行记录
 
 - 代码入口：[联合 trainer](../scripts/train_visual_joint.py)、[在线 RGB loader](../src/handloop/data/visual_rgb.py)、[HaWoR bridge](../src/handloop/visual/hawor.py)、[联合 pipeline](../src/handloop/visual/pipeline.py)、[两轮反馈系统](../src/handloop/models/visual_feedback.py)。代码存在与静态审查不代表远程已成功运行。
-- 代码 commit／源码 hash：待填。
-- 已完成 D37 source step／SHA／配置与 best 选择依据：待填。
-- RGB source manifest／SHA、实际 train／val 录制、帧数及左右手分布：待填。
-- run 路径、W&B、启动 UTC、实际 batch／显存／吞吐：待填。
-- 两轮输入依赖、全组梯度／参数更新、DDP／checkpoint／resume 验收：待填。
-- 固定视觉 baseline、joint／mesh／state 几何与 motion 能力保持结果：待填；尚无本轮提升结论。
+- 代码演进：`63a471d` 初始联合训练实现；`bfd473e` 修复 AMP 下几何 FP32 边界；smoke_v2 从 **`836d201`** 开始运行；随后补充 mmap checkpoint、早期恢复点及相同 checkpoint 的硬链接复用，正式 pilot 发起源码为 **`eeac1fc`**。
+- D37 于 **2026-10-15T23:55:39 UTC** 正常 complete 10,000 updates；本轮固定 source 为 best step10,000，SHA256=`9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c`，路径为 `/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/twm_d37_final_20261016/best.pt`。保留其模型配置、四库 train／val 划分与原噪声／objective。best 的预训练指标依据沿 D37 原协议，不能用该身份推断真实视觉收益。
+- RGB 准备：complete，实提 1,705 JPEG（train1,128／val577），16 train／8 val 录制；两主体分别 8 train／4 val，全池 14 right／10 left 录制。manifest 路径／SHA 与逐 split 手性细表待回收。
+- **保留失败：** `63a471d` 的首次双卡执行在 step0 baseline 因 `camera_to_anchor` 的 BF16×FP32 矩阵乘法 dtype 不一致报 RuntimeError，尚无 optimizer 更新。该失败 run 的 logs／status 保留，自建测试进程已终止，未删除用户 Job。
+- **修复与合同验收：** `bfd473e` 将相关几何计算限定为 FP32。远程 CPU 两轮梯度 fixture、真实 RGB FP32 的 crop／raw／GT 隔离／padding 合同已通过；修复后的 CUDA BF16 两轮梯度合同和真实 RGB AMP 合同也已通过。合同脚本见 [两轮检查](../scripts/check_visual_feedback_refinement.py)与[真实 RGB 检查](../scripts/check_visual_rgb.py)。这些测试不替代全量 HaWoR／TWM 联合更新、双卡同步与正式 checkpoint 验收。
+- **smoke 更新与恢复：** 已实际更新到 step4，保存后恢复至 step8，于 **2026-10-16T00:37:16 UTC** 完成 smoke 执行；这不是正式 1,000 次 pilot 完成。恢复测试给 `--twm-checkpoint` 传入不存在路径仍成功完成更新，证明已训练的 TWM 不依赖旧 D37 source 文件重载。
+- **checkpoint／DDP 验收：** step4 CPU audit 检查 1,076 个模型浮点张量、3,135 个 optimizer 浮点张量全部 finite；CPU 完整模型 hash 与两个 rank 相等。两 rank 的 14 个梯度组均记录 finite 非零梯度，且每组代表参数相对初始化已改变。该事实证明训练链路实际更新，不构成精度或全运动分布正确性结论。
+- **训练后真实 RGB 推理：** 16 帧输出当前 `[1,16,99]`、未来 modes `[1,16,4,60,99]`、两轮 state trace `[1,16,2,99]`；finite、正定 translation covariance、mixture 归一化检查通过。这里只验接口和数值合同，尚未给出真实 RGB future 精度。
+- **checkpoint I/O 修正：** 联合模型 checkpoint 约 8.5 GB，同 step 重复保存已改为复用硬链接。`93397b4` 曾残留与目标同 inode 的 `.tmp` 别名，不是 checkpoint 内容损坏；`eeac1fc` 已修复重复硬链接处理。历史同 inode 临时别名已安全清理，有效权重保留。
+- **正式 pilot 启动：** 源码 `eeac1fc`，于 **2026-10-16T00:38:57 UTC** 发起，metadata 于 00:39:53 UTC 写出；**00:43:19 UTC 快照为 training step10／1,000**。视觉每卡4×clip32、motion每卡32，trainable 参数 **708,688,515**，train／val clips 为 **46／24**；每卡 peak allocated 约 **37.742 GiB**。run 为 `/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v2_20261016`，源码 checkout 为 `/sciclone/data10/jchen57/Hand_Reconstruction/code/visual_feedback_joint_v2_20261016`。
+- **正式双卡与保存验收：** 两 rank 的 14 组非零梯度 seen 与代表参数变化均为 True；正式 `latest.pt` 在 step4，大小 **8,510,562,095 bytes**。两个 rank 完整模型 hash 一致，为 `37538aeafae4c1995e358f128e17c5de2852d2df16f57c0a7d4fa4522af1aa87`。smoke 的 CPU 1,076／3,135 finite 审计和不存在旧 D37 路径的续跑测试见上，不将其冒称为正式 step4 的额外 CPU 审计。
+- **W&B：** [3abfc864](https://wandb.ai/black-ant/handloop-twm/runs/3abfc864)，服务端已验 running／optimizer_step8；服务端标量有异步滞后，与远程 step10 快照分别记录。
+- **保留负面 step0 基线：** 固定 8 个 val clips、210 个有效 states，原 HaWoR raw 的腕／root／finger 为 **88.250 mm／11.729°／9.747°**；初始化两轮联合 final 为 **121.616 mm／27.489°／15.793°**，xyz 90% coverage 为 **0**。这是训练前明显失配的初始化结果，不能与随机训练 batch 的指标直接比较，也不能当成本轮已改善。首次训练后 fixed validation 在 step50，当前尚未到达。
+- 训练后的固定视觉 state／joint／mesh 几何与 motion 能力保持结论：待验证；当前只确认正式训练、双主干更新和保存链路已运行，尚无本轮精度提升结论。小型记录见[启动摘要](../reports/visual_joint_launch_20261016.json)。
