@@ -32,9 +32,9 @@ class MotionFixture(nn.Module):
 
     def forward(self, history, raw, candidate, **kwargs):
         features = candidate[..., :9, None].transpose(-1, -2).expand(-1, 16, -1)
-        dp = self.translation_head(features[:, 0]) * .001
+        dp = self.translation_head(features[:, 0]).float() * .001
         dp = dp + dp.new_tensor([.005, 0., 0.])
-        dr = self.rotation_head(features) * .001
+        dr = self.rotation_head(features).float() * .001
         state = g.state_apply_delta(candidate, torch.cat((dp, dr.flatten(-2)), -1))
         if state.requires_grad:
             state.retain_grad()
@@ -45,9 +45,9 @@ class MotionFixture(nn.Module):
                            'dt': kwargs['dt'].detach().clone(), 'state': state})
         return {'state': state,
                 'state_translation_std': torch.nn.functional.softplus(
-                    self.state_translation_scale_head(features[:, 0])) * .01 + .01,
+                    self.state_translation_scale_head(features[:, 0]).float()) * .01 + .01,
                 'state_rotation_concentration': torch.nn.functional.softplus(
-                    self.state_rotation_concentration_head(features).squeeze(-1)) + 10.,
+                    self.state_rotation_concentration_head(features).float().squeeze(-1)) + 10.,
                 'moe_load': state.new_ones(1), 'moe_balance_loss': state.new_zeros(())}
 
 
@@ -129,6 +129,35 @@ def main():
     assert motion.future_fixture.weight.grad is None  # Requires separate replay.
     gradient_norms = {'raw': float(raw.grad.norm()), 'patches': float(patches.grad.norm()),
                       'first_round_state': float(motion.calls[0]['state'].grad.norm())}
+    amp_contract = {'executed': False, 'reason': 'CPU invocation'}
+    if device.type == 'cuda':
+        if not torch.cuda.is_bf16_supported():
+            raise RuntimeError('CUDA refinement contract requires BF16 support')
+        motion.calls.clear()
+        system.zero_grad(set_to_none=True)
+        amp_raw = raw.detach().clone().requires_grad_()
+        amp_patches = patches.detach().clone().requires_grad_()
+        with torch.autocast(device_type='cuda', dtype=torch.bfloat16):
+            amp_output, amp_history = system.step(amp_patches, amp_raw, **kwargs)
+            amp_loss = feedback_current_nll(amp_output, target, kwargs['frame_valid'])
+        assert torch.isfinite(amp_loss)
+        for key in ('state_world', 'anchor_world', 'adapter_delta',
+                    'state_translation_covariance_world', 'refinement_joint_crop_coords'):
+            assert amp_output[key].dtype == torch.float32, (key, amp_output[key].dtype)
+            assert bool(torch.isfinite(amp_output[key]).all()), key
+        assert len(motion.calls) == 2 and int(amp_history.valid.sum()) == 1
+        for key in ('history', 'raw', 'availability', 'history_valid', 'dt'):
+            assert torch.equal(motion.calls[0][key], motion.calls[1][key]), key
+        amp_loss.backward()
+        amp_gradients = {'raw': amp_raw.grad, 'patches': amp_patches.grad,
+                         'first_round_state': motion.calls[0]['state'].grad,
+                         'twm_translation_head': motion.translation_head.weight.grad}
+        for name, gradient in amp_gradients.items():
+            assert gradient is not None and bool(torch.isfinite(gradient).all()), name
+            assert float(gradient.norm()) > 0, name
+        amp_contract = {'executed': True, 'dtype': 'bfloat16', 'rounds': 2,
+                        'geometry_dtype': 'float32', 'loss': float(amp_loss.detach()),
+                        'gradient_norms': {name: float(value.norm()) for name, value in amp_gradients.items()}}
     system.configure_trainable('adapter').train()
     assert not motion.training and not any(p.requires_grad for p in motion.parameters())
     system.configure_trainable('current_readout').train()
@@ -165,6 +194,7 @@ def main():
               'missing_warmup_finite_unavailable': True, 'padding_never_commits': True,
               'legacy_scopes_freeze_twm': True, 'full_scope_trainable': True,
               'joint21_rejected': True, 'future_needs_separate_objective': True}
+    report['amp_contract'] = amp_contract
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, allow_nan=False) + '\n')
     print(json.dumps(report, indent=2))

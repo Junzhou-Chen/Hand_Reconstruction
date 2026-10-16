@@ -42,6 +42,7 @@ def main():
     parser.add_argument('--split', choices=('train', 'val'), default='val')
     parser.add_argument('--real-frames', type=int, default=4)
     parser.add_argument('--device', default='cuda:0')
+    parser.add_argument('--autocast-bf16', action='store_true')
     parser.add_argument('--report', type=Path, required=True)
     args = parser.parse_args()
     if not Path('/sciclone/data10/jchen57').is_dir():
@@ -56,6 +57,8 @@ def main():
         torch.set_num_threads(1)
         torch.manual_seed(20261016)
         device = torch.device(args.device)
+        if args.autocast_bf16 and device.type != 'cuda':
+            raise ValueError('The BF16 production contract requires a CUDA device')
         if device.type == 'cuda':
             torch.cuda.set_device(device)
         dataset = VisualFeedbackRGBDataset(args.source_manifest, args.split,
@@ -82,7 +85,8 @@ def main():
                 raise AssertionError('Ground truth entered the official HaWoR forward')
             captured.append({key: value.detach().cpu().clone() for key, value in block.items()})
         handle = frontend.register_forward_pre_hook(capture)
-        with torch.no_grad():
+        with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16,
+                                             enabled=args.autocast_bf16):
             old = frontend.extract_clip(
                 [dataset.path.parent / p for p in record['image_paths'][start:start + count]],
                 arrays['bbox_xyxy'][start:start + count], arrays['handedness'][start:start + count],
@@ -109,7 +113,8 @@ def main():
         batch['target_world'].fill_(float('nan'))
         batch['target_valid'].zero_()
         captured.clear()
-        with torch.no_grad():
+        with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16,
+                                             enabled=args.autocast_bf16):
             output = pipeline(batch, return_forecast=False)
         handle.remove()
         if len(captured) != 1:
@@ -134,6 +139,7 @@ def main():
                        'source_manifest_sha256': dataset.manifest_sha256,
                        'twm_checkpoint_sha256': file_sha256(args.twm_checkpoint),
                        'twm_step': source.get('step'), 'refinement_steps': feedback.config.refinement_steps,
+                       'autocast_bf16': args.autocast_bf16,
                        'state_shape': list(output['state_world'].shape),
                        'final_history_valid': int(output['final_history'].valid.sum()),
                        'frontend': frontend.provenance()})

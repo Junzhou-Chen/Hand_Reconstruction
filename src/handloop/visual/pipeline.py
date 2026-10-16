@@ -18,9 +18,11 @@ from .hawor import FrozenHaWoRBridge
 def effective_crop_transform(full_crop_transform: Tensor) -> Tensor:
     """Source pixels -> [-1,1] in HaWoR's central 192 x 256 image region."""
     # Pixel centers: u_norm=2*(u_crop-32+.5)/192-1; likewise v.
-    affine = full_crop_transform.new_tensor([[2 / 192, 0, -1 - 63 / 192],
-                                           [0, 2 / 256, -1 + 1 / 256], [0, 0, 1]])
-    return affine @ full_crop_transform
+    with torch.autocast(device_type=full_crop_transform.device.type, enabled=False):
+        affine = torch.tensor([[2 / 192, 0, -1 - 63 / 192],
+                               [0, 2 / 256, -1 + 1 / 256], [0, 0, 1]],
+                              dtype=torch.float32, device=full_crop_transform.device)
+        return affine @ full_crop_transform.float()
 
 
 class HandLoopFeedbackPipeline(nn.Module):

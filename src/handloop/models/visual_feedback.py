@@ -485,7 +485,12 @@ class VisualFeedbackSystem(nn.Module):
         addon_history_avail = history.availability & addon_history_valid[..., None]
         raw_camera = transform_state(raw_clean, camera)
         history_camera = transform_state(history.state_world, camera)
-        camera_to_anchor = world_to_anchor[:, :3, :3] @ camera[:, :3, :3].transpose(-1, -2)
+        # The surrounding online trainer may use BF16 autocast. Coordinate
+        # transforms are a FP32 contract, including their construction: casting
+        # only delta below would otherwise mix a BF16 matrix with FP32 vectors.
+        with torch.autocast(device_type=raw_world.device.type, enabled=False):
+            camera_to_anchor = (world_to_anchor[:, :3, :3].float()
+                                @ camera[:, :3, :3].float().transpose(-1, -2))
         twm_beta = beta if self.config.condition_on_beta else None
         rounds = self.config.refinement_steps if use_adapter else 1
         candidate_anchor = base_anchor
@@ -503,22 +508,25 @@ class VisualFeedbackSystem(nn.Module):
                 if bool((image_valid & (handedness == 2)).any()):
                     raise ValueError("candidate MANO geometry requires known handedness on image-valid frames")
                 shape_valid = active if beta_valid is None else (active & beta_valid.bool())
-                geometry_beta = torch.where(shape_valid[:, None], beta.float(), 0.0)
-                joints = joint_geometry(candidate_camera, geometry_beta, handedness)
-                if not isinstance(joints, Tensor) or joints.shape != (b, 16, 3):
-                    raise ValueError("joint_geometry must return MANO16 [B,16,3]; map 21-joint orders explicitly")
-                finite = torch.isfinite(joints).all(-1)
-                safe_joints = torch.where(finite[..., None], joints.float(), 0.0)
-                depth = safe_joints[..., 2]
-                pixels = (intrinsic[:, None] @ safe_joints[..., None]).squeeze(-1)
-                pixels = pixels / pixels[..., 2:3].clamp_min(1e-5)
-                crop_h = (crop[:, None] @ pixels[..., None]).squeeze(-1)
-                denominator = crop_h[..., 2:3]
-                coords = crop_h[..., :2] / torch.where(denominator.abs() > 1e-6, denominator, 1.0)
-                projection_valid = (finite & (depth > 1e-5) & torch.isfinite(coords).all(-1)
-                    & (coords.abs() <= 1).all(-1) & candidate_availability[:, :1]
-                    & candidate_availability[:, 1:] & image_valid[:, None])
-                coords = torch.where(projection_valid[..., None], coords, 0.0)
+                # MANO/FK, camera projection and crop transforms stay FP32 too;
+                # image attention alone participates in the trainer's AMP.
+                with torch.autocast(device_type=raw_world.device.type, enabled=False):
+                    geometry_beta = torch.where(shape_valid[:, None], beta.float(), 0.0)
+                    joints = joint_geometry(candidate_camera.float(), geometry_beta, handedness)
+                    if not isinstance(joints, Tensor) or joints.shape != (b, 16, 3):
+                        raise ValueError("joint_geometry must return MANO16 [B,16,3]; map 21-joint orders explicitly")
+                    finite = torch.isfinite(joints).all(-1)
+                    safe_joints = torch.where(finite[..., None], joints.float(), 0.0)
+                    depth = safe_joints[..., 2]
+                    pixels = (intrinsic[:, None].float() @ safe_joints[..., None]).squeeze(-1)
+                    pixels = pixels / pixels[..., 2:3].clamp_min(1e-5)
+                    crop_h = (crop[:, None].float() @ pixels[..., None]).squeeze(-1)
+                    denominator = crop_h[..., 2:3]
+                    coords = crop_h[..., :2] / torch.where(denominator.abs() > 1e-6, denominator, 1.0)
+                    projection_valid = (finite & (depth > 1e-5) & torch.isfinite(coords).all(-1)
+                        & (coords.abs() <= 1).all(-1) & candidate_availability[:, :1]
+                        & candidate_availability[:, 1:] & image_valid[:, None])
+                    coords = torch.where(projection_valid[..., None], coords, 0.0)
                 projection = {"joint_crop_coords": coords, "joint_camera_depth": depth,
                               "joint_projection_valid": projection_valid}
             if use_adapter:

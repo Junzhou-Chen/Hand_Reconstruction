@@ -15,7 +15,8 @@ from pathlib import Path
 
 import torch
 
-from handloop.models.visual_feedback import FeedbackHistory
+from handloop.models.visual_feedback import FeedbackHistory, VisualFeedbackConfig, VisualFeedbackSystem
+from handloop.models.probabilistic_twm import ProbabilisticTWM, ProbabilisticTWMConfig
 from handloop.visual.hawor import FrozenHaWoRBridge
 from handloop.visual.pipeline import HandLoopFeedbackPipeline
 from train_visual_feedback import load_feedback_system, atomic_json, utc
@@ -45,10 +46,31 @@ def main():
         raise ValueError('Record coordinate frame and timestamp provenance')
     device = torch.device(args.device)
     torch.set_num_threads(1)
-    feedback, checkpoint = load_feedback_system(args.checkpoint, device)
+    checkpoint = torch.load(args.checkpoint, map_location='cpu', weights_only=False)
+    joint = 'replay_config' in checkpoint and 'identity' in checkpoint
+    if joint:
+        twm = ProbabilisticTWM(ProbabilisticTWMConfig(**checkpoint['twm_source']['model_config']))
+        feedback = VisualFeedbackSystem(twm, VisualFeedbackConfig(**checkpoint['config']['adapter']))
+        for side in ('LEFT', 'RIGHT'):
+            if file_sha256(args.mano_models/f'MANO_{side}.pkl') != checkpoint['identity']['mano_asset_sha256'][side]:
+                raise ValueError('Joint checkpoint MANO assets differ')
+        if file_sha256(args.hawor_config) != checkpoint['identity']['hawor_config_sha256']:
+            raise ValueError('Joint checkpoint HaWoR architecture config differs')
+    else:
+        del checkpoint
+        feedback, checkpoint = load_feedback_system(args.checkpoint, device)
     frontend = FrozenHaWoRBridge.from_pretrained(args.hawor_root, args.hawor_checkpoint,
         args.hawor_config, args.mano_models, device=str(device))
     pipeline = HandLoopFeedbackPipeline(frontend, feedback).eval()
+    if joint:
+        prefix = 'pipeline.'
+        if not all(name.startswith(prefix) for name in checkpoint['model']):
+            raise ValueError('Unexpected joint checkpoint parameter namespace')
+        pipeline.load_state_dict({name[len(prefix):]: value for name, value in checkpoint['model'].items()}, strict=True)
+        pipeline.to(device).eval()
+    # Do not retain the large optimizer and CPU state during RGB inference.
+    checkpoint_step = checkpoint['step']
+    del checkpoint
     initial = None
     if args.history:
         state = torch.load(args.history, map_location=device, weights_only=False)
@@ -68,7 +90,9 @@ def main():
             'availability', 'candidate_availability', 'frame_valid', 'image_valid',
             'history_count', 'history_reset', 'detected', 'bbox_valid', 'forecast_world',
             'forecast_modes_world', 'mixture_weights', 'forecast_translation_std',
-            'forecast_modes_translation_covariance_world', 'forecast_rotation_concentration')
+            'forecast_modes_translation_covariance_world', 'forecast_rotation_concentration',
+            'beta', 'refinement_states_world', 'refinement_candidates_world',
+            'refinement_joint_crop_coords', 'refinement_joint_projection_valid')
     result = {key: output[key].detach().cpu() for key in keys if key in output}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.output.with_suffix(args.output.suffix + '.tmp')
@@ -79,7 +103,7 @@ def main():
     atomic_json(args.output.with_suffix('.json'), {
         'utc': utc(), 'frames': len(frames), 'output': str(args.output),
         'history': str(history_path), 'feedback_checkpoint_sha256': file_sha256(args.checkpoint),
-        'feedback_step': checkpoint['step'], 'frontend': frontend.provenance(),
+        'feedback_step': checkpoint_step, 'joint_checkpoint': joint, 'frontend': frontend.provenance(),
         'track_json_sha256': file_sha256(args.track_json),
         'coordinate_frame': document['coordinate_frame'],
         'timestamp_source': document['timestamp_source'],

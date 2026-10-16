@@ -225,15 +225,20 @@ class FrozenHaWoRBridge(nn.Module):
         # NOT geometry.py's older interleaved reshape(-1,3,2) converter. Thus
         # these six numbers are first column xyz followed by second column xyz.
         # check_hawor_bridge compares the resulting matrices with official out.
-        rotations = rotation_6d_to_matrix(pose.reshape(b, t, 16, 6))
-        # Mirror tx back into the original image frame. Unlike official code's
-        # key-presence test, mixed left/right batches are handled per frame.
-        right = batch["is_right"].bool()
-        camera = torch.stack((camera[:, 0],
-            torch.where(right.flatten(), camera[:, 1], -camera[:, 1]), camera[:, 2]), dim=-1)
-        translation = self.model.get_trans(camera, original_center, scale, focal, img_center).squeeze(1).reshape(b, t, 3)
-        beta = beta.reshape(b, t, 10)
-        raw_world = self.codec.from_hawor(rotations, translation, beta, right, batch["camera_to_world"])
+        # AMP is for learned image features, not metric geometry. Explicitly
+        # disable it around camera recovery and coordinate conversion; float()
+        # alone does not stop autocast from quantizing their matrix products.
+        with torch.autocast(device_type=image.device.type, enabled=False):
+            rotations = rotation_6d_to_matrix(pose.float().reshape(b, t, 16, 6))
+            # Mirror tx back into the original image frame. Unlike official
+            # code's key-presence test, handle mixed left/right per frame.
+            right = batch["is_right"].bool()
+            camera = camera.float()
+            camera = torch.stack((camera[:, 0],
+                torch.where(right.flatten(), camera[:, 1], -camera[:, 1]), camera[:, 2]), dim=-1)
+            translation = self.model.get_trans(camera, original_center, scale, focal, img_center).squeeze(1).reshape(b, t, 3)
+            beta = beta.float().reshape(b, t, 10)
+            raw_world = self.codec.from_hawor(rotations, translation, beta, right, batch["camera_to_world"])
         observed = (batch["detected"].bool() & batch["bbox_valid"].bool() &
                     batch["frame_valid"].bool() & batch["image_valid"].bool())
         return {"image_features": patches, "raw_state_world": raw_world,

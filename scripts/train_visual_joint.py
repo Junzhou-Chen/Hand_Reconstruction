@@ -18,6 +18,7 @@ from pathlib import Path
 import random
 import signal
 import time
+import traceback
 
 import numpy as np
 import torch
@@ -222,9 +223,19 @@ def evaluate_motion(twm, dataset, device, config, samples=16):
                 with torch.autocast('cuda', dtype=torch.bfloat16):
                     output = twm(h, raw, candidate, **kwargs)
                 for key, values in state_errors(output['state'], target).items(): add('current/' + key, values)
-                for key, values in state_errors(output['forecast'], future).items(): add('future_ade/' + key, values, batch['future_valid'])
-                for key, values in state_errors(output['state'][:, None], future).items(): add('future_hold/' + key, values, batch['future_valid'])
-            result[source][mode] = {k: total[k]/counts[k] for k in total}
+                future_errors = state_errors(output['forecast'], future)
+                hold_errors = state_errors(output['state'][:, None], future)
+                for key, values in future_errors.items(): add('future_ade/' + key, values, batch['future_valid'])
+                for key, values in hold_errors.items(): add('future_hold/' + key, values, batch['future_valid'])
+                rows = torch.arange(len(target), device=device)
+                for seconds in (.1, .5, 1., 2.):
+                    difference = (batch['future_dt']-seconds).abs().masked_fill(~batch['future_valid'], float('inf'))
+                    distance, slot = difference.min(-1)
+                    eligible = distance <= batch['dt'][:, -1]*.6
+                    for label, errors in (('map', future_errors), ('hold', hold_errors)):
+                        for key, values in errors.items():
+                            add(f'future_{seconds:g}s/{label}/{key}', values[rows, slot], eligible)
+            result[source][mode] = {**{k: total[k]/counts[k] for k in total}, 'metric_counts': counts}
     return result
 
 
@@ -262,9 +273,9 @@ def main():
         raise ValueError('Explicit launch world size differs from config')
     if config['clip_length'] % 16 or config['clip_length'] < 16:
         raise ValueError('RGB clip must contain complete official 16-frame blocks')
-    if world > 1:
-        dist.init_process_group('nccl', timeout=timedelta(hours=2))
     device = torch.device('cuda', local); torch.cuda.set_device(device)
+    if world > 1:
+        dist.init_process_group('nccl', timeout=timedelta(hours=2), device_id=device)
     torch.set_num_threads(config.get('cpu_threads', 2))
     torch.backends.cuda.matmul.allow_tf32 = True
     seed = config['seed'] + rank
@@ -359,6 +370,8 @@ def main():
         'motion_objective': 'separate replay updates using unchanged source D37 six-term objective',
         'motion_sampling': 'equal source then uniform windows with replacement, independent rank seeds; not D37 full-coverage order',
         'best_selection': 'validation geometry score from existing D37 state_geometry_loss; NLL/coverage reported separately',
+        'baseline_definition': 'initialized joint two-round system and fixed original HaWoR raw; separate initialized adapter-bypass baseline',
+        'best_scope': 'best among trained checkpoints; initialized step0 metrics retained separately',
         'history': 'own completed final states; detached across physical frames; only final refinement committed',
         'resume_limit': 'weights/optimizer/schedule/rank RNG restored; RGB and motion loader cursors restart',
         'scope': 'bounded DexYCB GT-crop/fixed-camera-gauge pilot, fitted MANO references; not ego detector/SLAM benchmark'}
@@ -492,9 +505,16 @@ def main():
         if world > 1: dist.barrier()
         exit_code = 0
     except Exception as error:
+        traceback.print_exc()
         if rank == 0:
             atomic_json(args.output/'status.json', {'utc': utc(), 'phase': 'failed', 'step': step,
-                         'error_type': type(error).__name__, 'wandb_url': tracker.url})
+                         'error_type': type(error).__name__, 'error': str(error), 'wandb_url': tracker.url})
+        # A peer may be waiting at a baseline/evaluation barrier. Do not block
+        # the exception behind a graceful NCCL destroy; torchrun terminates the
+        # remaining workers when this worker exits with a nonzero status.
+        if dist.is_initialized():
+            tracker.finish(1)
+            os._exit(1)
         raise
     finally:
         tracker.finish(exit_code)

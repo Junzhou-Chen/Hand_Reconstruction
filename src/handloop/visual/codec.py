@@ -20,13 +20,14 @@ def invert_transform(transform: Tensor) -> Tensor:
     """Invert an SE(3) matrix, differentiably, without a generic matrix inverse."""
     if transform.shape[-2:] != (4, 4):
         raise ValueError("transform must end in (4,4)")
-    transform = transform.float()
-    rotation = transform[..., :3, :3].transpose(-1, -2)
-    translation = -(rotation @ transform[..., :3, 3:4]).squeeze(-1)
-    upper = torch.cat((rotation, translation[..., None]), dim=-1)
-    bottom = torch.zeros_like(transform[..., :1, :])
-    bottom[..., 0, 3] = 1
-    return torch.cat((upper, bottom), dim=-2)
+    with torch.autocast(device_type=transform.device.type, enabled=False):
+        transform = transform.float()
+        rotation = transform[..., :3, :3].transpose(-1, -2)
+        translation = -(rotation @ transform[..., :3, 3:4]).squeeze(-1)
+        upper = torch.cat((rotation, translation[..., None]), dim=-1)
+        bottom = torch.zeros_like(transform[..., :1, :])
+        bottom[..., 0, 3] = 1
+        return torch.cat((upper, bottom), dim=-2)
 
 
 def transform_state(state: Tensor, source_to_target: Tensor) -> Tensor:
@@ -37,13 +38,14 @@ def transform_state(state: Tensor, source_to_target: Tensor) -> Tensor:
     """
     if source_to_target.shape[-2:] != (4, 4):
         raise ValueError("source_to_target must end in (4,4)")
-    rotations = state_to_rotmat(state)
-    matrix = source_to_target.float()
-    root = matrix[..., :3, :3] @ rotations[..., 0, :, :]
-    position = (matrix[..., :3, :3] @ state[..., :3, None].float()).squeeze(-1)
-    position = position + matrix[..., :3, 3]
-    return state_from_rotmat(position, torch.cat((root[..., None, :, :],
-                                                 rotations[..., 1:, :, :]), dim=-3))
+    with torch.autocast(device_type=state.device.type, enabled=False):
+        rotations = state_to_rotmat(state)
+        matrix = source_to_target.float()
+        root = matrix[..., :3, :3] @ rotations[..., 0, :, :]
+        position = (matrix[..., :3, :3] @ state[..., :3, None].float()).squeeze(-1)
+        position = position + matrix[..., :3, 3]
+        return state_from_rotmat(position, torch.cat((root[..., None, :, :],
+                                                     rotations[..., 1:, :, :]), dim=-3))
 
 
 def state_to_anchor(state_world: Tensor, anchor_to_world: Tensor) -> Tensor:
@@ -75,16 +77,17 @@ def project_world_points(points_world: Tensor, camera_to_world: Tensor,
     Coordinates are not clamped to the image. Off-crop points remain off-crop;
     callers must mask them rather than pretending border pixels are evidence.
     """
-    world_to_camera = invert_transform(camera_to_world)
-    camera = (world_to_camera[..., None, :3, :3] @ points_world[..., None]).squeeze(-1)
-    camera = camera + world_to_camera[..., None, :3, 3]
-    positive = camera[..., 2] > min_depth
-    safe_z = camera[..., 2:3].clamp_min(min_depth)
-    homogeneous = camera / safe_z
-    pixels = (intrinsics.float()[..., None, :, :] @ homogeneous[..., None]).squeeze(-1)
-    if full_to_crop is not None:
-        pixels = (full_to_crop.float()[..., None, :, :] @ pixels[..., None]).squeeze(-1)
-    return pixels[..., :2], positive
+    with torch.autocast(device_type=points_world.device.type, enabled=False):
+        world_to_camera = invert_transform(camera_to_world)
+        camera = (world_to_camera[..., None, :3, :3] @ points_world.float()[..., None]).squeeze(-1)
+        camera = camera + world_to_camera[..., None, :3, 3]
+        positive = camera[..., 2] > min_depth
+        safe_z = camera[..., 2:3].clamp_min(min_depth)
+        homogeneous = camera / safe_z
+        pixels = (intrinsics.float()[..., None, :, :] @ homogeneous[..., None]).squeeze(-1)
+        if full_to_crop is not None:
+            pixels = (full_to_crop.float()[..., None, :, :] @ pixels[..., None]).squeeze(-1)
+        return pixels[..., :2], positive
 
 
 class MANOStateCodec(nn.Module):
@@ -124,14 +127,15 @@ class MANOStateCodec(nn.Module):
 
     def rest_wrist(self, beta: Tensor, is_right: Tensor) -> Tensor:
         """Shaped rest J0; MANO rotation occurs about this anatomical root."""
-        result = torch.zeros(*beta.shape[:-1], 3, device=beta.device, dtype=torch.float32)
-        for side, right in (("left", False), ("right", True)):
-            layer = self.layers[side]
-            shaped = layer.v_template.float() + torch.einsum(
-                "...k,vck->...vc", beta.float(), layer.shapedirs[..., :10].float())
-            root = torch.einsum("v,...vc->...c", layer.J_regressor[0].float(), shaped)
-            result = torch.where((is_right.bool() == right)[..., None], root, result)
-        return result
+        with torch.autocast(device_type=beta.device.type, enabled=False):
+            result = torch.zeros(*beta.shape[:-1], 3, device=beta.device, dtype=torch.float32)
+            for side, right in (("left", False), ("right", True)):
+                layer = self.layers[side]
+                shaped = layer.v_template.float() + torch.einsum(
+                    "...k,vck->...vc", beta.float(), layer.shapedirs[..., :10].float())
+                root = torch.einsum("v,...vc->...c", layer.J_regressor[0].float(), shaped)
+                result = torch.where((is_right.bool() == right)[..., None], root, result)
+            return result
 
     def from_hawor(self, rotation_matrices: Tensor, mano_translation: Tensor,
                    beta: Tensor, is_right: Tensor, camera_to_world: Tensor) -> Tensor:
@@ -154,6 +158,13 @@ class MANOStateCodec(nn.Module):
 
     def geometry(self, state: Tensor, beta: Tensor, is_right: Tensor) -> dict[str, Tensor]:
         """Differentiable vertices and MANO16 joints, preserving state J0 exactly."""
+        # Geometry remains FP32 even while the image network uses BF16. Merely
+        # casting inputs is insufficient: autocast also intercepts MANO's
+        # einsum/matmul, changing precision and indexed-assignment dtypes.
+        with torch.autocast(device_type=state.device.type, enabled=False):
+            return self._geometry_impl(state.float(), beta.float(), is_right)
+
+    def _geometry_impl(self, state: Tensor, beta: Tensor, is_right: Tensor) -> dict[str, Tensor]:
         shape = state.shape[:-1]
         rotations = state_to_rotmat(state).reshape(-1, 16, 3, 3)
         beta_flat = beta.float().reshape(-1, 10)
