@@ -246,6 +246,15 @@ def main():
     motion_grad = gradient(motion_loss, named_parameters)
     report = {'schema': 'handloop.joint_gradient_diagnostic.v1', 'created_utc': utc(), 'host': socket.gethostname(),
         'checkpoint': str(args.checkpoint), 'checkpoint_step': info['checkpoint_step'], 'selection': selection,
+        'source_sha256': {name: file_sha256(Path(__file__).resolve().parents[1] / name) for name in
+            ('scripts/diagnose_joint_gradients.py', 'scripts/train_visual_joint.py',
+             'scripts/train_probabilistic_twm.py', 'src/handloop/models/visual_feedback.py',
+             'src/handloop/models/probabilistic_twm.py', 'src/handloop/visual/hawor.py',
+             'src/handloop/visual/codec.py')},
+        'actual_training_configuration': info['training_config'],
+        'motion_objective_coefficients': {key: replay_config[key] for key in
+            ('current_nll_weight', 'forecast_nll_weight', 'forecast_geometry_weight',
+             'velocity_weight', 'moe_balance_weight')},
         'mode': 'eval/dropout off; autograd on; no optimizer; balanced fixed train prefixes',
         'parameter_scope': {name: {'parameters': sum(p.numel() for _, p in entries),
                                   'names': [key for key, _ in entries]} for name, entries in groups.items()},
@@ -255,6 +264,15 @@ def main():
                    'clipping': clipping_summary(motion_grad, groups, info['training_config']['grad_clip'])},
         'mirror_autograd_sanity': mirror_gradient_sanity(device), 'clips': [],
         'interpretation': 'Gradient scale/cosine is a local diagnostic at frozen parameters. Different visual/motion content is not a matched loss ablation. Dividing visual NLL by 51 changes no cosine; this is a unit diagnostic, not a proposed training change.'}
+    cross_groups = {name: entries for name, entries in groups.items() if
+        name in ('hawor_camera_readout', 'hawor_pose_readout', 'hawor_beta_readout', 'adapter')
+        or name.startswith('twm_')}
+    cross_groups['twm_all'] = [entry for name, entries in groups.items()
+                               if name.startswith('twm_') for entry in entries]
+    cross_names = {key for entries in cross_groups.values() for key, _ in entries}
+    side_sums = {0: {}, 1: {}}
+    side_clipped_sums = {0: {}, 1: {}}
+    side_counts = {0: 0, 1: 0}
     del motion_output, motion_loss, motion_batch, motion_terms
     gc.collect(); torch.cuda.empty_cache()
     for hand in (0, 1):
@@ -314,6 +332,22 @@ def main():
                 'visual_clipping': clipping_summary(visual_grad, groups, info['training_config']['grad_clip']),
                 'visual_div51_clipping': clipping_summary(scaled_visual, groups, info['training_config']['grad_clip']),
                 'local_position_jacobian': local_jacobian}
+            for name in cross_names:
+                value = visual_grad.get(name)
+                if value is None:
+                    continue
+                if name not in side_sums[hand]:
+                    side_sums[hand][name] = value.clone()
+                else:
+                    side_sums[hand][name].add_(value)
+                if name.startswith('feedback.'):
+                    module = 'twm' if name.startswith('feedback.twm.') else 'adapter'
+                    clipped = value * entry['visual_clipping'][module]['clip_scale']
+                    if name not in side_clipped_sums[hand]:
+                        side_clipped_sums[hand][name] = clipped
+                    else:
+                        side_clipped_sums[hand][name].add_(clipped)
+            side_counts[hand] += 1
             report['clips'].append(entry)
             atomic_json(args.output.with_name(args.output.stem + '_progress.json'), report)
             print(json.dumps({'utc': utc(), 'checkpoint_step': info['checkpoint_step'], 'hand': hand,
@@ -322,6 +356,17 @@ def main():
                               'twm_clip_scale': entry['visual_clipping']['twm']['clip_scale']}), flush=True)
             del output, observed, captured, batch, visual_grad, geometry_grad, raw_geometry_grad, raw_wrist_grad, scaled_visual, density
             gc.collect(); torch.cuda.empty_cache()
+    means = {hand: {name: value / side_counts[hand] for name, value in values.items()}
+             for hand, values in side_sums.items()}
+    clipped_means = {hand: {name: value / side_counts[hand] for name, value in values.items()}
+                     for hand, values in side_clipped_sums.items()}
+    report['left_right_mean_visual_gradients'] = {
+        'clips_by_side': side_counts, 'reduction': 'equal mean of selected train clips; each contains same valid frame count',
+        'first': 'left', 'second': 'right',
+        'unclipped': group_comparison(means[0], means[1], cross_groups),
+        'per_clip_training_module_clipped_twm_adapter': group_comparison(clipped_means[0], clipped_means[1],
+            {name: entries for name, entries in cross_groups.items() if name == 'adapter' or name.startswith('twm_')}),
+        'interpretation': 'Different selected left/right recordings are not mirror-matched actions. Negative cosine is local optimization tension, not proof of the cause of test disparity. HaWoR clipping unavailable outside head/PAM subset.'}
     report['twm_parameter_sha256_before'] = before
     report['twm_parameter_sha256_after'] = parameter_digest(pipeline.feedback.twm)
     report['selected_parameter_sha256_before'] = selected_before
