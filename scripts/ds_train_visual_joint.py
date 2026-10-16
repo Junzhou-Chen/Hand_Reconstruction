@@ -28,9 +28,12 @@ def main():
     parser.add_argument('--gpus', default='0,1')
     parser.add_argument('--wandb-key-file', default=base + '/private/wandb_api_key')
     parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--allow-rgb-batch-size-change', action='store_true')
     parser.add_argument('--stop-after-updates', type=int)
     parser.add_argument('--tracking-mode', choices=('online', 'offline', 'disabled'))
     args = parser.parse_args()
+    if args.allow_rgb_batch_size_change and not args.resume:
+        parser.error('--allow-rgb-batch-size-change requires --resume')
     config = vars(args)
     config['code_version'] = subprocess.check_output(['git', '-C', args.code, 'rev-parse', 'HEAD'], text=True).strip()
     program = 'CONFIG=' + repr(config) + '\n' + r'''
@@ -65,6 +68,7 @@ if CONFIG['action']=='start' and not alive:
     for key in ('source_manifest','motion_manifest','twm_checkpoint','hawor_root','hawor_checkpoint','hawor_config','mano_models'):
         command+=['--'+key.replace('_','-'),CONFIG[key]]
     if CONFIG['resume']: command+=['--resume',str(out/'latest.pt')]
+    if CONFIG['allow_rgb_batch_size_change']: command+=['--allow-rgb-batch-size-change']
     if CONFIG['stop_after_updates']: command+=['--stop-after-updates',str(CONFIG['stop_after_updates'])]
     if CONFIG['tracking_mode']: command+=['--tracking-mode',CONFIG['tracking_mode']]
     env=os.environ.copy(); threads=str(protocol.get('cpu_threads',2))

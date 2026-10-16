@@ -2,7 +2,7 @@
   "seed": 20261016,
   "world_size": 2,
   "steps": 1000,
-  "per_gpu_rgb_batch_size": 4,
+  "per_gpu_rgb_batch_size": 8,
   "per_gpu_motion_batch_size": 32,
   "clip_length": 32,
   "adapter_learning_rate": 0.0001,

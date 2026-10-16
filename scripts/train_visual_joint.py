@@ -56,6 +56,20 @@ def move(batch, device):
     return {k: v.to(device, non_blocking=True) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
 
 
+def resume_config_changes(previous, current, *, allow_rgb_batch_size_change=False):
+    changes = {key: {'previous': previous.get(key), 'current': current.get(key)}
+               for key in previous.keys() | current.keys()
+               if key not in previous or key not in current or previous[key] != current[key]}
+    allowed = {'per_gpu_rgb_batch_size'} if allow_rgb_batch_size_change else set()
+    if changes.keys() - allowed:
+        raise ValueError('Resume config differs outside explicitly allowed RGB batch size')
+    if 'per_gpu_rgb_batch_size' in changes:
+        for value in changes['per_gpu_rgb_batch_size'].values():
+            if type(value) is not int or value < 1:
+                raise ValueError('RGB batch size must be a positive integer')
+    return changes
+
+
 def tensor_hash(tensor):
     value = tensor.detach().cpu().contiguous().reshape(-1).view(torch.uint8).numpy()
     return hashlib.sha256(value.tobytes()).hexdigest()
@@ -264,11 +278,14 @@ def main():
                  'hawor-config', 'mano-models', 'config', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--resume', type=Path)
+    parser.add_argument('--allow-rgb-batch-size-change', action='store_true')
     parser.add_argument('--code-version', default='unrecorded')
     parser.add_argument('--stop-after-updates', type=int)
     parser.add_argument('--tracking-mode', choices=('online', 'offline', 'disabled'))
     parser.add_argument('--stop-before-utc')
     args = parser.parse_args()
+    if args.allow_rgb_batch_size_change and not args.resume:
+        parser.error('--allow-rgb-batch-size-change requires --resume')
     config = json.loads(args.config.read_text())
     if args.tracking_mode:
         config['tracking'].update(enabled=args.tracking_mode != 'disabled', mode=args.tracking_mode,
@@ -350,9 +367,12 @@ def main():
                 'mano_asset_sha256': {side: file_sha256(args.mano_models/f'MANO_{side}.pkl') for side in ('LEFT', 'RIGHT')}}
     start, best = 0, float('inf')
     generator = torch.Generator(device=device).manual_seed(seed + 901)
+    resume_changes = {}
     if args.resume:
-        if resumed['config'] != config or resumed['identity'] != identity or resumed['world_size'] != world:
-            raise ValueError('Resume requires identical config, inputs, sources, assets and world size')
+        resume_changes = resume_config_changes(resumed['config'], config,
+            allow_rgb_batch_size_change=args.allow_rgb_batch_size_change)
+        if resumed['identity'] != identity or resumed['world_size'] != world:
+            raise ValueError('Resume requires identical inputs, sources, assets and world size')
         model.load_state_dict(resumed['model'], strict=True)
         optimizer.load_state_dict(resumed['optimizer']); scheduler.load_state_dict(resumed['scheduler'])
         start, best = resumed['step'], resumed['best_geometry_score']
@@ -380,11 +400,21 @@ def main():
         'best_scope': 'best among trained checkpoints; initialized step0 metrics retained separately',
         'history': 'own completed final states; detached across physical frames; only final refinement committed',
         'resume_limit': 'weights/optimizer/schedule/rank RNG restored; RGB and motion loader cursors restart',
+        'resume': {'checkpoint': str(args.resume) if args.resume else None,
+                   'start_step': start, 'config_changes': resume_changes},
         'scope': 'bounded DexYCB GT-crop/fixed-camera-gauge pilot, fitted MANO references; not ego detector/SLAM benchmark'}
     tracker = WandbTracker(config.get('tracking'), args.output, run, rank=rank, resume=bool(args.resume))
     if rank == 0:
         run['tracking'] = tracker.metadata
+        execution_tag = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+        if (args.output/'run_metadata.json').exists():
+            atomic_json(args.output/'execution_metadata'/f'{execution_tag}_previous.json',
+                        json.loads((args.output/'run_metadata.json').read_text()))
         atomic_json(args.output/'run_metadata.json', run)
+        atomic_json(args.output/'execution_metadata'/f'{execution_tag}.json', run)
+        tracker.log({'runtime': {'per_gpu_rgb_batch_size': config['per_gpu_rgb_batch_size'],
+                                'per_gpu_motion_batch_size': config['per_gpu_motion_batch_size'],
+                                'resume_start_step': start}}, start)
     watched = {name: next((p for p in module.parameters() if p.requires_grad), None)
                for name,module in gradient_groups(pipeline).items() if module is not None}
     before = {name: tensor_hash(p) for name,p in watched.items() if p is not None}
@@ -423,6 +453,7 @@ def main():
             payload = {'step': step, 'model': model.state_dict(), 'optimizer': optimizer.state_dict(),
                 'scheduler': scheduler.state_dict(), 'config': config, 'identity': identity,
                 'twm_source': source, 'replay_config': replay_config, 'world_size': world,
+                'resume_transition': run['resume'],
                 'best_geometry_score': best, 'rank_states': states, 'code_version': args.code_version,
                 'frontend_assets': {'hawor_root': str(args.hawor_root), 'hawor_config': str(args.hawor_config),
                                     'mano_models': str(args.mano_models)}}
@@ -481,16 +512,18 @@ def main():
                 gradient_norms[name] = float(torch.nn.utils.clip_grad_norm_(
                     [p for p in module.parameters() if p.requires_grad], config['grad_clip'], error_if_nonfinite=True))
             optimizer.step(); scheduler.step(); step += 1
-            changed = {name: tensor_hash(p) != before[name] for name,p in watched.items() if p is not None} if step <= 8 else None
-            if step <= 8:
+            changed = {name: tensor_hash(p) != before[name] for name,p in watched.items() if p is not None} if step-start <= 8 else None
+            if step-start <= 8:
                 atomic_json(args.output/f'gradient_audit_rank{rank}.json',
-                    {'utc': utc(), 'step': step, 'task': task, 'gradients': groups,
+                    {'utc': utc(), 'step': step, 'execution_start_step': start, 'task': task, 'gradients': groups,
+                     'per_gpu_rgb_batch_size': config['per_gpu_rgb_batch_size'],
                      'nonzero_gradient_seen': grad_seen, 'representative_parameters_changed': changed,
                      'peak_allocated_bytes': torch.cuda.max_memory_allocated(device)})
             training = {**result['measurements'], 'gradient_norms': gradient_norms,
+                        'per_gpu_rgb_batch_size': config['per_gpu_rgb_batch_size'],
                         'elapsed_seconds': time.monotonic()-started,
                         'peak_allocated_gb': torch.cuda.max_memory_allocated(device)/2**30}
-            if rank == 0 and (step % config['log_every'] == 0 or step <= 8):
+            if rank == 0 and (step % config['log_every'] == 0 or step-start <= 8):
                 tracker.log({'train_' + task: training}, step)
                 print(json.dumps({'utc': utc(), 'step': step, 'task': task, 'training': training}), flush=True)
             validation = None
@@ -510,7 +543,7 @@ def main():
                 if world > 1: dist.broadcast_object_list(decision, src=0, device=device)
                 improved, best = decision
                 if improved: save(step, is_best=True)
-            if step % config['save_every'] == 0 or step == config.get('initial_checkpoint_step', 4):
+            if step % config['save_every'] == 0 or step == start+config.get('initial_checkpoint_step', 4):
                 save(step)
             if rank == 0:
                 status = {'utc': utc(), 'phase': 'training', 'step': step, 'target_steps': config['steps'],
