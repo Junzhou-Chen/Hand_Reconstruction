@@ -119,7 +119,7 @@ class ReductionFixture(nn.Module):
         self.value = nn.Parameter(torch.tensor(.7, device=device))
         self.rank, self.config = rank, config
 
-    def forward(self):
+    def forward(self, _dummy):
         rank = self.rank
         # Rank zero has no complete state; other terms also have unequal counts.
         counts = (0 if rank == 0 else 2, rank+1, 3*rank+1)
@@ -137,7 +137,10 @@ def reduction_contract(rank, world, device):
                                       raw_wrist_scale_m=.05, final_joint_scale_m=.1)
     module = ReductionFixture(rank, device, config)
     model = DDP(module, device_ids=[device.index] if device.type == 'cuda' else None) if world > 1 else module
-    model().backward()
+    # Torch 2.10 DDP's device scatter expects a positional input even when
+    # this scalar fixture does not need observations. Production visual/motion
+    # training already forwards a nonempty batch and does not share this case.
+    model(torch.zeros(1, device=device)).backward()
     weights = list(visual_loss_coefficients(config).values())
     expected = 0.
     for term, weight in enumerate(weights):
