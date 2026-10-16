@@ -297,7 +297,7 @@ def main():
     deadline = datetime.fromisoformat(args.stop_before_utc or config['stop_before_utc'])
     if deadline.utcoffset() is None:
         raise ValueError('Deadline must contain timezone')
-    resumed = torch.load(args.resume, map_location='cpu', weights_only=False) if args.resume else None
+    resumed = torch.load(args.resume, map_location='cpu', weights_only=False, mmap=True) if args.resume else None
     if resumed:
         source, replay_config = resumed['twm_source'], resumed['replay_config']
         # Build the architecture from embedded config. Trained weights below

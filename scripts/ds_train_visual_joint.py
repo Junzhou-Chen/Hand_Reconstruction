@@ -83,6 +83,12 @@ if CONFIG['action']=='start' and not alive:
     launch={'pid':p.pid,'command':command,'code_version':CONFIG['code_version'],'gpus':devices,
             'pod':CONFIG['pod'],'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat()}
     receipt.write_text(json.dumps(launch,indent=2)+'\n');alive=True
+    previous=json.loads((out/'status.json').read_text()) if (out/'status.json').exists() else {}
+    if previous:
+        (out/'previous_execution_status.json').write_text(json.dumps(previous,indent=2)+'\n')
+    (out/'status.json').write_text(json.dumps({'utc':launch['started_utc'],'phase':'initializing',
+        'step':previous.get('step',0),'target_steps':protocol['steps'],'resume':CONFIG['resume'],
+        'wandb_url':previous.get('wandb_url')},indent=2)+'\n')
 elif CONFIG['action']=='stop':
     if not alive: raise RuntimeError('No verified training launcher to stop')
     (out/'STOP').write_text(json.dumps({'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),

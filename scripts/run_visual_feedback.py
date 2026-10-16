@@ -46,7 +46,7 @@ def main():
         raise ValueError('Record coordinate frame and timestamp provenance')
     device = torch.device(args.device)
     torch.set_num_threads(1)
-    checkpoint = torch.load(args.checkpoint, map_location='cpu', weights_only=False)
+    checkpoint = torch.load(args.checkpoint, map_location='cpu', weights_only=False, mmap=True)
     joint = 'replay_config' in checkpoint and 'identity' in checkpoint
     if joint:
         twm = ProbabilisticTWM(ProbabilisticTWMConfig(**checkpoint['twm_source']['model_config']))
