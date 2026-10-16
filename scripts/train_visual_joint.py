@@ -507,7 +507,8 @@ def main():
                 if world > 1: dist.broadcast_object_list(decision, src=0, device=device)
                 improved, best = decision
                 if improved: save(step, is_best=True)
-            if step % config['save_every'] == 0: save(step)
+            if step % config['save_every'] == 0 or step == config.get('initial_checkpoint_step', 4):
+                save(step)
             if rank == 0:
                 status = {'utc': utc(), 'phase': 'training', 'step': step, 'target_steps': config['steps'],
                           'task': task, 'training': training, 'wandb_url': tracker.url}

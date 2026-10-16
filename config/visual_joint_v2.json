@@ -16,6 +16,7 @@
   "eval_every": 50,
   "eval_batches": 8,
   "save_every": 50,
+  "initial_checkpoint_step": 4,
   "log_every": 5,
   "num_workers": 0,
   "cpu_threads": 2,
