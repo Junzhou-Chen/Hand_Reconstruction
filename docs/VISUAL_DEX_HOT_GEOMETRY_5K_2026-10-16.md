@@ -61,3 +61,19 @@ Dex源为官方拟合MANO及Dex21，在固定相机坐标作明确world gauge；
 ### 并行数据准备状态
 
 08:40快照：ARCTIC仍running，verified51/343／failed0、已写约26.24GB。HO3D官方v2包已于08:30:22UTC完成37,044,700,091B获取、ZIP CRC与自算SHA；这是完整下载验收，不是该库99D／相机adapter已接入。HOT全部已下载1167 Aria clips的RGB准备08:37:57UTC完成，train275884／val38848个有效手状态、全split独立RGB174659张。它们继续留作下一版本准备，**没有改变正在训练的73524状态／63652独立RGB清单**。
+
+## 纽约10:26中期效果快照
+
+2026-10-16 14:26UTC只读查询，训练1773/5000、W&B仍running。既定fixed8共222个完整有效状态、4480个有效参考joint；最新验证1750，按原geometry score的best为1500。此次未启动额外模型评测或调整训练。
+
+| 指标 | 原始HaWoR | 1750微调HaWoR raw | 1750最终校正 |
+|---|---:|---:|---:|
+| 绝对腕位置误差mm | 46.412 | 9.770 | 10.102 |
+| root旋转误差° | 5.425 | 3.917 | 3.596 |
+| finger旋转误差° | 16.990 | 16.722 | 14.417 |
+
+最终有效joint绝对MPJPE为12.431mm；原始raw的该指标未被现有周期日志直接记录，不以初始化随机插件结果119.006mm冒充原HaWoR MPJPE。best1500最终腕9.424mm，相对原始raw下降79.70%，最终joint MPJPE12.173mm。1000步最终joint13.753mm，1500步12.173mm，1750步12.431mm，近期有波动。
+
+这些数据支持整体相对原HaWoR的腕改善，以及同权重raw到final的手指改善；腕在1750反而增加0.332mm，不能把整体收益归于TWM或称插件稳定改善腕部。1750有38.74%完整状态的腕恶化超过1mm，名义90%位置椭球仅覆盖50.90%，均需保留。尚未完成本run全val、独立test和等预算HaWoR-only比较，不据该小集判断泛化／完全收敛。
+
+远程完整摘要`evaluations/visual_dex_hot_geometry_5k_20261016/progress_20261016_midrun.json`，小型镜像[progress报告](../reports/visual_dex_hot_geometry_5k_progress_20261016.json)。1750保存时两rank模型hash一致，后续仍按既定5000步和原best规则运行。

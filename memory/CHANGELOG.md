@@ -1,5 +1,11 @@
 # HandLoop 项目记忆变更记录
 
+## 2026-10-16 只读核验两库5k训练中期效果
+
+- 远程14:26UTC／纽约10:26快照1773/5000仍training；读取原始HaWoR参考和W&B全部35次fixed8验证，保存[小型进度摘要](../reports/visual_dex_hot_geometry_5k_progress_20261016.json)。源码a642e6e／原冻结清单与既定配置保持。
+- best按原geometry score为1500，腕46.412→9.424mm；最新1750 final MPJPE12.431mm。分清整体相对原模型的改善与插件增量：1750微调raw腕9.770→final10.102mm，手指16.722→14.417°；不能将整体腕收益写成TWM独立收益。
+- 明确仅8clips／222完整状态、非全量val／独立test，近期波动与位置分布欠覆盖均保留。未停止／恢复训练、修改loss／数据、启动新模型评测或改变后台下载。
+
 **2026-10-16最新用户决定：先用已验收Dex＋HOT跑5000步，其他数据继续后台准备。** 用户明确效果优先、不必完全复现HaWoR，可增加与测试隔离的来源；当前指定此前63652独立RGB／73524 train手状态池立即重训5k。本条替代等四库就绪才启动、tiny Dex-only及前轮等用户回来再训练的安排。固定6314ec2…混源清单／2773train窗，原fixed8验证、两主干全量低LR／每卡8段／两轮／history30／噪声与geometry目标均保持；5000总更新＝3750视觉＋1250 motion回放。从官方HaWoR＋D37重新初始化，全新Adam和5000步cosine；不续用旧100步优化器。ARCTIC／HO3D下载与HOT全clips预处理继续，新来源不在本run中自动入池；旧best与旧100步保存。已于08:25UTC／纽约04:25正式双卡开训，源码a642e6e，08:40实测30/5000。step4的1076 model／3135 Adam浮点张量finite且CPU／双rank hash一致，step8两rank14组梯度seen非零／代表参数改变均通过，每卡peak63.50GiB，W&B ff3108fd online。HO3D下载校验与HOT全clips预处理随后complete，ARCTIC仍下载；本run数据不变。见[两库5k协议](../docs/VISUAL_DEX_HOT_GEOMETRY_5K_2026-10-16.md)；启动通过不代表新精度结论。
 
 **2026-10-16下载自查与训练范围澄清：** 用户表示等下载完成再来，本轮只添加并实测只读查询helper，不启动训练或改变后台worker。本机可执行`ssh ds 'python3 /sciclone/data10/jchen57/Hand_Reconstruction/download_runtime/check_hawor_data_progress.py'`，同时显示Dex／ARCTIC／HO3D下载、校验文件数／失败数／进程与HOT预处理；不读取私有凭据。complete表示下载及校验完成，checking未完成；HOT预处理单独计数。解释作者逐帧／视角ID清单不等于新增小样本要求，公开train可组织完整有效训练池，val/test排除；当前Dex单视角与HOT BOP覆盖仍有限，不能把完整下载包称为四库全量已接入。5000总更新不保证全池一遍，未据此改变预算。见[当前协议](../docs/HAWOR_ALIGNED_VISUAL_TRAINING_2026-10-16.md)。
