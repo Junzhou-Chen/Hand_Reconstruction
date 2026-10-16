@@ -1,0 +1,840 @@
+{
+  "checked_utc": "2026-10-16T08:40:39.626139+00:00",
+  "passed": true,
+  "checks": {
+    "prelaunch_data_and_test_exclusion_passed": true,
+    "training_updates_exceed8": true,
+    "target5000_and_rgb8_per_rank": true,
+    "visual_sources_exactly_dex_hot": true,
+    "both_rank_gradients_finite": true,
+    "both_rank_all14_groups_seen_nonzero": true,
+    "both_rank_all14_watched_parameters_changed": true,
+    "checkpoint_model_optimizer_finite_and_rank_hash_match": true,
+    "wandb_server_running_configured5000_batch8": true
+  },
+  "pod": "jchen57-fineturn-tl4zr",
+  "code_version": "a642e6eb55e320fa5cae89d5b8565dff9d43efe7",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_dex_hot_geometry_5k_20261016",
+  "process": {
+    "pid": 4581,
+    "command": [
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+      "-m",
+      "torch.distributed.run",
+      "--standalone",
+      "--nnodes=1",
+      "--nproc-per-node=2",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/visual_feedback_dex_hot_geometry_5k_20261016/scripts/train_visual_joint.py",
+      "--config",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/code/visual_feedback_dex_hot_geometry_5k_20261016/config/visual_joint_dex_hot_geometry_5k.json",
+      "--output",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_dex_hot_geometry_5k_20261016",
+      "--code-version",
+      "a642e6eb55e320fa5cae89d5b8565dff9d43efe7",
+      "--source-manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_hot_collection_v3_20261016/source_manifest.json",
+      "--motion-manifest",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+      "--twm-checkpoint",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/twm_d37_final_20261016/best.pt",
+      "--hawor-root",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/hawor_v1/source",
+      "--hawor-checkpoint",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/hawor_v1/weights/hawor.ckpt",
+      "--hawor-config",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/hawor_v1/weights/model_config.yaml",
+      "--mano-models",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived"
+    ],
+    "code_version": "a642e6eb55e320fa5cae89d5b8565dff9d43efe7",
+    "gpus": [
+      "0",
+      "1"
+    ],
+    "pod": "jchen57-fineturn-tl4zr",
+    "started_utc": "2026-10-16T08:25:37.226939+00:00"
+  },
+  "status": {
+    "phase": "training",
+    "step": 30,
+    "target_steps": 5000,
+    "task": "visual",
+    "training": {
+      "beta_norm": 1.2225472927093506,
+      "candidate/finger_deg": 9.863436698913574,
+      "candidate/root_deg": 11.366670608520508,
+      "candidate/wrist_mm": 38.17845916748047,
+      "current_nll": 561.708760799136,
+      "current_nll/count": 463,
+      "elapsed_seconds": 480.25199899915606,
+      "final/finger_deg": 10.888585090637207,
+      "final/root_deg": 15.302037239074707,
+      "final/wrist_mm": 47.29658126831055,
+      "final_mpjpe21_m": 0.05245715078270439,
+      "final_mpjpe21_m/count": 9669,
+      "geometry_score": 0.5275578498840332,
+      "gradient_norms": {
+        "adapter": 11.6217622756958,
+        "hawor": 120.93063354492188,
+        "twm": 11.683292388916016
+      },
+      "local_current_nll": 688.9461669921875,
+      "peak_allocated_gb": 63.498305797576904,
+      "per_gpu_rgb_batch_size": 8,
+      "raw/finger_deg": 9.213933944702148,
+      "raw/root_deg": 8.360462188720703,
+      "raw/wrist_mm": 35.869476318359375,
+      "raw_wrist_geometry_m": 0.031528530573999396,
+      "raw_wrist_geometry_m/count": 463,
+      "valid_states": 227,
+      "wrist_degradation_over_1mm": 0.5462554693222046,
+      "xyz_90pct_ellipsoid_coverage": 0.11453744024038315,
+      "xyz_std_mm": 6.501941204071045
+    },
+    "utc": "2026-10-16T08:40:35.652564+00:00",
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/ff3108fd"
+  },
+  "planned_total_updates": 5000,
+  "planned_visual_updates": 3750,
+  "planned_motion_replay_updates": 1250,
+  "visual_data": {
+    "manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+    "train_unique_rgb": 63652,
+    "train_states": 73524,
+    "train_clips": 2773,
+    "validation_states": 4037,
+    "validation_clips": 143,
+    "fixed_validation_budget": 8
+  },
+  "identity": {
+    "hawor_checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+    "hawor_config_sha256": "edfe12dc14ce371d698da722b59acfed5b4a38a7f8f5116cbc1fce459a07dd2d",
+    "mano_asset_sha256": {
+      "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+      "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+    },
+    "motion_manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "source_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+    "twm_source_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c"
+  },
+  "trainable_parameters": 708688515,
+  "optimizer_groups": [
+    {
+      "amsgrad": false,
+      "base_lr": 1e-06,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 1e-06,
+      "lr": 5e-08,
+      "maximize": false,
+      "name": "hawor_decay",
+      "parameters": 691790464,
+      "weight_decay": 0.01
+    },
+    {
+      "amsgrad": false,
+      "base_lr": 1e-06,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 1e-06,
+      "lr": 5e-08,
+      "maximize": false,
+      "name": "hawor_no_decay",
+      "parameters": 909901,
+      "weight_decay": 0.0
+    },
+    {
+      "amsgrad": false,
+      "base_lr": 0.0001,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 0.0001,
+      "lr": 5e-06,
+      "maximize": false,
+      "name": "adapter_decay",
+      "parameters": 2441728,
+      "weight_decay": 0.01
+    },
+    {
+      "amsgrad": false,
+      "base_lr": 0.0001,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 0.0001,
+      "lr": 5e-06,
+      "maximize": false,
+      "name": "adapter_no_decay",
+      "parameters": 16390,
+      "weight_decay": 0.0
+    },
+    {
+      "amsgrad": false,
+      "base_lr": 1e-05,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 1e-05,
+      "lr": 5.000000000000001e-07,
+      "maximize": false,
+      "name": "twm_decay",
+      "parameters": 13243776,
+      "weight_decay": 0.01
+    },
+    {
+      "amsgrad": false,
+      "base_lr": 1e-05,
+      "betas": [
+        0.9,
+        0.999
+      ],
+      "capturable": false,
+      "decoupled_weight_decay": true,
+      "differentiable": false,
+      "eps": 1e-08,
+      "foreach": false,
+      "fused": null,
+      "initial_lr": 1e-05,
+      "lr": 5.000000000000001e-07,
+      "maximize": false,
+      "name": "twm_no_decay",
+      "parameters": 286256,
+      "weight_decay": 0.0
+    }
+  ],
+  "configuration": {
+    "adapter": {
+      "candidate_guided_queries": true,
+      "condition_on_beta": false,
+      "d_model": 256,
+      "default_dt": 0.03333333333333333,
+      "detach_history": true,
+      "dim_feedforward": 512,
+      "dropout": 0.0,
+      "history_length": 30,
+      "image_feature_dim": 1280,
+      "local_patch_sigma": 0.25,
+      "max_gap_seconds": 0.25,
+      "nhead": 4,
+      "num_layers": 2,
+      "patch_grid_height": 16,
+      "patch_grid_width": 12,
+      "refinement_steps": 2,
+      "rotation_delta_scale": 0.5,
+      "translation_delta_scale": 0.1
+    },
+    "adapter_learning_rate": 0.0001,
+    "clip_length": 32,
+    "cpu_threads": 2,
+    "eval_batches": 8,
+    "eval_every": 50,
+    "grad_clip": 1.0,
+    "gradient_checkpointing": true,
+    "hawor_learning_rate": 1e-06,
+    "initial_checkpoint_step": 4,
+    "log_every": 5,
+    "motion_replay_every": 4,
+    "num_workers": 0,
+    "per_gpu_motion_batch_size": 32,
+    "per_gpu_rgb_batch_size": 8,
+    "required_visual_datasets": [
+      "dexycb",
+      "hot3d"
+    ],
+    "save_every": 50,
+    "seed": 20261016,
+    "steps": 5000,
+    "stop_before_utc": "2026-10-20T05:10:00+00:00",
+    "tracking": {
+      "enabled": true,
+      "entity": "black-ant",
+      "group": "visual-feedback-joint-finetune",
+      "mode": "online",
+      "name": "visual-joint-dex-hot-geometry-5k",
+      "project": "handloop-twm",
+      "require_online": true,
+      "tags": [
+        "full-finetune",
+        "online-rgb",
+        "hawor",
+        "d37-best",
+        "refinement2",
+        "motion-replay",
+        "gt-crop",
+        "dex-hot",
+        "raw-wrist-supervision",
+        "final-joint-supervision",
+        "fresh-5000",
+        "fixed-existing-mixed-pool"
+      ]
+    },
+    "twm_learning_rate": 1e-05,
+    "visual_geometry_supervision": {
+      "final_joint_scale_m": 0.05,
+      "final_joint_weight": 1.0,
+      "nll_weight": 0.0001,
+      "raw_wrist_scale_m": 0.05,
+      "raw_wrist_weight": 1.0
+    },
+    "warmup_steps": 20,
+    "weight_decay": 0.01,
+    "world_size": 2
+  },
+  "rank8_gradient_audits": {
+    "0": {
+      "execution_start_step": 0,
+      "gradients": {
+        "adapter": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_head": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_iam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_pam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_vit": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "twm_current": {
+          "finite": true,
+          "norm": 0.592555046081543,
+          "tensors": 2
+        },
+        "twm_encoder": {
+          "finite": true,
+          "norm": 1.203916311264038,
+          "tensors": 263
+        },
+        "twm_future": {
+          "finite": true,
+          "norm": 0.23709844052791595,
+          "tensors": 17
+        },
+        "twm_future_concentration": {
+          "finite": true,
+          "norm": 0.13692231476306915,
+          "tensors": 2
+        },
+        "twm_future_rotation": {
+          "finite": true,
+          "norm": 4.217764377593994,
+          "tensors": 2
+        },
+        "twm_future_scale": {
+          "finite": true,
+          "norm": 0.010821642354130745,
+          "tensors": 2
+        },
+        "twm_future_velocity": {
+          "finite": true,
+          "norm": 0.9388940930366516,
+          "tensors": 2
+        },
+        "twm_mixture": {
+          "finite": true,
+          "norm": 0.00046412600204348564,
+          "tensors": 2
+        },
+        "twm_rotation": {
+          "finite": true,
+          "norm": 2.7075212001800537,
+          "tensors": 2
+        }
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_bytes": 68180786688,
+      "per_gpu_rgb_batch_size": 8,
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "step": 8,
+      "task": "motion",
+      "utc": "2026-10-16T08:36:09.613666+00:00"
+    },
+    "1": {
+      "execution_start_step": 0,
+      "gradients": {
+        "adapter": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_head": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_iam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_pam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_vit": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "twm_current": {
+          "finite": true,
+          "norm": 0.592555046081543,
+          "tensors": 2
+        },
+        "twm_encoder": {
+          "finite": true,
+          "norm": 1.203916311264038,
+          "tensors": 263
+        },
+        "twm_future": {
+          "finite": true,
+          "norm": 0.23709844052791595,
+          "tensors": 17
+        },
+        "twm_future_concentration": {
+          "finite": true,
+          "norm": 0.13692231476306915,
+          "tensors": 2
+        },
+        "twm_future_rotation": {
+          "finite": true,
+          "norm": 4.217764377593994,
+          "tensors": 2
+        },
+        "twm_future_scale": {
+          "finite": true,
+          "norm": 0.010821642354130745,
+          "tensors": 2
+        },
+        "twm_future_velocity": {
+          "finite": true,
+          "norm": 0.9388940930366516,
+          "tensors": 2
+        },
+        "twm_mixture": {
+          "finite": true,
+          "norm": 0.00046412600204348564,
+          "tensors": 2
+        },
+        "twm_rotation": {
+          "finite": true,
+          "norm": 2.7075212001800537,
+          "tensors": 2
+        }
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_bytes": 68180786688,
+      "per_gpu_rgb_batch_size": 8,
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "step": 8,
+      "task": "motion",
+      "utc": "2026-10-16T08:36:09.611912+00:00"
+    }
+  },
+  "checkpoint4_cpu_audit": {
+    "utc": "2026-10-16T08:36:27.849885+00:00",
+    "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_dex_hot_geometry_5k_20261016/checkpoint4_launch_audit.pt",
+    "bytes": 8510562607,
+    "step": 4,
+    "code_version": "a642e6eb55e320fa5cae89d5b8565dff9d43efe7",
+    "model_floating_tensors": 1076,
+    "model_finite": true,
+    "model_sha256": "13141b18b9667f4b51e67e598d7359f83bffc9fac4fcaa8412a4ea0bd7917dd7",
+    "optimizer_floating_tensors": 3135,
+    "optimizer_finite": true,
+    "optimizer_parameter_states": 1045,
+    "optimizer_distinct_steps": [
+      1,
+      3,
+      4
+    ],
+    "optimizer_groups": [
+      {
+        "lr": 2.499996446944286e-07,
+        "base_lr": 1e-06,
+        "weight_decay": 0.01,
+        "name": "hawor_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-06
+      },
+      {
+        "lr": 2.499996446944286e-07,
+        "base_lr": 1e-06,
+        "weight_decay": 0.0,
+        "name": "hawor_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-06
+      },
+      {
+        "lr": 2.499996446944286e-05,
+        "base_lr": 0.0001,
+        "weight_decay": 0.01,
+        "name": "adapter_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 0.0001
+      },
+      {
+        "lr": 2.499996446944286e-05,
+        "base_lr": 0.0001,
+        "weight_decay": 0.0,
+        "name": "adapter_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 0.0001
+      },
+      {
+        "lr": 2.499996446944286e-06,
+        "base_lr": 1e-05,
+        "weight_decay": 0.01,
+        "name": "twm_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-05
+      },
+      {
+        "lr": 2.499996446944286e-06,
+        "base_lr": 1e-05,
+        "weight_decay": 0.0,
+        "name": "twm_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-05
+      }
+    ],
+    "source_twm_step": 10000,
+    "source_twm_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c",
+    "position_feature_scale": 0.05,
+    "cpu_matches_all_saved_ranks": true,
+    "passed": true
+  },
+  "wandb_server": {
+    "checked_utc": "2026-10-16T08:37:11.738827+00:00",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/ff3108fd",
+    "state": "running",
+    "server_optimizer_step": 10,
+    "configured_steps": 5000,
+    "per_gpu_rgb_batch_size": 8,
+    "visual_sources": [
+      "dexycb",
+      "hot3d"
+    ]
+  },
+  "initial_validation": {
+    "candidate/finger_deg": 17.433857015661292,
+    "candidate/root_deg": 14.982791479643401,
+    "candidate/wrist_mm": 73.08964466404271,
+    "clips": 8,
+    "current_nll": 9520.565684825451,
+    "final/finger_deg": 19.20425693408863,
+    "final/root_deg": 24.953891041042567,
+    "final/wrist_mm": 109.22668701034408,
+    "final_mpjpe21_m": 0.11900579801627569,
+    "geometry_score": 1.503380903789589,
+    "metric_counts": {
+      "candidate/finger_deg": 3330,
+      "candidate/root_deg": 222,
+      "candidate/wrist_mm": 222,
+      "current_nll": 222,
+      "final/finger_deg": 3330,
+      "final/root_deg": 222,
+      "final/wrist_mm": 222,
+      "final_mpjpe21_m": 4480,
+      "geometry_score": 222,
+      "raw/finger_deg": 3330,
+      "raw/root_deg": 222,
+      "raw/wrist_mm": 222,
+      "raw_wrist_geometry_m": 222,
+      "wrist_degradation_over_1mm": 222,
+      "xyz_90pct_ellipsoid_coverage": 222,
+      "xyz_std_mm": 222
+    },
+    "raw/finger_deg": 16.990268741642033,
+    "raw/root_deg": 5.425260075577745,
+    "raw/wrist_mm": 46.412233747877515,
+    "raw_wrist_geometry_m": 0.04641223249134717,
+    "valid_states": 222,
+    "wrist_degradation_over_1mm": 0.8468468489947619,
+    "xyz_90pct_ellipsoid_coverage": 0.013513513513513514,
+    "xyz_std_mm": 13.209634746517146
+  },
+  "initial_adapter_bypass": {
+    "candidate/finger_deg": 16.990268741642033,
+    "candidate/root_deg": 5.425260075577745,
+    "candidate/wrist_mm": 46.41223515690984,
+    "clips": 8,
+    "current_nll": 6724.0193904842345,
+    "final/finger_deg": 16.50600053598215,
+    "final/root_deg": 9.111556336686418,
+    "final/wrist_mm": 55.072141458322335,
+    "final_mpjpe21_m": 0.05660967230796814,
+    "geometry_score": 0.5251620967645902,
+    "metric_counts": {
+      "candidate/finger_deg": 3330,
+      "candidate/root_deg": 222,
+      "candidate/wrist_mm": 222,
+      "current_nll": 222,
+      "final/finger_deg": 3330,
+      "final/root_deg": 222,
+      "final/wrist_mm": 222,
+      "final_mpjpe21_m": 4480,
+      "geometry_score": 222,
+      "raw/finger_deg": 3330,
+      "raw/root_deg": 222,
+      "raw/wrist_mm": 222,
+      "raw_wrist_geometry_m": 222,
+      "wrist_degradation_over_1mm": 222,
+      "xyz_90pct_ellipsoid_coverage": 222,
+      "xyz_std_mm": 222
+    },
+    "raw/finger_deg": 16.990268741642033,
+    "raw/root_deg": 5.425260075577745,
+    "raw/wrist_mm": 46.412233747877515,
+    "raw_wrist_geometry_m": 0.04641223249134717,
+    "valid_states": 222,
+    "wrist_degradation_over_1mm": 0.4369369380108945,
+    "xyz_90pct_ellipsoid_coverage": 0.0,
+    "xyz_std_mm": 4.189944632418521
+  },
+  "prelaunch_source_audit": {
+    "checked_utc": "2026-10-16T08:24:05.831909+00:00",
+    "pod": "jchen57-fineturn-tl4zr",
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_hot_collection_v3_20261016/source_manifest.json",
+    "manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+    "checks": {
+      "manifest_matches_immutable_accepted_pool": true,
+      "previous_full_file_hash_acceptance_preserved": true,
+      "physical_train_val_disjoint": true,
+      "dex_all_s0_test_recordings_excluded": true,
+      "dex_saved_test16_recordings_disjoint": true,
+      "hot_all27_eval_parents_excluded": true,
+      "motion_dex_training_s0_test_excluded": true,
+      "only_two_visual_sources": true,
+      "motion_hot_all27_eval_parents_excluded": true
+    },
+    "train_states": 73524,
+    "val_states": 4037,
+    "train_records": 972,
+    "val_records": 33,
+    "previous_acceptance": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/data_expansion_geometry_v3_20261016/visual_collection_acceptance.json",
+      "sha256": "918c3e0808482eaa9c201a7164015601c4c07db26873c17da793a9ac5fc8aee9",
+      "verified_files": 67182
+    },
+    "memory_stat": {
+      "cache": 210915643392,
+      "rss": 2523697152,
+      "total_cache": 210915643392,
+      "total_rss": 2523697152,
+      "total_inactive_file": 38384300032,
+      "total_active_file": 172531032064
+    },
+    "passed": true,
+    "model_constructed": false
+  },
+  "background_preparation": {
+    "arctic": {
+      "phase": "running",
+      "updated_utc": "2026-10-16T08:40:32.602205+00:00",
+      "present_bytes": 26237054433,
+      "counts": {
+        "pending": 289,
+        "downloading": 3,
+        "checking": 0,
+        "verified": 51,
+        "failed": 0
+      }
+    },
+    "ho3d_v2": {
+      "phase": "complete",
+      "updated_utc": "2026-10-16T08:30:22.570556+00:00",
+      "present_bytes": 37044700091,
+      "counts": null
+    },
+    "hot_full_preprocess": {
+      "phase": "complete",
+      "completed_utc": "2026-10-16T08:37:57.594058+00:00",
+      "split_frames": {
+        "train": 275884,
+        "val": 38848
+      },
+      "unique_rgb_images": 174659
+    }
+  },
+  "scope": "accepted fixed Dex/HOT RGB pool; GT crops and calibrated camera; startup validation, not new geometric accuracy results"
+}
