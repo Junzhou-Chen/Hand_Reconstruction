@@ -1,0 +1,857 @@
+{
+  "checked_at_utc": "2026-10-16T04:43:28.312925+00:00",
+  "training_code_version": "87a2bcce50eb01075e6f5e6959ec536e26f1be58",
+  "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+  "manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+  "training_sampling": "full shuffled coverage, disjoint rank shards, no dropped final batch",
+  "epoch_schedule": {
+    "budget_unit": "step",
+    "target_steps": 10000,
+    "windows_per_epoch": 636610,
+    "steps_per_epoch": 622,
+    "ddp_padding_per_epoch": 0
+  },
+  "config": {
+    "seed": 20261015,
+    "history_frames": 30,
+    "min_future_frames": 3,
+    "window_stride": 4,
+    "source_sampling": "full_coverage",
+    "steps": 10000
+  },
+  "pure_motion": {
+    "train": {
+      "datasets": {
+        "dexycb": {
+          "0": {
+            "prepared_sequences": 400,
+            "prepared_frames": 25474,
+            "usable_sequences": 398,
+            "windows": 3187
+          },
+          "1": {
+            "prepared_sequences": 400,
+            "prepared_frames": 25387,
+            "usable_sequences": 400,
+            "windows": 3165
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "hot3d": {
+          "0": {
+            "prepared_sequences": 2201,
+            "prepared_frames": 330150,
+            "usable_sequences": 2201,
+            "windows": 66004
+          },
+          "1": {
+            "prepared_sequences": 2201,
+            "prepared_frames": 330150,
+            "usable_sequences": 2201,
+            "windows": 66004
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "oakink2": {
+          "0": {
+            "prepared_sequences": 431,
+            "prepared_frames": 707276,
+            "usable_sequences": 431,
+            "windows": 173430
+          },
+          "1": {
+            "prepared_sequences": 431,
+            "prepared_frames": 707276,
+            "usable_sequences": 431,
+            "windows": 173430
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "umetrack": {
+          "0": {
+            "prepared_sequences": 763,
+            "prepared_frames": 326578,
+            "usable_sequences": 763,
+            "windows": 74605
+          },
+          "1": {
+            "prepared_sequences": 783,
+            "prepared_frames": 335844,
+            "usable_sequences": 783,
+            "windows": 76785
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        }
+      },
+      "total_windows": 636610,
+      "totals": {
+        "0": {
+          "prepared_sequences": 3795,
+          "prepared_frames": 1389478,
+          "usable_sequences": 3793,
+          "windows": 317226,
+          "window_fraction": 0.49830508474576274
+        },
+        "1": {
+          "prepared_sequences": 3815,
+          "prepared_frames": 1398657,
+          "usable_sequences": 3815,
+          "windows": 319384,
+          "window_fraction": 0.5016949152542373
+        },
+        "2": {
+          "prepared_sequences": 0,
+          "prepared_frames": 0,
+          "usable_sequences": 0,
+          "windows": 0,
+          "window_fraction": 0.0
+        }
+      }
+    },
+    "val": {
+      "datasets": {
+        "dexycb": {
+          "0": {
+            "prepared_sequences": 20,
+            "prepared_frames": 1429,
+            "usable_sequences": 20,
+            "windows": 199
+          },
+          "1": {
+            "prepared_sequences": 20,
+            "prepared_frames": 1412,
+            "usable_sequences": 20,
+            "windows": 195
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "hot3d": {
+          "0": {
+            "prepared_sequences": 254,
+            "prepared_frames": 38100,
+            "usable_sequences": 254,
+            "windows": 7620
+          },
+          "1": {
+            "prepared_sequences": 254,
+            "prepared_frames": 38100,
+            "usable_sequences": 254,
+            "windows": 7620
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "oakink2": {
+          "0": {
+            "prepared_sequences": 39,
+            "prepared_frames": 56691,
+            "usable_sequences": 39,
+            "windows": 13864
+          },
+          "1": {
+            "prepared_sequences": 39,
+            "prepared_frames": 56691,
+            "usable_sequences": 39,
+            "windows": 13864
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        },
+        "umetrack": {
+          "0": {
+            "prepared_sequences": 89,
+            "prepared_frames": 38363,
+            "usable_sequences": 89,
+            "windows": 8826
+          },
+          "1": {
+            "prepared_sequences": 93,
+            "prepared_frames": 40314,
+            "usable_sequences": 93,
+            "windows": 9182
+          },
+          "2": {
+            "prepared_sequences": 0,
+            "prepared_frames": 0,
+            "usable_sequences": 0,
+            "windows": 0
+          }
+        }
+      },
+      "total_windows": 61370,
+      "totals": {
+        "0": {
+          "prepared_sequences": 402,
+          "prepared_frames": 134583,
+          "usable_sequences": 402,
+          "windows": 30509
+        },
+        "1": {
+          "prepared_sequences": 406,
+          "prepared_frames": 136517,
+          "usable_sequences": 406,
+          "windows": 30861
+        },
+        "2": {
+          "prepared_sequences": 0,
+          "prepared_frames": 0,
+          "usable_sequences": 0,
+          "windows": 0
+        }
+      }
+    }
+  },
+  "visual": {
+    "train_val": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_joint_sources_v2_20261016/source_manifest.json",
+      "sha256": "67462dced45615c9e0ea8d761da58094d03f8b8cadc47370c06f126751259d3e",
+      "counts": {
+        "train": {
+          "1": {
+            "recordings": 8,
+            "frames": 553,
+            "subjects": [
+              "20200709-subject-01",
+              "20200813-subject-02"
+            ]
+          },
+          "0": {
+            "recordings": 8,
+            "frames": 575,
+            "subjects": [
+              "20200709-subject-01",
+              "20200813-subject-02"
+            ]
+          }
+        },
+        "val": {
+          "1": {
+            "recordings": 6,
+            "frames": 434,
+            "subjects": [
+              "20200709-subject-01",
+              "20200813-subject-02"
+            ]
+          },
+          "0": {
+            "recordings": 2,
+            "frames": 143,
+            "subjects": [
+              "20200709-subject-01",
+              "20200813-subject-02"
+            ]
+          }
+        }
+      }
+    },
+    "test": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_eval_s0_test_prefix128_20261016/source_manifest.json",
+      "sha256": "b5a87d00878f3132692fba81aba68fea38a8fb6dd6980faf82e9fc39e43963a4",
+      "counts": {
+        "test": {
+          "1": {
+            "recordings": 7,
+            "frames": 461,
+            "subjects": [
+              "20200820-subject-03",
+              "20200908-subject-05",
+              "20200918-subject-06",
+              "20201015-subject-09",
+              "20201022-subject-10"
+            ]
+          },
+          "0": {
+            "recordings": 9,
+            "frames": 554,
+            "subjects": [
+              "20200903-subject-04",
+              "20200908-subject-05",
+              "20200918-subject-06",
+              "20200928-subject-07",
+              "20201002-subject-08",
+              "20201015-subject-09"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "schema": "handloop.left_hand_coverage_diagnosis.v1",
+  "updated_at_utc": "2026-10-16T04:45:24.658765+00:00",
+  "stage_errors": {
+    "validation": {
+      "left": {
+        "states": 143,
+        "branches": {
+          "baseline.raw": {
+            "wrist_mm": 71.95579314065147,
+            "root_deg": 18.666232099066246,
+            "finger_deg": 13.114663447533454,
+            "mpjpe21_mm": 63.81164378052825,
+            "wrist_aligned_mpjpe21_mm": 27.421414535362405
+          },
+          "best.candidate": {
+            "wrist_mm": 93.1274003482365,
+            "root_deg": 13.795965424784413,
+            "finger_deg": 11.341591651623066,
+            "mpjpe21_mm": 92.00754853895494,
+            "wrist_aligned_mpjpe21_mm": 20.708008065923945
+          },
+          "best.final": {
+            "wrist_mm": 86.06337324722664,
+            "root_deg": 14.128725351987185,
+            "finger_deg": 11.310003917534035,
+            "mpjpe21_mm": 86.48523933570702,
+            "wrist_aligned_mpjpe21_mm": 21.60410540253966
+          },
+          "best.raw": {
+            "wrist_mm": 157.70446633292244,
+            "root_deg": 14.468781909742555,
+            "finger_deg": 11.468958062725468,
+            "mpjpe21_mm": 149.8864574432373,
+            "wrist_aligned_mpjpe21_mm": 20.72201832857999
+          },
+          "last.candidate": {
+            "wrist_mm": 78.84383470195156,
+            "root_deg": 13.635813277918142,
+            "finger_deg": 11.151421211816213,
+            "mpjpe21_mm": 79.0344616949975,
+            "wrist_aligned_mpjpe21_mm": 20.294109437849137
+          },
+          "last.final": {
+            "wrist_mm": 75.09203523689217,
+            "root_deg": 13.828300819530353,
+            "finger_deg": 11.134426357029202,
+            "mpjpe21_mm": 75.8537434197806,
+            "wrist_aligned_mpjpe21_mm": 20.84769988226724
+          },
+          "last.raw": {
+            "wrist_mm": 113.86588362046889,
+            "root_deg": 15.017998025133894,
+            "finger_deg": 11.364968653325434,
+            "mpjpe21_mm": 106.08834723492602,
+            "wrist_aligned_mpjpe21_mm": 21.74858522748614
+          }
+        },
+        "recording_change_summary": {
+          "recordings": 2,
+          "improved_recordings": 1,
+          "worsened_recordings": 1,
+          "median_recording_mpjpe_change_mm": 22.875500964540084,
+          "largest_worsening": {
+            "recording": "20200709-subject-01/20200709_142446",
+            "states": 71,
+            "baseline_mpjpe": 66.86806402072101,
+            "best_raw_mpjpe": 209.76269891228475,
+            "best_final_mpjpe": 118.61603852392922,
+            "change_mm": 51.74797450320821,
+            "handedness": 0
+          }
+        }
+      },
+      "right": {
+        "states": 434,
+        "branches": {
+          "baseline.raw": {
+            "wrist_mm": 89.6513706637967,
+            "root_deg": 6.133958514796974,
+            "finger_deg": 7.211251924114842,
+            "mpjpe21_mm": 87.21910510964108,
+            "wrist_aligned_mpjpe21_mm": 8.86695346689444
+          },
+          "best.candidate": {
+            "wrist_mm": 21.00213239132534,
+            "root_deg": 5.36521611503467,
+            "finger_deg": 5.758319932194898,
+            "mpjpe21_mm": 21.356061608011274,
+            "wrist_aligned_mpjpe21_mm": 7.1048992465718
+          },
+          "best.final": {
+            "wrist_mm": 22.515590919327625,
+            "root_deg": 5.648693379718587,
+            "finger_deg": 5.722931954717856,
+            "mpjpe21_mm": 23.093743025981887,
+            "wrist_aligned_mpjpe21_mm": 7.628225195792414
+          },
+          "best.raw": {
+            "wrist_mm": 22.614142232226886,
+            "root_deg": 5.468799066159033,
+            "finger_deg": 5.806219105346961,
+            "mpjpe21_mm": 21.418477436364523,
+            "wrist_aligned_mpjpe21_mm": 7.805265612316571
+          },
+          "last.candidate": {
+            "wrist_mm": 19.752340063796066,
+            "root_deg": 4.987223668101197,
+            "finger_deg": 5.99491816786577,
+            "mpjpe21_mm": 20.032252211724558,
+            "wrist_aligned_mpjpe21_mm": 6.797744921824899
+          },
+          "last.final": {
+            "wrist_mm": 19.989981479359113,
+            "root_deg": 5.108321264317508,
+            "finger_deg": 6.004729670862997,
+            "mpjpe21_mm": 20.38037917526087,
+            "wrist_aligned_mpjpe21_mm": 7.023944303736709
+          },
+          "last.raw": {
+            "wrist_mm": 24.981719901484826,
+            "root_deg": 5.50892622830681,
+            "finger_deg": 6.07670425544686,
+            "mpjpe21_mm": 23.672541541437948,
+            "wrist_aligned_mpjpe21_mm": 8.672083764581636
+          }
+        },
+        "recording_change_summary": {
+          "recordings": 6,
+          "improved_recordings": 6,
+          "worsened_recordings": 0,
+          "median_recording_mpjpe_change_mm": -63.839297806894464,
+          "largest_worsening": {
+            "recording": "20200709-subject-01/20200709_142802",
+            "states": 69,
+            "baseline_mpjpe": 62.679337653560914,
+            "best_raw_mpjpe": 20.452065972314365,
+            "best_final_mpjpe": 18.464033444722492,
+            "change_mm": -44.21530420883842,
+            "handedness": 1
+          }
+        }
+      },
+      "recordings": [
+        {
+          "recording": "20200709-subject-01/20200709_142446",
+          "states": 71,
+          "baseline_mpjpe": 66.86806402072101,
+          "best_raw_mpjpe": 209.76269891228475,
+          "best_final_mpjpe": 118.61603852392922,
+          "change_mm": 51.74797450320821,
+          "handedness": 0
+        },
+        {
+          "recording": "20200813-subject-02/20200813_150228",
+          "states": 72,
+          "baseline_mpjpe": 60.79767382144928,
+          "best_raw_mpjpe": 90.84183043903775,
+          "best_final_mpjpe": 54.800701247321236,
+          "change_mm": -5.996972574128044,
+          "handedness": 0
+        },
+        {
+          "recording": "20200709-subject-01/20200709_142802",
+          "states": 69,
+          "baseline_mpjpe": 62.679337653560914,
+          "best_raw_mpjpe": 20.452065972314365,
+          "best_final_mpjpe": 18.464033444722492,
+          "change_mm": -44.21530420883842,
+          "handedness": 1
+        },
+        {
+          "recording": "20200709-subject-01/20200709_143125",
+          "states": 72,
+          "baseline_mpjpe": 99.26884190241496,
+          "best_raw_mpjpe": 35.960645622677276,
+          "best_final_mpjpe": 38.43694133228726,
+          "change_mm": -60.8319005701277,
+          "handedness": 1
+        },
+        {
+          "recording": "20200813-subject-02/20200813_145920",
+          "states": 74,
+          "baseline_mpjpe": 81.7817115010442,
+          "best_raw_mpjpe": 18.47391173646257,
+          "best_final_mpjpe": 20.76043818448041,
+          "change_mm": -61.02127331656379,
+          "handedness": 1
+        },
+        {
+          "recording": "20200813-subject-02/20200813_145612",
+          "states": 74,
+          "baseline_mpjpe": 85.47404665560336,
+          "best_raw_mpjpe": 17.09278493314176,
+          "best_final_mpjpe": 18.81672435837823,
+          "change_mm": -66.65732229722514,
+          "handedness": 1
+        },
+        {
+          "recording": "20200709-subject-01/20200709_142123",
+          "states": 71,
+          "baseline_mpjpe": 94.20016025489485,
+          "best_raw_mpjpe": 18.517792278612163,
+          "best_final_mpjpe": 21.46406866798938,
+          "change_mm": -72.73609158690547,
+          "handedness": 1
+        },
+        {
+          "recording": "20200813-subject-02/20200813_150535",
+          "states": 74,
+          "baseline_mpjpe": 98.86112460574589,
+          "best_raw_mpjpe": 18.22380223145356,
+          "best_final_mpjpe": 20.65604710901106,
+          "change_mm": -78.20507749673483,
+          "handedness": 1
+        }
+      ]
+    },
+    "test": {
+      "left": {
+        "states": 554,
+        "branches": {
+          "baseline.raw": {
+            "wrist_mm": 72.0125347715853,
+            "root_deg": 12.016120482868235,
+            "finger_deg": 8.964258685008714,
+            "mpjpe21_mm": 61.60196756541944,
+            "wrist_aligned_mpjpe21_mm": 17.831153718142733
+          },
+          "best.candidate": {
+            "wrist_mm": 59.503602410051364,
+            "root_deg": 8.217710957522858,
+            "finger_deg": 8.82897709939454,
+            "mpjpe21_mm": 60.20888328724389,
+            "wrist_aligned_mpjpe21_mm": 10.61793305985764
+          },
+          "best.final": {
+            "wrist_mm": 62.515086718845026,
+            "root_deg": 9.198763141885992,
+            "finger_deg": 8.67443176081895,
+            "mpjpe21_mm": 63.73518879835356,
+            "wrist_aligned_mpjpe21_mm": 11.922959732234693
+          },
+          "best.raw": {
+            "wrist_mm": 114.50836923922873,
+            "root_deg": 8.598754870116926,
+            "finger_deg": 9.251585852798572,
+            "mpjpe21_mm": 109.75393758009487,
+            "wrist_aligned_mpjpe21_mm": 11.518314763957413
+          },
+          "last.candidate": {
+            "wrist_mm": 63.26373713885834,
+            "root_deg": 8.376321196071938,
+            "finger_deg": 8.925688351104405,
+            "mpjpe21_mm": 64.37188332433735,
+            "wrist_aligned_mpjpe21_mm": 10.254030933448984
+          },
+          "last.final": {
+            "wrist_mm": 63.486653656305386,
+            "root_deg": 8.976441974136373,
+            "finger_deg": 8.784127929580771,
+            "mpjpe21_mm": 64.88233184211951,
+            "wrist_aligned_mpjpe21_mm": 11.088858897935612
+          },
+          "last.raw": {
+            "wrist_mm": 86.19529943087471,
+            "root_deg": 9.178575575136536,
+            "finger_deg": 9.521768809225586,
+            "mpjpe21_mm": 81.65611438458576,
+            "wrist_aligned_mpjpe21_mm": 12.796832465522986
+          }
+        },
+        "recording_change_summary": {
+          "recordings": 9,
+          "improved_recordings": 5,
+          "worsened_recordings": 4,
+          "median_recording_mpjpe_change_mm": -1.8538902256939878,
+          "largest_worsening": {
+            "recording": "20200918-subject-06/20200918_113405",
+            "states": 63,
+            "baseline_mpjpe": 32.580389779711524,
+            "best_raw_mpjpe": 130.81480698358445,
+            "best_final_mpjpe": 99.91426478491888,
+            "change_mm": 67.33387500520736,
+            "handedness": 0
+          }
+        }
+      },
+      "right": {
+        "states": 461,
+        "branches": {
+          "baseline.raw": {
+            "wrist_mm": 81.52950338789802,
+            "root_deg": 7.243873566195142,
+            "finger_deg": 8.869016139988268,
+            "mpjpe21_mm": 81.26346176668775,
+            "wrist_aligned_mpjpe21_mm": 10.453004349855435
+          },
+          "best.candidate": {
+            "wrist_mm": 24.92227699492862,
+            "root_deg": 7.350115571259935,
+            "finger_deg": 8.160016066081612,
+            "mpjpe21_mm": 27.56759559875455,
+            "wrist_aligned_mpjpe21_mm": 10.131738226739548
+          },
+          "best.final": {
+            "wrist_mm": 26.56427804042874,
+            "root_deg": 7.775571835015187,
+            "finger_deg": 8.084587620551053,
+            "mpjpe21_mm": 29.516664136774885,
+            "wrist_aligned_mpjpe21_mm": 10.80296641523564
+          },
+          "best.raw": {
+            "wrist_mm": 28.986797780121744,
+            "root_deg": 6.848654067697339,
+            "finger_deg": 8.251707937091654,
+            "mpjpe21_mm": 29.71451094559113,
+            "wrist_aligned_mpjpe21_mm": 9.792156084499235
+          },
+          "last.candidate": {
+            "wrist_mm": 22.19943562091819,
+            "root_deg": 7.001415945185498,
+            "finger_deg": 8.034388271691743,
+            "mpjpe21_mm": 25.077048670961126,
+            "wrist_aligned_mpjpe21_mm": 9.932262569084084
+          },
+          "last.final": {
+            "wrist_mm": 22.989086925078368,
+            "root_deg": 7.254283289330124,
+            "finger_deg": 8.005453365743806,
+            "mpjpe21_mm": 26.03351202652408,
+            "wrist_aligned_mpjpe21_mm": 10.32503776591667
+          },
+          "last.raw": {
+            "wrist_mm": 27.74714174808494,
+            "root_deg": 7.292202050411778,
+            "finger_deg": 8.14482914341246,
+            "mpjpe21_mm": 29.033885354850916,
+            "wrist_aligned_mpjpe21_mm": 11.10894078132646
+          }
+        },
+        "recording_change_summary": {
+          "recordings": 7,
+          "improved_recordings": 7,
+          "worsened_recordings": 0,
+          "median_recording_mpjpe_change_mm": -49.42061406090146,
+          "largest_worsening": {
+            "recording": "20200908-subject-05/20200908_143832",
+            "states": 63,
+            "baseline_mpjpe": 48.52359435671852,
+            "best_raw_mpjpe": 23.646503698258172,
+            "best_final_mpjpe": 20.64222452375624,
+            "change_mm": -27.881369832962278,
+            "handedness": 1
+          }
+        }
+      },
+      "recordings": [
+        {
+          "recording": "20200918-subject-06/20200918_113405",
+          "states": 63,
+          "baseline_mpjpe": 32.580389779711524,
+          "best_raw_mpjpe": 130.81480698358445,
+          "best_final_mpjpe": 99.91426478491888,
+          "change_mm": 67.33387500520736,
+          "handedness": 0
+        },
+        {
+          "recording": "20201002-subject-08/20201002_104827",
+          "states": 59,
+          "baseline_mpjpe": 35.02247978469073,
+          "best_raw_mpjpe": 48.02202641761909,
+          "best_final_mpjpe": 55.290857347391416,
+          "change_mm": 20.268377562700685,
+          "handedness": 0
+        },
+        {
+          "recording": "20201002-subject-08/20201002_105058",
+          "states": 59,
+          "baseline_mpjpe": 36.937218488272975,
+          "best_raw_mpjpe": 70.83013366440595,
+          "best_final_mpjpe": 54.868762735593116,
+          "change_mm": 17.93154424732014,
+          "handedness": 0
+        },
+        {
+          "recording": "20200928-subject-07/20200928_143500",
+          "states": 57,
+          "baseline_mpjpe": 69.69995508695904,
+          "best_raw_mpjpe": 118.53605963054456,
+          "best_final_mpjpe": 80.11376347458153,
+          "change_mm": 10.413808387622495,
+          "handedness": 0
+        },
+        {
+          "recording": "20201015-subject-09/20201015_143113",
+          "states": 74,
+          "baseline_mpjpe": 49.96615728172096,
+          "best_raw_mpjpe": 117.52886540180928,
+          "best_final_mpjpe": 48.11226705602697,
+          "change_mm": -1.8538902256939878,
+          "handedness": 0
+        },
+        {
+          "recording": "20200928-subject-07/20200928_143727",
+          "states": 59,
+          "baseline_mpjpe": 69.23001132577153,
+          "best_raw_mpjpe": 123.62532347339695,
+          "best_final_mpjpe": 54.52846252312094,
+          "change_mm": -14.701548802650585,
+          "handedness": 0
+        },
+        {
+          "recording": "20200903-subject-04/20200903_104115",
+          "states": 55,
+          "baseline_mpjpe": 76.78698524128308,
+          "best_raw_mpjpe": 138.89372697310014,
+          "best_final_mpjpe": 58.64293018687855,
+          "change_mm": -18.144055054404525,
+          "handedness": 0
+        },
+        {
+          "recording": "20200903-subject-04/20200903_103828",
+          "states": 63,
+          "baseline_mpjpe": 93.37198590475415,
+          "best_raw_mpjpe": 130.14888733152358,
+          "best_final_mpjpe": 72.71156727321564,
+          "change_mm": -20.66041863153852,
+          "handedness": 0
+        },
+        {
+          "recording": "20200908-subject-05/20200908_143832",
+          "states": 63,
+          "baseline_mpjpe": 48.52359435671852,
+          "best_raw_mpjpe": 23.646503698258172,
+          "best_final_mpjpe": 20.64222452375624,
+          "change_mm": -27.881369832962278,
+          "handedness": 1
+        },
+        {
+          "recording": "20200820-subject-03/20200820_135810",
+          "states": 74,
+          "baseline_mpjpe": 56.430469422727015,
+          "best_raw_mpjpe": 30.34274976317947,
+          "best_final_mpjpe": 24.244950500694483,
+          "change_mm": -32.18551892203253,
+          "handedness": 1
+        },
+        {
+          "recording": "20200908-subject-05/20200908_143535",
+          "states": 65,
+          "baseline_mpjpe": 91.82492661109337,
+          "best_raw_mpjpe": 107.13770347008338,
+          "best_final_mpjpe": 51.77102862138015,
+          "change_mm": -40.05389798971323,
+          "handedness": 0
+        },
+        {
+          "recording": "20201022-subject-10/20201022_111144",
+          "states": 59,
+          "baseline_mpjpe": 69.22761302883342,
+          "best_raw_mpjpe": 28.29091384047169,
+          "best_final_mpjpe": 28.35174774719497,
+          "change_mm": -40.87586528163845,
+          "handedness": 1
+        },
+        {
+          "recording": "20201022-subject-10/20201022_110947",
+          "states": 63,
+          "baseline_mpjpe": 110.27533746144128,
+          "best_raw_mpjpe": 55.54677297198583,
+          "best_final_mpjpe": 60.854723400539825,
+          "change_mm": -49.42061406090146,
+          "handedness": 1
+        },
+        {
+          "recording": "20200820-subject-03/20200820_135508",
+          "states": 71,
+          "baseline_mpjpe": 79.72853158225476,
+          "best_raw_mpjpe": 25.642109615702026,
+          "best_final_mpjpe": 26.888900884440247,
+          "change_mm": -52.83963069781451,
+          "handedness": 1
+        },
+        {
+          "recording": "20200918-subject-06/20200918_113137",
+          "states": 59,
+          "baseline_mpjpe": 102.68760810464116,
+          "best_raw_mpjpe": 25.795238721168648,
+          "best_final_mpjpe": 26.85324249429218,
+          "change_mm": -75.83436561034898,
+          "handedness": 1
+        },
+        {
+          "recording": "20201015-subject-09/20201015_142844",
+          "states": 72,
+          "baseline_mpjpe": 103.86867560280695,
+          "best_raw_mpjpe": 20.16912290785048,
+          "best_final_mpjpe": 21.007523940669167,
+          "change_mm": -82.86115166213779,
+          "handedness": 1
+        }
+      ]
+    }
+  },
+  "visual_training_fixed_subset": {
+    "indices": [
+      0,
+      3,
+      7,
+      10,
+      13,
+      16,
+      20,
+      23
+    ],
+    "state_counts_by_handedness": {
+      "1": 170,
+      "0": 40
+    },
+    "clip_counts_by_handedness": {
+      "1": 6,
+      "0": 2
+    },
+    "csv_fields": [
+      "clip_index",
+      "recording",
+      "hand",
+      "reference_index",
+      "frame_id",
+      "timestamp_seconds",
+      "frame_valid",
+      "complete_reference_valid",
+      "target_valid_17",
+      "raw_available_17",
+      "raw_wrist_mm",
+      "raw_root_deg",
+      "raw_finger_deg",
+      "raw_finger_count"
+    ]
+  },
+  "reference_evidence": {
+    "source_comparison_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/visual_joint_final_20261016/final_comparison_summary.json",
+    "comparison_sha256": "95391eb974962cc33d1de7a245b114edae743242fe15cc9d4c03195d99df6c57"
+  },
+  "scope": "Read-only actual training-window indexing and existing paired visual prediction reports; no new model inference, no optimizer, no model/checkpoint edits. Existing final test subset and fixed camera GT crop limitations retained."
+}
