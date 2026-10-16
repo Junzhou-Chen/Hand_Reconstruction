@@ -1,0 +1,225 @@
+{
+  "checked_utc": "2026-10-16T07:45:59.039218+00:00",
+  "pod": "jchen57-fineturn-tl4zr",
+  "baseline_visual_datasets": {
+    "hot3d": 573000,
+    "arctic": 165000,
+    "dexycb": 169000,
+    "ho3d": 66000
+  },
+  "baseline_source": "https://arxiv.org/html/2501.02973v1#S8.SS1",
+  "exact_author_frame_manifest_released": false,
+  "planned_optimizer_steps": 5000,
+  "training_launched": false,
+  "original_tiny_5k_launched": false,
+  "previous_mixed_run_status": {
+    "phase": "stopped",
+    "step": 100,
+    "target_steps": 1000,
+    "utc": "2026-10-16T07:14:26.469067+00:00",
+    "validation": {
+      "candidate/finger_deg": 16.26097806294759,
+      "candidate/root_deg": 4.516666030024623,
+      "candidate/wrist_mm": 15.382434741870776,
+      "clips": 8,
+      "current_nll": 53.19065334560635,
+      "final/finger_deg": 15.840477127212662,
+      "final/root_deg": 4.5176653432416485,
+      "final/wrist_mm": 15.879660073701325,
+      "final_mpjpe21_m": 0.018934503942728043,
+      "geometry_score": 0.1757811060896865,
+      "metric_counts": {
+        "candidate/finger_deg": 3330,
+        "candidate/root_deg": 222,
+        "candidate/wrist_mm": 222,
+        "current_nll": 222,
+        "final/finger_deg": 3330,
+        "final/root_deg": 222,
+        "final/wrist_mm": 222,
+        "final_mpjpe21_m": 4480,
+        "geometry_score": 222,
+        "raw/finger_deg": 3330,
+        "raw/root_deg": 222,
+        "raw/wrist_mm": 222,
+        "raw_wrist_geometry_m": 222,
+        "wrist_degradation_over_1mm": 222,
+        "xyz_90pct_ellipsoid_coverage": 222,
+        "xyz_std_mm": 222
+      },
+      "raw/finger_deg": 17.519570084305496,
+      "raw/root_deg": 4.856450574892062,
+      "raw/wrist_mm": 14.910397246077254,
+      "raw_wrist_geometry_m": 0.01491039702752689,
+      "valid_states": 222,
+      "wrist_degradation_over_1mm": 0.4819819841298971,
+      "xyz_90pct_ellipsoid_coverage": 0.2522522530577204,
+      "xyz_std_mm": 3.4802202684385284
+    },
+    "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/98ff0737"
+  },
+  "previous_checkpoint_cpu_audit_passed": true,
+  "source_policy_actual_two_source_check": {
+    "expected_two_sources": "passed",
+    "legacy_no_requirement": "passed",
+    "expected_four_sources": "correctly_rejected_missing_arctic_ho3d"
+  },
+  "hot3d_preprocessing": {
+    "process": {
+      "phase": "launched_preparation_only",
+      "pid": 3760,
+      "started_utc": "2026-10-16T07:34:42.516568+00:00",
+      "command": [
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+        "-u",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/code/visual_feedback_joint_v3_camera_20261016/scripts/prepare_hot3d_visual_sources.py",
+        "--hot-root",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/hot3d",
+        "--prepared",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--camera-toolkit",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/hand_tracking_toolkit_bc628e9",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_all_downloaded_v4_20261016",
+        "--workers",
+        "4",
+        "--skip-tar-rehash",
+        "--code-version",
+        "86f25ec842043bce2bcbdab17dbe539bacc3eef3"
+      ],
+      "output": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_all_downloaded_v4_20261016",
+      "training_launched": false,
+      "previous_attempt": {
+        "phase": "launched_preparation_only",
+        "pid": 3618,
+        "started_utc": "2026-10-16T07:29:36.259200+00:00",
+        "command": [
+          "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+          "-u",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/code/visual_feedback_joint_v3_camera_20261016/scripts/prepare_hot3d_visual_sources.py",
+          "--hot-root",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/hot3d",
+          "--prepared",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3",
+          "--mano-models",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+          "--camera-toolkit",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/hand_tracking_toolkit_bc628e9",
+          "--output",
+          "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_all_downloaded_v4_20261016",
+          "--workers",
+          "4",
+          "--skip-tar-rehash",
+          "--code-version",
+          "86f25ec842043bce2bcbdab17dbe539bacc3eef3"
+        ],
+        "output": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_all_downloaded_v4_20261016",
+        "training_launched": false
+      },
+      "retry_reason": "cv2 is in verified hawor_extra; include established runtime PYTHONPATH",
+      "log": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/hawor_training_source_alignment_20261016/hot3d_all_clips_prepare_retry1.log"
+    },
+    "latest_progress": {
+      "phase": "preparing",
+      "complete_clips": 340,
+      "total_clips": 1167,
+      "hand_records": 675
+    },
+    "final_manifest_exists": false
+  },
+  "arctic": {
+    "status": {
+      "dataset": "arctic",
+      "phase": "running",
+      "started_utc": "2026-10-16T07:43:43.934511+00:00",
+      "updated_utc": "2026-10-16T07:45:45.531446+00:00",
+      "total_bytes": null,
+      "known_total_bytes": 19757626032,
+      "present_bytes": 1025251120,
+      "counts": {
+        "pending": 337,
+        "downloading": 3,
+        "checking": 0,
+        "verified": 3,
+        "failed": 0
+      },
+      "errors": {}
+    },
+    "private_file_present": true,
+    "private_file_mode": "0o600",
+    "official_small_zip_sha_verified": true
+  },
+  "ho3d": {
+    "status": {
+      "dataset": "ho3d",
+      "version": "v2",
+      "phase": "downloading",
+      "started_utc": "2026-10-16T07:44:45.932780+00:00",
+      "official_readme": "https://github.com/shreyashampali/ho3d",
+      "official_share": "https://1drv.ms/f/c/11742dd40d1cbdc1/ElPb2rhOCeRMg-dFSM3iwO8B5nS1SgnQJs9F6l28G0pKKg?e=TMuxgr",
+      "archive": "HO3D_v2.zip",
+      "version_policy": "v2 candidate consistent with paper 66K; HaWoR exact version unpublished",
+      "training_allowed_yet": false,
+      "author_checksum_available": false,
+      "updated_utc": "2026-10-16T07:45:55.838012+00:00",
+      "page_title": "HO3D_v2 - OneDrive",
+      "suggested_filename": "HO3D_v2.zip",
+      "present_bytes": 1913417728
+    },
+    "process": {
+      "pid": 4390,
+      "started_utc": "2026-10-16T07:44:45.750570+00:00",
+      "command": [
+        "/sciclone/home/jchen57/.conda/envs/zhou/bin/python",
+        "-u",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/download_runtime/ho3d_playwright_1_56_0/download_ho3d_official.py",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/ho3d_v2"
+      ],
+      "script_sha256": "3f32d207087f5ad4b1a30c3f830e744e1017e6cba055c96362c619404c4fbe26",
+      "isolated_runtime": "/sciclone/data10/jchen57/Hand_Reconstruction/download_runtime/ho3d_playwright_1_56_0",
+      "training_launched": false,
+      "retry_reason": "select corresponding OneDrive row rather than clipped filename span",
+      "log": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/ho3d_v2/download_retry2.log"
+    },
+    "source_adapter_ready": false
+  },
+  "arctic_source_adapter_ready": false,
+  "existing_source_manifests": {
+    "original_dex": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_joint_sources_v2_20261016/source_manifest.json",
+      "sha256": "67462dced45615c9e0ea8d761da58094d03f8b8cadc47370c06f126751259d3e",
+      "phase": "complete",
+      "dataset": "dexycb",
+      "split_frames": null
+    },
+    "expanded_dex": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_expanded_v3_20261016/source_manifest.json",
+      "sha256": "8a7b498729111138132660a3f6031aea5e1e321f20d9e7a8022f819b136d9b8d",
+      "phase": "complete",
+      "dataset": "dexycb",
+      "split_frames": {
+        "train": 50861,
+        "val": 577
+      }
+    },
+    "hot_pilot": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_expanded_v3r2_20261016/source_manifest.json",
+      "sha256": "966aa71b50abe460702028313b18846c0a0be44f6e13a6a4a36e439032c5516e",
+      "phase": "complete",
+      "dataset": "hot3d",
+      "split_frames": {
+        "train": 22663,
+        "val": 3460
+      }
+    },
+    "old_mixed": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_hot_collection_v3_20261016/source_manifest.json",
+      "sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+      "phase": "complete",
+      "dataset": "mixed",
+      "split_frames": null
+    }
+  }
+}

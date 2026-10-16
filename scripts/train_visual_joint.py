@@ -29,6 +29,7 @@ from torch.utils.data import DataLoader, DistributedSampler, Subset
 
 from handloop.data.visual_clips import file_sha256
 from handloop.data.visual_rgb import VisualFeedbackRGBDataset, reference_geometry_metadata
+from handloop.data.visual_source_policy import require_visual_datasets
 from handloop.data.forecast_trajectory import ForecastTrajectoryWindows
 from handloop.data.trajectory import SourceBalancedSampler
 from handloop.models.probabilistic_twm import ProbabilisticTWM, ProbabilisticTWMConfig
@@ -297,6 +298,7 @@ def main():
     if args.allow_rgb_batch_size_change and not args.resume:
         parser.error('--allow-rgb-batch-size-change requires --resume')
     config = json.loads(args.config.read_text())
+    require_visual_datasets(args.source_manifest, config.get('required_visual_datasets'))
     visual_loss_config = VisualGeometryLossConfig.from_dict(config.get('visual_geometry_supervision'))
     if args.tracking_mode:
         config['tracking'].update(enabled=args.tracking_mode != 'disabled', mode=args.tracking_mode,
