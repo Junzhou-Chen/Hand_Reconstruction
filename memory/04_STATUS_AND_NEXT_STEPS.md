@@ -1,5 +1,13 @@
 # HandLoop 进展与下一步
 
+**2026-10-16最新：联合微调／TWM左右手深诊断完成，先分析后改法；未重新训练。** D37 10k、D40 1k均已结束，预选best300与last1000保持；本条替代下方仍待终点motion评估／继续D37训练的历史安排。新增三权重×1024固定val窗口×五种v3受损模式的完全配对评测，真实fullval577／test1015状态固定上下文换TWM／历史干预，逐轮几何与相机反算，以及train左／右各2条16帧录制的只读梯度probe，均完成且按各probe范围前后hash通过，无optimizer或权重变动。
+
+**现有证据是多个问题并存，不能唯一归因：** pretrain noisy左／右腕2.782／2.945mm，best3.548／3.689mm，两侧部分运动保持性变差；但同一真实saved-best历史／raw／candidate下jointbest62.512／26.561mm优于pretrain70.849／29.069mm，直接换回或冻结旧TWM不是已验证修复。前端camera逆尺度放大了少数尾部大错，左>500mm从baseline0变成best5／last6帧，最坏last最终腕4.201m；中位数改善不消除尾部风险。shape固定状态解码不是米级主因，但β上游训练路径仍未排除。局部camera final/raw定位目标冲突存在，却不是左手统一反号；只将NLL除51不会改变这些饱和moduleclip点的方向。历史质量、clip空历史启动、TWM quality未知及fixed8左19.05%仍需分开解释，不直接采纳删除history、重做左手预训或加步数。
+
+当前下一步是基于[完整诊断](../docs/JOINT_FAILURE_DEEP_DIAGNOSIS_2026-10-16.md)与[TWM保持性](../docs/TWM_HAND_RETENTION_DIAGNOSTIC_2026-10-16.md)讨论针对性修改／匹配消融；尚无新的loss、freeze、camera parameterization或门控决定。本轮保持99D、β另存、原GT／split和D38延后loss约定，不用test删帧或改选best。GT仍fitted MANO、视觉仍GTcrop固定camera短clip受控集，非完整ego／独立MoCap或等预算HaWoR-only消融。[聚合数值及SHA](../reports/joint_failure_deep_diagnosis_20261016.json)，远程`evaluations/joint_failure_deep_diagnosis_20261016/`；主实验88c7c00、梯度v2 5154594、camera11159dd、报表a72154d，原训练87a2bcc／eb8d0b9未改。
+
+以下同日覆盖／最终视觉评测及更早运行条目保留为历史；其中“未新推理”“尚无终点motion评估”仅描述当时阶段，现已由本条补充固定1024窗专项（仍非全部61,370个val窗口）。
+
 **2026-10-16左手问题定位更新（只读，未重训）：** D37预训练实际左317226/右319384可训练窗，约49.83/50.17%，四库均覆盖左手，且fullcoverage已跑16整遍；视觉train也左575/右553帧，不能将失败归因为没左手。test左原HaWoR MPJPE61.602→联合权重raw109.754→candidate60.209→final63.735mm，首先看到微调后视觉raw绝对定位退化，完整链路补偿但未稳胜原baseline；左最终腕/腕对齐仍改善，不等于整个左手先验无效。fixed8模型选择左40states/右170，test左5录制好4差/右7全好，存在少量验证与录制组成混杂。没有坐实镜像/编码/β bug；现行99D视觉目标不直接约束β或joint/mesh是候选因素，未据此改loss。下一步需分手别定位与匹配消融才能确定因果，不直接因该结果重做左手预训练；此项为诊断建议非新增已定训练方案。[完整诊断](../docs/LEFT_HAND_COVERAGE_AND_FAILURE_DIAGNOSIS_2026-10-16.md)、[实测记录](../reports/left_hand_diagnosis_20261016.json)。
 
 **D40训练与最终评测均已完成（2026-10-16 04:25:29UTC／纽约00:25）：** 训练eb8d0b9在03:49:16UTC正常complete1000；正式best为原fixed8预选step300，last1000作预定终点，未按test换权重。远程e72f7ed配对评测完成fullval24clips/577states/8录制与独立s0 test37clips/1015states/16录制。test官方HaWoR→best：腕76.335→46.187mm（−39.49%）、MPJPE21 70.532→48.194mm（−31.67%）、腕对齐14.480→11.414mm；fullval best腕85.266→38.265mm/MPJPE81.418→38.804mm。**test左手MPJPE61.60197→63.73519mm退化、右手81.26346→29.51666mm改善，平均收益不能写为双手普遍泛化。** 27.68%test状态MPJPE退化>1mm，best自身raw腕对齐退6.3344%；末轮candidate→final也退化，但candidate已含首轮TWM，不能据此否定整个TWM。test90%coverage best60.49%/last36.65%，未校准；last的MPJPE47.238mm点均值略好但对baseline的recording-bootstrap区间跨0。
@@ -148,7 +156,9 @@ Ume MANO有效741,099帧、native有效731,416帧；MANO有效但native absent/i
 
 双卡smoke实际26346→26446共100更新，随后真实DDP resume并仅对rank1发SIGTERM，两rank共同保存stopped26498；CPU检查163个model浮点张量及499个Adam递归浮点项（含超参，非499个张量）finite，两rank完整模型state的keys/dtype/shape/bytes SHA一致。正式迁移源是旧单卡latest26346，SHA256 `09a10b8f800cac5e8336da3a14cf69cfce9228ff8674be84182a84102e1bf27f`，不是smoke26498。正式run于19:47:53 UTC启动，launcher2963，rank0/1为2968/2969并使用GPU0/1；19:52:33 UTC actual step26450（迁移后104更新），四源实际累计抽取106,496=104×1024样本，各rank53,248且四源均正；该step loss0.0208302/梯度0.15867，早期435.9样本/s，不当稳态吞吐比较。updated checkpoint26350已独立CPU读取，163个model及489个AdamW浮点张量finite、Adam step26350；CPU重算完整模型hash与两rank及replica audit相等。19:52:47 UTC两卡瞬时util100%、显存38,172/36,686MiB，PID2968/2969；这不是长期利用率或峰值显存结论。严格逐样本resume未成立，sampler预取块/loader游标仍未完整保存。[运行与验收](../docs/TWM_DUAL_GPU_RUN_2026-10-14.md)、[摘要](../reports/twm_dual_gpu_20261014.json)。
 
-下一步按D37原配置继续至10k，跟踪14类固定验证的当前恢复、干净/近准观测保护与长预测；D37当前仅有合成观测历史验证，受控逐帧短片段、闭环回灌和真实HaWoR仍待验证。D36两epoch已完成，D34已停5,519步，D32已停3,110步及旧D29/D28均不恢复。历史仅留best；不自动重启旧run、重复下载或准备。D26/D27旧50k未完成，也不能把D25的50k挪作D26结果。之后仍需真实HaWoR误差、自身历史rollout、独立几何与基线验证。D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
+**历史阶段计划（已由D37完成、D40完成及顶部诊断替代，不是当前续训指令）：** 当时拟按D37原配置继续至10k，跟踪14类固定验证的当前恢复、干净/近准观测保护与长预测；当时仅有合成观测历史验证。D36两epoch已完成，D34已停5,519步，D32已停3,110步及旧D29/D28均不恢复。历史仅留best；不自动重启旧run、重复下载或准备。D26/D27旧50k未完成，也不能把D25的50k挪作D26结果。独立几何、长闭环与公平基线仍有后续缺口；D26替代单库范围，D27替代单卡执行，不废D18 glove/MoCap优先；HumanTouch/DexWild映射与质量验收仍为后续，D22 ARCTIC暂缓。所有实验远程，原始档案/旧run不覆盖。[四库执行协议](../docs/TWM_FOUR_SOURCE_RUN_2026-10-14.md)
+
+下表保留较早阶段安排，实际完成状态与当前未决问题以上方2026-10-16更新为准。
 
 | 阶段 | 具体工作 | 可检查的交付/验收 |
 |---|---|---|
