@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-16视觉插件职责与改进讨论完成（未改训）：** 用户要求重讲HaWoR状态流及改进空间；源码确认Z同时进入插件与两轮TWM，不仅使用图像feature。发现插件共享投影相加的局部角色对称、candidate-only局部查询与固定尺度、逐组图像质量尚缺及同帧分布反馈未用；未认定它们为误差主因。新增[插件复核与分阶段建议](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)，对照WiLoR／DIR／GeoHand全文与源码，优先建议角色／分歧、双假设取证、候选证据质量及逐阶段几何诊断，99D与纯数值TWM保持。仅代码／文献分析，无模型执行、训练修改或新架构落地。
+
 **2026-10-16纽约11:00，TWM数据扩容只读复核：** 用户要求看当前预训练来源与扩大可能性，未要求启动新训。原四库实际2788135 train手状态／636610重叠窗，D37完整10k后当前回放未变。ARCTIC已08:38纽约完成343/343，267官方train原参数有384780个双手状态（QC前，未适配入池）；HumanTouch约100h、DexWild人类7917ep／2924588transitions是公开候选，glove仍未参与训练。原motion loader只接17组完整GT，需先native骨架标定与partial监督支持；99D输出不用改。D37完整60步future覆盖Dex0／HOT49.96%／Ume83.60%／Oak96.45%，新增长连续运动值得验证，不据此断言仅量不足。建议ARCTIC先适配、并行glove小样本，等预算检验；未动正在运行的5k或loss／模型／采样。见[来源与边界](../docs/DATA_EXPANSION_SOURCE_AUDIT_2026-10-16.md)、[远程计数摘要](../reports/twm_data_pool_inventory_20261016.json)、[候选当前发布](../reports/twm_public_candidate_review_20261016.json)。
 
 **2026-10-16纽约10:26，两库5k中期只读核验：** 运行仍alive，快照1773/5000，最新fixed8验证1750，按既定geometry score选best1500。原始HaWoR腕46.412mm；best1500 final9.424mm（下降79.70%），自身β最终有效joint MPJPE12.173mm。最新1750的微调HaWoR raw腕9.770→final10.102mm，root3.917→3.596°、finger16.722→14.417°，final MPJPE12.431mm；腕校正仍轻度放大，不能把整体收益归因于TWM。1000步final MPJPE13.753→1500步12.173，随后波动；90%位置椭球覆盖最新仅50.90%，不确定性未校准。仅原固定8clips／222完整状态与4480有效joint，尚非全val／独立test或等预算消融；两卡1750 checkpoint模型hash相等。来源：[远程生成的进度摘要](../reports/visual_dex_hot_geometry_5k_progress_20261016.json)；配置／GT／坐标见[固定两库5k协议](../docs/VISUAL_DEX_HOT_GEOMETRY_5K_2026-10-16.md)。本轮未改参数、数据或训练进程，继续既定5k。
