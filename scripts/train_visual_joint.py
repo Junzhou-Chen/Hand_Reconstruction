@@ -392,8 +392,19 @@ def main():
     stop = {'requested': False}
     def request_stop(*unused): stop['requested'] = True
     signal.signal(signal.SIGTERM, request_stop); signal.signal(signal.SIGINT, request_stop)
+    last_saved = {'step': None, 'path': None}
 
     def save(step, is_best=False):
+        destination = args.output/('best.pt' if is_best else 'latest.pt')
+        if last_saved['step'] == step:
+            # Evaluation/break can request the same ~8GB state several times.
+            # Share the immutable inode until a later atomic replacement.
+            if rank == 0 and destination != last_saved['path']:
+                tmp = destination.with_suffix('.pt.tmp')
+                if tmp.exists(): tmp.unlink()
+                os.link(last_saved['path'], tmp); tmp.replace(destination)
+            if world > 1: dist.barrier()
+            return
         digest = model_hash(model)
         state = {'rank': rank, 'torch': torch.get_rng_state(), 'cuda': torch.cuda.get_rng_state(device),
                  'corruption': generator.get_state(), 'python': random.getstate(), 'numpy': np.random.get_state(),
@@ -412,11 +423,12 @@ def main():
                 'best_geometry_score': best, 'rank_states': states, 'code_version': args.code_version,
                 'frontend_assets': {'hawor_root': str(args.hawor_root), 'hawor_config': str(args.hawor_config),
                                     'mano_models': str(args.mano_models)}}
-            path = args.output/('best.pt' if is_best else 'latest.pt'); tmp = path.with_suffix('.pt.tmp')
+            path = destination; tmp = path.with_suffix('.pt.tmp')
             torch.save(payload, tmp); tmp.replace(path)
             atomic_json(args.output/'replica_checkpoint_audit.json',
                 {'utc': utc(), 'step': step, 'byte_equal': True, 'model_sha256': digest})
         if world > 1: dist.barrier()
+        last_saved.update(step=step, path=destination)
 
     epoch, step, started, exit_code = 0, start, time.monotonic(), 1
     sampler.set_epoch(epoch); rgb_iterator = iter(loader); motion_iterator = iter(motion_loader)
