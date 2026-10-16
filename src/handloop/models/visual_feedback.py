@@ -1,10 +1,11 @@
 """D33 visual readout feedback around a frozen, numerical-only TWM.
 
 The original HaWoR path runs once per image block, independently of feedback.
-This module consumes its REAL cached patch features and immutable raw states,
-then processes frames in chronological order. Only a completed final state is
-committed, once, for use by later frames. No target/GT argument exists on the
-forward path. Original HaWoR lookahead is retained: this is not an online claim.
+This module consumes REAL patch features and immutable raw states, cached or
+from a differentiable frontend, then processes frames chronologically. Optional
+within-frame refinement re-queries image evidence at candidate MANO joints.
+Only the final round is committed once for later frames. No target/GT argument
+exists on the forward path. Original HaWoR lookahead is retained.
 
 Coordinates use column vectors, metres, anatomical wrist J0 and column 6D.
 The visual adapter reads camera/crop geometry. TWM receives numerical states
@@ -15,7 +16,7 @@ diagonal Gaussian and final NLL are defined in that anchor, not world axes.
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 from torch import Tensor, nn
@@ -41,6 +42,10 @@ class VisualFeedbackConfig:
     rotation_delta_scale: float = 0.5
     detach_history: bool = True
     condition_on_beta: bool = False
+    # Legacy checkpoints/configs retain their original one-pass computation.
+    refinement_steps: int = 1
+    candidate_guided_queries: bool = False
+    local_patch_sigma: float = 0.25  # normalized effective-crop coordinates
 
 
 def transform_state(state: Tensor, transform: Tensor) -> Tensor:
@@ -190,11 +195,20 @@ class _ReadoutBlock(nn.Module):
                                  nn.Dropout(config.dropout), nn.Linear(config.dim_feedforward, d))
 
     def forward(self, query: Tensor, history: Tensor, history_padding: Tensor,
-                image: Tensor, image_padding: Tensor) -> Tensor:
+                image: Tensor, image_padding: Tensor, *,
+                local_attention_bias: Optional[Tensor] = None,
+                local_query_valid: Optional[Tensor] = None) -> Tensor:
         query = query + self.history_attention(self.history_norm(query), history, history,
                                                key_padding_mask=history_padding, need_weights=False)[0]
         query = query + self.image_attention(self.image_norm(query), image, image,
                                              key_padding_mask=image_padding, need_weights=False)[0]
+        if local_attention_bias is not None:
+            # Keep the global read above: a wrong projected candidate must not
+            # lock the model into a single incorrect neighborhood. Reuse the
+            # image attention parameters so legacy state-dict keys are unchanged.
+            local = self.image_attention(self.image_norm(query), image, image,
+                attn_mask=local_attention_bias, need_weights=False)[0]
+            query = query + local * local_query_valid[..., None].to(local.dtype)
         q = self.joint_norm(query)
         query = query + self.joint_attention(q, q, q, need_weights=False)[0]
         return query + self.ffn(self.ffn_norm(query))
@@ -211,6 +225,8 @@ class VisualFeedbackAdapter(nn.Module):
             raise ValueError("positive width divisible by heads and at least one layer required")
         if min(c.patch_grid_height, c.patch_grid_width, c.history_length) < 1:
             raise ValueError("patch grid and history length must be positive")
+        if c.refinement_steps < 1 or not c.local_patch_sigma > 0:
+            raise ValueError("refinement_steps and local_patch_sigma must be positive")
         self.joint_embedding = nn.Embedding(16, c.d_model)
         self.handedness_embedding = nn.Embedding(3, c.d_model)
         self.raw_projection = nn.Linear(11, c.d_model)
@@ -259,17 +275,25 @@ class VisualFeedbackAdapter(nn.Module):
                 history_uncertainty: Tensor, history_uncertainty_known: Tensor,
                 relative_time: Tensor, history_dt: Tensor, image_valid: Tensor,
                 handedness: Tensor, camera_intrinsics: Tensor,
-                crop_transform: Tensor) -> Tensor:
+                crop_transform: Tensor, candidate_camera: Optional[Tensor] = None,
+                candidate_availability: Optional[Tensor] = None,
+                joint_crop_coords: Optional[Tensor] = None,
+                joint_camera_depth: Optional[Tensor] = None,
+                joint_projection_valid: Optional[Tensor] = None) -> Tensor:
         b, patches, channels = patch_features.shape
         c = self.config
         if (patches, channels) != (c.patch_grid_height * c.patch_grid_width, c.image_feature_dim):
             raise ValueError("patch_features must match configured HaWoR patch grid and width")
-        safe_patches = torch.where(image_valid[:, None, None], patch_features.detach().float(), 0.0)
+        safe_patches = torch.where(image_valid[:, None, None], patch_features.float(), 0.0)
         if not bool(torch.isfinite(safe_patches).all()):
             raise ValueError("valid cached image patches must be finite")
         joint = self.joint_embedding.weight[None]
         query = self.raw_projection(torch.cat((_state_tokens(raw_camera, availability),
                                               _group_tokens(availability.float())), -1)) + joint
+        if candidate_camera is not None:
+            query = query + self.raw_projection(torch.cat((
+                _state_tokens(candidate_camera, candidate_availability),
+                _group_tokens(candidate_availability.float())), -1))
         query = query + self.handedness_embedding(handedness.long())[:, None]
         camera = self._crop_wrist(raw_camera, camera_intrinsics, crop_transform, availability[:, 0])
         query = query + self.camera_projection(camera)[:, None]
@@ -295,8 +319,27 @@ class VisualFeedbackAdapter(nn.Module):
         image = torch.cat((self.null_image.expand(b, -1, -1), image), 1)
         image_padding = torch.cat((torch.zeros(b, 1, dtype=torch.bool, device=image.device),
                                    (~image_valid)[:, None].expand(b, patches)), -1)
+        local_bias, local_valid = None, None
+        if c.candidate_guided_queries:
+            if any(value is None for value in
+                   (joint_crop_coords, joint_camera_depth, joint_projection_valid)):
+                raise ValueError("candidate-guided queries require MANO16 projection geometry")
+            if joint_crop_coords.shape != (b, 16, 2) or joint_camera_depth.shape != (b, 16):
+                raise ValueError("candidate projection must contain exactly MANO16 joints")
+            local_valid = joint_projection_valid.bool() & image_valid[:, None]
+            coords = torch.where(local_valid[..., None], joint_crop_coords.float(), 0.0)
+            depth = torch.where(local_valid, joint_camera_depth.float(), 0.0)
+            query = query + self.camera_projection(torch.cat((
+                coords, depth[..., None], local_valid.float()[..., None]), -1))
+            distance = (coords[..., None, :] - self.patch_positions[None, None]).square().sum(-1)
+            patch_bias = (-distance / (2 * c.local_patch_sigma ** 2)).clamp_min(-80.)
+            # A null token is always available, including out-of-crop queries.
+            local_bias = torch.cat((patch_bias.new_full((b, 16, 1), -4.), patch_bias), -1)
+            local_bias = local_bias.masked_fill(image_padding[:, None], float("-inf"))
+            local_bias = local_bias[:, None].expand(-1, c.nhead, -1, -1).reshape(b * c.nhead, 16, patches + 1)
         for block in self.blocks:
-            query = block(query, history, history_padding, image, image_padding)
+            query = block(query, history, history_padding, image, image_padding,
+                          local_attention_bias=local_bias, local_query_valid=local_valid)
         query = self.final_norm(query)
         delta = torch.cat((self.translation_head(query[:, 0]).float() * c.translation_delta_scale,
                            self.rotation_head(query).float().flatten(-2) * c.rotation_delta_scale), -1)
@@ -309,32 +352,40 @@ class VisualFeedbackSystem(nn.Module):
     """Sequential post-PAM visual plugin + final probabilistic TWM readout."""
 
     def __init__(self, twm: ProbabilisticTWM, config: Optional[VisualFeedbackConfig] = None,
-                 *, train_current_readout: bool = False):
+                 *, train_current_readout: bool = False,
+                 trainable_scope: Optional[str] = None):
         super().__init__()
         self.config = config or VisualFeedbackConfig()
         if self.config.default_dt <= 0 or self.config.max_gap_seconds <= 0:
             raise ValueError("default_dt and max_gap_seconds must be positive")
         self.adapter = VisualFeedbackAdapter(self.config)
         self.twm = twm
-        self.configure_trainable("current_readout" if train_current_readout else "adapter")
+        self.configure_trainable(trainable_scope or ("current_readout" if train_current_readout else "adapter"))
 
     def configure_trainable(self, mode: str = "adapter") -> "VisualFeedbackSystem":
-        """Keep motion core/future heads fixed, optionally unfreeze current heads."""
-        if mode not in ("adapter", "current_readout"):
-            raise ValueError("trainable mode must be adapter or current_readout")
+        """Legacy adapter/readout scopes, or explicit full TWM finetuning.
+
+        Full scope makes future parameters trainable too; a current-only loss
+        does not supervise them. The trainer must supply the motion replay or
+        future objective that is appropriate for its experiment.
+        """
+        if mode not in ("adapter", "current_readout", "full"):
+            raise ValueError("trainable mode must be adapter, current_readout or full")
+        self.trainable_scope = mode
         self.adapter.requires_grad_(True)
-        self.twm.requires_grad_(False)
+        self.twm.requires_grad_(mode == "full")
         if mode == "current_readout":
             for name in ("translation_head", "rotation_head", "state_translation_scale_head",
                          "state_rotation_concentration_head"):
                 getattr(self.twm, name).requires_grad_(True)
-        self.twm.eval()
+        self.twm.train(self.training if mode == "full" else False)
         return self
 
     def train(self, mode: bool = True) -> "VisualFeedbackSystem":
         super().train(mode)
         # Freezing parameters alone would leave frozen dropout active.
-        self.twm.eval()
+        if self.trainable_scope != "full":
+            self.twm.eval()
         return self
 
     def empty_history(self, batch_size: int, *, device: torch.device) -> FeedbackHistory:
@@ -346,7 +397,16 @@ class VisualFeedbackSystem(nn.Module):
              beta: Optional[Tensor] = None, beta_valid: Optional[Tensor] = None,
              reset: Optional[Tensor] = None, history: Optional[FeedbackHistory] = None,
              return_forecast: bool = False, use_adapter: bool = True,
-             adapter_history: bool = True) -> tuple[dict[str, Tensor], FeedbackHistory]:
+             adapter_history: bool = True,
+             joint_geometry: Optional[Callable[[Tensor, Tensor, Tensor], Tensor]] = None
+             ) -> tuple[dict[str, Tensor], FeedbackHistory]:
+        """Refine one frame in a fixed raw/history/anchor context.
+
+        ``joint_geometry(state_camera, beta, handedness)`` returns differentiable
+        MANO16 camera joints [B,16,3] in anatomical order. It must not return a
+        dataset-specific 21-joint order; the caller must map that explicitly.
+        Camera geometry remains in the visual branch, never a TWM input.
+        """
         b = raw_world.shape[0]
         if raw_world.shape != (b, 99):
             raise ValueError("raw_world must be [B,99]")
@@ -364,6 +424,8 @@ class VisualFeedbackSystem(nn.Module):
         availability = availability.bool() & active[:, None]
         image_valid = image_valid.bool() & active
         history = history or self.empty_history(b, device=raw_world.device)
+        if self.config.detach_history:
+            history = history.detach()
         if history.valid.shape != (b, self.config.history_length):
             raise ValueError("initial history has incompatible batch size/length")
         if not bool(torch.isfinite(torch.where(active, timestamps.double(), 0.0)).all()):
@@ -381,7 +443,10 @@ class VisualFeedbackSystem(nn.Module):
         has_history = history.valid[:, -1]
         timestamps = torch.where(active, timestamps.double(),
                                  history.timestamps[:, -1] + self.config.default_dt)
-        raw_clean = _masked_state(raw_world.detach(), availability)
+        # Raw is immutable, not detached: online HaWoR finetuning needs the
+        # final loss to reach its state and image-feature paths. Frozen/cached
+        # frontends supply non-gradient tensors and retain their old behavior.
+        raw_clean = _masked_state(raw_world, availability)
         last = history.state_world[:, -1]
         last_availability = history.availability[:, -1] & has_history[:, None]
         position = torch.where(availability[:, :1], raw_clean[:, :3], last[:, :3])
@@ -414,41 +479,83 @@ class VisualFeedbackSystem(nn.Module):
                                  self.config.default_dt).float()
         current_dt = torch.where(active, current_dt, self.config.default_dt)
         relative_time = torch.where(history.valid, history.timestamps - timestamps[:, None], 0.0).float()
-        # Geometry is re-expressed for the actual current view. No RGB or camera
-        # descriptors from this branch are passed into the motion model below.
-        if use_adapter:
-            # This ablation hides history ONLY from the visual addon; the TWM
-            # still receives the exact same completed self-history below.
-            addon_history_valid = history.valid if adapter_history else torch.zeros_like(history.valid)
-            addon_history_avail = history.availability & addon_history_valid[..., None]
-            delta = self.adapter(patch_features, transform_state(raw_clean, camera),
-                                 transform_state(history.state_world, camera),
-                                 availability=availability, history_availability=addon_history_avail,
-                                 history_valid=addon_history_valid, history_uncertainty=history.uncertainty,
-                                 history_uncertainty_known=history.uncertainty_known,
-                                 relative_time=relative_time, history_dt=hist_dt,
-                                 image_valid=image_valid, handedness=handedness,
-                                 camera_intrinsics=intrinsic, crop_transform=crop)
-        else:
-            delta = raw_clean.new_zeros(b, 51)
-        # Adapter dp/root updates are predicted in CURRENT CAMERA axes. Rotate
-        # those two vectors into the fixed anchor; finger updates stay local.
-        with torch.autocast(device_type=raw_world.device.type, enabled=False):
-            camera_to_anchor = world_to_anchor[:, :3, :3] @ camera[:, :3, :3].transpose(-1, -2)
-            dp = (camera_to_anchor @ delta[:, :3, None].float()).squeeze(-1)
-            root_dr = (camera_to_anchor @ delta[:, 3:6, None].float()).squeeze(-1)
-            delta_anchor = torch.cat((dp, root_dr, delta[:, 6:]), -1)
-        candidate_anchor = g.state_apply_delta(base_anchor, delta_anchor)
-        # A visual candidate may infer missing groups, but raw availability is
-        # untouched. With neither image nor history, unavailable slots stay masked.
-        candidate_availability = candidate_availability | (image_valid[:, None] & use_adapter)
+        # This ablation hides history ONLY from the visual addon; the TWM still
+        # receives the exact same completed self-history throughout all rounds.
+        addon_history_valid = history.valid if adapter_history else torch.zeros_like(history.valid)
+        addon_history_avail = history.availability & addon_history_valid[..., None]
+        raw_camera = transform_state(raw_clean, camera)
+        history_camera = transform_state(history.state_world, camera)
+        camera_to_anchor = world_to_anchor[:, :3, :3] @ camera[:, :3, :3].transpose(-1, -2)
         twm_beta = beta if self.config.condition_on_beta else None
-        output = self.twm(history_anchor, raw_anchor, candidate_anchor,
-                          history_valid=history.valid, history_availability=history.availability,
-                          availability=availability, candidate_availability=candidate_availability,
-                          dt=torch.cat((hist_dt, current_dt[:, None]), -1), beta=twm_beta,
-                          beta_valid=beta_valid if self.config.condition_on_beta else None,
-                          handedness=handedness, return_forecast=return_forecast)
+        rounds = self.config.refinement_steps if use_adapter else 1
+        candidate_anchor = base_anchor
+        round_states, round_candidates, round_coords, round_valid = [], [], [], []
+        for round_index in range(rounds):
+            projection = {}
+            coords = raw_clean.new_zeros(b, 16, 2)
+            projection_valid = torch.zeros(b, 16, device=raw_world.device, dtype=torch.bool)
+            candidate_camera = transform_state(transform_state(candidate_anchor, anchor_world), camera)
+            if use_adapter and self.config.candidate_guided_queries:
+                if joint_geometry is None or beta is None:
+                    raise ValueError("candidate-guided refinement requires joint_geometry and beta")
+                if beta.shape != (b, 10):
+                    raise ValueError("joint projection beta must be [B,10]")
+                if bool((image_valid & (handedness == 2)).any()):
+                    raise ValueError("candidate MANO geometry requires known handedness on image-valid frames")
+                shape_valid = active if beta_valid is None else (active & beta_valid.bool())
+                geometry_beta = torch.where(shape_valid[:, None], beta.float(), 0.0)
+                joints = joint_geometry(candidate_camera, geometry_beta, handedness)
+                if not isinstance(joints, Tensor) or joints.shape != (b, 16, 3):
+                    raise ValueError("joint_geometry must return MANO16 [B,16,3]; map 21-joint orders explicitly")
+                finite = torch.isfinite(joints).all(-1)
+                safe_joints = torch.where(finite[..., None], joints.float(), 0.0)
+                depth = safe_joints[..., 2]
+                pixels = (intrinsic[:, None] @ safe_joints[..., None]).squeeze(-1)
+                pixels = pixels / pixels[..., 2:3].clamp_min(1e-5)
+                crop_h = (crop[:, None] @ pixels[..., None]).squeeze(-1)
+                denominator = crop_h[..., 2:3]
+                coords = crop_h[..., :2] / torch.where(denominator.abs() > 1e-6, denominator, 1.0)
+                projection_valid = (finite & (depth > 1e-5) & torch.isfinite(coords).all(-1)
+                    & (coords.abs() <= 1).all(-1) & candidate_availability[:, :1]
+                    & candidate_availability[:, 1:] & image_valid[:, None])
+                coords = torch.where(projection_valid[..., None], coords, 0.0)
+                projection = {"joint_crop_coords": coords, "joint_camera_depth": depth,
+                              "joint_projection_valid": projection_valid}
+            if use_adapter:
+                condition_candidate = self.config.candidate_guided_queries or rounds > 1
+                delta = self.adapter(patch_features, raw_camera, history_camera,
+                    availability=availability, history_availability=addon_history_avail,
+                    history_valid=addon_history_valid, history_uncertainty=history.uncertainty,
+                    history_uncertainty_known=history.uncertainty_known,
+                    relative_time=relative_time, history_dt=hist_dt,
+                    image_valid=image_valid, handedness=handedness,
+                    camera_intrinsics=intrinsic, crop_transform=crop,
+                    candidate_camera=candidate_camera if condition_candidate else None,
+                    candidate_availability=candidate_availability if condition_candidate else None,
+                    **projection)
+            else:
+                delta = raw_clean.new_zeros(b, 51)
+            # dp/root increments are camera-axis vectors; fingers stay local.
+            with torch.autocast(device_type=raw_world.device.type, enabled=False):
+                dp = (camera_to_anchor @ delta[:, :3, None].float()).squeeze(-1)
+                root_dr = (camera_to_anchor @ delta[:, 3:6, None].float()).squeeze(-1)
+                delta_anchor = torch.cat((dp, root_dr, delta[:, 6:]), -1)
+            candidate_anchor = g.state_apply_delta(candidate_anchor, delta_anchor)
+            # Inference availability never changes the immutable raw mask.
+            candidate_availability = candidate_availability | (image_valid[:, None] & use_adapter)
+            output = self.twm(history_anchor, raw_anchor, candidate_anchor,
+                history_valid=history.valid, history_availability=history.availability,
+                availability=availability, candidate_availability=candidate_availability,
+                dt=torch.cat((hist_dt, current_dt[:, None]), -1), beta=twm_beta,
+                beta_valid=beta_valid if self.config.condition_on_beta else None,
+                handedness=handedness, return_forecast=return_forecast and round_index == rounds - 1)
+            round_candidates.append(transform_state(candidate_anchor, anchor_world))
+            round_states.append(transform_state(output["state"], anchor_world))
+            round_coords.append(coords)
+            round_valid.append(projection_valid)
+            # Refinement is differentiable across rounds, not physical time.
+            # No raw/history/anchor update occurs here, only the next candidate.
+            candidate_anchor = output["state"] if round_index < rounds - 1 else candidate_anchor
         state_world = transform_state(output["state"], anchor_world)
         # A rotated diagonal Gaussian generally has correlated world axes.
         # Keep the anchor std for likelihoods and expose its FULL world-space
@@ -460,10 +567,14 @@ class VisualFeedbackSystem(nn.Module):
                 @ rotation_world.transpose(-1, -2))
         output.update({"state_world": state_world, "anchor_world": anchor_world,
                        "state_translation_covariance_world": translation_covariance_world,
-                       "raw_world": raw_world.detach(), "candidate_world": transform_state(candidate_anchor, anchor_world),
+                       "raw_world": raw_world, "candidate_world": transform_state(candidate_anchor, anchor_world),
                        "adapter_delta": delta_anchor, "candidate_availability": candidate_availability,
                        "availability": availability, "frame_valid": active, "image_valid": image_valid,
-                       "history_count": history.valid.sum(-1), "history_reset": resets})
+                       "history_count": history.valid.sum(-1), "history_reset": resets,
+                       "refinement_states_world": torch.stack(round_states, 1),
+                       "refinement_candidates_world": torch.stack(round_candidates, 1),
+                       "refinement_joint_crop_coords": torch.stack(round_coords, 1),
+                       "refinement_joint_projection_valid": torch.stack(round_valid, 1)})
         if return_forecast:
             output["forecast_world"] = transform_state(output["forecast"], anchor_world)
             output["forecast_modes_world"] = transform_state(output["forecast_modes"], anchor_world)
@@ -483,7 +594,8 @@ class VisualFeedbackSystem(nn.Module):
                      beta: Optional[Tensor] = None, beta_valid: Optional[Tensor] = None,
                      reset: Optional[Tensor] = None, initial_history: Optional[FeedbackHistory] = None,
                      return_forecast: bool = False, use_adapter: bool = True,
-                     adapter_history: bool = True) -> dict:
+                     adapter_history: bool = True,
+                     joint_geometry: Optional[Callable[[Tensor, Tensor, Tensor], Tensor]] = None) -> dict:
         """Process cached [B,T,...] clips; pad frames never enter history.
 
         crop_transform maps source-image pixels to normalized [-1,1] in the
@@ -513,7 +625,7 @@ class VisualFeedbackSystem(nn.Module):
                 crop_transform=crop_transform[:, index], beta=shape, beta_valid=shape_valid,
                 reset=None if reset is None else reset[:, index], history=history,
                 return_forecast=return_forecast, use_adapter=use_adapter,
-                adapter_history=adapter_history)
+                adapter_history=adapter_history, joint_geometry=joint_geometry)
             results.append(output)
         # moe_load and its scalar balance are diagnostics with no batch axis.
         output = {key: torch.stack([result[key] for result in results], 1)

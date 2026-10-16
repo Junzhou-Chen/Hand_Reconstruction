@@ -1,4 +1,4 @@
-"""Frozen official HaWoR bridge, pinned to 66c7d4108d58a716deccd192cb7645170cdc7bd7.
+"""Official HaWoR bridge, pinned to 66c7d4108d58a716deccd192cb7645170cdc7bd7.
 
 The pretrained 16-frame ViT/IAM/head/PAM path never receives feedback. Cached
 IAM patches are actual image features, not projected model keypoints. This
@@ -60,22 +60,44 @@ class FrozenHaWoRBridge(nn.Module):
     """
 
     def __init__(self, model: nn.Module, codec: MANOStateCodec,
-                 *, provenance: dict[str, Any] | None = None) -> None:
+                 *, provenance: dict[str, Any] | None = None,
+                 trainable: bool = False, gradient_checkpointing: bool = False) -> None:
         super().__init__()
         self.model = model
         self.codec = codec
         self._provenance = provenance or {}
-        self.requires_grad_(False)
-        self.eval()
+        self.gradient_checkpointing = bool(gradient_checkpointing)
+        self.set_trainable(trainable)
+
+    def set_trainable(self, enabled: bool = True) -> "FrozenHaWoRBridge":
+        """Opt in to full image-network tuning; licensed MANO stays fixed.
+
+        The legacy class name and default frozen behavior are retained for
+        existing caches and official parity checks. Freezing parameters does
+        not require detaching candidate/shape inputs from MANO geometry.
+        """
+        self.trainable = bool(enabled)
+        self.model.requires_grad_(self.trainable)
+        # The official MANO wrapper is a geometry asset, not a visual backbone.
+        if isinstance(getattr(self.model, "mano", None), nn.Module):
+            self.model.mano.requires_grad_(False)
+            self.model.mano.eval()
+        self.codec.requires_grad_(False)
+        return self.train(self.trainable)
 
     def train(self, mode: bool = True) -> "FrozenHaWoRBridge":
-        super().train(False)
+        super().train(bool(mode) and self.trainable)
+        self.codec.eval()
+        if isinstance(getattr(self.model, "mano", None), nn.Module):
+            self.model.mano.eval()
         return self
 
     @classmethod
     def from_pretrained(cls, repo_root: str | Path, checkpoint_path: str | Path,
                         config_path: str | Path, mano_model_dir: str | Path,
-                        *, device: str | torch.device = "cuda:0") -> "FrozenHaWoRBridge":
+                        *, device: str | torch.device = "cuda:0",
+                        trainable: bool = False,
+                        gradient_checkpointing: bool = False) -> "FrozenHaWoRBridge":
         """Load public weights and caller-supplied licensed MANO assets.
 
         Repo import paths are explicit; no package stubs or rewritten official
@@ -137,7 +159,9 @@ class FrozenHaWoRBridge(nn.Module):
                                f"unexpected={incompatible.unexpected_keys}")
         codec = MANOStateCodec(mano_dir / "MANO_RIGHT.pkl", mano_dir / "MANO_LEFT.pkl",
                                left_shapedirs_fix=True)
-        bridge = cls(model, codec, provenance={"official_revision": HAWOR_REVISION,
+        bridge = cls(model, codec, trainable=trainable,
+            gradient_checkpointing=gradient_checkpointing,
+            provenance={"official_revision": HAWOR_REVISION,
             "verified_git_revision": revision, "checkpoint_path": str(checkpoint),
             "verified_source_git_blobs": source_blobs,
             "config_path": str(config), "source_path": str(root),
@@ -150,10 +174,17 @@ class FrozenHaWoRBridge(nn.Module):
                 "temporal_context": "16 bidirectional frames; last padding repeats final frame",
                 "feature": "post-IAM 16x12 raster patches, each 1280 channels",
                 "raw_pose": "post-PAM absolute rotation matrices",
+                "trainable_image_network": self.trainable,
+                "gradient_checkpointing": self.gradient_checkpointing,
                 "rgb_enters_twm": False}
 
-    @torch.no_grad()
     def forward(self, batch: dict[str, Tensor]) -> dict[str, Tensor]:
+        # Eval mode and autograd are separate: a trainable bridge can be
+        # evaluated under no_grad, while the legacy bridge is always frozen.
+        with torch.set_grad_enabled(torch.is_grad_enabled() and self.trainable):
+            return self._forward_impl(batch)
+
+    def _forward_impl(self, batch: dict[str, Tensor]) -> dict[str, Tensor]:
         image = batch["img"]
         if image.ndim != 5 or tuple(image.shape[1:]) != (16, 3, 256, 256):
             raise ValueError("img must be [B,16,3,256,256] normalized official crops")
@@ -173,7 +204,12 @@ class FrozenHaWoRBridge(nn.Module):
         if (scale <= 0).any() or (focal <= 0).any():
             raise ValueError("scale/focal must be positive, including finite missing-frame placeholders")
         bbox = self.model.bbox_est(center, scale, focal, img_center)
-        feature = self.model.backbone(image.flatten(0, 1)[:, :, :, 32:-32]).float()
+        backbone_input = image.flatten(0, 1)[:, :, :, 32:-32]
+        if self.gradient_checkpointing and self.training and torch.is_grad_enabled():
+            from torch.utils.checkpoint import checkpoint
+            feature = checkpoint(self.model.backbone, backbone_input, use_reentrant=False).float()
+        else:
+            feature = self.model.backbone(backbone_input).float()
         if feature.shape[1:] != (1280, 16, 12):
             raise RuntimeError(f"Unexpected official ViT features {tuple(feature.shape)}")
         if self.model.st_module is not None:
@@ -193,8 +229,8 @@ class FrozenHaWoRBridge(nn.Module):
         # Mirror tx back into the original image frame. Unlike official code's
         # key-presence test, mixed left/right batches are handled per frame.
         right = batch["is_right"].bool()
-        camera = camera.clone()
-        camera[:, 1] = torch.where(right.flatten(), camera[:, 1], -camera[:, 1])
+        camera = torch.stack((camera[:, 0],
+            torch.where(right.flatten(), camera[:, 1], -camera[:, 1]), camera[:, 2]), dim=-1)
         translation = self.model.get_trans(camera, original_center, scale, focal, img_center).squeeze(1).reshape(b, t, 3)
         beta = beta.reshape(b, t, 10)
         raw_world = self.codec.from_hawor(rotations, translation, beta, right, batch["camera_to_world"])

@@ -1,4 +1,4 @@
-"""RGB crops -> frozen official HaWoR -> feedback -> final state distribution.
+"""RGB crops -> official HaWoR -> feedback -> final state distribution.
 
 Bounding boxes and camera poses are explicit frontend inputs. The original
 HaWoR detector/SLAM can supply them; this module does not invent camera poses
@@ -24,7 +24,7 @@ def effective_crop_transform(full_crop_transform: Tensor) -> Tensor:
 
 
 class HandLoopFeedbackPipeline(nn.Module):
-    """Frozen RGB feature path plus a trainable visual feedback readout.
+    """Frozen by default; the bridge may explicitly enable full HaWoR tuning.
 
     ``forward`` expects prepared 16-frame crops and real camera/crop metadata.
     ``run_track`` reads RGB files using the official crop preprocessing. Both
@@ -40,8 +40,33 @@ class HandLoopFeedbackPipeline(nn.Module):
 
     def train(self, mode: bool = True):
         super().train(mode)
-        self.frontend.eval()
+        # FrozenHaWoRBridge itself enforces its explicit trainability scope.
+        self.frontend.train(mode)
         return self
+
+    def joint_geometry(self, state_camera: Tensor, beta: Tensor,
+                       handedness: Tensor) -> Tensor:
+        """The 16 MANO skeletal joints, in their rotation-parameter order.
+
+        MANOStateCodec.geometry deliberately returns MANO16, not an arbitrary
+        first-16 selection from a reordered 21-joint dataset skeleton.
+        """
+        return self.frontend.codec.geometry(state_camera, beta, handedness.bool())['joints']
+
+    def _observe(self, batch: dict[str, Tensor]) -> dict[str, Tensor]:
+        """Preserve official 16-frame blocks within a longer training clip."""
+        image = batch['img']
+        if image.ndim != 5 or image.shape[1] < 16 or image.shape[1] % 16:
+            raise ValueError('Prepared RGB clips need [B,T,3,256,256] with T a positive multiple of 16')
+        # Deliberate allowlist: target_world/target_valid never reach HaWoR.
+        names = ('img', 'center', 'center_unflipped', 'scale', 'img_focal', 'img_center',
+                 'is_right', 'camera_to_world', 'detected', 'bbox_valid', 'frame_valid', 'image_valid')
+        pieces: dict[str, list[Tensor]] = {}
+        for start in range(0, image.shape[1], 16):
+            block = {key: batch[key][:, start:start + 16] for key in names}
+            for key, value in self.frontend(block).items():
+                pieces.setdefault(key, []).append(value)
+        return {key: torch.cat(values, dim=1) for key, values in pieces.items()}
 
     def forward(self, batch: dict[str, Tensor], *, initial_history: Optional[FeedbackHistory] = None,
                 return_forecast: bool = False, use_adapter: bool = True,
@@ -52,7 +77,7 @@ class HandLoopFeedbackPipeline(nn.Module):
         crop_transform[B,16,3,3] already normalized to the effective crop,
         optional reset[B,16]. Other batch entries follow FrozenHaWoRBridge.
         """
-        observed = self.frontend(batch)
+        observed = self._observe(batch)
         output = self.feedback.forward_clip(
             observed['image_features'], observed['raw_state_world'],
             timestamps=batch['timestamps'], frame_valid=observed['frame_valid'],
@@ -62,7 +87,12 @@ class HandLoopFeedbackPipeline(nn.Module):
             world_to_camera=inverse_rigid(observed['camera_to_world']),
             camera_intrinsics=batch['intrinsics'], crop_transform=batch['crop_transform'],
             beta=observed['beta'], reset=batch.get('reset'), initial_history=initial_history,
-            return_forecast=return_forecast, use_adapter=use_adapter, adapter_history=adapter_history)
+            return_forecast=return_forecast, use_adapter=use_adapter, adapter_history=adapter_history,
+            joint_geometry=self.joint_geometry)
+        output['raw_world'] = observed['raw_state_world']
+        output['availability'] = observed['raw_available']
+        output['frame_valid'] = observed['frame_valid']
+        output['beta'] = observed['beta']
         output['detected'] = observed['detected']
         output['bbox_valid'] = observed['bbox_valid']
         return output
@@ -111,7 +141,12 @@ class HandLoopFeedbackPipeline(nn.Module):
             beta=observed['beta'][None],
             reset=None if reset is None else torch.as_tensor(reset, device=device, dtype=torch.bool)[None],
             initial_history=initial_history, return_forecast=return_forecast,
-            use_adapter=use_adapter, adapter_history=adapter_history)
+            use_adapter=use_adapter, adapter_history=adapter_history,
+            joint_geometry=self.joint_geometry)
+        output['raw_world'] = observed['raw_state_world'][None]
+        output['availability'] = observed['raw_available'][None]
+        output['frame_valid'] = observed['frame_valid'][None]
+        output['beta'] = observed['beta'][None]
         output['detected'] = observed['detected'][None]
         output['bbox_valid'] = observed['bbox_valid'][None]
         return output
