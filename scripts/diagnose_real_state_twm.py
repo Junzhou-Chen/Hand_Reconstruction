@@ -75,6 +75,13 @@ def collect(prediction_dir, baseline_dir, manifest):
         n = int(payload['unpadded_frames'])
         indices = payload['reference_indices'][:n].long()
         timestamps = reference_times[indices]
+        gaps = timestamps[1:] - timestamps[:-1]
+        if bool(((gaps <= 0) | (gaps > .25)).any()):
+            raise ValueError('Explicitly reconstruct resets before evaluating clips with time gaps')
+        if not bool((payload['handedness'][0, :n] == payload['handedness'][0, 0]).all()):
+            raise ValueError('Explicitly reconstruct resets before evaluating mixed-hand clips')
+        if not bool(payload['frame_valid'][0, :n].all()):
+            raise ValueError('Unpadded frames must be active')
         if not bool(payload['target_valid'][0, :n].all()):
             raise ValueError('This diagnostic needs complete paired reference states')
         if not bool(payload['availability'][0, :n].all()) or not bool(baseline['availability'][0, :n].all()):
@@ -225,7 +232,14 @@ def main():
             if control == 'joint_saved_history':
                 difference = errors(states, saved)
                 measured['saved_replay_difference'] = {k: {'mean': float(v.mean()), 'max': float(v.max())} for k, v in difference.items()}
-                if label == 'best' and (float(difference['wrist_mm'].max()) > 1.0 or float(difference['root_deg'].max()) > .25):
+                measured['saved_replay_difference_by_hand'] = {}
+                for side, code in [('left', 0), ('right', 1)]:
+                    mask = torch.tensor([f['hand'] == code for f in frames], device=device)
+                    measured['saved_replay_difference_by_hand'][side] = {
+                        k: {'mean': float(v[mask].mean()), 'max': float(v[mask].max())}
+                        for k, v in difference.items()}
+                if label == 'best' and (float(difference['wrist_mm'].max()) > 1.0 or float(difference['root_deg'].max()) > .25
+                                        or float(difference['finger_deg'].max()) > .5):
                     raise ValueError('Saved best replay parity failed; do not interpret interventions')
             result['controls'][control] = measured
             torch.save({'state_world': states.cpu(), 'frames': frames, 'control': control,
