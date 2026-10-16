@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+2026-10-16下一轮训练分析：记录用户“以原生baseline→final的平均纠正为主，无逐帧保证要求”，复核已有20点fixed8曲线、46clip／1128帧的小视觉池与scheduler；补查可用group的预训练raw=candidate和真实多轮条件差异。核官方HaWoR compute_loss（其3D为root-relative，不自动约束绝对深度）、StableHand、PoseBERT、DIP、DF、WHAM与WestWorld训练协议，提出数据覆盖、raw绝对腕／finaljoint监督、条件／历史对齐、回放和3k/5k版本化预算的单因素建议。新增[下一轮训练分析](../docs/NEXT_TRAINING_ANALYSIS_2026-10-16.md)，更新入口／02／04；未实施新loss／采样／schedule／权重／checkpoint选择，未新训或做模型推理，不将候选写成用户决定。
+
 2026-10-16联合失败深诊断完成：按用户“先充分分析、再讨论怎么改”，在授权Pod完成冻结三权重（D37best10000、D40预选best300、last1000）×1024固定val窗口×五种原v3模式配对评测，原视觉val577／test1015状态的固定raw/candidate/完成history换TWM及oracle/empty控制，逐轮几何／shape分解、官方camera逆尺度反算，以及train两侧各2条16帧录制的eval只读梯度。输入／目标hash和各probe范围前后模型／源checkpoint／被测参数hash通过；无optimizer、无训练或权重变动。执行88c7c00、梯度5154594、camera11159dd、聚合a72154d，与原训练87a2bcc／eb8d0b9分开。
 
 关键结论保留两面证据：pretrain noisy左／右腕2.782／2.945→jointbest3.548／3.689mm，两侧部分保持退化；但同一真实savedbest上下文，jointbest62.512／26.561优于pretrain70.849／29.069mm，不能直接换回旧TWM。少数camera尺度低估经逆比例放大到米级，左>500mm baseline0／best5／last6帧，最坏last final腕4.201m，不删样本或换best。shape固定状态控制不支持米级主因，β上游作用未排除；局部camera final/raw冲突非统一左反号；NLL/51后仍饱和moduleclip，不能据1020系数比直接修复。短history／quality未知／fixed8左19%与单subject梯度的限制同报，没有唯一根因或新loss/freeze/camera/history方案决定。
