@@ -78,7 +78,13 @@ def gradient_groups(pipeline):
         'adapter': pipeline.feedback.adapter,
         'twm_encoder': pipeline.feedback.twm.encoder,
         'twm_current': pipeline.feedback.twm.translation_head,
+        'twm_rotation': pipeline.feedback.twm.rotation_head,
         'twm_future': pipeline.feedback.twm.future_decoder,
+        'twm_future_velocity': pipeline.feedback.twm.future_translation_velocity_head,
+        'twm_future_scale': pipeline.feedback.twm.future_translation_scale_head,
+        'twm_future_rotation': pipeline.feedback.twm.future_rotation_velocity_head,
+        'twm_future_concentration': pipeline.feedback.twm.future_rotation_concentration_head,
+        'twm_mixture': pipeline.feedback.twm.mixture_head,
     }
 
 

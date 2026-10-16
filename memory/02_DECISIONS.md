@@ -58,6 +58,8 @@
 
 ## 已替代的历史路线
 
+**D39（2026-10-16 UTC／纽约10-15，用户明确执行决定）：** 用户要求HaWoR与TWM两个主干以低学习率全量微调，与新增插件协调；使用已完成D37预训练，并先实现当前讨论框架、跑起来看效果。此决定替代D35视觉阶段双主干冻结的首版执行范围及“先固定HaWoR”的后续默认建议。保留TWM纯数值、99D＋β另存、raw/candidate/history分离；本轮具体两轮candidate-guided取证、adapter/TWM/HaWoR学习率1e-4/1e-5/1e-6、3:1独立motion replay与1000更新pilot属于工程配置，非已证最优。独立w/q校准未因本次要求自动变成已实现；D38延后loss重设计保留，视觉阶段沿单一current NLL、motion replay沿D37原目标。[新协议与实际验收](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
+
 | 历史方案 | 当前处理 | 替代依据 |
 |---|---|---|
 | RGB-D 优先，再拓展 RGB | 第一版头戴 RGB；推理不依赖 depth sensor | D03、D07；START §1 |
