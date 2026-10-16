@@ -1,8 +1,8 @@
 {
   "schema": "handloop.data_geometry_v3.acceptance.v1",
   "created_utc": "2026-10-16T06:23:39.622162+00:00",
-  "status": "data_preparation_and_acceptance",
-  "training_started": false,
+  "status": "data_geometry_acceptance_complete_and_production_training_running",
+  "training_started": true,
   "motion_pool_changed": false,
   "data": {
     "dex": {
@@ -27,6 +27,30 @@
       "states": {
         "train": 300,
         "val": 300
+      }
+    },
+    "hot_expanded": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_expanded_v3r2_20261016/source_manifest.json",
+      "sha256": "966aa71b50abe460702028313b18846c0a0be44f6e13a6a4a36e439032c5516e",
+      "phase": "complete",
+      "code_version": "86f25ec842043bce2bcbdab17dbe539bacc3eef3",
+      "records": {
+        "train": 172,
+        "val": 25
+      },
+      "states": {
+        "train": 22663,
+        "val": 3460
+      },
+      "unique_rgb_images": {
+        "train": 12791,
+        "val": 1948
+      },
+      "rejected_hand_clips": 1,
+      "projection_precision": {
+        "rotated_pinhole_projection_max_error_px": 5.820766091346741e-11,
+        "float32_export_in_frame_max_error_px": 0.0004066957800432647,
+        "sampling_map_equivalence_max_error_px": 9.094947017729282e-13
       }
     }
   },
@@ -61,6 +85,114 @@
         "padding_not_committed": true,
         "one_commit_per_real_frame": true
       }
+    },
+    "mixed_rgb_geometry_contract.json": {
+      "passed": true,
+      "scope": "real two-source train-only same-batch full-backbone forward/backward; no optimizer or accuracy claim; distributed reduction verified separately",
+      "trainable_parameter_count": 708688515,
+      "measurements": {
+        "current_nll/count": 16,
+        "current_nll": 11430.39453125,
+        "raw_wrist_geometry_m/count": 16,
+        "raw_wrist_geometry_m": 0.0737353265285492,
+        "final_mpjpe21_m/count": 328,
+        "final_mpjpe21_m": 0.14798503968773818
+      },
+      "gradients": {
+        "hawor_vit": {
+          "connected_tensors": 389,
+          "norm": 49.104164123535156,
+          "finite": true
+        },
+        "hawor_iam": {
+          "connected_tensors": 76,
+          "norm": 49.331581115722656,
+          "finite": true
+        },
+        "hawor_head": {
+          "connected_tensors": 111,
+          "norm": 362.38641357421875,
+          "finite": true
+        },
+        "hawor_pam": {
+          "connected_tensors": 76,
+          "norm": 32.790279388427734,
+          "finite": true
+        },
+        "adapter": {
+          "connected_tensors": 72,
+          "norm": 58.012901306152344,
+          "finite": true
+        },
+        "twm_encoder": {
+          "connected_tensors": 263,
+          "norm": 12.357383728027344,
+          "finite": true
+        },
+        "twm_current": {
+          "connected_tensors": 2,
+          "norm": 35.75510787963867,
+          "finite": true
+        },
+        "twm_rotation": {
+          "connected_tensors": 2,
+          "norm": 44.068885803222656,
+          "finite": true
+        },
+        "twm_future": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        },
+        "twm_future_velocity": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        },
+        "twm_future_scale": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        },
+        "twm_future_rotation": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        },
+        "twm_future_concentration": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        },
+        "twm_mixture": {
+          "connected_tensors": 0,
+          "norm": 0.0,
+          "finite": true
+        }
+      },
+      "readout_gradients": {
+        "camera": {
+          "norm": 351.449462890625,
+          "connected_tensors": 2
+        },
+        "beta": {
+          "norm": 2.00992488861084,
+          "connected_tensors": 2
+        }
+      },
+      "output_gradients": {
+        "raw_world": 9.047563552856445,
+        "state_world": 4.9981913566589355,
+        "beta": 0.01630754955112934
+      },
+      "connected_parameter_tensors": 1007,
+      "parameters_unchanged": true,
+      "source_checkpoints_unchanged": true,
+      "all_present_parameter_gradients_finite": true,
+      "mixed_default_collate": true,
+      "source_manifests_unchanged": true,
+      "peak_allocated_bytes": 17436585984,
+      "code_version": "d634999"
     }
   },
   "train_only_gradient_probes": {
@@ -208,7 +340,305 @@
     }
   },
   "known_failures_retained": [
-    "geometry_ddp.log: empty-input test fixture, fixed7e1535c; v2 passes",
-    "hot_full_prepare.log: camera projection precision check; under repair"
-  ]
+    "geometry_ddp.log empty-input test fixture fixed7e1535c; v2 both ranks pass",
+    "hot_full_prepare.log float32 camera precision false check fixed86f25ec; full99 clip r2 preparation and collection acceptance pass"
+  ],
+  "camera_precision_diagnosis": {
+    "counts": {
+      "in_frame_landmarks": 491156,
+      "nonpositive_frame": 109,
+      "old_check_failing_frames": 20,
+      "positive_frames": 29591,
+      "published_positive_landmarks": 591820
+    },
+    "metrics": {
+      "export_float32_max_px_in_frame": 0.0004066957800432647,
+      "export_float32_max_px_positive": 6.023620118648978,
+      "json_float64_rotation_algebra_max_px_positive": 2.759043127298355e-07,
+      "old_transpose_vs_inverse_max_px_in_frame": 6.16766811845082e-05,
+      "old_transpose_vs_inverse_max_px_positive": 2.108900182734942
+    },
+    "model_or_optimizer_used": false,
+    "phase": "complete",
+    "reference_manifest": {
+      "bytes": 43542255,
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+      "sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0"
+    },
+    "rgb_publication": false,
+    "selection": {
+      "cap_selection": "evenly spaced sorted metadata IDs",
+      "clips_per_parent_cap": 1,
+      "hawor_excluded_recordings": [
+        "P0001_8d136980",
+        "P0001_9b6feab7",
+        "P0001_a68492d5",
+        "P0002_016222d1",
+        "P0002_2ea9af5b",
+        "P0002_65085bfc",
+        "P0009_02511c2f",
+        "P0010_0ecbf39f",
+        "P0010_160e551c",
+        "P0010_1c9fe708",
+        "P0010_41c4c626",
+        "P0010_924e574e",
+        "P0011_11475e24",
+        "P0011_47878e48",
+        "P0011_72efb935",
+        "P0011_76ea6d47",
+        "P0011_cee8fe4f",
+        "P0012_119de519",
+        "P0012_130a66e1",
+        "P0012_476bae57",
+        "P0012_915e71c6",
+        "P0012_d85e10f6",
+        "P0012_f7e3880b",
+        "P0014_24cb3bf0",
+        "P0014_8254f925",
+        "P0014_84ea2dcc",
+        "P0015_42b8b389"
+      ],
+      "motion_split_seed": 20261014,
+      "parents_per_split_cap": 0,
+      "rule": "preserve existing pure-motion parent recording split, no test-dependent selection",
+      "selected_clips": 99,
+      "selected_parents": 99,
+      "source_stream": "Aria RGB214-1 only; Quest3 monochrome excluded"
+    }
+  },
+  "updated_utc": "2026-10-16T07:00:45.832092+00:00",
+  "native_motion_admission": {
+    "dataset": "humantouch",
+    "audit_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/data_expansion_geometry_v3_20261016/humantouch_native_audit.json",
+    "structural_pass": true,
+    "ready_for_training": false,
+    "source_revision": "81822a10cac5def2638db546eaeced581d71a8b5",
+    "frames": 1597,
+    "downloaded_files": 3,
+    "downloaded_bytes": 6379522,
+    "status": "native sample audited; mapping, rest frames, tracker-anatomical wrist calibration and subject split unresolved; not in full99D trainer"
+  },
+  "collection_acceptance": {
+    "code_revision": "86f25ec842043bce2bcbdab17dbe539bacc3eef3",
+    "collection_checks": {
+      "all_image_reference_bytes_preserved": true,
+      "per_record_geometry_protocol_preserved": true,
+      "physical_parent_train_val_disjoint": true,
+      "source_manifests_unchanged": true,
+      "test_records_absent": true
+    },
+    "completed_utc": "2026-10-16T06:49:23.429412+00:00",
+    "dataset_split_frames": {
+      "dexycb": {
+        "train": 50861,
+        "val": 577
+      },
+      "hot3d": {
+        "train": 22663,
+        "val": 3460
+      }
+    },
+    "hot_source": {
+      "float32_export_checked_in_frame_landmarks": 491009,
+      "float32_export_in_frame_max_error_px": 0.0004066957800432647,
+      "rejected_hand_clips": 1,
+      "rotated_pinhole_projection_max_error_px": 5.820766091346741e-11,
+      "split_frames": {
+        "train": 22663,
+        "val": 3460
+      },
+      "split_hand_frames": {
+        "train": {
+          "left": 11012,
+          "right": 11651
+        },
+        "val": {
+          "left": 1570,
+          "right": 1890
+        }
+      },
+      "split_records": {
+        "train": 172,
+        "val": 25
+      },
+      "unique_rgb_images": 14739
+    },
+    "loader_counts": {
+      "train": {
+        "dataset_hand_counts": {
+          "dexycb/left": {
+            "hand_records": 400,
+            "reference_frames": 25474,
+            "valid_frames_across_windows": 25474,
+            "windows": 990
+          },
+          "dexycb/right": {
+            "hand_records": 400,
+            "reference_frames": 25387,
+            "valid_frames_across_windows": 25387,
+            "windows": 990
+          },
+          "hot3d/left": {
+            "hand_records": 86,
+            "reference_frames": 11012,
+            "valid_frames_across_windows": 11012,
+            "windows": 388
+          },
+          "hot3d/right": {
+            "hand_records": 86,
+            "reference_frames": 11651,
+            "valid_frames_across_windows": 11651,
+            "windows": 405
+          }
+        },
+        "hand_records": 972,
+        "reference_frames": 73524,
+        "windows": 2773
+      },
+      "val": {
+        "dataset_hand_counts": {
+          "dexycb/left": {
+            "hand_records": 2,
+            "reference_frames": 143,
+            "valid_frames_across_windows": 143,
+            "windows": 6
+          },
+          "dexycb/right": {
+            "hand_records": 6,
+            "reference_frames": 434,
+            "valid_frames_across_windows": 434,
+            "windows": 18
+          },
+          "hot3d/left": {
+            "hand_records": 12,
+            "reference_frames": 1570,
+            "valid_frames_across_windows": 1570,
+            "windows": 54
+          },
+          "hot3d/right": {
+            "hand_records": 13,
+            "reference_frames": 1890,
+            "valid_frames_across_windows": 1890,
+            "windows": 65
+          }
+        },
+        "hand_records": 33,
+        "reference_frames": 4037,
+        "windows": 143
+      }
+    },
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_hot_collection_v3_20261016/source_manifest.json",
+    "manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+    "neural_network_or_optimizer_constructed": false,
+    "original_dex_val_byte_identity_passed": true,
+    "original_dex_val_frames": 577,
+    "original_dex_val_recordings": 8,
+    "phase": "complete",
+    "publication": {
+      "counts": {
+        "hardlink_immutable_source": 67182
+      },
+      "policy": "hardlink immutable source; copy only for EXDEV; no symlink",
+      "unique_files": 67182
+    },
+    "real_rgb_crop_checks": [
+      {
+        "dataset": "dexycb",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "dex21",
+        "rgb_finite": true,
+        "side": "left",
+        "split": "train",
+        "valid_frames": 32,
+        "window_index": 4
+      },
+      {
+        "dataset": "dexycb",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "dex21",
+        "rgb_finite": true,
+        "side": "right",
+        "split": "train",
+        "valid_frames": 32,
+        "window_index": 0
+      },
+      {
+        "dataset": "hot3d",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "meta21",
+        "rgb_finite": true,
+        "side": "left",
+        "split": "train",
+        "valid_frames": 32,
+        "window_index": 1980
+      },
+      {
+        "dataset": "hot3d",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "meta21",
+        "rgb_finite": true,
+        "side": "right",
+        "split": "train",
+        "valid_frames": 32,
+        "window_index": 1985
+      },
+      {
+        "dataset": "dexycb",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "dex21",
+        "rgb_finite": true,
+        "side": "left",
+        "split": "val",
+        "valid_frames": 32,
+        "window_index": 3
+      },
+      {
+        "dataset": "dexycb",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "dex21",
+        "rgb_finite": true,
+        "side": "right",
+        "split": "val",
+        "valid_frames": 32,
+        "window_index": 0
+      },
+      {
+        "dataset": "hot3d",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "meta21",
+        "rgb_finite": true,
+        "side": "left",
+        "split": "val",
+        "valid_frames": 32,
+        "window_index": 24
+      },
+      {
+        "dataset": "hot3d",
+        "gt_used_only_as_external_reference": true,
+        "joint_order": "meta21",
+        "rgb_finite": true,
+        "side": "right",
+        "split": "val",
+        "valid_frames": 32,
+        "window_index": 29
+      }
+    ],
+    "source_manifest_sha256": {
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_expanded_v3_20261016/source_manifest.json": "8a7b498729111138132660a3f6031aea5e1e321f20d9e7a8022f819b136d9b8d",
+      "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_expanded_v3r2_20261016/source_manifest.json": "966aa71b50abe460702028313b18846c0a0be44f6e13a6a4a36e439032c5516e"
+    },
+    "split_records": {
+      "train": 972,
+      "val": 33
+    },
+    "training_started": false
+  },
+  "production_launch_report": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/data_expansion_geometry_v3_20261016/production_launch_acceptance.json",
+  "wandb_server": {
+    "state": "running",
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/98ff0737",
+    "summary_step": 6,
+    "runtime_rgb_batch": 8,
+    "configured_steps": 1000
+  }
 }

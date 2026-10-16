@@ -1,5 +1,7 @@
 # HandLoop 方法与接口记忆
 
+**2026-10-16数据／几何v3启动验收（本聊天远程实测）：** 已启用视觉NLL1e-4＋raw解剖J0绝对距离/0.05m＋final自身预测β解码的有效joint绝对距离/0.05m，按源Dex21／Meta21与独立全局count归约；标签仅供loss，未新增2D／shape参数／速度项。系数为train-only梯度初值，非收益或最优结论。motion原D37目标、纯数值TWM、全量低LR双主干、两轮自身历史及原1000预算保持。[精确方法和运行](../docs/VISUAL_DATA_GEOMETRY_V3_2026-10-16.md)。
+
 **D39当前实现方向（2026-10-16 UTC／纽约10-15）：** 用户明确两个主干均低LR全量微调，替代D35视觉双冻结的首版范围及此前优先固定HaWoR的建议。在线HaWoR patch/raw→2轮candidate-conditioned MANO16投影取证＋数值TWM→末轮最终分布→自身跨帧历史；帧内raw/H/anchor固定、仅最终commit，帧间detach。两主干参数、插件均在可微路径上，图像/相机features仍不进TWM；σ/κ仍非已校准w/q。视觉current NLL与原motion六项回放分开更新，D38 loss改版未提前实施；实际验收状态见[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
 
 **2026-10-15 loss对照建议，未替代现行六项：** 已读12篇world model/手部恢复/生成论文，WestWorld以CE为主但Dreamer/TD-MPC2/StableHand/HMP/HaWoR均有不同带权组合。建议先统一conditional probability主线、同架构逐项消融，future起点stopgrad单独验证；NLL＋几何不天然矛盾，尚无证据定位六项为失败原因。任务采样和有效帧归约不能隐藏为“无权重”；现future从确定性current均值出发，不能称完整current–future不确定性传播。DF/条件RFM是第二路线，会改变生成头/采样/可靠性与D35解析NLL接口，尚未实施。D37仍沿原六项；D35视觉阶段单一current NLL不改。[文献与精确建议](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。

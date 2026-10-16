@@ -13,7 +13,7 @@
 | 已下载、完成完整99D接入并参与D37训练 | OakInk2、HOT3D、独立UmeTrack、DexYCB；具体split／来源和转换依据见[四库协议](TWM_FOUR_SOURCE_RUN_2026-10-14.md) |
 | 新增下载并完成原生结构检查 | HumanTouch固定一个episode及两份metadata，共3文件、6,379,522 bytes、1,597帧；官方文件hash核验和结构检查通过，**ready_for_training=false** |
 | 有来源和访问核查，尚未下载训练包／完成本项目adapter | DexWild、Stanford DexCap、GRAB、ARCTIC、DexterHand、HandX等候选；ARCTIC仍waiting_credentials |
-| 后续视觉多库准备 | DexYCB扩大范围与HOT3D实际准备进度由执行记录另记；本文不把资料可获得性写成已完成视觉训练接入 |
+| 本轮完成视觉多库接入 | DexYCB＋HOT3D合并train73,524个手部状态／63,652张不同RGB／2,773窗口，val4,037状态；完整source／split／SHA与loader验收通过，06:50UTC已启动新联合run，更新与checkpoint状态见[执行记录](VISUAL_DATA_GEOMETRY_V3_2026-10-16.md) |
 
 新glove来源仍按native测量质量与标定可审计性优先，不因MANO字段方便优先选择视觉拟合标签。完整99D输出保持不变；统一输出不意味着每个来源都有全部99D参数真值。
 
@@ -79,3 +79,5 @@ episode JSON还包含joint_names、头相机内参与畸变、`camera_from_head_
 5. **完整参数与部分参考分开接入**：现行motion trainer要求17组完整参数参考，不能把HumanTouch的缺失rotation填零／标valid后直接混入。native部分监督需要独立、可检查的数据与几何loss支持；当前仅样本验收，不代表该训练接口已完成。
 
 以上是数据接入的验收步骤，不是本轮修改raw/candidate构造、历史或回放方案。来源混合比例、全库下载规模和性能收益仍待有效数据量与受控验证决定，不以宣传小时数直接分配权重。
+
+**HumanTouch最小后续入口（建议，未实现）：** 可先验非拇指PIP／DIP的同指单位骨段夹角，作为不依赖global腕平移／旋转的局部几何参考；需先核25点名字对应的父子关系与解剖位置。metadata没有给出MANUS rest transforms、传感器骨段轴到MANO的固定变换或tracker→解剖J0，不能直接把25个源四元数当15组MANO local rotation。直接监督local点前还要验掌frame与个体骨长／shape；约9cm差不直接减常数。保持完整99D预测，仅对已核局部几何开放mask监督，需要独立完成现motion trainer的partial接口，不能沿用17组全GT入口冒充接入成功。

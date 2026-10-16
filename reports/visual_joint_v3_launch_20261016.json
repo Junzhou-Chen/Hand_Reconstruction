@@ -1,0 +1,473 @@
+{
+  "schema": "handloop.visual_joint_v3_launch_acceptance.v1",
+  "utc": "2026-10-16T06:57:09.486163+00:00",
+  "passed": true,
+  "code_version": "86f25ec842043bce2bcbdab17dbe539bacc3eef3",
+  "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_joint_v3_geometry_20261016",
+  "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/98ff0737",
+  "config": {
+    "adapter": {
+      "candidate_guided_queries": true,
+      "condition_on_beta": false,
+      "d_model": 256,
+      "default_dt": 0.03333333333333333,
+      "detach_history": true,
+      "dim_feedforward": 512,
+      "dropout": 0.0,
+      "history_length": 30,
+      "image_feature_dim": 1280,
+      "local_patch_sigma": 0.25,
+      "max_gap_seconds": 0.25,
+      "nhead": 4,
+      "num_layers": 2,
+      "patch_grid_height": 16,
+      "patch_grid_width": 12,
+      "refinement_steps": 2,
+      "rotation_delta_scale": 0.5,
+      "translation_delta_scale": 0.1
+    },
+    "adapter_learning_rate": 0.0001,
+    "clip_length": 32,
+    "cpu_threads": 2,
+    "eval_batches": 8,
+    "eval_every": 50,
+    "grad_clip": 1.0,
+    "gradient_checkpointing": true,
+    "hawor_learning_rate": 1e-06,
+    "initial_checkpoint_step": 4,
+    "log_every": 5,
+    "motion_replay_every": 4,
+    "num_workers": 0,
+    "per_gpu_motion_batch_size": 32,
+    "per_gpu_rgb_batch_size": 8,
+    "save_every": 50,
+    "seed": 20261016,
+    "steps": 1000,
+    "stop_before_utc": "2026-10-20T05:10:00+00:00",
+    "tracking": {
+      "enabled": true,
+      "entity": "black-ant",
+      "group": "visual-feedback-joint-finetune",
+      "mode": "online",
+      "name": "visual-joint-v3-dex-hot-geometry",
+      "project": "handloop-twm",
+      "require_online": true,
+      "tags": [
+        "full-finetune",
+        "online-rgb",
+        "hawor",
+        "d37-best",
+        "refinement2",
+        "motion-replay",
+        "gt-crop",
+        "dex-hot",
+        "raw-wrist-supervision",
+        "final-joint-supervision",
+        "same-1000-budget"
+      ]
+    },
+    "twm_learning_rate": 1e-05,
+    "visual_geometry_supervision": {
+      "final_joint_scale_m": 0.05,
+      "final_joint_weight": 1.0,
+      "nll_weight": 0.0001,
+      "raw_wrist_scale_m": 0.05,
+      "raw_wrist_weight": 1.0
+    },
+    "warmup_steps": 20,
+    "weight_decay": 0.01,
+    "world_size": 2
+  },
+  "identity": {
+    "hawor_checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+    "hawor_config_sha256": "edfe12dc14ce371d698da722b59acfed5b4a38a7f8f5116cbc1fce459a07dd2d",
+    "mano_asset_sha256": {
+      "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+      "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+    },
+    "motion_manifest_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "source_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3",
+    "twm_source_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c"
+  },
+  "observed_production_status": {
+    "utc": "2026-10-16T06:57:02.261623+00:00",
+    "phase": "training",
+    "step": 16,
+    "target_steps": 1000
+  },
+  "first_eight_update_audits": {
+    "0": {
+      "execution_start_step": 0,
+      "gradients": {
+        "adapter": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_head": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_iam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_pam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_vit": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "twm_current": {
+          "finite": true,
+          "norm": 0.5833399295806885,
+          "tensors": 2
+        },
+        "twm_encoder": {
+          "finite": true,
+          "norm": 1.190661907196045,
+          "tensors": 263
+        },
+        "twm_future": {
+          "finite": true,
+          "norm": 0.23831994831562042,
+          "tensors": 17
+        },
+        "twm_future_concentration": {
+          "finite": true,
+          "norm": 0.13852226734161377,
+          "tensors": 2
+        },
+        "twm_future_rotation": {
+          "finite": true,
+          "norm": 4.241694927215576,
+          "tensors": 2
+        },
+        "twm_future_scale": {
+          "finite": true,
+          "norm": 0.010836170986294746,
+          "tensors": 2
+        },
+        "twm_future_velocity": {
+          "finite": true,
+          "norm": 0.9399954080581665,
+          "tensors": 2
+        },
+        "twm_mixture": {
+          "finite": true,
+          "norm": 0.0004632340569514781,
+          "tensors": 2
+        },
+        "twm_rotation": {
+          "finite": true,
+          "norm": 2.7975993156433105,
+          "tensors": 2
+        }
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_bytes": 68180786688,
+      "per_gpu_rgb_batch_size": 8,
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "step": 8,
+      "task": "motion",
+      "utc": "2026-10-16T06:55:34.630204+00:00"
+    },
+    "1": {
+      "execution_start_step": 0,
+      "gradients": {
+        "adapter": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_head": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_iam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_pam": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "hawor_vit": {
+          "finite": true,
+          "norm": 0.0,
+          "tensors": 0
+        },
+        "twm_current": {
+          "finite": true,
+          "norm": 0.5833399295806885,
+          "tensors": 2
+        },
+        "twm_encoder": {
+          "finite": true,
+          "norm": 1.190661907196045,
+          "tensors": 263
+        },
+        "twm_future": {
+          "finite": true,
+          "norm": 0.23831994831562042,
+          "tensors": 17
+        },
+        "twm_future_concentration": {
+          "finite": true,
+          "norm": 0.13852226734161377,
+          "tensors": 2
+        },
+        "twm_future_rotation": {
+          "finite": true,
+          "norm": 4.241694927215576,
+          "tensors": 2
+        },
+        "twm_future_scale": {
+          "finite": true,
+          "norm": 0.010836170986294746,
+          "tensors": 2
+        },
+        "twm_future_velocity": {
+          "finite": true,
+          "norm": 0.9399954080581665,
+          "tensors": 2
+        },
+        "twm_mixture": {
+          "finite": true,
+          "norm": 0.0004632340569514781,
+          "tensors": 2
+        },
+        "twm_rotation": {
+          "finite": true,
+          "norm": 2.7975993156433105,
+          "tensors": 2
+        }
+      },
+      "nonzero_gradient_seen": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "peak_allocated_bytes": 68180786688,
+      "per_gpu_rgb_batch_size": 8,
+      "representative_parameters_changed": {
+        "adapter": true,
+        "hawor_head": true,
+        "hawor_iam": true,
+        "hawor_pam": true,
+        "hawor_vit": true,
+        "twm_current": true,
+        "twm_encoder": true,
+        "twm_future": true,
+        "twm_future_concentration": true,
+        "twm_future_rotation": true,
+        "twm_future_scale": true,
+        "twm_future_velocity": true,
+        "twm_mixture": true,
+        "twm_rotation": true
+      },
+      "step": 8,
+      "task": "motion",
+      "utc": "2026-10-16T06:55:34.629810+00:00"
+    }
+  },
+  "checkpoint_audit": {
+    "utc": "2026-10-16T06:55:04.283441+00:00",
+    "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/data_expansion_geometry_v3_20261016/production_checkpoint_for_cpu_audit.pt",
+    "bytes": 8510562479,
+    "step": 4,
+    "code_version": "86f25ec842043bce2bcbdab17dbe539bacc3eef3",
+    "model_floating_tensors": 1076,
+    "model_finite": true,
+    "model_sha256": "b29bb2e589daa1316fe349bfd9da123a077f88a8414b0f2bad66d702ad3ee3dd",
+    "optimizer_floating_tensors": 3135,
+    "optimizer_finite": true,
+    "optimizer_parameter_states": 1045,
+    "optimizer_distinct_steps": [
+      1,
+      3,
+      4
+    ],
+    "optimizer_groups": [
+      {
+        "lr": 2.499911174729293e-07,
+        "base_lr": 1e-06,
+        "weight_decay": 0.01,
+        "name": "hawor_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-06
+      },
+      {
+        "lr": 2.499911174729293e-07,
+        "base_lr": 1e-06,
+        "weight_decay": 0.0,
+        "name": "hawor_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-06
+      },
+      {
+        "lr": 2.4999111747292933e-05,
+        "base_lr": 0.0001,
+        "weight_decay": 0.01,
+        "name": "adapter_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 0.0001
+      },
+      {
+        "lr": 2.4999111747292933e-05,
+        "base_lr": 0.0001,
+        "weight_decay": 0.0,
+        "name": "adapter_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 0.0001
+      },
+      {
+        "lr": 2.4999111747292933e-06,
+        "base_lr": 1e-05,
+        "weight_decay": 0.01,
+        "name": "twm_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-05
+      },
+      {
+        "lr": 2.4999111747292933e-06,
+        "base_lr": 1e-05,
+        "weight_decay": 0.0,
+        "name": "twm_no_decay",
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "amsgrad": false,
+        "maximize": false,
+        "foreach": false,
+        "capturable": false,
+        "differentiable": false,
+        "fused": null,
+        "decoupled_weight_decay": true,
+        "initial_lr": 1e-05
+      }
+    ],
+    "source_twm_step": 10000,
+    "source_twm_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c",
+    "position_feature_scale": 0.05,
+    "cpu_matches_all_saved_ranks": true,
+    "passed": true
+  },
+  "checkpoint_audit_process_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/data_expansion_geometry_v3_20261016/production_checkpoint_audit_process_receipt.json",
+  "definitions": {
+    "nonzero_gradient_seen": "cumulative across first eight actual visual/motion updates, not every module active in every individual task",
+    "representative_parameters_changed": "one monitored trainable tensor per named group differs from initialized value",
+    "peak_allocated_gib": {
+      "0": 63.498305797576904,
+      "1": 63.498305797576904
+    },
+    "scope": "launch integrity only; not evidence of validation accuracy gain; no training changes/interruption; one CPU checkpoint audit, no extra model execution"
+  }
+}

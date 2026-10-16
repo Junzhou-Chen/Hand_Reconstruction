@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16数据／几何v3启动验收（本聊天远程实测）：** 完成前两项修改：Dex＋HOT73,524 train手状态／63,652不同RGB／2773窗，val4037状态，原Dex577val字节保留；严格SHA／split／loader通过。相机精度假警报86f25ec修复，真实mixed全主干及DDP全局计数通过。06:50:51UTC新联合训练启动，16/1000快照、14组双rank梯度／更新与checkpoint4 CPU finite／hash通过，每卡peak63.50GiB，W&B98ff0737在线。只改数据和raw J0／final自身β几何；motion仍四库／D37，HumanTouch native样本未入训，原第3／4／5项未改。初始化变差已记录，不由启动推出收益。更新[协议](../docs/VISUAL_DATA_GEOMETRY_V3_2026-10-16.md)及小型启动／验收报告；并发本地整理的其他内容不纳入本聊天提交。
+
 2026-10-16用户采纳前两项、暂缓第3／4／5项：扩查HumanTouch／DexWild／DexCap／GRAB／ARCTIC／DexterHand／HandX／TACO的官方开放、GT来源、motion与视觉职责，新增固定HumanTouch native样本获取与结构检查（ready=false，不造99D）。已扩大Dex视觉train为50861有效帧／800录制／10主体，val577字节保留；实现HOT真实RGB标定链和不可变多源合并，烟测通过但full99clip投影精度自检失败待修，失败产物保留。新增可配置raw J0与final自身β绝对joint监督、按源21点mapping和loss-only标签字段，双rank计数／mask／GT隔离及两源独立真实梯度通过，旧DDPfixture无输入失败由7e1535c修复。新增来源审计、执行协议、v3配置，更新入口／02／03／04／08；NLL1e-4＋两项/0.05m是train-only梯度支持的初值而非收益证明。1000步／LR／batch／历史／噪声／回放未改，当前尚未启动新run。旧best和其他聊天的PA／AUC审计全部保留。
 
 **2026-10-16 AUC补测完成：** 同test1015保存预测，官方HaWoR→预选best300 final的PA-AUC **89.83933%→90.62120%（+0.78187个百分点）**；绝对AUC13.59279%→33.08518%，仅腕平移对齐71.10035%→77.20214%。last1000 PA90.73607%仅终点对照；val577 PA89.40736%→best91.32986%。沿作者0–50mm／100阈值、逐joint PCK≤与梯形积分归一化；官方EvalUtil每split69项独立核对AUC／曲线差均0，原五项几何均值与上轮CPU结果最大差8.882e-16mm。论文PA-AUC90.5%为不同完整集合，当前小子集不作排名。Pod CPU仅FK／指标，无视觉前向、训练、权重或best选择改变。[协议与结果](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小型摘要](../reports/hawor_auc_audit_20261016.json)。
