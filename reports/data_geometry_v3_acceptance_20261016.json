@@ -1,0 +1,214 @@
+{
+  "schema": "handloop.data_geometry_v3.acceptance.v1",
+  "created_utc": "2026-10-16T06:23:39.622162+00:00",
+  "status": "data_preparation_and_acceptance",
+  "training_started": false,
+  "motion_pool_changed": false,
+  "data": {
+    "dex": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dex_expanded_v3_20261016/source_manifest.json",
+      "phase": "complete",
+      "records": {
+        "train": 800,
+        "val": 8
+      },
+      "states": {
+        "train": 50861,
+        "val": 577
+      }
+    },
+    "hot_smoke": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_hot3d_aria_smoke_v3_20261016/source_manifest.json",
+      "phase": "complete",
+      "records": {
+        "train": 2,
+        "val": 2
+      },
+      "states": {
+        "train": 300,
+        "val": 300
+      }
+    }
+  },
+  "contracts": {
+    "geometry_ddp_contract_v2.json": {
+      "passed": true,
+      "error": null,
+      "checks": null
+    },
+    "geometry_ddp_contract_v2_rank1.json": {
+      "passed": true,
+      "error": null,
+      "checks": null
+    },
+    "hot_rgb_forward_contract.json": {
+      "passed": true,
+      "error": null,
+      "checks": {
+        "tail_masks": true,
+        "crop_errors": {
+          "img": 0.0,
+          "center": 0.0,
+          "center_unflipped": 0.0,
+          "scale": 0.0,
+          "img_focal": 0.0,
+          "img_center": 0.0,
+          "normalized_crop_transform": 0.0
+        },
+        "no_gt_forward": true,
+        "online_crop_vs_extract_clip": true,
+        "raw_world_parity_mixed_units": 0.0,
+        "padding_not_committed": true,
+        "one_commit_per_real_frame": true
+      }
+    }
+  },
+  "train_only_gradient_probes": {
+    "geometry_train_gradient_probe.json": {
+      "passed": true,
+      "scope": "train-only, eval/dropout-off, ViT/IAM frozen upstream; head/PAM+full adapter/TWM; no optimizer, not actual training-batch or Adam update",
+      "parameters_unchanged": true,
+      "source_checkpoint_unchanged": true,
+      "no_reference_forward": true,
+      "source_manifest_sha256": "67462dced45615c9e0ea8d761da58094d03f8b8cadc47370c06f126751259d3e",
+      "twm_checkpoint_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c",
+      "clips": [
+        {
+          "handedness": 1,
+          "loss_means_unweighted": {
+            "current_nll": 5736.978515625,
+            "raw_wrist_geometry_m": 0.0677780881524086,
+            "final_mpjpe21_m": 0.12035118043422699
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 442676.03636025405,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 2.3584991286840373
+            },
+            "hawor_camera_readout": {
+              "current_nll": 139701.48296122847,
+              "raw_wrist_geometry_m": 5.22786238701606,
+              "final_mpjpe21_m": 11.871731654989336
+            }
+          }
+        },
+        {
+          "handedness": 1,
+          "loss_means_unweighted": {
+            "current_nll": 3741.763671875,
+            "raw_wrist_geometry_m": 0.0703265443444252,
+            "final_mpjpe21_m": 0.14720427989959717
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 325381.54985745775,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 2.4834096652955315
+            },
+            "hawor_camera_readout": {
+              "current_nll": 576051.6312397643,
+              "raw_wrist_geometry_m": 18.9352547019822,
+              "final_mpjpe21_m": 15.45966888213918
+            }
+          }
+        },
+        {
+          "handedness": 0,
+          "loss_means_unweighted": {
+            "current_nll": 11619.76953125,
+            "raw_wrist_geometry_m": 0.07979534566402435,
+            "final_mpjpe21_m": 0.14479991793632507
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 468120.288211817,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 2.318070254385335
+            },
+            "hawor_camera_readout": {
+              "current_nll": 478697.96488731884,
+              "raw_wrist_geometry_m": 9.01040004699772,
+              "final_mpjpe21_m": 8.637526421777768
+            }
+          }
+        },
+        {
+          "handedness": 0,
+          "loss_means_unweighted": {
+            "current_nll": 12240.044921875,
+            "raw_wrist_geometry_m": 0.12402831017971039,
+            "final_mpjpe21_m": 0.20234258472919464
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 400280.02817504527,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 2.4673733635974493
+            },
+            "hawor_camera_readout": {
+              "current_nll": 704258.4556128852,
+              "raw_wrist_geometry_m": 8.68971022132244,
+              "final_mpjpe21_m": 12.301941011680436
+            }
+          }
+        }
+      ]
+    },
+    "geometry_hot_train_gradient_probe.json": {
+      "passed": true,
+      "scope": "train-only, eval/dropout-off, ViT/IAM frozen upstream; head/PAM+full adapter/TWM; no optimizer, not actual training-batch or Adam update",
+      "parameters_unchanged": true,
+      "source_checkpoint_unchanged": true,
+      "no_reference_forward": true,
+      "source_manifest_sha256": "e4c3efdf066400013f777956cd0bb79c414bacac9778019fd523770b932bb6f8",
+      "twm_checkpoint_sha256": "9f500a283109fbad75f380281808b16781a335550b99853d66832cb120bef76c",
+      "clips": [
+        {
+          "handedness": 0,
+          "loss_means_unweighted": {
+            "current_nll": 8211.234375,
+            "raw_wrist_geometry_m": 0.03194312006235123,
+            "final_mpjpe21_m": 0.044706087559461594
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 538167.8561430114,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 3.209652387541563
+            },
+            "hawor_camera_readout": {
+              "current_nll": 613054.9789518417,
+              "raw_wrist_geometry_m": 15.813286431825599,
+              "final_mpjpe21_m": 2.5005329413640274
+            }
+          }
+        },
+        {
+          "handedness": 1,
+          "loss_means_unweighted": {
+            "current_nll": 11764.7041015625,
+            "raw_wrist_geometry_m": 0.05270963907241821,
+            "final_mpjpe21_m": 0.13476680219173431
+          },
+          "gradient_norms": {
+            "twm_complete": {
+              "current_nll": 532830.512339745,
+              "raw_wrist_geometry_m": 0.0,
+              "final_mpjpe21_m": 3.1748366600161435
+            },
+            "hawor_camera_readout": {
+              "current_nll": 381023.05886662763,
+              "raw_wrist_geometry_m": 19.7902485345161,
+              "final_mpjpe21_m": 12.172325495536011
+            }
+          }
+        }
+      ]
+    }
+  },
+  "known_failures_retained": [
+    "geometry_ddp.log: empty-input test fixture, fixed7e1535c; v2 passes",
+    "hot_full_prepare.log: camera projection precision check; under repair"
+  ]
+}

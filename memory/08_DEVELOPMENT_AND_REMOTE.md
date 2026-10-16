@@ -1,5 +1,7 @@
 # 开发、GitHub同步和远程实验约定
 
+**2026-10-16前两项修改执行中：** 同授权Pod／data10，所有数据准备、native audit、真实RGB与MANO／autograd／DDP检查均远程。本机只源码、文档、静态检查及查看远程生成的QA叠图（不入Git）。native下载c9ec200、Dex扩大d9550a3、几何监督／HOT准备41bf150、DDP测试fixture修复7e1535c；两个Git immutable snapshots为`code/visual_feedback_joint_v3_20261016`及`...v3r2_20261016`，未覆盖旧训练run。额外依赖隔离在`runtime/native_data_extra/site-packages`（pyarrow21.0）及固定官方camera工具`runtime/hand_tracking_toolkit_bc628e9`。远程`evaluations/data_expansion_geometry_v3_20261016/`保留各driver、pass／failed记录；HOT fullprep投影检查待修，不启动不完整训练。配置／产物和范围见[新协议](../docs/VISUAL_DATA_GEOMETRY_V3_2026-10-16.md)。
+
 **2026-10-16最新只读深诊断已完成：** 仍经`ssh ds`进入授权Pod `jchen57-fineturn-tl4zr`，根`/sciclone/data10/jchen57/Hand_Reconstruction`，复用已验CUDA的项目Torch runtime；数据索引／推理／几何／梯度／数值聚合与制图均在远程，本机只源码、文档和轻量检查。主实验快照`88c7c00cdc5548aa2febddbb8366ce1b857a171b`；梯度扩展`515459429f99fa62673c09b7ebc9e79bea5c1a42`；相机反算`11159dd78616daf2846aeedc25a8c773ca24b6ac`；聚合／制图`a72154d`。这不改变训练provenance：D37仍87a2bcc、D40仍eb8d0b9，run均已complete，best300／last1000未覆盖，未建删Job、未启动训练或更改配置。
 
 产物根`evaluations/joint_failure_deep_diagnosis_20261016/`：`twm_paired/summary.json`及selection含1024个原val窗／五模式／三权重的配对输入hash；`real_states_val/report.json`、`real_states_test/report.json`覆盖原577／1015状态、冻结真实raw/candidate/history与替换／oracle控制；geometry、camera与v2 gradient产物完整身份和路径见Git[聚合报告](../reports/joint_failure_deep_diagnosis_20261016.json)。梯度在eval／dropoutoff下保留autograd、无optimizer，train每侧2条16帧不同录制，ViT/IAM仅固定上游，测head/PAM／adapter／TWM；模型tensor、源文件／checkpoint或被测参数hash按各probe范围前后核验通过，不将子集梯度当整个HaWoR范数或真实Adam更新。
