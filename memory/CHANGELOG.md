@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16新用户决定：撤回扩展数据，原Dex几何监督5000步。** 用户要求取消当前扩大数据，只先检验第2项直接几何监督，并从1000提高到约4000／5000步；实现选5000上限。本条替代前轮扩大数据＋1000步安排，第3／4项条件／历史／噪声／回放不改。混源run已07:14:26UTC正常stopped100/1000，checkpoint100与双rank hash3fff5e8f…保存；不删数据或旧best。新视觉source恢复原67462dce…清单：16train录制／1128帧／46窗，val8录制／577帧／24窗；不用扩大Dex或HOT RGB。原四库motion与D37仍保持，从官方HaWoR＋D37＋新插件、全新Adam重新起训，不载入混源权重。保留NLL1e-4＋raw腕／final自身β绝对joint距离各/0.05m；同LR／batch8／3:1／两轮／history30。实现另将同一原val每50步覆盖全24窗，非新增训练标签；cosine按5000从头安排，非旧1k简单续跑。当前新配置与协议已准备，启动待验，尚无新精度结论。[本轮协议](../docs/VISUAL_GEOMETRY_ORIGINAL_DEX_5K_2026-10-16.md)。
+
 **2026-10-16数据／几何v3启动验收（本聊天远程实测）：** 完成前两项修改：Dex＋HOT73,524 train手状态／63,652不同RGB／2773窗，val4037状态，原Dex577val字节保留；严格SHA／split／loader通过。相机精度假警报86f25ec修复，真实mixed全主干及DDP全局计数通过。06:50:51UTC新联合训练启动，16/1000快照、14组双rank梯度／更新与checkpoint4 CPU finite／hash通过，每卡peak63.50GiB，W&B98ff0737在线。只改数据和raw J0／final自身β几何；motion仍四库／D37，HumanTouch native样本未入训，原第3／4／5项未改。初始化变差已记录，不由启动推出收益。更新[协议](../docs/VISUAL_DATA_GEOMETRY_V3_2026-10-16.md)及小型启动／验收报告；并发本地整理的其他内容不纳入本聊天提交。
 
 2026-10-16用户采纳前两项、暂缓第3／4／5项：扩查HumanTouch／DexWild／DexCap／GRAB／ARCTIC／DexterHand／HandX／TACO的官方开放、GT来源、motion与视觉职责，新增固定HumanTouch native样本获取与结构检查（ready=false，不造99D）。已扩大Dex视觉train为50861有效帧／800录制／10主体，val577字节保留；实现HOT真实RGB标定链和不可变多源合并，烟测通过但full99clip投影精度自检失败待修，失败产物保留。新增可配置raw J0与final自身β绝对joint监督、按源21点mapping和loss-only标签字段，双rank计数／mask／GT隔离及两源独立真实梯度通过，旧DDPfixture无输入失败由7e1535c修复。新增来源审计、执行协议、v3配置，更新入口／02／03／04／08；NLL1e-4＋两项/0.05m是train-only梯度支持的初值而非收益证明。1000步／LR／batch／历史／噪声／回放未改，当前尚未启动新run。旧best和其他聊天的PA／AUC审计全部保留。

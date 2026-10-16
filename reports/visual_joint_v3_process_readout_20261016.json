@@ -1,0 +1,142 @@
+{
+  "utc": "2026-10-16T07:07:34.208784+00:00",
+  "wandb_state": "running",
+  "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/98ff0737",
+  "validation_rows": [
+    {
+      "optimizer_step": 50,
+      "validation/geometry_score": 0.19613900847800142,
+      "validation/raw/wrist_mm": 16.380957697962856,
+      "validation/final/wrist_mm": 16.607071842159236,
+      "validation/final/root_deg": 5.497141017570152,
+      "validation/final/finger_deg": 16.42406279761512,
+      "validation/final_mpjpe21_m": 0.020322484469839506,
+      "validation/current_nll": 423.16953256967906,
+      "validation/raw_wrist_geometry_m": 0.01638095832622803,
+      "validation/valid_states": 222,
+      "validation/xyz_90pct_ellipsoid_coverage": 0.1756756751386969
+    }
+  ],
+  "scope": "read-only report of existing scalar logs; no inference/training change",
+  "process_details": {
+    "utc": "2026-10-16T07:09:46.435865+00:00",
+    "validation_selection": [
+      {
+        "window_index": 0,
+        "dataset": "dexycb",
+        "handedness": 1,
+        "recording": "20200709-subject-01/20200709_142123",
+        "start": 0,
+        "real_frames": 32
+      },
+      {
+        "window_index": 20,
+        "dataset": "dexycb",
+        "handedness": 0,
+        "recording": "20200813-subject-02/20200813_150228",
+        "start": 64,
+        "real_frames": 8
+      },
+      {
+        "window_index": 41,
+        "dataset": "hot3d",
+        "handedness": 1,
+        "recording": "hot3d/P0009_5f2583e0/clip-002277/right",
+        "start": 64,
+        "real_frames": 32
+      },
+      {
+        "window_index": 61,
+        "dataset": "hot3d",
+        "handedness": 0,
+        "recording": "hot3d/P0010_fd1891a8/clip-002562/left",
+        "start": 0,
+        "real_frames": 32
+      },
+      {
+        "window_index": 81,
+        "dataset": "hot3d",
+        "handedness": 0,
+        "recording": "hot3d/P0011_7a8886e7/clip-002675/left",
+        "start": 0,
+        "real_frames": 32
+      },
+      {
+        "window_index": 101,
+        "dataset": "hot3d",
+        "handedness": 1,
+        "recording": "hot3d/P0011_cd22f5e0/clip-002721/right",
+        "start": 0,
+        "real_frames": 32
+      },
+      {
+        "window_index": 122,
+        "dataset": "hot3d",
+        "handedness": 1,
+        "recording": "hot3d/P0012_73e66984/clip-002873/right",
+        "start": 96,
+        "real_frames": 32
+      },
+      {
+        "window_index": 142,
+        "dataset": "hot3d",
+        "handedness": 1,
+        "recording": "hot3d/P0015_7fc6548d/clip-003302/right",
+        "start": 128,
+        "real_frames": 22
+      }
+    ],
+    "validation_state_count": 222,
+    "visual_updates_planned": 750,
+    "motion_updates_planned": 250,
+    "visual_updates_per_sampler_cycle": 174,
+    "visual_sampler_cycles_planned": 4.310344827586207,
+    "motion_presentations_planned": 16000,
+    "source_windows": {
+      "dexycb": 6352,
+      "hot3d": 132008,
+      "oakink2": 346860,
+      "umetrack": 151390
+    },
+    "current_status": {
+      "phase": "training",
+      "step": 82,
+      "target_steps": 1000,
+      "task": "visual",
+      "training": {
+        "beta_norm": 3.5711145401000977,
+        "candidate/finger_deg": 14.18042278289795,
+        "candidate/root_deg": 7.996831893920898,
+        "candidate/wrist_mm": 21.98366355895996,
+        "current_nll": 82.46966103557901,
+        "current_nll/count": 462,
+        "elapsed_seconds": 1040.778064978309,
+        "final/finger_deg": 13.833287239074707,
+        "final/root_deg": 8.161361694335938,
+        "final/wrist_mm": 21.579500198364258,
+        "final_mpjpe21_m": 0.034587411343141125,
+        "final_mpjpe21_m/count": 9495,
+        "geometry_score": 0.22837112843990326,
+        "gradient_norms": {
+          "adapter": 10.219395637512207,
+          "hawor": 84.88770294189453,
+          "twm": 14.347546577453613
+        },
+        "local_current_nll": 60.10098648071289,
+        "peak_allocated_gb": 63.498305797576904,
+        "per_gpu_rgb_batch_size": 8,
+        "raw/finger_deg": 14.778353691101074,
+        "raw/root_deg": 7.880725860595703,
+        "raw/wrist_mm": 22.803699493408203,
+        "raw_wrist_geometry_m": 0.030988874889555432,
+        "raw_wrist_geometry_m/count": 462,
+        "valid_states": 232,
+        "wrist_degradation_over_1mm": 0.3836206793785095,
+        "xyz_90pct_ellipsoid_coverage": 0.3318965435028076,
+        "xyz_std_mm": 4.936385631561279
+      },
+      "utc": "2026-10-16T07:09:41.286856+00:00",
+      "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/98ff0737"
+    }
+  }
+}

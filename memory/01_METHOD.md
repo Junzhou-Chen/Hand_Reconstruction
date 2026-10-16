@@ -1,5 +1,7 @@
 # HandLoop 方法与接口记忆
 
+**2026-10-16新用户决定：撤回扩展数据，原Dex几何监督5000步。** 用户要求取消当前扩大数据，只先检验第2项直接几何监督，并从1000提高到约4000／5000步；实现选5000上限。本条替代前轮扩大数据＋1000步安排，第3／4项条件／历史／噪声／回放不改。混源run已07:14:26UTC正常stopped100/1000，checkpoint100与双rank hash3fff5e8f…保存；不删数据或旧best。新视觉source恢复原67462dce…清单：16train录制／1128帧／46窗，val8录制／577帧／24窗；不用扩大Dex或HOT RGB。原四库motion与D37仍保持，从官方HaWoR＋D37＋新插件、全新Adam重新起训，不载入混源权重。保留NLL1e-4＋raw腕／final自身β绝对joint距离各/0.05m；同LR／batch8／3:1／两轮／history30。实现另将同一原val每50步覆盖全24窗，非新增训练标签；cosine按5000从头安排，非旧1k简单续跑。当前新配置与协议已准备，启动待验，尚无新精度结论。[本轮协议](../docs/VISUAL_GEOMETRY_ORIGINAL_DEX_5K_2026-10-16.md)。
+
 **2026-10-16数据／几何v3启动验收（本聊天远程实测）：** 已启用视觉NLL1e-4＋raw解剖J0绝对距离/0.05m＋final自身预测β解码的有效joint绝对距离/0.05m，按源Dex21／Meta21与独立全局count归约；标签仅供loss，未新增2D／shape参数／速度项。系数为train-only梯度初值，非收益或最优结论。motion原D37目标、纯数值TWM、全量低LR双主干、两轮自身历史及原1000预算保持。[精确方法和运行](../docs/VISUAL_DATA_GEOMETRY_V3_2026-10-16.md)。
 
 **D39当前实现方向（2026-10-16 UTC／纽约10-15）：** 用户明确两个主干均低LR全量微调，替代D35视觉双冻结的首版范围及此前优先固定HaWoR的建议。在线HaWoR patch/raw→2轮candidate-conditioned MANO16投影取证＋数值TWM→末轮最终分布→自身跨帧历史；帧内raw/H/anchor固定、仅最终commit，帧间detach。两主干参数、插件均在可微路径上，图像/相机features仍不进TWM；σ/κ仍非已校准w/q。视觉current NLL与原motion六项回放分开更新，D38 loss改版未提前实施；实际验收状态见[新协议](../docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
