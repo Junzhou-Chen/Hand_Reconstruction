@@ -1,5 +1,7 @@
 # 联合微调完成后的模型与 HaWoR 对照
 
+**后续补算（2026-10-16）：** 同一保存预测的test PA-MPJPE21，官方HaWoR5.08159mm／预选best300 final4.68934mm。原表70.532mm是未对齐绝对误差，不能与论文PA4.76mm直接比较；本次没有改变原权重或按test重选best。详见[论文指标核查](HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)。
+
 记录日期：2026-10-16 UTC。数据准备、RGB 推理、MANO 几何解码和数值汇总均在 SciClone 的 `jchen57-fineturn-tl4zr` Pod 执行；本机只维护源码、文档与小型摘要。
 
 **独立录制 test 已完成：预先由训练 fixed8 选出的 best（step300）将腕位置误差从官方预训练 HaWoR 的 76.34 mm 降至 46.19 mm（下降39.49%），将绝对 MPJPE21 从 70.53 mm 降至 48.19 mm（下降31.67%）。** 同一组16录制／1,015状态上仍有27.68%的状态，最终 MPJPE 比 baseline 大超过1mm；best 的最后一轮 TWM 也使其输入候选的绝对 MPJPE 回升。方法有可测收益，同时存在局部误改与不确定性低估。下文分别报告完整 validation 和独立 test，保留预定终点 last1000 对照，不根据 test 重新挑权重。

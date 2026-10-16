@@ -1,5 +1,7 @@
 # HandLoop 数据与评测记忆
 
+**2026-10-16 HaWoR论文指标差距核查完成：** 论文DexYCB Table1的4.76mm是PA-MPJPE，原报告70.532mm是绝对MPJPE，均为毫米，不能直接比较。Pod CPU重解码同一保存预测后，test1015原官方HaWoR PA **5.08159mm**、预选best300 final **4.68934mm**（同集PA下降7.719%）；baseline比论文数值高6.756%，非十倍。仍16录制／单视角prefix128子集，不能据4.689<4.76宣称胜过论文完整test。新增可选PA评测，原四项逐帧差<0.001mm，无训练／视觉前向或best重选。[核查与来源](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小摘要](../reports/hawor_paper_metric_audit_20261016.json)。
+
 **2026-10-16联合失败与TWM分侧深诊断已完成（新增冻结推理／无optimizer）：** 本条替代下方“终点motion／future尚无新评估”和“仅索引、未新推理”的现状判断；原条目保留为前一阶段历史。D37 best10000、D40预选best300、终点last1000三份权重，在同一原D37 val split上按四源×左右各128窗固定选择，共1024窗；五种原v3模式clean/noisy/reanchor/position_burst4/missing，模型间逐batch输入／目标hash配对相同。history30、min_future3、stride4、future最多60、position_feature_scale=0.05m、β conditioning关闭，99D动态state／β10另存均不变。四源等权的noisy腕左／右从pretrain **2.782／2.945mm**变为best **3.548／3.689mm**，说明两侧部分保持性下降；不能由此称所有模式或未来均退化。1s四源、2s仅三源；GT仍为准备好的fitted MANO参考，非独立MoCap测量。窗口可能重叠，五模式复用同1024窗，不计作5120个独立样本。
 
 真实状态干预覆盖原fullval577／test1015状态，固定best raw、最后candidate和完成历史，仅换TWM：test左／右腕pretrain70.849／29.069→jointbest62.512／26.561mm，适配有益，不能因synthetic保持变差直接换回旧权重；candidate已含首轮TWM，非整模块因果消融。oracle过去改善、empty history不跨split稳定，GT干预仅诊断。几何／相机分解确认少量逆尺度尾部大错：subject06/113405 frame14，参考隐含s16.827、MANO深度1.134m，last.raw s3.5／5.454m，final腕误差4.201m；左>500mm为baseline0、best5、last6帧，均保留原指标。固定99D的shape替换不支持shape是米级定位大错主因，但未排除β的上游训练梯度作用。

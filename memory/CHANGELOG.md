@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16 HaWoR论文指标差距核查完成：** 论文DexYCB Table1的4.76mm是PA-MPJPE，原报告70.532mm是绝对MPJPE，均为毫米，不能直接比较。Pod CPU重解码同一保存预测后，test1015原官方HaWoR PA **5.08159mm**、预选best300 final **4.68934mm**（同集PA下降7.719%）；baseline比论文数值高6.756%，非十倍。仍16录制／单视角prefix128子集，不能据4.689<4.76宣称胜过论文完整test。新增可选PA评测，原四项逐帧差<0.001mm，无训练／视觉前向或best重选。[核查与来源](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小摘要](../reports/hawor_paper_metric_audit_20261016.json)。
+
 2026-10-16下一轮训练分析：记录用户“以原生baseline→final的平均纠正为主，无逐帧保证要求”，复核已有20点fixed8曲线、46clip／1128帧的小视觉池与scheduler；补查可用group的预训练raw=candidate和真实多轮条件差异。核官方HaWoR compute_loss（其3D为root-relative，不自动约束绝对深度）、StableHand、PoseBERT、DIP、DF、WHAM与WestWorld训练协议，提出数据覆盖、raw绝对腕／finaljoint监督、条件／历史对齐、回放和3k/5k版本化预算的单因素建议。新增[下一轮训练分析](../docs/NEXT_TRAINING_ANALYSIS_2026-10-16.md)，更新入口／02／04；未实施新loss／采样／schedule／权重／checkpoint选择，未新训或做模型推理，不将候选写成用户决定。
 
 2026-10-16联合失败深诊断完成：按用户“先充分分析、再讨论怎么改”，在授权Pod完成冻结三权重（D37best10000、D40预选best300、last1000）×1024固定val窗口×五种原v3模式配对评测，原视觉val577／test1015状态的固定raw/candidate/完成history换TWM及oracle/empty控制，逐轮几何／shape分解、官方camera逆尺度反算，以及train两侧各2条16帧录制的eval只读梯度。输入／目标hash和各probe范围前后模型／源checkpoint／被测参数hash通过；无optimizer、无训练或权重变动。执行88c7c00、梯度5154594、camera11159dd、聚合a72154d，与原训练87a2bcc／eb8d0b9分开。

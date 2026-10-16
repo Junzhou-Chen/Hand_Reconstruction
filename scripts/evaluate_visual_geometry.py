@@ -15,8 +15,9 @@ Example (run inside the compute Pod):
 
 Each input is an evaluate_visual_joint.py output directory containing
 clips/*.pt, a directory of such .pt files, or one clip .pt. Only fixed-camera
-DexYCB source manifests with identity camera_to_world are supported. Metrics
-are absolute or wrist-translation-aligned, with no scale/rotation/PA fit.
+DexYCB source manifests with identity camera_to_world are supported. Absolute
+and wrist-translation-aligned metrics are always reported; --include-pa adds
+per-frame similarity-aligned joint error for comparison with pose papers.
 """
 from __future__ import annotations
 
@@ -34,6 +35,30 @@ METRICS = ('mpjpe21_mm', 'wrist_aligned_mpjpe21_mm',
            'mpvpe778_mm', 'wrist_aligned_mpvpe778_mm')
 DEX_ORDER = (0, 13, 14, 15, 16, 1, 2, 3, 17, 4, 5, 6, 18,
              10, 11, 12, 19, 7, 8, 9, 20)
+
+
+def pa_mpjpe_mm(predicted, target):
+    """Fit s*X@R+t to Y per frame, enforcing det(R)=+1 (no reflection).
+
+    Double precision keeps the small hand cloud stable after camera offsets
+    are removed. This is an evaluation alignment using reference joints,
+    never a correction available during deployment.
+    """
+    import torch
+
+    x, y = predicted.double(), target.double()
+    x_mean, y_mean = x.mean(1, keepdim=True), y.mean(1, keepdim=True)
+    xc, yc = x - x_mean, y - y_mean
+    variance = xc.square().sum((1, 2))
+    if bool((variance <= 1e-20).any()):
+        raise ValueError('Cannot similarity-align a degenerate predicted hand')
+    u, singular, vh = torch.linalg.svd(xc.transpose(1, 2) @ yc)
+    signs = torch.ones_like(singular)
+    signs[:, -1] = torch.where(torch.linalg.det(u @ vh) < 0, -1.0, 1.0)
+    rotation = (u * signs[:, None, :]) @ vh
+    scale = (singular * signs).sum(-1) / variance
+    aligned = scale[:, None, None] * (xc @ rotation) + y_mean
+    return (aligned - y).norm(dim=-1).mean(-1) * 1000
 
 
 def save_json(path: Path, value: dict[str, Any]) -> None:
@@ -83,6 +108,7 @@ def grouped(rows: list[dict[str, Any]], field: str,
 
 
 def main() -> None:
+    global METRICS
     parser = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--predictions', action='append', type=parse_input, required=True,
@@ -93,7 +119,11 @@ def main() -> None:
     parser.add_argument('--output', type=Path, required=True, help='New JSON report filename')
     parser.add_argument('--batch-size', type=int, default=64, help='MANO decode batch size')
     parser.add_argument('--cpu-threads', type=int, default=2)
+    parser.add_argument('--include-pa', action='store_true',
+                        help='Also report per-frame translation/rotation/scale-aligned MPJPE21')
     args = parser.parse_args()
+    if args.include_pa:
+        METRICS = (*METRICS, 'pa_mpjpe21_mm')
     if not Path('/sciclone/data10/jchen57').is_dir():
         raise RuntimeError('Run geometry/model evaluation in the remote compute Pod')
     if args.batch_size < 1 or args.cpu_threads < 1:
@@ -334,6 +364,8 @@ def main() -> None:
                             'mpvpe778_mm': vertex_delta.norm(dim=-1).mean(-1) * 1000,
                             'wrist_aligned_mpvpe778_mm': (vertex_delta - wrist_delta).norm(dim=-1).mean(-1) * 1000,
                         }
+                        if args.include_pa:
+                            measured['pa_mpjpe21_mm'] = pa_mpjpe_mm(predicted_joints, target_joints)
                         if not all(bool(torch.isfinite(value).all()) for value in measured.values()):
                             raise FloatingPointError('Nonfinite decoded geometric error')
                         for metric, values in measured.items():
@@ -383,6 +415,11 @@ def main() -> None:
         'handedness': grouped(ordered_rows, 'handedness', branches),
         'per_frame_csv': str(csv_path), 'torch_version': torch.__version__,
         'device': str(device), 'gpu': torch.cuda.get_device_name(device) if device.type == 'cuda' else None}
+    if args.include_pa:
+        report['metric_definition']['pa_mpjpe21_mm'] = (
+            'Per-frame least-squares similarity fit of all21 predicted joints to reference '
+            '(translation, proper rotation det+1, uniform scale), then mean Euclidean '
+            'joint error in millimetres. Same subset/mask as absolute metrics; not the full paper benchmark.')
     save_json(output, report)
     print(json.dumps({'complete': True, 'report': str(output), 'all': report['all']}, sort_keys=True), flush=True)
 

@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-16 HaWoR论文指标差距核查完成：** 论文DexYCB Table1的4.76mm是PA-MPJPE，原报告70.532mm是绝对MPJPE，均为毫米，不能直接比较。Pod CPU重解码同一保存预测后，test1015原官方HaWoR PA **5.08159mm**、预选best300 final **4.68934mm**（同集PA下降7.719%）；baseline比论文数值高6.756%，非十倍。仍16录制／单视角prefix128子集，不能据4.689<4.76宣称胜过论文完整test。新增可选PA评测，原四项逐帧差<0.001mm，无训练／视觉前向或best重选。[核查与来源](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小摘要](../reports/hawor_paper_metric_audit_20261016.json)。
+
 **2026-10-16下一轮建议已整理，未启动训练：** 用户接受平均纠正原生HaWoR作为主要目标，要求先分析如何改进预训练／联合微调及是否加步。读取已有远程20点fixed8曲线与源码，没有新增模型推理或数值汇总；300→1000腕37.300→37.297mm，不能仅凭1000数字称欠训；1128帧／46clips／16录制两主体的小池已反复遍历。新源码事实是可用当前group的motion预训练raw与candidate相同，与视觉多轮条件存在差异，尚非已证根因。建议先扩大实际train覆盖、单因素加raw腕／finaljoint绝对几何，再检验条件对齐、短／自身历史、回放曝光及3k/5k明确schedule；不直接改steps续跑、不同时全改。低LR双主干、99D与既有split／best不变。训练建议、论文和公平HaWoR-only控制见[下一轮分析](../docs/NEXT_TRAINING_ANALYSIS_2026-10-16.md)；具体系数与启动仍未定。
 
 **2026-10-16最新：联合微调／TWM左右手深诊断完成，先分析后改法；未重新训练。** D37 10k、D40 1k均已结束，预选best300与last1000保持；本条替代下方仍待终点motion评估／继续D37训练的历史安排。新增三权重×1024固定val窗口×五种v3受损模式的完全配对评测，真实fullval577／test1015状态固定上下文换TWM／历史干预，逐轮几何与相机反算，以及train左／右各2条16帧录制的只读梯度probe，均完成且按各probe范围前后hash通过，无optimizer或权重变动。

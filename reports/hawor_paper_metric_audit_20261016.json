@@ -1,0 +1,563 @@
+{
+  "schema": "handloop.hawor_paper_metric_audit.v1",
+  "scope": "Same saved RGB predictions; no neural forward/training/checkpoint reselection. MANO FK and metric aggregation on Pod CPU. Current custom single-view prefix128 subset, not the full official benchmark.",
+  "alignment_checks": {
+    "identity_max_mm": 2.923648230562452e-13,
+    "similarity_max_mm": 4.98028824195122e-13,
+    "reflection_min_mm": 39.070554179491644,
+    "passed": true
+  },
+  "source_code_base": "e72f7ed27480fdfabccd8768f41a2b79e95e2279",
+  "splits": {
+    "test": {
+      "evaluation_script_sha256": "4c1751566c7b45b82b8c1742c76ff8f8542726c9319630906b1cbc343250a774",
+      "source_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_eval_s0_test_prefix128_20261016/source_manifest.json",
+      "source_manifest_sha256": "b5a87d00878f3132692fba81aba68fea38a8fb6dd6980faf82e9fc39e43963a4",
+      "mano_asset_sha256": {
+        "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+        "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+      },
+      "metric_definition": {
+        "mpjpe21_mm": "Mean Euclidean predicted MANO/Dex21 joint distance to source joint_3d, unaligned, millimetres.",
+        "mpvpe778_mm": "Mean corresponding MANO778 vertex distance to source-state/source-beta fitted reference mesh, unaligned.",
+        "pa_mpjpe21_mm": "Per-frame least-squares similarity fit of all21 predicted joints to reference (translation, proper rotation det+1, uniform scale), then mean Euclidean joint error in millimetres. Same subset/mask as absolute metrics; not the full paper benchmark.",
+        "wrist_aligned_mpjpe21_mm": "Subtract each hand own J0 translation before joint distance; no rotation/scale/PA alignment.",
+        "wrist_aligned_mpvpe778_mm": "Subtract each hand own anatomical wrist translation before vertex distance; no rotation/scale/PA alignment."
+      },
+      "joint_mapping": {
+        "dex21_order": [
+          0,
+          13,
+          14,
+          15,
+          16,
+          1,
+          2,
+          3,
+          17,
+          4,
+          5,
+          6,
+          18,
+          10,
+          11,
+          12,
+          19,
+          7,
+          8,
+          9,
+          20
+        ],
+        "left_tip_vertices": [
+          745,
+          317,
+          445,
+          556,
+          673
+        ],
+        "mano_joint_count": 16,
+        "right_tip_vertices": [
+          745,
+          317,
+          444,
+          556,
+          673
+        ]
+      },
+      "prediction_codec": {
+        "hand_mean": "absolute rotation matrices; never added twice",
+        "left_pose_unflip": "S R S with S=diag(-1,1,1)",
+        "left_shapedirs_fix": true,
+        "left_shapedirs_fix_type": "unconditional official HaWoR renderer",
+        "position_conversion": "J0=MANO_transl+J_regressor0(v_shaped)",
+        "state": "wrist_J0_metres+root_columns6D+15_local_columns6D"
+      },
+      "reference_codec": {
+        "hand_mean": "absolute rotation matrices; never added twice",
+        "left_pose_unflip": "S R S with S=diag(-1,1,1)",
+        "left_shapedirs_fix": false,
+        "left_shapedirs_fix_type": "unconditional official HaWoR renderer",
+        "position_conversion": "J0=MANO_transl+J_regressor0(v_shaped)",
+        "state": "wrist_J0_metres+root_columns6D+15_local_columns6D"
+      },
+      "all": {
+        "branches": {
+          "baseline.raw": {
+            "mpjpe21_mm": 70.53196475588042,
+            "mpvpe778_mm": 70.86217316688575,
+            "pa_mpjpe21_mm": 5.081588248971316,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 14.480092780108523,
+            "wrist_aligned_mpvpe778_mm": 13.930449554837983
+          },
+          "best.candidate": {
+            "mpjpe21_mm": 45.38362745651471,
+            "mpvpe778_mm": 45.25641168444027,
+            "pa_mpjpe21_mm": 4.7145589258966485,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 10.39710941526103,
+            "wrist_aligned_mpvpe778_mm": 10.06513984426489
+          },
+          "best.final": {
+            "mpjpe21_mm": 48.193572674831145,
+            "mpvpe778_mm": 48.04748936404148,
+            "pa_mpjpe21_mm": 4.689344610174899,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 11.414273050148498,
+            "wrist_aligned_mpvpe778_mm": 11.040599213445129
+          },
+          "best.raw": {
+            "mpjpe21_mm": 73.40105391112455,
+            "mpvpe778_mm": 73.51202051181511,
+            "pa_mpjpe21_mm": 4.920714371977264,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 10.734315188177701,
+            "wrist_aligned_mpvpe778_mm": 10.36454018372033
+          },
+          "last.candidate": {
+            "mpjpe21_mm": 46.52467287138765,
+            "mpvpe778_mm": 46.35928080140663,
+            "pa_mpjpe21_mm": 4.66141586078345,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 10.107887504136034,
+            "wrist_aligned_mpvpe778_mm": 9.802198038195154
+          },
+          "last.final": {
+            "mpjpe21_mm": 47.23769492398342,
+            "mpvpe778_mm": 47.06342456188108,
+            "pa_mpjpe21_mm": 4.633215588725353,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 10.74194089086185,
+            "wrist_aligned_mpvpe778_mm": 10.409847675755694
+          },
+          "last.raw": {
+            "mpjpe21_mm": 57.75577000960928,
+            "mpvpe778_mm": 57.8368073848668,
+            "pa_mpjpe21_mm": 4.980494895701221,
+            "valid_states": 1015,
+            "wrist_aligned_mpjpe21_mm": 12.030213223537201,
+            "wrist_aligned_mpvpe778_mm": 11.591900729428371
+          }
+        },
+        "frames": 1015
+      },
+      "handedness": {
+        "left": {
+          "branches": {
+            "baseline.raw": {
+              "mpjpe21_mm": 61.60196612285793,
+              "mpvpe778_mm": 62.191872385004366,
+              "pa_mpjpe21_mm": 5.258462361288394,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 17.831153706953415,
+              "wrist_aligned_mpvpe778_mm": 17.161432983212524
+            },
+            "best.candidate": {
+              "mpjpe21_mm": 60.2088819118183,
+              "mpvpe778_mm": 60.152526943261876,
+              "pa_mpjpe21_mm": 5.172778019952679,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 10.617933014239645,
+              "wrist_aligned_mpvpe778_mm": 10.343912355736274
+            },
+            "best.final": {
+              "mpjpe21_mm": 63.73518771298956,
+              "mpvpe778_mm": 63.66413068254932,
+              "pa_mpjpe21_mm": 5.15257182118836,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 11.922959404301558,
+              "wrist_aligned_mpvpe778_mm": 11.60029451511397
+            },
+            "best.raw": {
+              "mpjpe21_mm": 109.753935405924,
+              "mpvpe778_mm": 110.02525265036077,
+              "pa_mpjpe21_mm": 5.437838019176781,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 11.518314621939126,
+              "wrist_aligned_mpvpe778_mm": 11.177015914813706
+            },
+            "last.candidate": {
+              "mpjpe21_mm": 64.37188407230033,
+              "mpvpe778_mm": 64.26702057583668,
+              "pa_mpjpe21_mm": 5.128264337381061,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 10.254030498786953,
+              "wrist_aligned_mpvpe778_mm": 10.032372831007203
+            },
+            "last.final": {
+              "mpjpe21_mm": 64.88233082303071,
+              "mpvpe778_mm": 64.77032745874315,
+              "pa_mpjpe21_mm": 5.097816716132348,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 11.088858439173508,
+              "wrist_aligned_mpvpe778_mm": 10.833716445881537
+            },
+            "last.raw": {
+              "mpjpe21_mm": 81.65611132043364,
+              "mpvpe778_mm": 81.92106117152134,
+              "pa_mpjpe21_mm": 5.530457615691177,
+              "valid_states": 554,
+              "wrist_aligned_mpjpe21_mm": 12.796832025696654,
+              "wrist_aligned_mpvpe778_mm": 12.379578539610769
+            }
+          },
+          "frames": 554
+        },
+        "right": {
+          "branches": {
+            "baseline.raw": {
+              "mpjpe21_mm": 81.26345985933912,
+              "mpvpe778_mm": 81.28158018025297,
+              "pa_mpjpe21_mm": 4.8690323742996044,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 10.45300437778299,
+              "wrist_aligned_mpvpe778_mm": 10.047662528114568
+            },
+            "best.candidate": {
+              "mpjpe21_mm": 27.567594987451383,
+              "mpvpe778_mm": 27.35522328229892,
+              "pa_mpjpe21_mm": 4.163900838896576,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 10.131737888505816,
+              "wrist_aligned_mpvpe778_mm": 9.730129060414246
+            },
+            "best.final": {
+              "mpjpe21_mm": 29.51666436433275,
+              "mpvpe778_mm": 29.280419319674145,
+              "pa_mpjpe21_mm": 4.132668091950498,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 10.80296667227259,
+              "wrist_aligned_mpvpe778_mm": 10.367993579769342
+            },
+            "best.raw": {
+              "mpjpe21_mm": 29.714510856636693,
+              "mpvpe778_mm": 29.63277841907261,
+              "pa_mpjpe21_mm": 4.299268600722329,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 9.792155348039243,
+              "wrist_aligned_mpvpe778_mm": 9.388159370215492
+            },
+            "last.candidate": {
+              "mpjpe21_mm": 25.07704813102838,
+              "mpvpe778_mm": 24.838916734087235,
+              "pa_mpjpe21_mm": 4.100387539666139,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 9.932262300152065,
+              "wrist_aligned_mpvpe778_mm": 9.525588851171564
+            },
+            "last.final": {
+              "mpjpe21_mm": 26.033512086516605,
+              "mpvpe778_mm": 25.784413271508868,
+              "pa_mpjpe21_mm": 4.074887986591996,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 10.32503780677365,
+              "wrist_aligned_mpvpe778_mm": 9.900469587578431
+            },
+            "last.raw": {
+              "mpjpe21_mm": 29.033884790093676,
+              "mpvpe778_mm": 28.89390804038389,
+              "pa_mpjpe21_mm": 4.319585249552785,
+              "valid_states": 461,
+              "wrist_aligned_mpjpe21_mm": 11.10894030293777,
+              "wrist_aligned_mpvpe778_mm": 10.645320454285098
+            }
+          },
+          "frames": 461
+        }
+      },
+      "torch_version": "2.10.0+cu130",
+      "device": "cpu",
+      "completed_utc": "2026-10-16T06:00:16.449610+00:00",
+      "report_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/hawor_paper_metric_audit_20261016/geometry_test_pa.json",
+      "report_sha256": "59b772b099822225f3911171fc28a496fd9ec6e42165b225cae135a81bb69e6a",
+      "prediction_artifact_fingerprint_sha256": "45715dd52626d5fa790d4ff24f5178a87042f78cd1c3cbe244dfcc9ff6fcfa89",
+      "prior_metric_per_frame_max_abs_difference_mm": 0.00048828125,
+      "per_frame_rows": 1015,
+      "reference_fk_max_mm": 0.00024575624024691933
+    },
+    "val": {
+      "evaluation_script_sha256": "4c1751566c7b45b82b8c1742c76ff8f8542726c9319630906b1cbc343250a774",
+      "source_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_feedback_dex_joint_sources_v2_20261016/source_manifest.json",
+      "source_manifest_sha256": "67462dced45615c9e0ea8d761da58094d03f8b8cadc47370c06f126751259d3e",
+      "mano_asset_sha256": {
+        "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+        "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+      },
+      "metric_definition": {
+        "mpjpe21_mm": "Mean Euclidean predicted MANO/Dex21 joint distance to source joint_3d, unaligned, millimetres.",
+        "mpvpe778_mm": "Mean corresponding MANO778 vertex distance to source-state/source-beta fitted reference mesh, unaligned.",
+        "pa_mpjpe21_mm": "Per-frame least-squares similarity fit of all21 predicted joints to reference (translation, proper rotation det+1, uniform scale), then mean Euclidean joint error in millimetres. Same subset/mask as absolute metrics; not the full paper benchmark.",
+        "wrist_aligned_mpjpe21_mm": "Subtract each hand own J0 translation before joint distance; no rotation/scale/PA alignment.",
+        "wrist_aligned_mpvpe778_mm": "Subtract each hand own anatomical wrist translation before vertex distance; no rotation/scale/PA alignment."
+      },
+      "joint_mapping": {
+        "dex21_order": [
+          0,
+          13,
+          14,
+          15,
+          16,
+          1,
+          2,
+          3,
+          17,
+          4,
+          5,
+          6,
+          18,
+          10,
+          11,
+          12,
+          19,
+          7,
+          8,
+          9,
+          20
+        ],
+        "left_tip_vertices": [
+          745,
+          317,
+          445,
+          556,
+          673
+        ],
+        "mano_joint_count": 16,
+        "right_tip_vertices": [
+          745,
+          317,
+          444,
+          556,
+          673
+        ]
+      },
+      "prediction_codec": {
+        "hand_mean": "absolute rotation matrices; never added twice",
+        "left_pose_unflip": "S R S with S=diag(-1,1,1)",
+        "left_shapedirs_fix": true,
+        "left_shapedirs_fix_type": "unconditional official HaWoR renderer",
+        "position_conversion": "J0=MANO_transl+J_regressor0(v_shaped)",
+        "state": "wrist_J0_metres+root_columns6D+15_local_columns6D"
+      },
+      "reference_codec": {
+        "hand_mean": "absolute rotation matrices; never added twice",
+        "left_pose_unflip": "S R S with S=diag(-1,1,1)",
+        "left_shapedirs_fix": false,
+        "left_shapedirs_fix_type": "unconditional official HaWoR renderer",
+        "position_conversion": "J0=MANO_transl+J_regressor0(v_shaped)",
+        "state": "wrist_J0_metres+root_columns6D+15_local_columns6D"
+      },
+      "all": {
+        "branches": {
+          "baseline.raw": {
+            "mpjpe21_mm": 81.41794701382854,
+            "mpvpe778_mm": 81.64146274090639,
+            "pa_mpjpe21_mm": 5.30048362235529,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 13.465372372747915,
+            "wrist_aligned_mpvpe778_mm": 12.899073840840437
+          },
+          "best.candidate": {
+            "mpjpe21_mm": 38.865874880521304,
+            "mpvpe778_mm": 38.83452092464916,
+            "pa_mpjpe21_mm": 4.361280813752997,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 10.476206752208531,
+            "wrist_aligned_mpvpe778_mm": 10.077549109012663
+          },
+          "best.final": {
+            "mpjpe21_mm": 38.804286584490505,
+            "mpvpe778_mm": 38.734135129422825,
+            "pa_mpjpe21_mm": 4.334768206102055,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 11.091918125103003,
+            "wrist_aligned_mpvpe778_mm": 10.661722632793248
+          },
+          "best.raw": {
+            "mpjpe21_mm": 53.257161501582,
+            "mpvpe778_mm": 53.417913724479476,
+            "pa_mpjpe21_mm": 4.5676807746052965,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 11.006471030220416,
+            "wrist_aligned_mpvpe778_mm": 10.552965228644359
+          },
+          "last.candidate": {
+            "mpjpe21_mm": 34.6549829395433,
+            "mpvpe778_mm": 34.597783812617095,
+            "pa_mpjpe21_mm": 4.264472967079963,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 10.142597497232659,
+            "wrist_aligned_mpvpe778_mm": 9.749652619585007
+          },
+          "last.final": {
+            "mpjpe21_mm": 34.12854317775839,
+            "mpvpe778_mm": 34.052492773512206,
+            "pa_mpjpe21_mm": 4.264957658990443,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 10.449935308982017,
+            "wrist_aligned_mpvpe778_mm": 10.042141501163899
+          },
+          "last.raw": {
+            "mpjpe21_mm": 44.09794863216592,
+            "mpvpe778_mm": 44.271404691957315,
+            "pa_mpjpe21_mm": 4.631910122879675,
+            "valid_states": 577,
+            "wrist_aligned_mpjpe21_mm": 11.91287987318981,
+            "wrist_aligned_mpvpe778_mm": 11.409085106395146
+          }
+        },
+        "frames": 577
+      },
+      "handedness": {
+        "left": {
+          "branches": {
+            "baseline.raw": {
+              "mpjpe21_mm": 63.81164280684678,
+              "mpvpe778_mm": 64.10003960215963,
+              "pa_mpjpe21_mm": 9.03988078146178,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 27.421414041852618,
+              "wrist_aligned_mpvpe778_mm": 26.24175348481932
+            },
+            "best.candidate": {
+              "mpjpe21_mm": 92.00754799542727,
+              "mpvpe778_mm": 92.00384887948736,
+              "pa_mpjpe21_mm": 7.639225726170973,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 20.708007739140438,
+              "wrist_aligned_mpvpe778_mm": 19.883392333984375
+            },
+            "best.final": {
+              "mpjpe21_mm": 86.4852381219397,
+              "mpvpe778_mm": 86.37024257899998,
+              "pa_mpjpe21_mm": 7.66908208484661,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 21.604105235813382,
+              "wrist_aligned_mpvpe778_mm": 20.728958163228068
+            },
+            "best.raw": {
+              "mpjpe21_mm": 149.88645494901218,
+              "mpvpe778_mm": 150.33818030190633,
+              "pa_mpjpe21_mm": 7.777499665850243,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 20.722018548658678,
+              "wrist_aligned_mpvpe778_mm": 19.886993288160205
+            },
+            "last.candidate": {
+              "mpjpe21_mm": 79.03446060127311,
+              "mpvpe778_mm": 78.94355898637038,
+              "pa_mpjpe21_mm": 7.5265036739223214,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 20.294108657570153,
+              "wrist_aligned_mpvpe778_mm": 19.505135622891512
+            },
+            "last.final": {
+              "mpjpe21_mm": 75.85374043871472,
+              "mpvpe778_mm": 75.72680012496201,
+              "pa_mpjpe21_mm": 7.553968036042413,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 20.847698768535693,
+              "wrist_aligned_mpvpe778_mm": 20.032773928208783
+            },
+            "last.raw": {
+              "mpjpe21_mm": 106.08834630125887,
+              "mpvpe778_mm": 106.57352878330471,
+              "pa_mpjpe21_mm": 7.891545012139786,
+              "valid_states": 143,
+              "wrist_aligned_mpjpe21_mm": 21.748584967393143,
+              "wrist_aligned_mpvpe778_mm": 20.82643590273557
+            }
+          },
+          "frames": 143
+        },
+        "right": {
+          "branches": {
+            "baseline.raw": {
+              "mpjpe21_mm": 87.21910254746538,
+              "mpvpe778_mm": 87.42124041104647,
+              "pa_mpjpe21_mm": 4.068378106797163,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 8.866953113112032,
+              "wrist_aligned_mpvpe778_mm": 8.502753128653847
+            },
+            "best.candidate": {
+              "mpjpe21_mm": 21.356060927914037,
+              "mpvpe778_mm": 21.315594893446715,
+              "pa_mpjpe21_mm": 3.281220623716665,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 7.104899053749401,
+              "wrist_aligned_mpvpe778_mm": 6.846591548710924
+            },
+            "best.final": {
+              "mpjpe21_mm": 23.0937426447319,
+              "mpvpe778_mm": 23.038367006635884,
+              "pa_mpjpe21_mm": 3.2361348313083407,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 7.628225137011796,
+              "wrist_aligned_mpvpe778_mm": 7.344638114700669
+            },
+            "best.raw": {
+              "mpjpe21_mm": 21.418477255078503,
+              "mpvpe778_mm": 21.483355842977076,
+              "pa_mpjpe21_mm": 3.5100676376282824,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 7.8052652810575776,
+              "wrist_aligned_mpvpe778_mm": 7.477467503965175
+            },
+            "last.candidate": {
+              "mpjpe21_mm": 20.032251820586243,
+              "mpvpe778_mm": 19.9861574304818,
+              "pa_mpjpe21_mm": 3.189656397774763,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 6.797744741637586,
+              "wrist_aligned_mpvpe778_mm": 6.5352884042098225
+            },
+            "last.final": {
+              "mpjpe21_mm": 20.380379103295812,
+              "mpvpe778_mm": 20.32109657245847,
+              "pa_mpjpe21_mm": 3.181251474846592,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 7.023944123000044,
+              "wrist_aligned_mpvpe778_mm": 6.750297176123764
+            },
+            "last.raw": {
+              "mpjpe21_mm": 23.672541105252808,
+              "mpvpe778_mm": 23.743285463702293,
+              "pa_mpjpe21_mm": 3.557882958906869,
+              "valid_states": 434,
+              "wrist_aligned_mpjpe21_mm": 8.672083033394705,
+              "wrist_aligned_mpvpe778_mm": 8.306133115895882
+            }
+          },
+          "frames": 434
+        }
+      },
+      "torch_version": "2.10.0+cu130",
+      "device": "cpu",
+      "completed_utc": "2026-10-16T06:00:19.095077+00:00",
+      "report_path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/hawor_paper_metric_audit_20261016/geometry_val_pa.json",
+      "report_sha256": "c34743664ad845d64226e009de50de20620760bc9981b2ca2ce21e449e3a2e9f",
+      "prediction_artifact_fingerprint_sha256": "65cd58b6696f52d5dfe43417d255b83b82184b9fbcbcaa43f604718e34cfd0e9",
+      "prior_metric_per_frame_max_abs_difference_mm": 8.20159912109375e-05,
+      "per_frame_rows": 577,
+      "reference_fk_max_mm": 0.00023992720343812834
+    }
+  },
+  "paper": {
+    "url": "https://arxiv.org/html/2501.02973v1",
+    "table": 1,
+    "DexYCB_PA_MPJPE_mm": 4.76,
+    "source": "Original paper section4 metrics and Table1 caption explicitly say Procrustes aligned."
+  },
+  "ratios": {
+    "baseline_test_pa_above_paper_percent": 6.756055650657888,
+    "best_test_pa_reduction_percent": 7.7189181724005245
+  },
+  "baseline_reference_alignment_check": {
+    "states": 1015,
+    "negative_determinant_fits": 0,
+    "max_absolute_difference_mm": 1.3885381733302893e-09,
+    "reference": "FreiHAND eval.py align_w_scale as imported by HaWoR author HPEEvaluator; reimplemented center/norm/scipy fit, millimetre inputs",
+    "url": "https://raw.githubusercontent.com/lmb-freiburg/freihand/master/eval.py",
+    "passed": true
+  }
+}
