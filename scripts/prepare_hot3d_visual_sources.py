@@ -96,11 +96,26 @@ def read_reference(root: Path, entry: dict) -> tuple[dict, dict]:
 
 def pinhole_parameters(raw: dict, image_size: int) -> tuple:
     """Official projection, plus an explicit center-consistent image scaling."""
+    from scipy.spatial.transform import Rotation
     source = _CAMERA.from_json(raw)
     if (raw["calibration"]["projection_model_type"] != "CameraModelType.FISHEYE624"
             or len(raw["calibration"]["projection_params"]) != 15
             or source.width != source.height or "rgb" not in source.label.lower()):
         raise ValueError("Require audited square Aria FISHEYE624 RGB camera")
+    # Official from_json first stores T in float32. Its R is then only
+    # approximately orthogonal: R.T and inv(R) disagree, amplified by 1/z
+    # for near-plane, far-out-of-image landmarks. Rebuild the same SE(3)
+    # directly from original JSON values in float64, before any projection.
+    quaternion = np.asarray(raw["T_world_from_camera"]["quaternion_wxyz"], dtype=np.float64)
+    translation = np.asarray(raw["T_world_from_camera"]["translation_xyz"], dtype=np.float64)
+    if (quaternion.shape != (4,) or translation.shape != (3,)
+            or not np.isfinite(quaternion).all() or not np.isfinite(translation).all()
+            or np.linalg.norm(quaternion) < 1e-12):
+        raise ValueError("Invalid source camera quaternion/translation")
+    exact_transform = np.eye(4, dtype=np.float64)
+    exact_transform[:3, :3] = Rotation.from_quat(quaternion[[1, 2, 3, 0]]).as_matrix()
+    exact_transform[:3, 3] = translation
+    source.T_world_from_eye = exact_transform
     scale = image_size / source.width
     f = np.asarray(source.f, dtype=np.float64) * scale
     c = (np.asarray(source.c, dtype=np.float64) + .5) * scale - .5
@@ -113,7 +128,7 @@ def pinhole_parameters(raw: dict, image_size: int) -> tuple:
     transform[:3, :3] = transform[:3, :3] @ clockwise.T
     intrinsic = np.asarray([[f[1], 0., image_size - 1 - c[1]],
                             [0., f[0], c[0]], [0., 0., 1.]], dtype=np.float64)
-    if (np.max(np.abs(transform[:3, :3].T @ transform[:3, :3] - np.eye(3))) > 1e-5
+    if (np.max(np.abs(transform[:3, :3].T @ transform[:3, :3] - np.eye(3))) > 1e-12
             or not np.isfinite(intrinsic).all()):
         raise ValueError("Nonrigid/nonfinite rotated camera")
     return source, pinhole, intrinsic, transform
@@ -150,10 +165,40 @@ def remap_for_camera(source, pinhole) -> tuple[np.ndarray, np.ndarray, float]:
 
 
 def project_world(joints: np.ndarray, transform: np.ndarray, intrinsic: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    inverse = np.linalg.inv(transform)
-    camera_joints = joints.astype(np.float64) @ inverse[:3, :3].T + inverse[:3, 3]
+    # T is the exact float64 JSON rigid transform, so transpose is its rigid
+    # inverse. Subtract camera translation before rotating to avoid two large
+    # world-coordinate terms cancelling after separate matrix products.
+    matrix = np.asarray(transform, dtype=np.float64)
+    camera_joints = (joints.astype(np.float64) - matrix[:3, 3]) @ matrix[:3, :3]
     projected = camera_joints @ intrinsic.T
     return projected[..., :2] / projected[..., 2:], camera_joints
+
+
+def check_float32_export(joints: np.ndarray, transform: np.ndarray, intrinsic: np.ndarray,
+                         projected64: np.ndarray, valid_slots: np.ndarray, image_size: int) -> tuple[float, int]:
+    """Check the actual loader/codec float32 SE(3) path on in-image landmarks.
+
+    All positive landmarks already pass the independent float64 rotation
+    identity. Far-offscreen near-plane points do not define an image pixel;
+    separately require exported K/T to preserve calibrated in-frame pixels.
+    The 0.02px threshold is the original precision gate, not a relaxed one.
+    """
+    import torch
+    in_frame = valid_slots & np.all((projected64 >= 0) & (projected64 <= image_size - 1), axis=-1)
+    if not in_frame.any():
+        return 0., 0
+    points = torch.from_numpy(np.ascontiguousarray(joints)).float()
+    matrix, k = torch.from_numpy(np.ascontiguousarray(transform)).float(), torch.from_numpy(intrinsic).float()
+    inverse_rotation = matrix[:3, :3].T
+    # Same float32 operations as invert_transform + transform_points in the
+    # production codec; GT and exported camera tensors are both float32.
+    camera_joints = points @ inverse_rotation.T - (inverse_rotation @ matrix[:3, 3])[None]
+    homogeneous = camera_joints @ k.T
+    projected32 = (homogeneous[:, :2] / homogeneous[:, 2:]).numpy()
+    error = float(np.max(np.abs(projected32[in_frame] - projected64[in_frame])))
+    if not np.isfinite(error) or error > .02:
+        raise ValueError(f"Float32 exported K/T lose in-frame pixel precision: {error}px")
+    return error, int(in_frame.sum())
 
 
 def prepare_clip(job: dict) -> dict:
@@ -167,6 +212,7 @@ def prepare_clip(job: dict) -> dict:
         raise ValueError("HOT archive size/SHA differs from immutable download/preparation")
     records, rejected, metadata_digest = [], [], hashlib.sha256()
     states_max_error, rotation_pixel_max_error, map_max_error = 0., 0., 0.
+    export_pixel_max_error, export_checked_landmarks = 0., 0
     camera_data, image_metadata, map_cache = {}, {}, {}
     with tarfile.open(tar_path, "r:") as archive:
         names = [member.name for member in archive.getmembers() if member.isfile()]
@@ -239,13 +285,17 @@ def prepare_clip(job: dict) -> dict:
                 rotated = np.stack((job["image_size"] - 1 - old[:, 1], old[:, 0]), axis=-1)
                 pixel_error = float(np.max(np.abs(projected[valid_slots] - rotated[valid_slots])))
                 rotation_pixel_max_error = max(rotation_pixel_max_error, pixel_error)
-                if pixel_error > .02:
-                    raise ValueError(f"Rotated K/camera_to_world projection mismatch: {pixel_error}px")
+                if pixel_error > 1e-5:
+                    raise ValueError(f"Float64 rotated K/camera_to_world identity mismatch: {pixel_error}px")
                 box = np.concatenate((projected[valid_slots].min(axis=0), projected[valid_slots].max(axis=0)))
                 clipped = np.concatenate((np.maximum(box[:2], 0), np.minimum(box[2:], job["image_size"] - 1)))
                 if not np.isfinite(box).all() or np.any(clipped[2:] - clipped[:2] < 4):
                     skipped["reference_bbox_has_less_than_4px_pinhole_intersection"] += 1
                     continue
+                export_error, checked = check_float32_export(joints[position], transform, intrinsic,
+                    projected, valid_slots, job["image_size"])
+                export_pixel_max_error = max(export_pixel_max_error, export_error)
+                export_checked_landmarks += checked
                 # Crop only the portion present in this pinhole image. This
                 # avoids treating unobserved fisheye rays as an RGB detection.
                 selected.append(position)
@@ -321,6 +371,8 @@ def prepare_clip(job: dict) -> dict:
             "unique_rgb_images": len(image_metadata), "source_metadata_payload_sha256": metadata_digest.hexdigest(),
             "source_mano_redecode_max_abs_state_error": states_max_error,
             "rotated_pinhole_projection_max_error_px": rotation_pixel_max_error,
+            "float32_export_in_frame_max_error_px": export_pixel_max_error,
+            "float32_export_checked_in_frame_landmarks": export_checked_landmarks,
             "sampling_map_equivalence_max_error_px": map_max_error}
 
 
@@ -429,6 +481,7 @@ def main() -> None:
         "reference_manifest": prepared_identity, "download_manifest": download_identity, "decoder_provenance": decoder,
         "camera_toolkit_revision": toolkit_revision, "camera_toolkit_files": toolkit_files,
         "camera_protocol": "official FISHEYE624 projection; centered scaled pinhole; clockwise90 pixels with corresponding positive-focal K and T_world_from_camera rotation",
+        "camera_precision_protocol": "original JSON quaternion/translation rebuilt as float64 SE3; <=1e-5px clockwise identity for every positive reference landmark; unchanged <=0.02px gate for exported float32 K/T at in-frame published landmarks; source/selection rules unchanged",
         "pinhole_image_size": args.image_size, "image_encoding": "JPEG quality95 after linear remap; no grayscale replication",
         "sampling_map_protocol": "pinhole rays to original calibrated fisheye eye_to_window; same eye as official warp_image; float64 world-path cross-check",
         "focal_convention": FOCAL_CONVENTION, "coordinate_convention": "column vectors; source recording world; metres; calibrated moving camera",
