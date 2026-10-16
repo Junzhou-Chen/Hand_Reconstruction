@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16 AUC补测完成：** 同test1015保存预测，官方HaWoR→预选best300 final的PA-AUC **89.83933%→90.62120%（+0.78187个百分点）**；绝对AUC13.59279%→33.08518%，仅腕平移对齐71.10035%→77.20214%。last1000 PA90.73607%仅终点对照；val577 PA89.40736%→best91.32986%。沿作者0–50mm／100阈值、逐joint PCK≤与梯形积分归一化；官方EvalUtil每split69项独立核对AUC／曲线差均0，原五项几何均值与上轮CPU结果最大差8.882e-16mm。论文PA-AUC90.5%为不同完整集合，当前小子集不作排名。Pod CPU仅FK／指标，无视觉前向、训练、权重或best选择改变。[协议与结果](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小型摘要](../reports/hawor_auc_audit_20261016.json)。
+
 **2026-10-16 HaWoR论文指标差距核查完成：** 论文DexYCB Table1的4.76mm是PA-MPJPE，原报告70.532mm是绝对MPJPE，均为毫米，不能直接比较。Pod CPU重解码同一保存预测后，test1015原官方HaWoR PA **5.08159mm**、预选best300 final **4.68934mm**（同集PA下降7.719%）；baseline比论文数值高6.756%，非十倍。仍16录制／单视角prefix128子集，不能据4.689<4.76宣称胜过论文完整test。新增可选PA评测，原四项逐帧差<0.001mm，无训练／视觉前向或best重选。[核查与来源](../docs/HAWOR_BASELINE_METRIC_AUDIT_2026-10-16.md)、[小摘要](../reports/hawor_paper_metric_audit_20261016.json)。
 
 2026-10-16下一轮训练分析：记录用户“以原生baseline→final的平均纠正为主，无逐帧保证要求”，复核已有20点fixed8曲线、46clip／1128帧的小视觉池与scheduler；补查可用group的预训练raw=candidate和真实多轮条件差异。核官方HaWoR compute_loss（其3D为root-relative，不自动约束绝对深度）、StableHand、PoseBERT、DIP、DF、WHAM与WestWorld训练协议，提出数据覆盖、raw绝对腕／finaljoint监督、条件／历史对齐、回放和3k/5k版本化预算的单因素建议。新增[下一轮训练分析](../docs/NEXT_TRAINING_ANALYSIS_2026-10-16.md)，更新入口／02／04；未实施新loss／采样／schedule／权重／checkpoint选择，未新训或做模型推理，不将候选写成用户决定。

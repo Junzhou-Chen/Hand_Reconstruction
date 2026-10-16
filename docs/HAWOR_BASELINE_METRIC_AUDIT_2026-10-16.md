@@ -39,3 +39,25 @@ HaWoR 论文 Table 1 的表头简写 `MPJPE`，但 caption 和 §4 明确为 **P
 - [Git小型摘要](../reports/hawor_paper_metric_audit_20261016.json)保存指标、manifest／资产／脚本SHA与输入产物fingerprint；完整预测、licensed MANO与逐帧原始产物留远程。原D40 best300／last1000身份不变，没有按PA指标重选。
 
 来源：[HaWoR原论文 §4与Table1](https://arxiv.org/html/2501.02973v1)、[作者DexYCB HPEEvaluator](https://github.com/ThunderVVV/dex-ycb-toolkit/blob/ad97815f946f220f91fd70b1e75191d422ab85bf/dex_ycb_toolkit/hpe_eval.py)（`joint_3d *=1000`、`align_w_scale(kpt_gt,kpt_pred)`）、[FreiHAND对齐函数](https://github.com/lmb-freiburg/freihand/blob/master/eval.py)、[原联合终点评测协议](VISUAL_JOINT_FINAL_EVALUATION_2026-10-16.md)。
+
+## 后续：AUC补算（2026-10-16）
+
+按用户要求新增 `--include-auc`（自动启用PA），在同一Pod CPU重解码原三套保存预测，覆盖七个raw/candidate/final分支。阈值和积分沿作者HPEEvaluator引用的[FreiHAND EvalUtil](https://github.com/lmb-freiburg/freihand/blob/master/utils/eval_util.py)：0–50mm、100个含端点的等间隔阈值，逐joint判断 `error <= threshold`，PCK曲线梯形积分除以50，再对21个joint平均。计算使用全部完整有效状态；不是对逐帧MPJPE先取均值再阈值化。AUC归一化为[0,1]，下表乘100显示，越高越好；不是某个单阈值的正确率或模型置信度。
+
+| 模型 / test1015 | 绝对 AUC % | 仅腕平移对齐 AUC % | PA-AUC % |
+|---|---:|---:|---:|
+| 官方HaWoR raw | 13.59279 | 71.10035 | **89.83933** |
+| 预选best300 final | 33.08518 | 77.20214 | **90.62120** |
+| 预定终点last1000 final | 38.42950 | 78.54020 | **90.73607** |
+
+best同test PA-AUC提高 **0.78187个百分点**；绝对AUC提高19.49239个百分点。论文Table1 DexYCB All PA-AUC为 **90.5%**，但仍因当前单视角prefix128子集与论文完整协议不同，不能按90.62>90.5宣称超过论文。last仅终点对照，未重新选择best。
+
+| 模型 / val577 | 绝对 AUC % | 仅腕平移对齐 AUC % | PA-AUC % |
+|---|---:|---:|---:|
+| 官方HaWoR raw | 5.16100 | 74.84914 | 89.40736 |
+| 预选best300 final | 44.96625 | 78.16383 | 91.32986 |
+| 预定终点last1000 final | 51.45567 | 79.44190 | 91.47516 |
+
+验证：直接加载已审阅的官方EvalUtil源码，在远程对每个实际branch×alignment×all/left/right的结果及0/25/50/>50mm边界／mixed-joint用例独立核对。每个split共69项，AUC及每个PCK曲线点最大差均为0；对照作者源码常数0/50/100通过。原五项几何指标的所有分支均值与上轮CPU PA报告最大差8.882e-16mm（浮点舍入），test1015／val577计数与reference FK审计保持通过。无新视觉模型前向、训练、checkpoint调整、test筛选或遮挡分组；只新增FK／指标评测。
+
+远程产物：`/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/hawor_auc_audit_20261016/`，包括 `geometry_{test,val}_auc.json`、逐帧几何CSV、完整PCK曲线、参考源码及SHA、`reference_checks_{test,val}.json`、执行脚本和原日志。新脚本仍复用原e72f7ed的src/codec，当前工作区其它训练修改未进入本次评测。Git仅保存[小型AUC摘要](../reports/hawor_auc_audit_20261016.json)、源码与文档；完整预测及许可MANO留远程。

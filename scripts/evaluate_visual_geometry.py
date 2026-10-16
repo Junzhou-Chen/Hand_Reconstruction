@@ -18,6 +18,8 @@ clips/*.pt, a directory of such .pt files, or one clip .pt. Only fixed-camera
 DexYCB source manifests with identity camera_to_world are supported. Absolute
 and wrist-translation-aligned metrics are always reported; --include-pa adds
 per-frame similarity-aligned joint error for comparison with pose papers.
+--include-auc additionally reports normalized PCK AUC over 0--50 mm (100
+thresholds), for absolute, wrist-aligned, and PA-aligned joint distances.
 """
 from __future__ import annotations
 
@@ -37,7 +39,7 @@ DEX_ORDER = (0, 13, 14, 15, 16, 1, 2, 3, 17, 4, 5, 6, 18,
              10, 11, 12, 19, 7, 8, 9, 20)
 
 
-def pa_mpjpe_mm(predicted, target):
+def pa_joint_errors_mm(predicted, target):
     """Fit s*X@R+t to Y per frame, enforcing det(R)=+1 (no reflection).
 
     Double precision keeps the small hand cloud stable after camera offsets
@@ -58,7 +60,36 @@ def pa_mpjpe_mm(predicted, target):
     rotation = (u * signs[:, None, :]) @ vh
     scale = (singular * signs).sum(-1) / variance
     aligned = scale[:, None, None] * (xc @ rotation) + y_mean
-    return (aligned - y).norm(dim=-1).mean(-1) * 1000
+    return (aligned - y).norm(dim=-1) * 1000
+
+
+def pa_mpjpe_mm(predicted, target):
+    return pa_joint_errors_mm(predicted, target).mean(-1)
+
+
+def pck_auc(errors_mm):
+    """FreiHAND EvalUtil semantics for complete [N,21] joint observations.
+
+    PCK uses <= threshold. Integrate each joint's PCK over 100 inclusive
+    thresholds from 0 to 50 mm, normalize by 50, then average 21 joints.
+    Never threshold a per-frame mean error in place of individual joints.
+    """
+    import numpy as np
+
+    errors = np.asarray(errors_mm, dtype=np.float64)
+    if (errors.ndim != 2 or errors.shape[1] != 21 or not len(errors)
+            or not np.isfinite(errors).all() or (errors < 0).any()):
+        raise ValueError('AUC requires nonempty finite nonnegative [N,21] errors in mm')
+    thresholds = np.linspace(0.0, 50.0, 100)
+    per_joint_curve = (errors[..., None] <= thresholds).mean(axis=0)
+    area = ((per_joint_curve[:, 1:] + per_joint_curve[:, :-1]) * 0.5
+            * np.diff(thresholds)).sum(axis=-1) / 50.0
+    auc = float(area.mean())
+    return {'auc': auc, 'auc_percent': auc * 100.0,
+            'valid_states': len(errors), 'joint_observations': int(errors.size),
+            'thresholds_mm': thresholds.tolist(),
+            'pck_curve': per_joint_curve.mean(axis=0).tolist(),
+            'pck_at_mm': {str(t): float((errors <= t).mean()) for t in (5, 10, 20, 30, 50)}}
 
 
 def save_json(path: Path, value: dict[str, Any]) -> None:
@@ -121,7 +152,10 @@ def main() -> None:
     parser.add_argument('--cpu-threads', type=int, default=2)
     parser.add_argument('--include-pa', action='store_true',
                         help='Also report per-frame translation/rotation/scale-aligned MPJPE21')
+    parser.add_argument('--include-auc', action='store_true',
+                        help='Also report absolute/wrist-aligned/PA PCK AUC; implies --include-pa')
     args = parser.parse_args()
+    args.include_pa = args.include_pa or args.include_auc
     if args.include_pa:
         METRICS = (*METRICS, 'pa_mpjpe21_mm')
     if not Path('/sciclone/data10/jchen57').is_dir():
@@ -245,6 +279,7 @@ def main() -> None:
     branches: list[str] = []
     input_provenance: dict[str, Any] = {}
     coverage: dict[str, set[tuple[str, int, int]]] = {}
+    auc_samples: dict[str, list[dict[str, Any]]] = {}
     with torch.no_grad():
         for label, path in args.predictions:
             paths = prediction_paths(path)
@@ -365,7 +400,15 @@ def main() -> None:
                             'wrist_aligned_mpvpe778_mm': (vertex_delta - wrist_delta).norm(dim=-1).mean(-1) * 1000,
                         }
                         if args.include_pa:
-                            measured['pa_mpjpe21_mm'] = pa_mpjpe_mm(predicted_joints, target_joints)
+                            pa_errors = pa_joint_errors_mm(predicted_joints, target_joints)
+                            measured['pa_mpjpe21_mm'] = pa_errors.mean(-1)
+                        if args.include_auc:
+                            auc_samples.setdefault(branch, []).append({
+                                'handedness': right.detach().cpu().numpy(),
+                                'absolute': joint_delta.norm(dim=-1).detach().cpu().numpy() * 1000,
+                                'wrist_aligned': (joint_delta - wrist_delta).norm(dim=-1).detach().cpu().numpy() * 1000,
+                                'pa': pa_errors.detach().cpu().numpy(),
+                            })
                         if not all(bool(torch.isfinite(value).all()) for value in measured.values()):
                             raise FloatingPointError('Nonfinite decoded geometric error')
                         for metric, values in measured.items():
@@ -420,6 +463,20 @@ def main() -> None:
             'Per-frame least-squares similarity fit of all21 predicted joints to reference '
             '(translation, proper rotation det+1, uniform scale), then mean Euclidean '
             'joint error in millimetres. Same subset/mask as absolute metrics; not the full paper benchmark.')
+    if args.include_auc:
+        auc_groups: dict[str, Any] = {'all': {}, 'left': {}, 'right': {}}
+        for branch, samples in auc_samples.items():
+            right = np.concatenate([sample['handedness'] for sample in samples]).astype(bool)
+            for alignment in ('absolute', 'wrist_aligned', 'pa'):
+                distances = np.concatenate([sample[alignment] for sample in samples])
+                for name, mask in (('all', np.ones_like(right)), ('left', ~right), ('right', right)):
+                    if mask.any():
+                        auc_groups[name].setdefault(branch, {})[alignment] = pck_auc(distances[mask])
+        report['pck_auc'] = {
+            'protocol': 'Per-joint PCK(error<=threshold), 100 inclusive linspace thresholds 0--50 mm; trapezoidal integral / 50, then mean over21 joints. AUC in [0,1], auc_percent in [0,100]; higher is better.',
+            'reference': 'https://github.com/lmb-freiburg/freihand/blob/master/utils/eval_util.py',
+            'groups': auc_groups,
+            'scope': 'Same complete-state subset and prediction-valid masks as the geometric metrics; no occlusion grouping or full benchmark claim.'}
     save_json(output, report)
     print(json.dumps({'complete': True, 'report': str(output), 'all': report['all']}, sort_keys=True), flush=True)
 
