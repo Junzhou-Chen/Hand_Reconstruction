@@ -1,5 +1,7 @@
 # HandLoop 项目记忆入口
 
+**D40已完成与最终baseline评测（2026-10-16 04:32UTC／纽约00:32）：** 联合训练正常complete1000（03:49:16UTC），预选best300与终点last1000身份／双rankhash均核，W&B finished。远程新推理完成原始HaWoR、best、last在完整val24clips/577states及独立s0 test16录制/37clips/1015states的同输入对照；test best腕76.335→46.187mm（下降39.49%）、绝对MPJPE21 70.532→48.194mm（31.67%）、仅腕平移对齐MPJPE21 14.480→11.414mm（21.17%）。终点last为45.093/47.238/10.742mm，独立报告，不据test改选best。**收益不均衡：左手绝对MPJPE61.602→63.735mm退化，右手81.263→29.517mm改善；27.68%states绝对MPJPE恶化>1mm。** best末轮candidate→final也退化，但candidate已含首轮TWM／历史，不是整TWM消融；90%椭球覆盖仅60.49%。MANO使用自身预测β，参考FK均通过；GT crop、固定camera、拟合MANO参考、预定prefix128小集，非完整HaWoR官方/ego benchmark。未改损失/权重/Job或新训练；终点motion保持未另测。[最终协议、所有分支与限制](docs/VISUAL_JOINT_FINAL_EVALUATION_2026-10-16.md)、[可复现数值](reports/visual_joint_final_comparison_20261016.json)。下列训练中快照保留作历史。
+
 **D40联合训练效果检查（2026-10-16 01:32UTC／纽约10-15 21:32）：** 只读远程记录，训练253/1000、完整fixedval/best250；8clips/210states，同一GT crop固定camera拟合MANO参考。腕原HaWoR88.250→当前HaWoR65.478→最终48.598mm（较原始低44.9%、较当前raw低25.8%）；root最终8.591°、finger7.530°，finger较当前raw仅低0.78%。最后候选49.590mm/8.452°/7.561°已含首轮TWM/历史，不能将最后一轮腕2%追加收益当整个TWM贡献。训练有波动；37.1%states腕较当前raw差>1mm，90%椭球覆盖仅40%（std32.622mm），NLL回升。相同四源各16窗motion保持noisy腕2.959→3.514mm、finger0.696→0.896°；1s腕100.370→94.874mm改善，2s（三源）152.983→172.615mm且差于hold169.452，不能称先验完全保持。best/latest250双rankhash一致；未改训练/损失或新增推理。[完整效果](docs/VISUAL_JOINT_PROGRESS_2026-10-16.md)、[数值](reports/visual_joint_progress_20261016_0132.json)。
 
 **D40联合训练改为每卡8段（2026-10-16 00:59UTC／纽约10-15 20:59验收）：** 按用户占用反馈，旧batch4在65步完整保存停止，eb8d0b9仅放行RGB batch4→8后续跑；clip32/global16、motion32、LR与3:1任务及总1000不变。实际76/1000，checkpoint69已落盘、双rankhash9455c4b9…一致；两rank在73步14组梯度finite/非零seen/代表参数改变全通过。每卡peak allocated63.498GiB，单时刻nvidia-smi79446MiB，非稳态吞吐证明。W&B同[3abfc864](https://wandb.ai/black-ant/handloop-twm/runs/3abfc864)服务端running/75，runtimebatch8与resume_start65已核。optimizer/scheduler/rank RNG恢复，loader/sampler游标重建；旧阶段归档保留，无精度提升断言。[新批次摘要](reports/visual_joint_batch8_resume_20261016.json)、[协议](docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)。
@@ -18,7 +20,7 @@
 
 **D36启动历史（已完成两epoch；2026-10-15纽约02:56验收）：** 用户要求修复短时噪声并按2个epoch重跑。旧D34已保存停止5,519步，checkpoint/STOP保留且finite/sync通过。新v3显式局部plateau/ramp/scattered/jitter、因果缺失填充、encoder-only位置尺度0.05m；完整覆盖每轮636,610窗、622更新、最后每卡353，每卡512/global1024。25fee71在独立远程worktree从头启动，实际50更新=0.080426/2 epoch、51,200窗口；四库与五case均参与，每卡peak allocated约63.9GB。正式checkpoint10的322个model/963个AdamW浮点张量finite，CPU/两rank hash一致；W&B[58f012f8](https://wandb.ai/black-ant/handloop-twm/runs/58f012f8)服务端已收到step50及epoch曲线。13模式语义检查、全量索引并集/互斥、真实短片段1→4更新跨epoch续跑/尾批次，以及独立STOP保存通过。2epochs是pilot目标，非完成或已证实精度改善；自然样本占比改变旧等源权重，具体比例/尺度仍是假设，D35框架不改。[协议与失败修正](docs/TWM_TRANSIENT_EPOCH_RUN_2026-10-15.md)、[验收摘要](reports/twm_transient_epoch2_20261015.json)。
 
-更新日期：2026-10-15 UTC（纽约10-15）。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
+更新日期：2026-10-16 UTC（纽约10-16）。研究工作名：HandLoop；论文标题仍为候选，以 **Are Gloves Necessary? Learning to Correct Visual Hand Reconstruction with Motion Priors** 为当前写作参考。
 
 **核心 idea：将高精度 glove/MoCap 轨迹中学到的手部结构和运动知识，转移到头戴 RGB 的当前状态估计中。让当前可信的局部视觉观测帮助修复不可见或错误的关节，并通过帧内取证和跨帧反馈持续校正。**
 
@@ -127,14 +129,14 @@
 
 ## 必须记住的项目约束
 
-1. **输入和主干已选定。** 第一版是头戴 RGB + HaWoR，先冻结视觉权重。RGB-D 优先、EgoInfinity 为主干、WiLoR 单帧作为完整系统是历史路线。
+1. **输入和主干已选定。** 第一版是头戴 RGB + HaWoR；D39已按用户决定由D35双冻结改为HaWoR/TWM低LR全量联合微调，D40已完成。RGB-D 优先、EgoInfinity 为主干、WiLoR 单帧作为完整系统是历史路线。
 2. **TWM 独立学状态关系。** 仅以 glove/MoCap 等高质量运动轨迹预训练，不用配对图像、不直接复用 WestWorld 机器人权重、不依赖真实控制 action。
 3. **恢复当前状态为主。** TWM 结合历史和当前受损/部分状态；D29新增较长未来轨迹分布（本轮60步约2秒）用于学习时序关系，并加入MoE及输出不确定性。当前恢复仍单独监督与验收，不按confidence硬拼接。
 4. **可信观测可约束其他关节。** 不只是“看得见保留，看不见预测”。局部可信状态应通过结构关系帮助恢复其他部分。
 5. **视觉和先验都可能出错。** 高 confidence 仍需检验；真实急停/转向应能推翻错误运动预期。
-6. **视觉反馈和时间反馈分开。** D35首版每帧一次：校正历史条件化真实图像读取，candidate交TWM，最终状态及分布描述只在下一帧回灌；不等同已实现帧内多轮或已校准质量q。
+6. **视觉反馈和时间反馈分开。** D39实现每帧两轮候选引导视觉取证＋TWM恢复，帧内raw/H/anchor固定，仅末轮最终状态及分布描述提交下一帧；D35单轮为历史首版。分布尚未校准，不能称已实现可靠质量q。
 7. **状态与测量分开。** 固定原始观测 `Z_t`，更新候选 `S_t^(k)`；当前帧内历史 `H_t` 和参考系 `A_t` 固定。不能把中间输出当成新测量。
-8. **每手99D已定。** p3＋root6＋15个finger rotation6D90，β另存；不是99个独立物理DoF。HaWoR输出需经hand mean/腕偏移等adapter统一，视频支持双手；Oak/Meta/Dex已在各自记录范围验证codec/FK一致性，HaWoR adapter和独立GT几何精度尚未验。
+8. **每手99D已定。** p3＋root6＋15个finger rotation6D90，β另存；不是99个独立物理DoF。HaWoR输出经hand mean/腕偏移等adapter统一，左右手codec与拟合MANO几何对照已在D40测试记录范围验收；独立glove/MoCap精度、双手同时交互仍未验。
 9. **有效性不等于正确性。** raw detection、joint availability、原观测可靠性 `w`、最终状态可靠性 `q` 含义不同。
 10. **精度优先于平滑。** 报告 world/camera/local 几何误差及突变、遮挡、再可见恢复；不以平滑度或 PA-MPJPE 代替绝对世界精度。
 
@@ -144,7 +146,7 @@
 
 ```mermaid
 flowchart TD
-    I[RGB与检测/相机元数据] --> V[冻结HaWoR原16帧路径]
+    I[RGB与检测/相机元数据] --> V[低LR微调HaWoR原16帧路径]
     V --> F[真实IAM图像特征]
     V --> Z[不可覆盖的raw99D]
     F --> A[视觉反馈插件]
@@ -158,7 +160,7 @@ flowchart TD
     O --> N[下一帧历史]
 ```
 
-这是D35已实现首版，不代表正式效果已通过。原16帧HaWoR仍有lookahead；RGB入口要求外部检测与相机轨迹，本轮以GT crop和固定camera小样本验收。旧独立Corrector/w/q/帧内多轮图保留在Git历史与原方法文档，不能当首版代码事实。[实现与边界](docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)。
+该图省略帧内重复；D39实际每帧两轮取证／TWM，仅末轮commit历史，D40已在GT crop与固定camera受控小集完成几何对照。原16帧HaWoR仍有lookahead，部署RGB入口仍需外部检测与相机轨迹。旧独立Corrector/w/q图保留在Git历史与原方法文档，不能当现行代码事实。[实现](docs/VISUAL_JOINT_FINETUNE_2026-10-16.md)、[最终效果与边界](docs/VISUAL_JOINT_FINAL_EVALUATION_2026-10-16.md)。
 
 ## 研究价值与证据边界
 
@@ -172,7 +174,7 @@ flowchart TD
 
 **在统一时间戳、骨架、坐标和 GT 条件下，纯轨迹条件恢复能否降低真实 HaWoR 输出的几何误差，并优于 smoothing/Kalman/普通 temporal model？**
 
-当前执行D37：修复后的v3＋位置feature尺度保持，完整遍历循环采样，从头10,000步、每卡512/global1024；D36两轮已正常完成。历史所有训练checkpoint按用户最新要求改为best-only，旧latest/暂停快照已清理，历史数值与日志保留；具体配比/幅度/尺度不是已验证最优。后续同架构验证分布设计、长预测是否优于hold/常速度及当前恢复是否受益；旧模型可靠当前观测利用不足仍是必须复查的问题，不能假定加MoE/长预测已解决。D25的Oak子集50k结果保留；D26单卡26,346步与D27双卡32,783步均已保存停止。D28的冻结全量验证与输入控制已完成，发现当前可靠观测在带噪历史下未被充分保留；下一步先复查历史/当前噪声与质量提示的训练设计，再验证真实HaWoR误差和自身历史闭环，不能把合成降噪收益直接当完整方法成功。[评测证据](docs/TWM_PAUSED_EVAL_2026-10-14.md)。当前旧dense run保持暂停，不自动resume。
+当前D37纯轨迹10,000步与D40联合微调1,000步均已完成，不自动续训。D40独立test相对原始HaWoR有总体几何收益，但左手绝对关节误差、末轮误改与质量覆盖仍有失败；等预算HaWoR-only微调、smoothing/Kalman、完整ego与长闭环尚无本轮新对照。历史checkpoint按D37用户要求清理为best-only，数值与日志保留；新D40 best300/latest1000均保留，未按test替换best。D40终点纯motion恢复／未来保持尚未另测，不能沿用早期250步的先验保持数值作终点结论。旧dense run保持暂停，不自动resume；[旧输入控制](docs/TWM_PAUSED_EVAL_2026-10-14.md)与[最终联合测试](docs/VISUAL_JOINT_FINAL_EVALUATION_2026-10-16.md)按各自协议分别解释。
 
 ## 记忆的效力与维护
 
