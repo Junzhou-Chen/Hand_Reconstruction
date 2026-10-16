@@ -400,10 +400,13 @@ def main():
             # Evaluation/break can request the same ~8GB state several times.
             # Share the immutable inode until a later atomic replacement.
             if rank == 0 and destination != last_saved['path']:
-                tmp = destination.with_suffix('.pt.tmp')
-                if tmp.exists(): tmp.unlink()
-                os.link(last_saved['path'], tmp); tmp.replace(destination)
+                same_inode = destination.exists() and os.path.samefile(destination, last_saved['path'])
+                if not same_inode:
+                    tmp = destination.with_suffix('.pt.tmp')
+                    if tmp.exists(): tmp.unlink()
+                    os.link(last_saved['path'], tmp); tmp.replace(destination)
             if world > 1: dist.barrier()
+            last_saved.update(step=step, path=destination)
             return
         digest = model_hash(model)
         state = {'rank': rank, 'torch': torch.get_rng_state(), 'cuda': torch.cuda.get_rng_state(device),
