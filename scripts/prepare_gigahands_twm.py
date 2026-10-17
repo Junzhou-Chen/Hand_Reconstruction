@@ -53,6 +53,7 @@ import sys
 import tarfile
 import time
 import tempfile
+import traceback
 import types
 
 import numpy as np
@@ -66,6 +67,7 @@ SOURCE_HASHES = {
     "body_model.py": "4bf74b71d544516a2b58d9f14e5b1e32ab25788993087885a781d4725136f5dc",
     "lbs.py": "f819ebdac888ad364b2844d222a92668c767c6eadd728b264cec102afe74651a",
 }
+SOURCE_BBOX_DIAGONAL_BOUNDS_M = (0.03, 0.5)
 _RUNTIME = None
 
 
@@ -463,7 +465,7 @@ def convert(job: dict) -> dict:
                 "sorted_order_first20": union[:20].tolist()}
     if len(union) == 0:
         return {"recording": job["recording"], "sequences": [], "rejected": "no_chosen_frames"}
-    entries, skipped = [], {}
+    entries, skipped, rejected_hands = [], {}, {}
     for side in ("left", "right"):
         params = value[side]
         pose = rows(params["poses"], 48)
@@ -485,6 +487,7 @@ def convert(job: dict) -> dict:
         if job["max_frames"]:
             indices = indices[:job["max_frames"]]
         if len(indices) < 2:
+            skipped[side]["reason"] = "fewer_than_two_finite_chosen_frames"
             continue
         pose, rh, th, beta = (torch.from_numpy(a[indices].copy()) for a in (pose, rh, th, beta))
         with torch.no_grad():
@@ -536,8 +539,37 @@ def convert(job: dict) -> dict:
                 vertex_count += ve.numel()
                 joint_count += je.numel()
                 diameters.extend((source.amax(1)-source.amin(1)).norm(dim=-1).tolist())
-            if not np.isfinite(diameters).all() or min(diameters) < 0.03 or max(diameters) > 0.5:
-                raise ValueError("Source MANO scale is implausible for metre units; review source/assets")
+            minimum_diagonal, maximum_diagonal = SOURCE_BBOX_DIAGONAL_BOUNDS_M
+            diameter_values = np.asarray(diameters)
+            bad_geometry = (~np.isfinite(diameter_values) | (diameter_values < minimum_diagonal) |
+                            (diameter_values > maximum_diagonal))
+            if bad_geometry.any():
+                # This is source-geometry QC, independent of whether a99D
+                # conversion reproduces that geometry. For example released
+                # p017-fastfood/049 left contains enormous pose/translation
+                # fits whose float32 world mesh collapses to zero diameter,
+                # while its right hand is usable. Never change its beta,
+                # lower the fixed guard, or discard the other hand.
+                rejected_hands[side] = {
+                    "reason": "source_world_mesh_bbox_diagonal_outside_fixed_metres_guard",
+                    "recording": job["recording"], "hand": side,
+                    "source_path": str(source_path), "source_sha256": sha256(source_path),
+                    "source_rows": n, "finite_chosen_frames": len(indices),
+                    "nonfinite_source_parameter_rows": skipped[side]["nonfinite"],
+                    "source_parameter_extrema": {
+                        "poses_abs_max_rad": float(pose.abs().max()),
+                        "Rh_abs_max_rad": float(rh.abs().max()),
+                        "Th_abs_max_m": float(th.abs().max()),
+                        "beta_abs_max": float(beta.abs().max())},
+                    "bbox_diagonal_minmax_m": [float(diameter_values.min()), float(diameter_values.max())],
+                    "guard_bounds_m": [minimum_diagonal, maximum_diagonal],
+                    "checked_frame_ids": union[indices[check]].tolist(),
+                    "bad_checked_frame_ids": union[indices[check[bad_geometry]]].tolist(),
+                    "all_retained_frames_checked": len(check) == len(indices),
+                    "source_to_export_vertex_max_m": vertex_max,
+                    "source_to_export_joint_max_m": joint_max,
+                    "policy": "reject this source hand only; preserve the other hand; never alter parameters; unknown errors and FK mismatches remain fatal"}
+                continue
         frames = union[indices]
         raw_wrist_audit = triangulated_wrist_audit(
             root / session / "keypoints_3d" / clip / (side + ".jsonl"), frames,
@@ -578,7 +610,8 @@ def convert(job: dict) -> dict:
                                          "hand_bbox_diagonal_m": [min(diameters), max(diameters)],
                                          "tolerance_m": job["fk_tolerance_m"],
                                          "scope": "independent pinned source EasyMoCap LBS versus shared-smplx decoded exported99D; not physical GT accuracy"}})
-    return {"recording": job["recording"], "sequences": entries, "skipped": skipped}
+    return {"recording": job["recording"], "sequences": entries, "skipped": skipped,
+            "rejected_hands": rejected_hands}
 
 
 def main():
@@ -692,6 +725,12 @@ def main():
                                        "root": "R(Rh) @ R(poses[:3])", "wrist": "R(Rh) @ shaped_J0 + Th",
                                        "fingers": "poses[3:] + hand-specific mean exactly once",
                                        "left_shapedirs_fix": False, "coordinate_transform": "none; original source world preserved"},
+                "source_geometry_qc": {
+                    "measurement": "world MANO vertex bounding-box diagonal in metres",
+                    "fixed_bounds_m": list(SOURCE_BBOX_DIAGONAL_BOUNDS_M),
+                    "policy": "explicit per-hand rejection receipt; other hand retained; no source parameter edits or guard relaxation",
+                    "scope": "FK-audit sampled frames, or all retained frames when sample_frames=0; not an independent physical-accuracy certification",
+                    "unknown_errors_and_fk_mismatch_policy": "fatal"},
                 "scope": "train/val only, one original motion per session/clip/hand; no views/captions duplication",
                 "selection_mode": args.selection_mode, "source_params_recordings_total": len(available),
                 "selected_source_params_recordings": len(recordings),
@@ -763,20 +802,43 @@ def main():
              "storage": args.storage, "sample_frames": args.sample_frames, "max_frames": args.max_frames,
              "fps": args.fps, "fk_tolerance_m": args.fk_tolerance_m} for entry in selected]
     save_json(status_path, {"phase": "preparing", "done": 0, "total": len(jobs), "utc": now()})
+    # Do not put the failure receipt outside an executor context manager:
+    # __exit__ otherwise waits for every submitted source clip before exposing
+    # a failed future. Report the exact source immediately and cancel work that
+    # has not started; only already-dispatched jobs are then allowed to finish.
+    pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn"))
+    futures, done, active_job = {}, 0, None
     try:
-        with ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
-            futures = [pool.submit(convert, job) for job in jobs]
-            for done, future in enumerate(as_completed(futures), 1):
-                result = future.result()
-                metadata["sequences"].extend(result.pop("sequences"))
-                metadata["recordings_summary"].append(result)
-                status = {"phase": "preparing", "done": done, "total": len(jobs),
-                          "last_recording": result["recording"], "utc": now()}
-                save_json(status_path, status)
-                print(json.dumps(status), flush=True)
+        for job in jobs:
+            active_job = job
+            futures[pool.submit(convert, job)] = job
+        active_job = None
+        for future in as_completed(futures):
+            active_job = futures[future]
+            result = future.result()
+            metadata["sequences"].extend(result.pop("sequences"))
+            metadata["recordings_summary"].append(result)
+            done += 1
+            status = {"phase": "preparing", "done": done, "total": len(jobs),
+                      "last_recording": result["recording"], "utc": now()}
+            save_json(status_path, status)
+            print(json.dumps(status), flush=True)
     except Exception as exc:
-        save_json(status_path, {"phase": "failed", "error_type": type(exc).__name__, "error": str(exc), "utc": now()})
+        cancelled = sum(future.cancel() for future in futures)
+        failure = {"phase": "failed", "done": done, "total": len(jobs),
+                   "failed_recording": active_job["recording"] if active_job else None,
+                   "failed_split": active_job["split"] if active_job else None,
+                   "error_type": type(exc).__name__, "error": str(exc),
+                   "traceback": traceback.format_exc(), "cancelled_pending_futures": cancelled,
+                   "shutdown_policy": "cancel pending work, wait only for already-dispatched jobs; never publish aggregate manifest",
+                   "utc": now()}
+        save_json(args.output/"conversion_failure.json", failure)
+        save_json(status_path, failure)
+        print(json.dumps(failure), file=sys.stderr, flush=True)
+        pool.shutdown(wait=True, cancel_futures=True)
         raise
+    else:
+        pool.shutdown(wait=True)
     metadata["sequences"].sort(key=lambda entry: entry["path"])
     metadata["recordings_summary"].sort(key=lambda entry: entry["recording"])
     if not metadata["sequences"]:
