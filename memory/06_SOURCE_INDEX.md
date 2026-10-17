@@ -1,5 +1,7 @@
 # HandLoop 记忆来源索引
 
+**2026-10-17新增九库30k中期效果证据：** [进度报告](../docs/TWM_NINE_SOURCE_30K_PROGRESS_2026-10-17.md)、[固定0–14k验证与逐库数值](../reports/twm_nine_source_30k_progress_20261017.json)。源码e759bb1，纽约14:28实际14,370步；仅Pod CPU汇总已有日志，当前best13.5k。当前恢复、干净误改、长预测、条件覆盖率分别报告；不将源拟合参考/合成验证等同真实RGB闭环。
+
 **2026-10-17用户改30k并已实际重启：** 九库10k旧run按指令在816步合作保存停止，model／Adam finite、双rank和真实字节hash一致，optimizer／RNG／sampler／日志完整保留。采用fresh完整30k cosine日程重跑（非改strict resume），warmup500、每卡512／global1024、九库固定manifest／split／QC、99D＋future60及模型／loss／噪声均不变。纽约2026-10-17 01:37:31 EDT已实际到step20，checkpoint10、九源采样及W&B服务端记录验收通过；新codee759bb1，新run为runs/twm_nine_sources_moe_transient_v3_b512_30k_20261017，deadline保持10-20 01:10EDT。此决定替代此前10k目标，旧启动验收为历史；不代表30k已完成或已证实精度收益。[当前运行](../docs/TWM_NINE_SOURCE_30K_RESTART_2026-10-17.md)、[验收](../reports/twm_nine_source_30k_restart_20261017.json)。
 
 **2026-10-16新增精度指标源表：** [手部重建／恢复／世界轨迹精度报告审计](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)，11篇官方全文与具体表号，另含Ego-Exo4D官方benchmark。重点记录PA主表地位、CS/R/P、W/WA同名异义、16/21joint、漏检及加速度单位；不将未计算的时序或PA-mesh指标写成已完成。

@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-17核查九库30k预训练效果（未改训）：** 从实际run提取0–14k固定验证，远程CPU生成曲线与逐库摘要，核对best规则、九源腕改善、时域分母、双rank／GPU与W&B运行状态。新增[报告](../docs/TWM_NINE_SOURCE_30K_PROGRESS_2026-10-17.md)及[约225KB小型结果](../reports/twm_nine_source_30k_progress_20261017.json)，更新入口／数据／状态／来源记忆。明确clean/reanchor误改、missing部分finger退化、2s近平台及不确定性失配；模型、数据、原始日志均不入Git。
+
 **2026-10-17用户改30k并已实际重启：** 九库10k旧run按指令在816步合作保存停止，model／Adam finite、双rank和真实字节hash一致，optimizer／RNG／sampler／日志完整保留。采用fresh完整30k cosine日程重跑（非改strict resume），warmup500、每卡512／global1024、九库固定manifest／split／QC、99D＋future60及模型／loss／噪声均不变。纽约2026-10-17 01:37:31 EDT已实际到step20，checkpoint10、九源采样及W&B服务端记录验收通过；新codee759bb1，新run为runs/twm_nine_sources_moe_transient_v3_b512_30k_20261017，deadline保持10-20 01:10EDT。此决定替代此前10k目标，旧启动验收为历史；不代表30k已完成或已证实精度收益。[当前运行](../docs/TWM_NINE_SOURCE_30K_RESTART_2026-10-17.md)、[验收](../reports/twm_nine_source_30k_restart_20261017.json)。
 
 **2026-10-16补算并核验完整Dex测试五指标：** 新增remote-only saved预测评测器、冻结官方函数独立校验器和TF32／分组精度探针；在Pod完成1280视角／78768状态W／WA／PA／Accel／RTE，保留proper PA与reset／T−2诊断。保存初次严格PA验收失败及TF32修复证据；13自测、37官方／真实案例和12旧几何对照通过。新增[结果／定义／分母文档](../docs/DEXYCB_WORLD_METRICS_2026-10-16.md)、[身份与数值摘要](../reports/dexycb_world_metrics_20261016.json)，链接原完整结果并更新本轮事实记忆。原始逐帧audit／fixture／预测及MANO资产仅远程／忽略目录，无新训练或神经推理。
