@@ -1,6 +1,6 @@
 # HandLoop 记忆来源索引
 
-**2026-10-17九库预训练执行新增索引：** [九库范围、源decoder、时基、split、真实失败及修复](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)；[小型实际状态](../reports/twm_nine_source_preparation_20261017.json)；[可复现queue recipe](../reports/twm_nine_source_queue_recipe_20261017.json)。源码为五库prepare脚本、download_twm_expansion、prepare_twm_expanded_collection、run_twm_preparation_queue、verify_code_snapshot与launch_prepared_twm；source full labels／独立物理精度／已有新训练收益不得混用。
+**2026-10-17九库联合TWM已实际开训并验收：** 原Oak／HOT／独立Ume／Dex四库同一路径和固定SHA保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3Dv2全部prepared；train9,480,866／val1,460,978手状态，非独立视频数。2026-10-17T04:49:42.393400+00:00在ds Pod双卡每卡512、global1024的fresh10k已到step20，checkpoint10的model／Adam finite、两rank与真实模型字节hash一致，在线W&B服务端已返回训练行，九源实际采样均>0。每手99D、未来60步及原模型／噪声／loss保持，未冒称精度收益。Giga以全部12,775个params全clip选库，31无caption不再被删；7源缺失、2时序不明录制、3短右手和1发散左手均有审计，049正常右手保留，guard未放松。此前仅八库准备／等待队列的快照由此条取代，失败与partial未删除；HumanTouch停、DexWild暂缓。实际code170c347，queue v5，run为runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017；详见[执行与数据](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)、[验收](../reports/twm_nine_source_launch_acceptance_20261017.json)。
 
 **2026-10-16新增精度指标源表：** [手部重建／恢复／世界轨迹精度报告审计](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)，11篇官方全文与具体表号，另含Ego-Exo4D官方benchmark。重点记录PA主表地位、CS/R/P、W/WA同名异义、16/21joint、漏检及加速度单位；不将未计算的时序或PA-mesh指标写成已完成。
 

@@ -1,5 +1,7 @@
 # HandLoop 决策与演进记忆
 
+**2026-10-17用户要求本轮无人值守完成到真实训练：** 下载和处理完成后直接运行，确认能跑起来后再结束，不在排队或step0处交接；此次已按真实更新、checkpoint和W&B服务端联合验收。九库／原四保留与99D决定不变。工程实现更正：Giga纯轨迹按全部发布params选取，不让文字caption决定运动GT资格或范围； source缺失／时间不明／发散拟合按明确证据审计，不编造或放松阈值。后者是执行层修正，不是用户新定模型或精度结论。[实测记录](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
+
 **2026-10-16用户新增五指标统计要求，已完成：** 用户要求统计截图的W-MPJPE／WA-MPJPE／PA-MPJPE／加速度误差／RTE；执行范围取刚完成的全部DexYCB s0 test冻结预测，非主动选优的展示片段。工程上保留既有Dex O(3) PA主口径并另报HaWoR proper SO(3) PA；W／WA／Accel／RTE参考冻结官方函数迁移至Dex21固定相机。该迁移与按帧聚合是明确披露的执行口径，不代表用户新定HOT3D benchmark或方法／训练变更。[实际定义与结果](../docs/DEXYCB_WORLD_METRICS_2026-10-16.md)。
 
 **2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 用户最后明确“这个也加进来，9个dataset一起pre train”。99D、纯轨迹输入、既有current restoration＋60步future任务保持；新10k配置沿旧预算是工程起点，不是用户本轮指定新超参。 [执行与来源](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。

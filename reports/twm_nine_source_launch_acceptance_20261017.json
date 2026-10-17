@@ -1,0 +1,202 @@
+{
+  "accepted": true,
+  "checked_utc": "2026-10-17T04:49:42.393400+00:00",
+  "checkpoint": {
+    "checkpoint_model_hash_matches_ranks": true,
+    "file_sha256": "bbb96151c957f78dbee1ae6e570064687bab1c5fcc5a8c6069381078124fa5b3",
+    "live_path_still_same_inode": true,
+    "model_finite": {
+      "all_tensor_devices_cpu": true,
+      "all_tensors": 325,
+      "finite": true,
+      "floating_elements": 13530038,
+      "floating_numpy_arrays": 0,
+      "floating_tensors": 322,
+      "nonfinite_paths": [],
+      "python_float_values": 0
+    },
+    "model_state_sha256": "4895e74dd8f9ec43c4989ddb53156ed95d8e0efbef9fbab869c689694730e116",
+    "opened_file": {
+      "bytes": 162803377,
+      "device": 205,
+      "inode": 1964947629781,
+      "mtime_ns": 1792212565496803912
+    },
+    "opened_inode_unchanged": true,
+    "optimizer_finite": {
+      "all_tensor_devices_cpu": true,
+      "all_tensors": 963,
+      "finite": true,
+      "floating_elements": 27060385,
+      "floating_numpy_arrays": 0,
+      "floating_tensors": 963,
+      "nonfinite_paths": [],
+      "python_float_values": 10
+    },
+    "optimizer_parameter_step_max": 10.0,
+    "optimizer_parameter_step_min": 10.0,
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017/latest.pt",
+    "race_policy": "an atomic replacement of live path is allowed; audit refers only to this immutable opened inode",
+    "rank_hashes_equal": true,
+    "same_open_fd_for_hash_and_load": true,
+    "step": 10
+  },
+  "completed_utc": "2026-10-17T04:49:51.301292+00:00",
+  "metadata": {
+    "code_version": "170c3473e1288d3d5a2877d0553185ce180af36a",
+    "global_batch_size": 1024,
+    "per_gpu_batch_size": 512,
+    "sampling": "full shuffled coverage, disjoint rank shards, no dropped final batch",
+    "sha256": "e406a2e488160cde9a2915c938adc69c728de53f5ced01aa69e36004dac83aa7",
+    "world_size": 2
+  },
+  "phase": "accepted",
+  "read_only": true,
+  "required_minimum_updates": 10,
+  "run_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
+  "source_coverage": {
+    "all_nine_train_and_val_sources_positive": true,
+    "collection_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+    "collection_manifest_sha256": "a1c09d67b3528c6f108a0d36825382a6054e8ae5865367a1431dba9085c2fe90",
+    "early_sampling_note": "window availability is checked for all nine; zero early observed samples is not treated as a missing source",
+    "observed_training_samples": {
+      "arctic": 888,
+      "dexycb": 58,
+      "gigahands": 12473,
+      "ho3d": 62,
+      "hot3d": 1373,
+      "interhand": 10,
+      "oakink2": 3568,
+      "taco": 564,
+      "umetrack": 1484
+    },
+    "samplers": [
+      {
+        "batch_cursor": 10,
+        "batch_size": 512,
+        "epoch": 0,
+        "num_samples": 1018946,
+        "rank": 0,
+        "replicas": 2
+      },
+      {
+        "batch_cursor": 10,
+        "batch_size": 512,
+        "epoch": 0,
+        "num_samples": 1018946,
+        "rank": 1,
+        "replicas": 2
+      }
+    ],
+    "source_manifests": {
+      "arctic": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1/manifest.json",
+        "phase": "complete",
+        "sha256": "528eef1b579cee8f17e2d6988ef326e6b216a9b1b07f8fc747c8ac512431f6da"
+      },
+      "dexycb": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+        "phase": "complete",
+        "sha256": "b36f171ad3af1951d08db25cab5876db92bf703378fa54e9e6bc1208f289a911"
+      },
+      "gigahands": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v5/manifest.json",
+        "phase": "complete",
+        "sha256": "3a7a8a9541c1a165f1f4897d5ec9fcce6c89b5f7159856c53f0a1a460544dda6"
+      },
+      "ho3d": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2/manifest.json",
+        "phase": "complete",
+        "sha256": "ca3776ffa7e1530087ab8037f8eadd962fb2412a48ecfdd6945a95b059722cf8"
+      },
+      "hot3d": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+        "phase": "complete",
+        "sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0"
+      },
+      "interhand": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1/manifest.json",
+        "phase": "complete",
+        "sha256": "977e2c612dfd7cecd4c88eb22ebc7a3fb003e212f1a8e0fce991ad87eba66e95"
+      },
+      "oakink2": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+        "phase": "complete",
+        "sha256": "570e423e28ae36a9e03bef087f00a053a9bb93e2c6d81feaf8c96ff818b64291"
+      },
+      "taco": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1/manifest.json",
+        "phase": "complete",
+        "sha256": "506e7565739edf8b2dbaf637de1f7ed2567aa261ebf0ab18ee293c97d6fe7347"
+      },
+      "umetrack": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+        "phase": "complete",
+        "sha256": "77623ccab62e733f64196201720d22219f62341cac07ae2724da2fb67cae8a24"
+      }
+    },
+    "train_windows": {
+      "arctic": 91972,
+      "dexycb": 6352,
+      "gigahands": 1245932,
+      "ho3d": 5588,
+      "hot3d": 132008,
+      "interhand": 1215,
+      "oakink2": 346860,
+      "taco": 56574,
+      "umetrack": 151390
+    },
+    "val_windows": {
+      "arctic": 12402,
+      "dexycb": 394,
+      "gigahands": 228794,
+      "ho3d": 420,
+      "hot3d": 15240,
+      "interhand": 54,
+      "oakink2": 27728,
+      "taco": 7152,
+      "umetrack": 18008
+    }
+  },
+  "status": {
+    "grad_norm": 9.29200267791748,
+    "loss": -0.3521215617656708,
+    "lr": 8.000000000000001e-06,
+    "phase": "training",
+    "samples_by_dataset": {
+      "arctic": 888,
+      "dexycb": 58,
+      "gigahands": 12473,
+      "ho3d": 62,
+      "hot3d": 1373,
+      "interhand": 10,
+      "oakink2": 3568,
+      "taco": 564,
+      "umetrack": 1484
+    },
+    "sha256": "d1a5484f6dd6e5be19238af83755c249b0257e39322ec55d7dc920b5b2fe4936",
+    "step": 20,
+    "utc": "2026-10-17T04:49:36.325536+00:00"
+  },
+  "wandb_server": {
+    "identity": {
+      "entity": "black-ant",
+      "id": "fa17b1ef",
+      "project": "handloop-twm"
+    },
+    "private_credentials_printed": false,
+    "server_history_verified": true,
+    "state": "running",
+    "summary": {
+      "optimizer_step": 10.0,
+      "train/loss": -0.2205153852701187
+    },
+    "training_rows": [
+      {
+        "optimizer_step": 10,
+        "train/loss": -0.2205153852701187
+      }
+    ],
+    "url": "https://wandb.ai/black-ant/handloop-twm/runs/fa17b1ef"
+  }
+}

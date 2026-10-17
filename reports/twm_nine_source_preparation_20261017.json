@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "checked_utc": "2026-10-17T04:11:45Z",
+  "checked_utc": "2026-10-17T04:50:21Z",
   "user_decision": "Nine selected sources together, previous four unchanged; HumanTouch and DexWild excluded",
-  "code_version": "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+  "code_version": "170c3473e1288d3d5a2877d0553185ce180af36a",
   "pod": "jchen57-fineturn-tl4zr",
   "runtime": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
   "state": "per-hand actual wrist p3 + root6D6 + finger6D90, beta10 separate, metres, seconds",
@@ -138,9 +138,19 @@
       "source_revision": "fd3b5a6b39565ca6935a91d35d5e91dde03c5142"
     },
     "gigahands": {
-      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v2/manifest.json",
-      "phase": "not_ready",
-      "preparation_status": null
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v5/manifest.json",
+      "manifest_sha256": "3a7a8a9541c1a165f1f4897d5ec9fcce6c89b5f7159856c53f0a1a460544dda6",
+      "hand_states_by_split": {
+        "train": 5921548,
+        "val": 1086966
+      },
+      "hand_sequences_by_split": {
+        "train": 21768,
+        "val": 3774
+      },
+      "full_fk_verified": false,
+      "source_revision": "8ad3ef9a50157f44a7eef5645b0766362110a961"
     },
     "ho3d": {
       "phase": "complete",
@@ -159,66 +169,66 @@
     }
   },
   "queue": {
-    "phase": "running",
-    "stage": "gigahands_full",
-    "pid": 7490,
+    "phase": "complete",
+    "stage": null,
+    "pid": 7765,
     "child_pid": null,
-    "updated_utc": "2026-10-17T04:11:29.647791+00:00",
-    "recipe_sha256": "e0ca8c353333d3e351046b101a32c6e04e9dbbb52962165fbf297aa6e9f8e770",
+    "updated_utc": "2026-10-17T04:45:04.119471+00:00",
+    "recipe_sha256": "d9083db77b202aade333be0db4f401d3206d01b8906571ef7abe77433dd6a247",
     "stages": {
       "interhand_full": {
         "phase": "skipped",
         "pid": null,
         "returncode": 0,
         "error": null,
-        "completed_utc": "2026-10-17T04:10:17.866560+00:00"
+        "completed_utc": "2026-10-17T04:37:26.477545+00:00"
       },
       "arctic_full": {
         "phase": "skipped",
         "pid": null,
         "returncode": 0,
         "error": null,
-        "completed_utc": "2026-10-17T04:10:17.941586+00:00"
+        "completed_utc": "2026-10-17T04:37:26.542936+00:00"
       },
       "ho3d_full": {
-        "phase": "complete",
-        "pid": 7491,
+        "phase": "skipped",
+        "pid": null,
         "returncode": 0,
         "error": null,
-        "completed_utc": "2026-10-17T04:10:29.521327+00:00"
+        "completed_utc": "2026-10-17T04:37:26.572339+00:00"
       },
       "taco_full": {
         "phase": "skipped",
         "pid": null,
         "returncode": 0,
         "error": null,
-        "completed_utc": "2026-10-17T04:10:29.590125+00:00"
+        "completed_utc": "2026-10-17T04:37:26.625764+00:00"
       },
       "gigahands_full": {
-        "phase": "waiting_for_source",
-        "pid": null,
-        "returncode": null,
+        "phase": "complete",
+        "pid": 7766,
+        "returncode": 0,
         "error": null,
-        "completed_utc": null
+        "completed_utc": "2026-10-17T04:40:46.625112+00:00"
       },
       "collection_audit": {
-        "phase": "pending",
-        "pid": null,
-        "returncode": null,
+        "phase": "complete",
+        "pid": 7790,
+        "returncode": 0,
         "error": null,
-        "completed_utc": null
+        "completed_utc": "2026-10-17T04:45:03.508321+00:00"
       },
       "launch_training": {
-        "phase": "pending",
-        "pid": null,
-        "returncode": null,
+        "phase": "complete",
+        "pid": 7823,
+        "returncode": 0,
         "error": null,
-        "completed_utc": null
+        "completed_utc": "2026-10-17T04:45:04.115455+00:00"
       }
     }
   },
   "downloads": {
-    "updated_utc": "2026-10-17T04:11:44.265400+00:00",
+    "updated_utc": "2026-10-17T04:12:44.480596+00:00",
     "sources": {
       "interhand": {
         "phase": "complete",
@@ -233,16 +243,286 @@
         "completed_utc": "2026-10-17T04:00:21.845628+00:00"
       },
       "gigahands": {
-        "phase": "running",
+        "phase": "complete",
         "root": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/gigahands",
-        "started_utc": "2026-10-17T03:40:27.948041+00:00"
+        "started_utc": "2026-10-17T03:40:27.948041+00:00",
+        "completed_utc": "2026-10-17T04:12:40.591767+00:00"
       }
     }
   },
   "training": {
     "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
-    "status": null,
-    "process": null
+    "status": {
+      "utc": "2026-10-17T04:50:06.696538+00:00",
+      "phase": "training",
+      "step": 30,
+      "epoch_progress": 0.015074400409835261,
+      "completed_epochs": 0,
+      "target_steps": 10000,
+      "step_progress": 0.003,
+      "windows_seen": 30720,
+      "updates_per_epoch": 1991,
+      "batch_in_epoch": 30,
+      "loss": -0.42029476165771484,
+      "restoration_loss": 0.03269663453102112,
+      "current_nll_per_dof": -2.6799380779266357,
+      "forecast_nll_per_dof": -1.7116755247116089,
+      "best_trajectory_geometry_loss": 0.965669572353363,
+      "velocity_loss": 0.015668343752622604,
+      "moe_balance_loss": 0.059085339307785034,
+      "mode_entropy": 1.3861610889434814,
+      "current_xyz_std_mm": 48.255279541015625,
+      "future_within_mode_xyz_std_mm": 99.63082122802734,
+      "future_total_xyz_std_mm": 99.71647644042969,
+      "grad_norm": 5.122582912445068,
+      "lr": 1.2e-05,
+      "elapsed_seconds": 102.61825347226113,
+      "samples_per_second": 299.36194546815165,
+      "ranks": [
+        {
+          "rank": 0,
+          "pid": 7831,
+          "device": 0,
+          "peak_allocated_gb": 63.924396544,
+          "peak_reserved_gb": 64.709722112
+        },
+        {
+          "rank": 1,
+          "pid": 7832,
+          "device": 1,
+          "peak_allocated_gb": 63.913988608,
+          "peak_reserved_gb": 64.699236352
+        }
+      ],
+      "samples_by_dataset": {
+        "arctic": 1337,
+        "dexycb": 74,
+        "gigahands": 18747,
+        "ho3d": 93,
+        "hot3d": 2020,
+        "interhand": 17,
+        "oakink2": 5333,
+        "taco": 840,
+        "umetrack": 2259
+      },
+      "corruption_samples_by_case": {
+        "clean_motion": 6146,
+        "current_reanchors_history": 6098,
+        "ordinary_restoration": 10669,
+        "partial_missing": 6257,
+        "rare_local_failure": 1550
+      },
+      "temporal_samples_by_pattern": {
+        "jitter": 9226,
+        "plateau": 13868,
+        "ramp": 4578,
+        "scattered": 3048
+      },
+      "spatial_samples_by_pattern": {
+        "translation_only": 7675,
+        "wrist_pose": 7628,
+        "fingers": 7653,
+        "whole_hand": 7764
+      },
+      "moe_load": {
+        "0": 0.2619263529777527,
+        "1": 0.25640034675598145,
+        "2": 0.25294220447540283,
+        "3": 0.22873112559318542
+      },
+      "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/fa17b1ef"
+    },
+    "process": {
+      "pid": 7826,
+      "command": [
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+        "-m",
+        "torch.distributed.run",
+        "--standalone",
+        "--nnodes=1",
+        "--nproc-per-node=2",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017/scripts/train_probabilistic_twm.py",
+        "--manifest",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+        "--config",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017/config/twm_nine_sources_moe_transient_v3_b512_10k.json",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
+        "--code-version",
+        "170c3473e1288d3d5a2877d0553185ce180af36a"
+      ],
+      "code_version": "170c3473e1288d3d5a2877d0553185ce180af36a",
+      "code_provenance": {
+        "mode": "deployment_receipt_verified",
+        "effective_git_head": "170c3473e1288d3d5a2877d0553185ce180af36a",
+        "expected_commit": "170c3473e1288d3d5a2877d0553185ce180af36a",
+        "expected_commit_verified": true,
+        "git_binary_missing": true,
+        "git_binary": null,
+        "deployment_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017/.codex/deployment.json",
+        "deployment_receipt_sha256": "68692146b7b7bfae6440e200a158d4b6e8b11e92a1a9649f59d83a9fa3c1f722",
+        "scope": [
+          "src",
+          "scripts",
+          "config"
+        ],
+        "files": {
+          "config/arctic_credentials.example.json": "ec2f5be7b43059c05731619acf5b9d5294d8b1510085695c0266a04c687b8a65",
+          "config/twm_corruption_mixed_v2.json": "6ad627319fc09b2651c89f9d562e0909e4ba82429127524e4a9f6c959b3e3518",
+          "config/twm_corruption_mixed_v2_proposal.json": "b651de307811cee8a334c29edbca6ee46833e636fd64c679042525beb1f2f9a2",
+          "config/twm_corruption_transient_v3.json": "7dea2b94c5080c11eb86154837157a248902c6f7dda2fd81def609269078c4bb",
+          "config/twm_four_sources_moe_long_horizon.json": "5a8aeca75bbf14792724e098ba33ad07ded9f2941b07cb9f4575e5ccc83f4041",
+          "config/twm_four_sources_moe_mixed_v2.json": "cb6134cc0335eb8eca5dee9c59bf5ad2dc1297ee5328a60fdfdfd9a6679db26a",
+          "config/twm_four_sources_moe_mixed_v2_b512_10k.json": "9fc566ab9711eff489c7acb4d0bc001f12e4b86883db698f4ea779c79a20a3eb",
+          "config/twm_four_sources_moe_transient_v3_b512_10k.json": "7e912b8764a334f36d2691952e42938937514155548efc123c816551912154dc",
+          "config/twm_four_sources_moe_transient_v3_epoch2.json": "bc90b180ac45b38ca17d332bb654aeabe482fef8e50c0121acdbc4a4c7e83edb",
+          "config/twm_four_sources_structured_mamba.json": "939260a27ef6a212dbc7ee85cafc6528ae7ab7c9b825e1452072d2e9e0c95302",
+          "config/twm_four_sources_structured_mamba_ddp.json": "1dd7a7f02cae2e2eac6149a8e30bcf5abae31def32e846fa317e5cb5d3f9ff16",
+          "config/twm_nine_sources_moe_transient_v3_b512_10k.json": "dfc9c3277b1f9a141399b1f9707effe67a9b3760225f96960f476340cbc6bcdf",
+          "config/twm_oakink2_pilot.json": "c8730b270f242854caf37675f96355de3c586eef178d2ca17fda35ae2e6eb831",
+          "config/twm_oakink2_structured_mamba_pilot.json": "8715e561647ef4f3f24f5fd227fcc1f362dae21169e09f66023993e483eb9fd1",
+          "config/visual_feedback_v1.json": "ba699d45d2cb8b895ad11d51dd51dd0924c47e94b90dd8bc11d371edaeb37d39",
+          "config/visual_geometry_supervision.example.json": "47ff0f0b14e2a750555777060a18e5b2ae06149b8ea5184f87acce9dc8252002",
+          "config/visual_joint_dex_hot_geometry_5k.json": "4def62efed9d0ce8e27e929a29e15e47a3363fac93819e9fcc6aca1cf7756b39",
+          "config/visual_joint_geometry_hawor_sources_5k.json": "0cb116f9406533a353a12df7e218e8e908049432aea9367d4dbd63f95369cd78",
+          "config/visual_joint_geometry_original_dex_5k.json": "97a3b156af3fb4c9174631398d0598c645fc30ba53254bc86276189bd4fbacf3",
+          "config/visual_joint_v2.json": "b826b39960874ce5cd123a9ae85bc3a01f467ff728956d60338bca429caf11c7",
+          "config/visual_joint_v3_geometry.json": "2a9827a5dc4511132a8e152aab890530f7a7fd29e2eda7ebeeb5ba9445b81cd9",
+          "scripts/audit_humantouch_source.py": "96c685122a985b53964915bc3f9cd4926442ccb5b05f2a67ada2173a1d352add",
+          "scripts/audit_probabilistic_checkpoint.py": "d8f5e7bc84bce638d71b6b42bb53ee68cb9e197ebe7d1e094ecbe5af3bc5a1bb",
+          "scripts/audit_twm_dataset_samples.py": "a6037c06f73d775c9a0a09a9010aa754590b84093b98951c628b678a3c4c6df6",
+          "scripts/audit_twm_nine_source_launch.py": "db67dff1a870bcbaf8bc63c8c86ee73cd9af806f8f487538449631dd99666bab",
+          "scripts/benchmark_probabilistic_twm.py": "199b8bbbe991abdf88b322410c86829ca594b8ee5c54fa4ebb09491419acbf75",
+          "scripts/benchmark_twm_batch.py": "5936c4399e3c94172dc60a07ce2a17b73043117634066aa465aab0e507ef49a0",
+          "scripts/check_comparison_download.py": "d32c773ccea69cc8df4e1498741f5d831063f53333aa1ffb6d63b3814620d7a0",
+          "scripts/check_dexycb_full_test_smoke.py": "fee298e2374089888ef8f18fdc691db6b9637740bac3385eeda3bb01ce0a407b",
+          "scripts/check_download_resume.py": "57a392fa4af9392969763d3f381d72c929a28052f7642a408ae1573be52db5c7",
+          "scripts/check_forecast_data_contract.py": "b15a7ad6fdbed3855bd6705d5edf6da60c91a72d4216e9aab184515a5675a977",
+          "scripts/check_hawor_bridge.py": "e28229a0552f1812bd042b1e9ce3a75bb454260379d304c6e0a27944643286f4",
+          "scripts/check_hawor_data_progress.py": "ef371686c54326b1fa719c8137f3076eb49c4336f49e3dc11fb1dcc1e5203e48",
+          "scripts/check_hf_range_file.py": "71ff31c38abe3c190cbb0634cc825eb93675364fd0b4dee0a10fa101555508f1",
+          "scripts/check_mamba_runtime.py": "4d53de7f90510937525563efbd89a1d54936ad32f49922c78159ea40f71344d4",
+          "scripts/check_mixed_corruption.py": "6a886a318dcba897e7b62c32269b68de6fd09b35fc76e9a51eedd1501a0add04",
+          "scripts/check_mixed_visual_geometry.py": "5b11976a2c28cec7b2b485761d1ab01f1bb02832cd29c680976231114370077d",
+          "scripts/check_probabilistic_twm_numerics.py": "c2b2f5540e887a8106123a601e95c57ed4229675870e20c6127909746872fd8a",
+          "scripts/check_saved_world_metrics.py": "1086ac1dc9ff578bbf6975ee71c8d6046f966c45c4071f1e7e155050e248e4d0",
+          "scripts/check_structured_twm_numerics.py": "9c98fb0f21db1a4d66a5b193f3f98a146c257c624ecf75a244c02e27cc95ed16",
+          "scripts/check_temporal_corruption.py": "75d1d4ab137c4217db4ada4f52db157f5e72be5e99d856c81fa9e4c1d4f65cd1",
+          "scripts/check_twm_numerics.py": "07420ec333d1c2c48ece4ec6b3977552c8cfe2ddd9b11472035c07373a7707ef",
+          "scripts/check_visual_feedback.py": "2ca837bf9fae6eaf620f9765b4c17719af78ff509a10b181844d5ec722e42c71",
+          "scripts/check_visual_feedback_refinement.py": "3f3129427b43b0f0ee00cca1ceb74ccce508847b0226250c6900f6f5b01439a6",
+          "scripts/check_visual_geometry_supervision.py": "ec089e5dd75975c27c5ed706b5c765d20e296d4768c8b932f14b0f07c31b2203",
+          "scripts/check_visual_joint_checkpoint.py": "21d77668f9fccf54e214bb6f6c4f45587f99b1f2cca465105d3752f1becab59c",
+          "scripts/check_visual_rgb.py": "49a93789e7b2d23080811d287f9b1579a68af01639c5b033d6a7215d195cea0a",
+          "scripts/compose_visual_source_collection.py": "46232307255f0ce6f97cca6b9aa95c440cbd0d15ddec405b0ac2c6814a252872",
+          "scripts/dexycb_test_metrics.py": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+          "scripts/diagnose_camera_depth_failures.py": "ea282d8e76201e24a0ee60361acf8155952f62441bc26a7b0e881522cf1d54dc",
+          "scripts/diagnose_hot3d_camera_precision.py": "4924aef60f2afcc5d7c2fefa028da1f8599ceeeb6216912f5e20f493746f9650",
+          "scripts/diagnose_joint_gradients.py": "51e2dc10beb2c1d43c804c92091f2572beb707559fb1a6b729e4bcd0efaeec72",
+          "scripts/diagnose_real_state_twm.py": "a3baa4adce571240c8f7266089bbd103ca6c301437ead83c91c3f5744095c29a",
+          "scripts/diagnose_twm_handedness.py": "4def19404045fad02234e682b7662164103472f882e8dfac344c1e620c455b16",
+          "scripts/diagnose_twm_transient_drift.py": "329fb30bcb4ce25b9b2f7c882d182f783a9199b46ede67be3202390b70422625",
+          "scripts/diagnose_twm_wrist.py": "9ab17d6b73cd20b20d0edd83e335356e6c53c687ea4e44a2454a7914b9e3645c",
+          "scripts/diagnose_visual_geometry_bias.py": "3698325abc7c21761adc803896669fc4672ad9714a6bd1f4d76d8204292cb524",
+          "scripts/download_comparison_data.py": "01356891b2a55708abbeb304f0fc62a0eb3629d1d233aa3ae1d7e01b8432d619",
+          "scripts/download_dexwild_trajectories.py": "9bf69ff6946845de5b7088b7b0b531fe9005c7cbac258d3bb1f0a2660f26e3dd",
+          "scripts/download_ho3d_official.py": "3f32d207087f5ad4b1a30c3f830e744e1017e6cba055c96362c619404c4fbe26",
+          "scripts/download_humantouch_sample.py": "c693f7f3d21ce9bab3d894a2dee61e3f033dab4be757f27478d6adff3541f7ad",
+          "scripts/download_humantouch_trajectories.py": "239f724f6bc2b92389f755e54954db36c31b80a47168efaf0b702af4dad2cf4b",
+          "scripts/download_twm_data.py": "c9abf0feb47a2b7860dfe0aa49683dd455fa230bc81005eefd9bd0ce0aa30fe1",
+          "scripts/download_twm_expansion.py": "ef685952189764ab1ebb99f2c02917bdeb40d69282ec8141465d0814a2af78f6",
+          "scripts/ds_downloads.py": "9fbffba1b8a0c871c862c71d139ede413ad4f5b7273f890f6aaadbe6f67d801d",
+          "scripts/ds_train_probabilistic_twm.py": "0eac2540194afef4c97fa75e15a7621c3e7fa5b7f84f5eb371537af3978ea55e",
+          "scripts/ds_train_twm.py": "b887973e91aa0867c2c5b4bd3633835dd0e5530089a4c5d63229516ba59607f9",
+          "scripts/ds_train_twm_ddp.py": "6c4f32363aec0f27915ff329139054acb99ade6b8a42266c4d9c7d6b3bd346e2",
+          "scripts/ds_train_visual_joint.py": "96bc51699add98089996bcb41ee166761b07c66a83bc79e39309b11aa2646374",
+          "scripts/evaluate_dexycb_full.py": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+          "scripts/evaluate_saved_world_metrics.py": "a3bebbb470998d54969a0684b2db92dc3826819092e2737c279a57895b2c6acc",
+          "scripts/evaluate_twm_checkpoint.py": "8301bead8d986bdafd1d97d0fc6b31d964daf738eb54a6f4542588c00cdbbcec",
+          "scripts/evaluate_twm_controls.py": "737c86b40c214156af6550e30f19f3013f91a59d074ec7cb6a03ae88602ad23e",
+          "scripts/evaluate_visual_geometry.py": "c6d01debc8d3195c1c92fa1f707f482cb0cdc95a1f0dcb967fe415132adea941",
+          "scripts/evaluate_visual_joint.py": "3f2a61ddca05e7c18980bd098ece233af94b3e13e3a1fc83e627133ca0c74228",
+          "scripts/hf_range_file.py": "0e26767862da13b2022a1cebf0eaa47b2ecf023463579d8c7f2fb3cc2ef48fb8",
+          "scripts/launch_prepared_twm.py": "aaca2ecfae2e3962e745eba6f0839e235fe003a8939f09ad84ee3b92d9874e2e",
+          "scripts/plot_twm_forecast_review.py": "95693da602c45513a2c478f2c78fbe56b6a9fc1e622e615a1897978a2ba80aa6",
+          "scripts/plot_twm_training_review.py": "74b11092acffae1e8f2db557b4421fdc57ee7a4f7092ac1337a5e500e973c2b1",
+          "scripts/plot_twm_validation.py": "d86ea4effa5c87bc43531c26d0a6a960fd9fd5d6aebc2641439b830745cc6b7a",
+          "scripts/prepare_arctic_twm.py": "48d34e5f0a0d06ddbae021d314cbea158ad56f9c76f1ee5d3c49486492ed87a5",
+          "scripts/prepare_dexycb_full_test.py": "494f5bf9f292e9f2faaf4c8cc965766b127ff17869af7d44a80266f65530faef",
+          "scripts/prepare_dexycb_twm.py": "90bc3b9ea0c40dabfca3f4e678a6e72edabb9a24e7508b32da942fdf00efe31b",
+          "scripts/prepare_gigahands_twm.py": "8870afd7ca4acccde6dac9a9bbf6805927fce84852f62c37e7bdf1f5c8834f47",
+          "scripts/prepare_ho3d_twm.py": "5f660bb023673abf134d8d86fc72b6e4f24ea642edbafb0499370b0ae6003bdd",
+          "scripts/prepare_hot3d_visual_sources.py": "4cb8f2be87c248698736cfb815fbe2c0f9c79a4f7bb228517d1d1403124edf03",
+          "scripts/prepare_interhand_twm.py": "f362b9f032a4011c188e356dc4db6e2e72a9632b0a0e28ab61d612ab0d91e1cf",
+          "scripts/prepare_mano_assets.py": "db79c8eec7ec6edc84b521da0684dbfa93c2bf4a1338dc83db673c3be3d2062a",
+          "scripts/prepare_meta_twm.py": "c676590c50e492a9f6fc4d37bb7b91b77740cfd96fe329f7f8682480d05c21ea",
+          "scripts/prepare_oakink2_twm.py": "bb9560f7319e90f1beb0d9a1c75f534ee3d9c8974bab68c42ffbc71b4d931de5",
+          "scripts/prepare_taco_twm.py": "964c0959723112052320dd48f64195b5f76580c8028110d4f5d5f99b993c9d57",
+          "scripts/prepare_twm_collection.py": "e9c7a0af84b6ef71eaa736519185182d8726664c479b0fb767ccb6a879b3029f",
+          "scripts/prepare_twm_expanded_collection.py": "c9b2fc2c84ef11e127c19bc4001a1b59e70b4074eb84da5ab3cc92c9dfc4f961",
+          "scripts/prepare_visual_eval_sources.py": "385f02bb165382ea80f0a4b86284bdb1c1538d8cac35e95bc07b24fe370536f3",
+          "scripts/prepare_visual_feedback_cache.py": "5f1e1c3cfcb9d45dde9d54f6375b87f29c425380455718318d4a50674c8adaa1",
+          "scripts/prepare_visual_joint_sources.py": "b757a53cf65cf943017c9f158271ec750b219772df0bd3b44df85f42d8368080",
+          "scripts/probe_visual_geometry_gradients.py": "c173e0e95efbd06e23f425b2d86f77da4e76ae0905a26514d6624a9704e5c569",
+          "scripts/probe_world_metric_precision.py": "88d9500051550a7e4d90eac1dd07a2f08fdf6d2e2e8edec0e7b32f63d2904235",
+          "scripts/prune_training_checkpoints.py": "c2f86cebac38227685e3775e3cdcd8e193c5f186b72e02f1c1579681528501c3",
+          "scripts/render_hand_overlay_demo.py": "0fdf584f264c3ca579a155dc42257142c1f3e3814c9f7dbc2e10476882b87290",
+          "scripts/report_joint_failure_diagnosis.py": "50324cf510d4c3bb9a47c78249e57153ba7d7a0a76806335fc0f19fbbe04c216",
+          "scripts/review_probabilistic_twm_run.py": "4b58ecae18cf1be37aad3c240aa1ddca0bc6ee74f738b2c803cbef64ba4875e5",
+          "scripts/review_twm_forecast.py": "c5329aa61600b7d320e9ceb0a765db1aead09533ef78b8961ddc12594262fe24",
+          "scripts/run_dexycb_full_test.py": "1780c63cadb04b58769146a0de12bbec4cca9bbf930c39eeff7aa6a9c45e439b",
+          "scripts/run_twm_preparation_queue.py": "531866baf41613672eaf3904fbd24b257c38d4638db5c6ea3f0430b993f16fb0",
+          "scripts/run_visual_feedback.py": "0fd3a114557610dd13b3fccbca7180a530736e87e568f477a441b88c534962a3",
+          "scripts/select_hand_demo_cases.py": "b7aa7afa799c8d701e9fb5a76d49cc1d3c2cbac832578791aeb3591d81d114a2",
+          "scripts/setup_mamba_runtime.py": "6f99fb6eef15295c0bec937525178ddacaed5d51e2551c070c6dd1469f170cd5",
+          "scripts/setup_visual_feedback_runtime.py": "05abe835bf8e1b2942d1a2e263ab9ccba1c94f0eefd7ad9713820eff13e2e188",
+          "scripts/smoke_temporal_epoch_training.py": "45fdda96d114dcc3a2aabb40e63e3c28619836610696e774d090574f21e4f7fa",
+          "scripts/summarize_twm_transient_drift.py": "2581117db3e33500c4b387d84fedca1878977a5eeb0f36dd7d0ec7bde8f09328",
+          "scripts/summarize_visual_comparison.py": "75a826da05816cac8ce55e0c39a83f0c9309bf479f7ea2726d0f910200758782",
+          "scripts/train_probabilistic_twm.py": "4e080c58becf3d70fa692920f04becefb2bc85f058369d7bb18d32a33bcba267",
+          "scripts/train_twm.py": "dab8acd2ab953aa01d5c0c63ba93030758890fb82620289fc9cb51e66cd7b317",
+          "scripts/train_twm_ddp.py": "730e8234e1a74180988c49a9fa00f0237f90b3641b70d6dd706c5815144828d2",
+          "scripts/train_visual_feedback.py": "36a171417f3a119a0f3034cce9c090e7b3b82bc350fe53cff8d6fd1e9f94cb6a",
+          "scripts/train_visual_joint.py": "6813db0f289b578d67162ca258701c701ef83f644770db03bca3e98951c21ee5",
+          "scripts/train_when_prepared.py": "e881f2c4d3ac1f581953bdbc485f8e372395fab30092ff2dee0029519a13c842",
+          "scripts/verify_code_snapshot.py": "e50db4f093afcab7358223790e416babd67fd46d0f0cff68fd26902dc55e8064",
+          "src/handloop/__init__.py": "9e9f9a65e6020cc58dbcdca4ac2db27c4aea0efa8829e53e5e6c754c5a8d20ae",
+          "src/handloop/data/__init__.py": "bb44791969c5773323088618c3f302d43d56580940263acabaa4c5478cd6ce37",
+          "src/handloop/data/corruption.py": "dbdd038a1c0734ebcde1b2e7820d979fe881fed76fe2df9317bacd38d2f269ce",
+          "src/handloop/data/epoch_sampling.py": "ed8c320266c2bc1e82a2bd4253cdb3dea0da946c34f76e3df7087c29a0b527e1",
+          "src/handloop/data/forecast_trajectory.py": "d7d6e7aa9b61441ad979fdd90bb3d3b4b37bf0fe4f45f16598ce2a856fc16369",
+          "src/handloop/data/meta_mano.py": "635b5668376b79e375a9f491e62c9126e787301fd4d3ad2fcf44d82bf0792ceb",
+          "src/handloop/data/temporal_corruption.py": "67de303b65ba0634bfabe850a0958c978bc85d7ac45f01fbd43b7bbd09e8dfac",
+          "src/handloop/data/trajectory.py": "4e9d5b1bfd7a7a66f2245c365b575f264dbe7306c3eb6ee17099102cdf41e2fe",
+          "src/handloop/data/visual_clips.py": "4f4c9a4753d6e7a6ef15fd3fdf3a2fa1d55e7caac567873ff27c91cecfd6b5ca",
+          "src/handloop/data/visual_rgb.py": "dd7b9da0e79ace342f89f1314ddae24af18640ee921a84a91e766c07d4f24305",
+          "src/handloop/data/visual_source_policy.py": "abe58810655a0f844b40ac0f6eaa6f0a1d0fe6756a54d96b422cb427cadc4b68",
+          "src/handloop/geometry.py": "28227728f20cc39de3fa3b0a71602dafeccf62cf5cc1c493bc4c5ed8b468650c",
+          "src/handloop/models/__init__.py": "a5b98bd466e59bc59e32fd73fedbfcb787481094b7975107b81626c817e756fc",
+          "src/handloop/models/probabilistic_twm.py": "5459d1e396a09b657619d2029e19b46ea553ba744e09afb22125ed8238992804",
+          "src/handloop/models/structured_mamba.py": "521344d0eb71100f34430b9e9defa2dad7d86da9e4dd730d2b523f024e896344",
+          "src/handloop/models/twm.py": "f75a736c200e572cd6acb5159cb8bc1ad45eec7f3133193e63cd0404afa02262",
+          "src/handloop/models/visual_feedback.py": "048c97586b7bfeb01c2f7e6512f5391f6535715be5230927d66a93f8eaaae937",
+          "src/handloop/tracking.py": "aeb1c73564c6306579caa4e8a7dde8b01af60711c5b98e37419dbbca8cb41ab0",
+          "src/handloop/visual/__init__.py": "e14ee3d7fa1c972481f0dbbc7a5288ae20c3fb82fc33fdefd81da0478d6bd9d9",
+          "src/handloop/visual/codec.py": "830eb1e254eab2bf483445f3bb29962394d93aa1c35a86617a7d731a8d9579fd",
+          "src/handloop/visual/hawor.py": "69d3b85fa18bd1b0b1d960bd58e144324f01013a25cf0d0c8dfa920290ed1a05",
+          "src/handloop/visual/losses.py": "ce002a108b0da8c97259274d1e027927f7deed9c8e9dd5452e2b133b583c329c",
+          "src/handloop/visual/pipeline.py": "be9a9e235ead3d55c1360017a908769f5dcdf8f3a016cb4f8f1eba752f206778"
+        },
+        "file_count": 142,
+        "files_aggregate_sha256": "ea2b9c57fa71eefd3daefe11812b0e5aa80997b4ca0866b3b00f61231b3c33e8",
+        "trust_boundary": "clean local Git HEAD or exact hashes from trusted login-host deployment receipt"
+      },
+      "started_utc": "2026-10-17T04:45:03.960312+00:00",
+      "manifest_sha256": "a1c09d67b3528c6f108a0d36825382a6054e8ae5865367a1431dba9085c2fe90",
+      "config_sha256": "dfc9c3277b1f9a141399b1f9707effe67a9b3760225f96960f476340cbc6bcdf",
+      "gpus": [
+        "0",
+        "1"
+      ],
+      "status": "launcher_created; inspect status.json and online W&B for actual updates"
+    }
   },
   "queue_smoke": {
     "phase": "complete",
@@ -373,6 +653,3200 @@
     "stop_reason": "User excludes HumanTouch from nine-source run",
     "observed_process_state": "State:\tZ (zombie)",
     "status_note": "Byte/count fields retain last downloader snapshot; downloaded files preserved"
+  },
+  "giga_source_checks": {
+    "selection_mode": "pure_motion_all_params",
+    "source_params_recordings_total": 12775,
+    "published_source_params_complete": true,
+    "source_annotation_params_complete": false,
+    "caption_ranges_applied": false,
+    "source_params_without_annotation": [
+      "p001-packing/002",
+      "p005-tea/000",
+      "p007-tablet-gopro/150",
+      "p008-boxing/014",
+      "p017-gopro/008",
+      "p018-boxing/015",
+      "p018-boxing/018",
+      "p018-boxing/019",
+      "p018-boxing/020",
+      "p018-boxing/021",
+      "p018-boxing/024",
+      "p023-boxing/016",
+      "p023-boxing/019",
+      "p023-boxing/020",
+      "p023-boxing/021",
+      "p023-boxing/022",
+      "p023-boxing/024",
+      "p028-boxing/015",
+      "p028-boxing/016",
+      "p028-boxing/017",
+      "p028-boxing/022",
+      "p029-instrument/041",
+      "p035-boxing/016",
+      "p035-boxing/018",
+      "p035-boxing/019",
+      "p035-boxing/020",
+      "p035-boxing/025",
+      "p038-massage/003",
+      "p038-massage/006",
+      "p041-boxing/023",
+      "p041-tea/000"
+    ],
+    "source_missing_params_audit": {
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_expansion_20261017/gigahands_source_missing_params_20261017.json",
+      "sha256": "872a9f13a1127ebe4d729fd50d1ac662dc2ce835af3b55d25d4706fef6f6d594",
+      "source_absent_recordings": [
+        "p015-monopoly/037",
+        "p031-sewing/010",
+        "p031-sewing/011",
+        "p031-sewing/012",
+        "p031-sewing/013",
+        "p031-sewing/014",
+        "p031-sewing/015"
+      ],
+      "gzip_eof_crc_verified": true,
+      "source_params_count": 12775
+    },
+    "excluded_source_recordings": [
+      {
+        "recording": "p015-monopoly/037",
+        "split": "train",
+        "subject": "p015",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/010",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/011",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/012",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/013",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/014",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      },
+      {
+        "recording": "p031-sewing/015",
+        "split": "train",
+        "subject": "p031",
+        "annotation_ranges": [
+          [
+            0,
+            -1
+          ]
+        ],
+        "reason": "MANO params absent from complete official release archive"
+      }
+    ],
+    "rejected_recordings": {
+      "p008-boxing/014": "official_set_union_order_not_chronological",
+      "p016-packing/042": "official_set_union_order_not_chronological"
+    },
+    "rejected_hands": [
+      {
+        "recording": "p017-fastfood/049",
+        "hand": "left",
+        "reason": "source_world_mesh_bbox_diagonal_outside_fixed_metres_guard",
+        "source_sha256": "b3f40d24a8aff1af0750aa49fa092337d50643e2ed2e648109cabdfa560c694c",
+        "finite_chosen_frames": 215,
+        "source_parameter_extrema": {
+          "poses_abs_max_rad": 4820268102975488.0,
+          "Rh_abs_max_rad": 1.0563271274790912e+16,
+          "Th_abs_max_m": 4.674679857081221e+17,
+          "beta_abs_max": 0.005036460235714912
+        },
+        "bbox_diagonal_minmax_m": [
+          0.0,
+          0.0
+        ],
+        "guard_bounds_m": [
+          0.03,
+          0.5
+        ],
+        "all_retained_frames_checked": false
+      }
+    ],
+    "short_hands": [
+      {
+        "recording": "p007-tool/013",
+        "hand": "right",
+        "outside_motion_selection": 0,
+        "nonfinite": 0,
+        "hand_not_chosen": 126,
+        "source_pose_rows": 126,
+        "annotation_empty_intervals": 0,
+        "annotation_end_saturations": 0,
+        "reason": "fewer_than_two_finite_chosen_frames"
+      },
+      {
+        "recording": "p042-laptop/018",
+        "hand": "right",
+        "outside_motion_selection": 0,
+        "nonfinite": 0,
+        "hand_not_chosen": 211,
+        "source_pose_rows": 212,
+        "annotation_empty_intervals": 0,
+        "annotation_end_saturations": 0,
+        "reason": "fewer_than_two_finite_chosen_frames"
+      },
+      {
+        "recording": "p042-tool/007",
+        "hand": "right",
+        "outside_motion_selection": 0,
+        "nonfinite": 0,
+        "hand_not_chosen": 60,
+        "source_pose_rows": 61,
+        "annotation_empty_intervals": 0,
+        "annotation_end_saturations": 0,
+        "reason": "fewer_than_two_finite_chosen_frames"
+      }
+    ],
+    "full_fk_verified": false,
+    "full_fk_note": "Every source hand has sampled up to32-frame independent FK, not exhaustive all-state FK; selected smoke and049 geometry all-frame checked",
+    "qc_smoke": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/twm_expansion_20261017/gigahands_source_qc_v5_smoke/smoke_result.json"
+  },
+  "queue_history": [
+    {
+      "directory": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_20261017",
+      "phase": "stopped",
+      "pid": 7413,
+      "code_version": "cc0dcd5b44cc84e67815d97e3f3ac955d03a618d",
+      "stages": {
+        "interhand_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "arctic_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "ho3d_full": {
+          "phase": "failed",
+          "error": "Source preparation prerequisite failed: {\"ready\": false, \"path\": \"/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v1/preparation_status.json\", \"source\": null, \"observed_phase\": \"failed\", \"wanted_phase\": \"complete\", \"failed\": true, \"reason\": \"upstream_source_terminal_failure\", \"upstream_error\": \"Source per-person beta varies in BB10: 28.70027446746826; preserve/re-audit rather than averaging\"}",
+          "returncode": null
+        },
+        "taco_full": {
+          "phase": "complete",
+          "error": null,
+          "returncode": 0
+        },
+        "gigahands_full": {
+          "phase": "stopped",
+          "error": null,
+          "returncode": null
+        },
+        "collection_audit": {
+          "phase": "not_started",
+          "error": null,
+          "returncode": null
+        },
+        "launch_training": {
+          "phase": "not_started",
+          "error": null,
+          "returncode": null
+        }
+      }
+    },
+    {
+      "directory": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v2_20261017",
+      "phase": "failed",
+      "pid": 7490,
+      "code_version": "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+      "stages": {
+        "interhand_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "arctic_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "ho3d_full": {
+          "phase": "complete",
+          "error": null,
+          "returncode": 0
+        },
+        "taco_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "gigahands_full": {
+          "phase": "failed",
+          "error": "Stage child exited with returncode=1; see /sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v2_20261017/logs/gigahands_full.log",
+          "returncode": 1
+        },
+        "collection_audit": {
+          "phase": "blocked",
+          "error": null,
+          "returncode": null
+        },
+        "launch_training": {
+          "phase": "blocked",
+          "error": null,
+          "returncode": null
+        }
+      }
+    },
+    {
+      "directory": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v3_20261017",
+      "phase": "stopped",
+      "pid": 7620,
+      "code_version": "52d27bd868f544c83e1cf41b3a04c5c8c04e06cf",
+      "stages": {
+        "interhand_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "arctic_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "ho3d_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "taco_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "gigahands_full": {
+          "phase": "stopped",
+          "error": null,
+          "returncode": -15
+        },
+        "collection_audit": {
+          "phase": "not_started",
+          "error": null,
+          "returncode": null
+        },
+        "launch_training": {
+          "phase": "not_started",
+          "error": null,
+          "returncode": null
+        }
+      }
+    },
+    {
+      "directory": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v4_20261017",
+      "phase": "failed",
+      "pid": 7687,
+      "code_version": "d5379d8c70c0dd08a7d88aee048154f85d1f6c13",
+      "stages": {
+        "interhand_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "arctic_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "ho3d_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "taco_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "gigahands_full": {
+          "phase": "failed",
+          "error": "Stage child exited with returncode=1; see /sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v4_20261017/logs/gigahands_full.log",
+          "returncode": 1
+        },
+        "collection_audit": {
+          "phase": "blocked",
+          "error": null,
+          "returncode": null
+        },
+        "launch_training": {
+          "phase": "blocked",
+          "error": null,
+          "returncode": null
+        }
+      }
+    },
+    {
+      "directory": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v5_20261017",
+      "phase": "complete",
+      "pid": 7765,
+      "code_version": "170c3473e1288d3d5a2877d0553185ce180af36a",
+      "stages": {
+        "interhand_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "arctic_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "ho3d_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "taco_full": {
+          "phase": "skipped",
+          "error": null,
+          "returncode": 0
+        },
+        "gigahands_full": {
+          "phase": "complete",
+          "error": null,
+          "returncode": 0
+        },
+        "collection_audit": {
+          "phase": "complete",
+          "error": null,
+          "returncode": 0
+        },
+        "launch_training": {
+          "phase": "complete",
+          "error": null,
+          "returncode": 0
+        }
+      }
+    }
+  ],
+  "collection": {
+    "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+    "manifest_sha256": "a1c09d67b3528c6f108a0d36825382a6054e8ae5865367a1431dba9085c2fe90",
+    "phase": "complete",
+    "required_datasets": [
+      "oakink2",
+      "hot3d",
+      "umetrack",
+      "dexycb",
+      "interhand",
+      "taco",
+      "gigahands",
+      "arctic",
+      "ho3d"
+    ],
+    "checks": {
+      "actual_forecast_loader_used": true,
+      "all_prepared_masks_explicit_complete17": true,
+      "all_previous_pretraining_sources_retained_exactly": true,
+      "all_source_manifests_complete": true,
+      "all_state_values_exhaustively_rescanned": false,
+      "every_source_positive_train_val_windows": true,
+      "exact_expected_sources": true,
+      "expected_source_count": 9,
+      "real_window_materialized_per_source_and_split": true,
+      "recording_train_val_disjoint_within_source": true,
+      "source_manifest_hashes_unchanged": true,
+      "test_entries_absent": true
+    },
+    "loader_inspection": {
+      "train": {
+        "by_source": {
+          "arctic": {
+            "all_requested_future_frames_fraction": 0.917409646414126,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 91972
+              },
+              "15": {
+                "fraction": 0.9825816552863915,
+                "windows": 90370
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 91972
+              },
+              "30": {
+                "fraction": 0.9610968555647371,
+                "windows": 88394
+              },
+              "60": {
+                "fraction": 0.917409646414126,
+                "windows": 84376
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 91972
+              },
+              "0.5": {
+                "fraction": 0.9825816552863915,
+                "windows": 90370
+              },
+              "1.0": {
+                "fraction": 0.9610968555647371,
+                "windows": 88394
+              },
+              "2.0": {
+                "fraction": 0.917409646414126,
+                "windows": 84376
+              }
+            },
+            "eligible_hand_sequences": 534,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 0,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 1940331,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000036,
+            "minimum_observed_future_seconds": 0.09999999999999432,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.917409646414126,
+            "windows": 91972
+          },
+          "dexycb": {
+            "all_requested_future_frames_fraction": 0.0,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 6352
+              },
+              "15": {
+                "fraction": 0.6235831234256927,
+                "windows": 3961
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 6352
+              },
+              "30": {
+                "fraction": 0.19883501259445843,
+                "windows": 1263
+              },
+              "60": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 6352
+              },
+              "0.5": {
+                "fraction": 0.6235831234256927,
+                "windows": 3961
+              },
+              "1.0": {
+                "fraction": 0.19883501259445843,
+                "windows": 1263
+              },
+              "2.0": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "eligible_hand_sequences": 798,
+            "materialized_window": {
+              "available_future_frames": 32,
+              "available_future_max_seconds": 1.0666667222976685,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 1,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": true,
+              "global_window_index": 630258,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 1.5,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.0,
+            "windows": 6352
+          },
+          "gigahands": {
+            "all_requested_future_frames_fraction": 0.7364928423060007,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 1245932
+              },
+              "15": {
+                "fraction": 0.940727904893686,
+                "windows": 1172083
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 1245932
+              },
+              "30": {
+                "fraction": 0.8693291447687354,
+                "windows": 1083125
+              },
+              "60": {
+                "fraction": 0.7364928423060007,
+                "windows": 917620
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 1245932
+              },
+              "0.5": {
+                "fraction": 0.940727904893686,
+                "windows": 1172083
+              },
+              "1.0": {
+                "fraction": 0.8693291447687354,
+                "windows": 1083125
+              },
+              "2.0": {
+                "fraction": 0.7364928423060007,
+                "windows": 917620
+              }
+            },
+            "eligible_hand_sequences": 21603,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 2,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 694399,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000284,
+            "minimum_observed_future_seconds": 0.0999999999999659,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.7364928423060007,
+            "windows": 1245932
+          },
+          "ho3d": {
+            "all_requested_future_frames_fraction": 0.9459556191839656,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 5588
+              },
+              "15": {
+                "fraction": 0.9887258410880458,
+                "windows": 5525
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 5588
+              },
+              "30": {
+                "fraction": 0.974588403722262,
+                "windows": 5446
+              },
+              "60": {
+                "fraction": 0.9459556191839656,
+                "windows": 5286
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 5588
+              },
+              "0.5": {
+                "fraction": 0.9887258410880458,
+                "windows": 5525
+              },
+              "1.0": {
+                "fraction": 0.974588403722262,
+                "windows": 5446
+              },
+              "2.0": {
+                "fraction": 0.9459556191839656,
+                "windows": 5286
+              }
+            },
+            "eligible_hand_sequences": 21,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 3,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 2032303,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000036,
+            "minimum_observed_future_seconds": 0.09999999999999432,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.9459556191839656,
+            "windows": 5588
+          },
+          "hot3d": {
+            "all_requested_future_frames_fraction": 0.49959093388279496,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 132008
+              },
+              "15": {
+                "fraction": 0.8998697048663717,
+                "windows": 118790
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 132008
+              },
+              "30": {
+                "fraction": 0.7663626446882007,
+                "windows": 101166
+              },
+              "60": {
+                "fraction": 0.49959093388279496,
+                "windows": 65950
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 0.9913187079570935,
+                "windows": 130862
+              },
+              "0.5": {
+                "fraction": 0.8916126295376038,
+                "windows": 117700
+              },
+              "1.0": {
+                "fraction": 0.7663626446882007,
+                "windows": 101166
+              },
+              "2.0": {
+                "fraction": 0.39033997939518816,
+                "windows": 51528
+              }
+            },
+            "eligible_hand_sequences": 4402,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 4,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 346860,
+              "history_seconds": 1.0
+            },
+            "maximum_observed_future_seconds": 2.002507668999897,
+            "minimum_observed_future_seconds": 0.09755443700123578,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.39033997939518816,
+            "windows": 132008
+          },
+          "interhand": {
+            "all_requested_future_frames_fraction": 0.023868312757201648,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 1215
+              },
+              "15": {
+                "fraction": 0.388477366255144,
+                "windows": 472
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 1215
+              },
+              "30": {
+                "fraction": 0.1176954732510288,
+                "windows": 143
+              },
+              "60": {
+                "fraction": 0.023868312757201648,
+                "windows": 29
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 1215
+              },
+              "0.5": {
+                "fraction": 0.388477366255144,
+                "windows": 472
+              },
+              "1.0": {
+                "fraction": 0.1176954732510288,
+                "windows": 143
+              },
+              "2.0": {
+                "fraction": 0.023868312757201648,
+                "windows": 29
+              }
+            },
+            "eligible_hand_sequences": 257,
+            "materialized_window": {
+              "available_future_frames": 8,
+              "available_future_max_seconds": 0.2666666805744171,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 5,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": true,
+              "global_window_index": 636610,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0,
+            "minimum_observed_future_seconds": 0.09999999999990905,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.023868312757201648,
+            "windows": 1215
+          },
+          "oakink2": {
+            "all_requested_future_frames_fraction": 0.9645332410770916,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 346860
+              },
+              "15": {
+                "fraction": 0.9925445424667012,
+                "windows": 344274
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 346860
+              },
+              "30": {
+                "fraction": 0.9832093640085336,
+                "windows": 341036
+              },
+              "60": {
+                "fraction": 0.9645332410770916,
+                "windows": 334558
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 346860
+              },
+              "0.5": {
+                "fraction": 0.9925445424667012,
+                "windows": 344274
+              },
+              "1.0": {
+                "fraction": 0.9832093640085336,
+                "windows": 341036
+              },
+              "2.0": {
+                "fraction": 0.9645332410770916,
+                "windows": 334558
+              }
+            },
+            "eligible_hand_sequences": 862,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 6,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 0,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000284,
+            "minimum_observed_future_seconds": 0.09999999999999432,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.9645332410770916,
+            "windows": 346860
+          },
+          "taco": {
+            "all_requested_future_frames_fraction": 0.5729487043518224,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 56574
+              },
+              "15": {
+                "fraction": 0.9100646940290593,
+                "windows": 51486
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 56574
+              },
+              "30": {
+                "fraction": 0.7974334499946972,
+                "windows": 45114
+              },
+              "60": {
+                "fraction": 0.5729487043518224,
+                "windows": 32414
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 56574
+              },
+              "0.5": {
+                "fraction": 0.9100646940290593,
+                "windows": 51486
+              },
+              "1.0": {
+                "fraction": 0.7974334499946972,
+                "windows": 45114
+              },
+              "2.0": {
+                "fraction": 0.5729487043518224,
+                "windows": 32414
+              }
+            },
+            "eligible_hand_sequences": 1696,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 7,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 637825,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000001,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.5729487043518224,
+            "windows": 56574
+          },
+          "umetrack": {
+            "all_requested_future_frames_fraction": 0.8360327630622895,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 151390
+              },
+              "15": {
+                "fraction": 0.9652090626857784,
+                "windows": 146123
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 151390
+              },
+              "30": {
+                "fraction": 0.9213158068564634,
+                "windows": 139478
+              },
+              "60": {
+                "fraction": 0.8360327630622895,
+                "windows": 126567
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 151390
+              },
+              "0.5": {
+                "fraction": 0.9652090626857784,
+                "windows": 146123
+              },
+              "1.0": {
+                "fraction": 0.9213158068564634,
+                "windows": 139478
+              },
+              "2.0": {
+                "fraction": 0.8360327630622895,
+                "windows": 126567
+              }
+            },
+            "eligible_hand_sequences": 1546,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 8,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 478868,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000001,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.8360327630622895,
+            "windows": 151390
+          }
+        },
+        "forecast_contract": {
+          "coverage_seconds_comparison": "maximum valid target offset >= horizon minus 1e-6 seconds",
+          "forecast_frames": 60,
+          "future_coverage": {
+            "arctic": {
+              "maximum_observed_seconds": 2.0000000000000036,
+              "minimum_observed_seconds": 0.09999999999999432,
+              "valid_windows_by_step": [
+                91972,
+                91972,
+                91972,
+                91852,
+                91736,
+                91598,
+                91438,
+                91318,
+                91202,
+                91064,
+                90904,
+                90784,
+                90668,
+                90530,
+                90370,
+                90250,
+                90134,
+                89996,
+                89836,
+                89716,
+                89600,
+                89462,
+                89302,
+                89182,
+                89066,
+                88928,
+                88768,
+                88648,
+                88532,
+                88394,
+                88234,
+                88114,
+                87998,
+                87860,
+                87700,
+                87580,
+                87464,
+                87326,
+                87166,
+                87046,
+                86930,
+                86792,
+                86632,
+                86512,
+                86396,
+                86258,
+                86098,
+                85978,
+                85862,
+                85724,
+                85564,
+                85444,
+                85328,
+                85190,
+                85030,
+                84910,
+                84794,
+                84656,
+                84496,
+                84376
+              ],
+              "windows": 91972,
+              "windows_reaching_seconds": {
+                "0.1": 91972,
+                "0.5": 90370,
+                "1.0": 88394,
+                "2.0": 84376
+              }
+            },
+            "dexycb": {
+              "maximum_observed_seconds": 1.5,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                6352,
+                6352,
+                6352,
+                6287,
+                5969,
+                5865,
+                5554,
+                5489,
+                5171,
+                5067,
+                4756,
+                4691,
+                4375,
+                4271,
+                3961,
+                3896,
+                3582,
+                3478,
+                3170,
+                3105,
+                2796,
+                2692,
+                2393,
+                2328,
+                2036,
+                1932,
+                1667,
+                1602,
+                1367,
+                1263,
+                1051,
+                986,
+                824,
+                720,
+                596,
+                531,
+                442,
+                338,
+                275,
+                210,
+                166,
+                64,
+                55,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "windows": 6352,
+              "windows_reaching_seconds": {
+                "0.1": 6352,
+                "0.5": 3961,
+                "1.0": 1263,
+                "2.0": 0
+              }
+            },
+            "gigahands": {
+              "maximum_observed_seconds": 2.0000000000000284,
+              "minimum_observed_seconds": 0.0999999999999659,
+              "valid_windows_by_step": [
+                1245932,
+                1245932,
+                1245932,
+                1239607,
+                1233227,
+                1227011,
+                1220990,
+                1214748,
+                1208441,
+                1202315,
+                1196376,
+                1190213,
+                1183985,
+                1177940,
+                1172083,
+                1165986,
+                1159821,
+                1153840,
+                1148047,
+                1142018,
+                1135921,
+                1130009,
+                1124269,
+                1118319,
+                1112284,
+                1106440,
+                1100756,
+                1094864,
+                1088893,
+                1083125,
+                1077505,
+                1071669,
+                1065749,
+                1060072,
+                1054525,
+                1048750,
+                1042897,
+                1037277,
+                1031792,
+                1026083,
+                1020296,
+                1014750,
+                1009339,
+                1003692,
+                997965,
+                992494,
+                987155,
+                981593,
+                975926,
+                970546,
+                965325,
+                959852,
+                954279,
+                948992,
+                943872,
+                938511,
+                933023,
+                927856,
+                922847,
+                917620
+              ],
+              "windows": 1245932,
+              "windows_reaching_seconds": {
+                "0.1": 1245932,
+                "0.5": 1172083,
+                "1.0": 1083125,
+                "2.0": 917620
+              }
+            },
+            "ho3d": {
+              "maximum_observed_seconds": 2.0000000000000036,
+              "minimum_observed_seconds": 0.09999999999999432,
+              "valid_windows_by_step": [
+                5588,
+                5588,
+                5588,
+                5580,
+                5578,
+                5572,
+                5567,
+                5559,
+                5557,
+                5551,
+                5546,
+                5538,
+                5536,
+                5530,
+                5525,
+                5517,
+                5515,
+                5509,
+                5504,
+                5496,
+                5494,
+                5488,
+                5483,
+                5475,
+                5473,
+                5467,
+                5462,
+                5454,
+                5452,
+                5446,
+                5441,
+                5433,
+                5431,
+                5425,
+                5420,
+                5412,
+                5410,
+                5404,
+                5399,
+                5391,
+                5389,
+                5383,
+                5378,
+                5370,
+                5368,
+                5362,
+                5357,
+                5349,
+                5347,
+                5341,
+                5336,
+                5328,
+                5326,
+                5320,
+                5315,
+                5307,
+                5305,
+                5299,
+                5294,
+                5286
+              ],
+              "windows": 5588,
+              "windows_reaching_seconds": {
+                "0.1": 5588,
+                "0.5": 5525,
+                "1.0": 5446,
+                "2.0": 5286
+              }
+            },
+            "hot3d": {
+              "maximum_observed_seconds": 2.002507668999897,
+              "minimum_observed_seconds": 0.09755443700123578,
+              "valid_windows_by_step": [
+                132008,
+                132008,
+                132008,
+                127604,
+                127604,
+                127602,
+                127602,
+                123198,
+                123198,
+                123196,
+                123196,
+                118792,
+                118792,
+                118790,
+                118790,
+                114386,
+                114386,
+                114384,
+                114384,
+                109980,
+                109980,
+                109978,
+                109978,
+                105574,
+                105574,
+                105572,
+                105572,
+                101168,
+                101168,
+                101166,
+                101166,
+                96762,
+                96762,
+                96760,
+                96760,
+                92356,
+                92356,
+                92354,
+                92354,
+                87952,
+                87952,
+                87950,
+                87950,
+                83550,
+                83550,
+                83548,
+                83548,
+                79148,
+                79148,
+                79146,
+                79146,
+                74746,
+                74746,
+                74746,
+                74746,
+                70348,
+                70348,
+                70348,
+                70348,
+                65950
+              ],
+              "windows": 132008,
+              "windows_reaching_seconds": {
+                "0.1": 130862,
+                "0.5": 117700,
+                "1.0": 101166,
+                "2.0": 51528
+              }
+            },
+            "interhand": {
+              "maximum_observed_seconds": 2.0,
+              "minimum_observed_seconds": 0.09999999999990905,
+              "valid_windows_by_step": [
+                1215,
+                1215,
+                1215,
+                1120,
+                1047,
+                967,
+                898,
+                824,
+                770,
+                703,
+                651,
+                598,
+                559,
+                510,
+                472,
+                439,
+                408,
+                375,
+                349,
+                323,
+                297,
+                273,
+                253,
+                235,
+                216,
+                200,
+                186,
+                168,
+                155,
+                143,
+                133,
+                121,
+                112,
+                106,
+                99,
+                92,
+                84,
+                82,
+                76,
+                71,
+                67,
+                66,
+                62,
+                58,
+                55,
+                54,
+                52,
+                48,
+                46,
+                45,
+                43,
+                40,
+                39,
+                39,
+                37,
+                34,
+                33,
+                33,
+                32,
+                29
+              ],
+              "windows": 1215,
+              "windows_reaching_seconds": {
+                "0.1": 1215,
+                "0.5": 472,
+                "1.0": 143,
+                "2.0": 29
+              }
+            },
+            "oakink2": {
+              "maximum_observed_seconds": 2.0000000000000284,
+              "minimum_observed_seconds": 0.09999999999999432,
+              "valid_windows_by_step": [
+                346860,
+                346860,
+                346860,
+                346626,
+                346412,
+                346208,
+                345998,
+                345764,
+                345550,
+                345346,
+                345136,
+                344902,
+                344688,
+                344484,
+                344274,
+                344040,
+                343826,
+                343622,
+                343412,
+                343178,
+                342964,
+                342760,
+                342550,
+                342316,
+                342102,
+                341898,
+                341688,
+                341454,
+                341240,
+                341036,
+                340826,
+                340592,
+                340378,
+                340174,
+                339964,
+                339730,
+                339516,
+                339312,
+                339102,
+                338868,
+                338654,
+                338450,
+                338240,
+                338006,
+                337792,
+                337588,
+                337378,
+                337144,
+                336930,
+                336726,
+                336516,
+                336282,
+                336068,
+                335864,
+                335654,
+                335420,
+                335206,
+                335002,
+                334792,
+                334558
+              ],
+              "windows": 346860,
+              "windows_reaching_seconds": {
+                "0.1": 346860,
+                "0.5": 344274,
+                "1.0": 341036,
+                "2.0": 334558
+              }
+            },
+            "taco": {
+              "maximum_observed_seconds": 2.000000000000001,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                56574,
+                56574,
+                56574,
+                56142,
+                55688,
+                55290,
+                54878,
+                54446,
+                53992,
+                53594,
+                53182,
+                52750,
+                52296,
+                51898,
+                51486,
+                51054,
+                50600,
+                50202,
+                49790,
+                49358,
+                48904,
+                48506,
+                48094,
+                47662,
+                47208,
+                46810,
+                46398,
+                45966,
+                45512,
+                45114,
+                44702,
+                44270,
+                43816,
+                43418,
+                43006,
+                42574,
+                42120,
+                41722,
+                41310,
+                40878,
+                40424,
+                40026,
+                39614,
+                39182,
+                38728,
+                38330,
+                37920,
+                37488,
+                37034,
+                36636,
+                36226,
+                35794,
+                35340,
+                34942,
+                34532,
+                34102,
+                33648,
+                33252,
+                32844,
+                32414
+              ],
+              "windows": 56574,
+              "windows_reaching_seconds": {
+                "0.1": 56574,
+                "0.5": 51486,
+                "1.0": 45114,
+                "2.0": 32414
+              }
+            },
+            "umetrack": {
+              "maximum_observed_seconds": 2.000000000000001,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                151390,
+                151390,
+                151390,
+                150088,
+                149950,
+                149788,
+                149618,
+                148321,
+                148188,
+                148031,
+                147863,
+                146571,
+                146440,
+                146287,
+                146123,
+                144834,
+                144712,
+                144562,
+                144405,
+                143120,
+                143000,
+                142855,
+                142703,
+                141419,
+                141304,
+                141161,
+                141010,
+                139730,
+                139621,
+                139478,
+                139328,
+                138053,
+                137948,
+                137805,
+                137657,
+                136385,
+                136283,
+                136141,
+                135993,
+                134721,
+                134623,
+                134484,
+                134338,
+                133068,
+                132973,
+                132835,
+                132692,
+                131424,
+                131333,
+                131200,
+                131061,
+                129797,
+                129708,
+                129577,
+                129439,
+                128178,
+                128091,
+                127960,
+                127825,
+                126567
+              ],
+              "windows": 151390,
+              "windows_reaching_seconds": {
+                "0.1": 151390,
+                "0.5": 146123,
+                "1.0": 139478,
+                "2.0": 126567
+              }
+            }
+          },
+          "gt_policy": "complete 17-group MANO only; padded targets have false GT masks",
+          "history_frames": 30,
+          "min_future_frames": 3,
+          "query_time": "actual source offsets; padded queries continue last valid cadence",
+          "target_policy": "next contiguous frames, masked at first timestamp gap or sequence end",
+          "timestamp_units": "seconds",
+          "window_stride": 4
+        },
+        "sequences": {
+          "arctic": 534,
+          "dexycb": 798,
+          "gigahands": 21603,
+          "ho3d": 21,
+          "hot3d": 4402,
+          "interhand": 257,
+          "oakink2": 862,
+          "taco": 1696,
+          "umetrack": 1546
+        },
+        "source_revisions": {
+          "arctic": [
+            "49f3eb4b7f01663172576357bb3d95695d7a7689"
+          ],
+          "dexycb": [
+            "64551b001d360ad83bc383157a559ec248fb9100"
+          ],
+          "gigahands": [
+            "8ad3ef9a50157f44a7eef5645b0766362110a961"
+          ],
+          "ho3d": [
+            "2fd6ee17dc1383d0b3922bc10595a67058fca776"
+          ],
+          "hot3d": [
+            "30fe9674782f32e1e5edba98476b6ff4300132c5"
+          ],
+          "interhand": [
+            "None"
+          ],
+          "oakink2": [
+            "21705616140d726607027e70d58b7837f442ffd8"
+          ],
+          "taco": [
+            "fd3b5a6b39565ca6935a91d35d5e91dde03c5142"
+          ],
+          "umetrack": [
+            "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+          ]
+        },
+        "total_windows": 2037891,
+        "windows": {
+          "arctic": 91972,
+          "dexycb": 6352,
+          "gigahands": 1245932,
+          "ho3d": 5588,
+          "hot3d": 132008,
+          "interhand": 1215,
+          "oakink2": 346860,
+          "taco": 56574,
+          "umetrack": 151390
+        }
+      },
+      "val": {
+        "by_source": {
+          "arctic": {
+            "all_requested_future_frames_fraction": 0.9222706015158846,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 12402
+              },
+              "15": {
+                "fraction": 0.9835510401548138,
+                "windows": 12198
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 12402
+              },
+              "30": {
+                "fraction": 0.9630704725044348,
+                "windows": 11944
+              },
+              "60": {
+                "fraction": 0.9222706015158846,
+                "windows": 11438
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 12402
+              },
+              "0.5": {
+                "fraction": 0.9835510401548138,
+                "windows": 12198
+              },
+              "1.0": {
+                "fraction": 0.9630704725044348,
+                "windows": 11944
+              },
+              "2.0": {
+                "fraction": 0.9222706015158846,
+                "windows": 11438
+              }
+            },
+            "eligible_hand_sequences": 68,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 0,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 297370,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000036,
+            "minimum_observed_future_seconds": 0.09999999999999787,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.9222706015158846,
+            "windows": 12402
+          },
+          "dexycb": {
+            "all_requested_future_frames_fraction": 0.0,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 394
+              },
+              "15": {
+                "fraction": 0.6954314720812182,
+                "windows": 274
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 394
+              },
+              "30": {
+                "fraction": 0.3147208121827411,
+                "windows": 124
+              },
+              "60": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 394
+              },
+              "0.5": {
+                "fraction": 0.6954314720812182,
+                "windows": 274
+              },
+              "1.0": {
+                "fraction": 0.3147208121827411,
+                "windows": 124
+              },
+              "2.0": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "eligible_hand_sequences": 40,
+            "materialized_window": {
+              "available_future_frames": 40,
+              "available_future_max_seconds": 1.3333333730697632,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 1,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": true,
+              "global_window_index": 60976,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 1.4333333333333331,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.0,
+            "windows": 394
+          },
+          "gigahands": {
+            "all_requested_future_frames_fraction": 0.7526333732527951,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 228794
+              },
+              "15": {
+                "fraction": 0.9437660078498562,
+                "windows": 215928
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 228794
+              },
+              "30": {
+                "fraction": 0.8767887269771061,
+                "windows": 200604
+              },
+              "60": {
+                "fraction": 0.7526333732527951,
+                "windows": 172198
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 228794
+              },
+              "0.5": {
+                "fraction": 0.9437660078498562,
+                "windows": 215928
+              },
+              "1.0": {
+                "fraction": 0.8767887269771061,
+                "windows": 200604
+              },
+              "2.0": {
+                "fraction": 0.7526333732527951,
+                "windows": 172198
+              }
+            },
+            "eligible_hand_sequences": 3700,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 2,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 68576,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000007,
+            "minimum_observed_future_seconds": 0.09999999999999432,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.7526333732527951,
+            "windows": 228794
+          },
+          "ho3d": {
+            "all_requested_future_frames_fraction": 0.9333333333333333,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 420
+              },
+              "15": {
+                "fraction": 0.9857142857142858,
+                "windows": 414
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 420
+              },
+              "30": {
+                "fraction": 0.969047619047619,
+                "windows": 407
+              },
+              "60": {
+                "fraction": 0.9333333333333333,
+                "windows": 392
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 420
+              },
+              "0.5": {
+                "fraction": 0.9857142857142858,
+                "windows": 414
+              },
+              "1.0": {
+                "fraction": 0.969047619047619,
+                "windows": 407
+              },
+              "2.0": {
+                "fraction": 0.9333333333333333,
+                "windows": 392
+              }
+            },
+            "eligible_hand_sequences": 2,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 3,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 309772,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.0000000000000018,
+            "minimum_observed_future_seconds": 0.13333333333333286,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.9333333333333333,
+            "windows": 420
+          },
+          "hot3d": {
+            "all_requested_future_frames_fraction": 0.5,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 15240
+              },
+              "15": {
+                "fraction": 0.9,
+                "windows": 13716
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 15240
+              },
+              "30": {
+                "fraction": 0.7666666666666667,
+                "windows": 11684
+              },
+              "60": {
+                "fraction": 0.5,
+                "windows": 7620
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 0.9898950131233596,
+                "windows": 15086
+              },
+              "0.5": {
+                "fraction": 0.8889763779527559,
+                "windows": 13548
+              },
+              "1.0": {
+                "fraction": 0.7666666666666667,
+                "windows": 11684
+              },
+              "2.0": {
+                "fraction": 0.3674540682414698,
+                "windows": 5600
+              }
+            },
+            "eligible_hand_sequences": 508,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 4,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 27728,
+              "history_seconds": 1.0
+            },
+            "maximum_observed_future_seconds": 2.0021134440030437,
+            "minimum_observed_future_seconds": 0.09996394100016914,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.3674540682414698,
+            "windows": 15240
+          },
+          "interhand": {
+            "all_requested_future_frames_fraction": 0.0,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 54
+              },
+              "15": {
+                "fraction": 0.42592592592592593,
+                "windows": 23
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 54
+              },
+              "30": {
+                "fraction": 0.12962962962962962,
+                "windows": 7
+              },
+              "60": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 54
+              },
+              "0.5": {
+                "fraction": 0.42592592592592593,
+                "windows": 23
+              },
+              "1.0": {
+                "fraction": 0.12962962962962962,
+                "windows": 7
+              },
+              "2.0": {
+                "fraction": 0.0,
+                "windows": 0
+              }
+            },
+            "eligible_hand_sequences": 6,
+            "materialized_window": {
+              "available_future_frames": 9,
+              "available_future_max_seconds": 0.30000001192092896,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 5,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": true,
+              "global_window_index": 61370,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 1.4666666666665833,
+            "minimum_observed_future_seconds": 0.10000000000002274,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.0,
+            "windows": 54
+          },
+          "oakink2": {
+            "all_requested_future_frames_fraction": 0.9598961338718984,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 27728
+              },
+              "15": {
+                "fraction": 0.9915608770917484,
+                "windows": 27494
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 27728
+              },
+              "30": {
+                "fraction": 0.9813185227928448,
+                "windows": 27210
+              },
+              "60": {
+                "fraction": 0.9598961338718984,
+                "windows": 26616
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 27728
+              },
+              "0.5": {
+                "fraction": 0.9915608770917484,
+                "windows": 27494
+              },
+              "1.0": {
+                "fraction": 0.9813185227928448,
+                "windows": 27210
+              },
+              "2.0": {
+                "fraction": 0.9598961338718984,
+                "windows": 26616
+              }
+            },
+            "eligible_hand_sequences": 78,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 6,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 0,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000014,
+            "minimum_observed_future_seconds": 0.09999999999999432,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.9598961338718984,
+            "windows": 27728
+          },
+          "taco": {
+            "all_requested_future_frames_fraction": 0.5788590604026845,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 7152
+              },
+              "15": {
+                "fraction": 0.9119127516778524,
+                "windows": 6522
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 7152
+              },
+              "30": {
+                "fraction": 0.8022930648769575,
+                "windows": 5738
+              },
+              "60": {
+                "fraction": 0.5788590604026845,
+                "windows": 4140
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 7152
+              },
+              "0.5": {
+                "fraction": 0.9119127516778524,
+                "windows": 6522
+              },
+              "1.0": {
+                "fraction": 0.8022930648769575,
+                "windows": 5738
+              },
+              "2.0": {
+                "fraction": 0.5788590604026845,
+                "windows": 4140
+              }
+            },
+            "eligible_hand_sequences": 210,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 7,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 61424,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000001,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.5788590604026845,
+            "windows": 7152
+          },
+          "umetrack": {
+            "all_requested_future_frames_fraction": 0.8399044868947134,
+            "available_by_future_step": {
+              "1": {
+                "fraction": 1.0,
+                "windows": 18008
+              },
+              "15": {
+                "fraction": 0.9659040426477121,
+                "windows": 17394
+              },
+              "3": {
+                "fraction": 1.0,
+                "windows": 18008
+              },
+              "30": {
+                "fraction": 0.9233673922701022,
+                "windows": 16628
+              },
+              "60": {
+                "fraction": 0.8399044868947134,
+                "windows": 15125
+              }
+            },
+            "available_by_seconds": {
+              "0.1": {
+                "fraction": 1.0,
+                "windows": 18008
+              },
+              "0.5": {
+                "fraction": 0.9659040426477121,
+                "windows": 17394
+              },
+              "1.0": {
+                "fraction": 0.9233673922701022,
+                "windows": 16628
+              },
+              "2.0": {
+                "fraction": 0.8399044868947134,
+                "windows": 15125
+              }
+            },
+            "eligible_hand_sequences": 182,
+            "materialized_window": {
+              "available_future_frames": 60,
+              "available_future_max_seconds": 2.0,
+              "beta_valid": true,
+              "complete17_history_and_available_future": true,
+              "dataset_id": 8,
+              "finite_materialized_tensors": true,
+              "future_tail_masked": false,
+              "global_window_index": 42968,
+              "history_seconds": 1.0000001192092896
+            },
+            "maximum_observed_future_seconds": 2.000000000000001,
+            "minimum_observed_future_seconds": 0.09999999999999964,
+            "some_windows_shorter_than_two_seconds": true,
+            "two_second_target_available_fraction": 0.8399044868947134,
+            "windows": 18008
+          }
+        },
+        "forecast_contract": {
+          "coverage_seconds_comparison": "maximum valid target offset >= horizon minus 1e-6 seconds",
+          "forecast_frames": 60,
+          "future_coverage": {
+            "arctic": {
+              "maximum_observed_seconds": 2.0000000000000036,
+              "minimum_observed_seconds": 0.09999999999999787,
+              "valid_windows_by_step": [
+                12402,
+                12402,
+                12402,
+                12390,
+                12378,
+                12352,
+                12334,
+                12322,
+                12310,
+                12284,
+                12266,
+                12254,
+                12242,
+                12216,
+                12198,
+                12186,
+                12174,
+                12148,
+                12130,
+                12118,
+                12106,
+                12080,
+                12062,
+                12050,
+                12038,
+                12012,
+                11994,
+                11982,
+                11970,
+                11944,
+                11926,
+                11914,
+                11902,
+                11876,
+                11858,
+                11846,
+                11834,
+                11808,
+                11790,
+                11778,
+                11766,
+                11740,
+                11722,
+                11710,
+                11698,
+                11672,
+                11654,
+                11642,
+                11630,
+                11604,
+                11586,
+                11574,
+                11562,
+                11536,
+                11518,
+                11506,
+                11494,
+                11468,
+                11450,
+                11438
+              ],
+              "windows": 12402,
+              "windows_reaching_seconds": {
+                "0.1": 12402,
+                "0.5": 12198,
+                "1.0": 11944,
+                "2.0": 11438
+              }
+            },
+            "dexycb": {
+              "maximum_observed_seconds": 1.4333333333333331,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                394,
+                394,
+                394,
+                386,
+                377,
+                364,
+                354,
+                346,
+                337,
+                324,
+                314,
+                306,
+                297,
+                284,
+                274,
+                266,
+                257,
+                244,
+                234,
+                226,
+                217,
+                204,
+                194,
+                186,
+                177,
+                164,
+                154,
+                146,
+                137,
+                124,
+                114,
+                106,
+                97,
+                84,
+                74,
+                66,
+                57,
+                44,
+                35,
+                27,
+                21,
+                9,
+                8,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "windows": 394,
+              "windows_reaching_seconds": {
+                "0.1": 394,
+                "0.5": 274,
+                "1.0": 124,
+                "2.0": 0
+              }
+            },
+            "gigahands": {
+              "maximum_observed_seconds": 2.000000000000007,
+              "minimum_observed_seconds": 0.09999999999999432,
+              "valid_windows_by_step": [
+                228794,
+                228794,
+                228794,
+                227675,
+                226643,
+                225552,
+                224440,
+                223333,
+                222320,
+                221250,
+                220148,
+                219063,
+                218069,
+                217018,
+                215928,
+                214859,
+                213878,
+                212841,
+                211761,
+                210701,
+                209738,
+                208711,
+                207645,
+                206601,
+                205652,
+                204636,
+                203580,
+                202549,
+                201610,
+                200604,
+                199561,
+                198543,
+                197614,
+                196621,
+                195595,
+                194596,
+                193684,
+                192698,
+                191683,
+                190694,
+                189794,
+                188823,
+                187825,
+                186851,
+                185963,
+                185013,
+                184039,
+                183082,
+                182212,
+                181280,
+                180317,
+                179374,
+                178515,
+                177594,
+                176654,
+                175738,
+                174903,
+                174004,
+                173097,
+                172198
+              ],
+              "windows": 228794,
+              "windows_reaching_seconds": {
+                "0.1": 228794,
+                "0.5": 215928,
+                "1.0": 200604,
+                "2.0": 172198
+              }
+            },
+            "ho3d": {
+              "maximum_observed_seconds": 2.0000000000000018,
+              "minimum_observed_seconds": 0.13333333333333286,
+              "valid_windows_by_step": [
+                420,
+                420,
+                420,
+                420,
+                419,
+                419,
+                418,
+                418,
+                417,
+                417,
+                416,
+                416,
+                415,
+                415,
+                414,
+                414,
+                413,
+                413,
+                412,
+                412,
+                411,
+                411,
+                410,
+                410,
+                409,
+                409,
+                408,
+                408,
+                407,
+                407,
+                406,
+                406,
+                405,
+                405,
+                404,
+                404,
+                403,
+                403,
+                402,
+                402,
+                401,
+                401,
+                400,
+                400,
+                399,
+                399,
+                398,
+                398,
+                397,
+                397,
+                396,
+                396,
+                395,
+                395,
+                394,
+                394,
+                393,
+                393,
+                392,
+                392
+              ],
+              "windows": 420,
+              "windows_reaching_seconds": {
+                "0.1": 420,
+                "0.5": 414,
+                "1.0": 407,
+                "2.0": 392
+              }
+            },
+            "hot3d": {
+              "maximum_observed_seconds": 2.0021134440030437,
+              "minimum_observed_seconds": 0.09996394100016914,
+              "valid_windows_by_step": [
+                15240,
+                15240,
+                15240,
+                14732,
+                14732,
+                14732,
+                14732,
+                14224,
+                14224,
+                14224,
+                14224,
+                13716,
+                13716,
+                13716,
+                13716,
+                13208,
+                13208,
+                13208,
+                13208,
+                12700,
+                12700,
+                12700,
+                12700,
+                12192,
+                12192,
+                12192,
+                12192,
+                11684,
+                11684,
+                11684,
+                11684,
+                11176,
+                11176,
+                11176,
+                11176,
+                10668,
+                10668,
+                10668,
+                10668,
+                10160,
+                10160,
+                10160,
+                10160,
+                9652,
+                9652,
+                9652,
+                9652,
+                9144,
+                9144,
+                9144,
+                9144,
+                8636,
+                8636,
+                8636,
+                8636,
+                8128,
+                8128,
+                8128,
+                8128,
+                7620
+              ],
+              "windows": 15240,
+              "windows_reaching_seconds": {
+                "0.1": 15086,
+                "0.5": 13548,
+                "1.0": 11684,
+                "2.0": 5600
+              }
+            },
+            "interhand": {
+              "maximum_observed_seconds": 1.4666666666665833,
+              "minimum_observed_seconds": 0.10000000000002274,
+              "valid_windows_by_step": [
+                54,
+                54,
+                54,
+                52,
+                46,
+                45,
+                40,
+                39,
+                34,
+                33,
+                30,
+                29,
+                25,
+                25,
+                23,
+                22,
+                19,
+                19,
+                17,
+                16,
+                13,
+                13,
+                12,
+                12,
+                9,
+                9,
+                8,
+                8,
+                7,
+                7,
+                6,
+                6,
+                5,
+                5,
+                4,
+                4,
+                3,
+                3,
+                2,
+                2,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "windows": 54,
+              "windows_reaching_seconds": {
+                "0.1": 54,
+                "0.5": 23,
+                "1.0": 7,
+                "2.0": 0
+              }
+            },
+            "oakink2": {
+              "maximum_observed_seconds": 2.000000000000014,
+              "minimum_observed_seconds": 0.09999999999999432,
+              "valid_windows_by_step": [
+                27728,
+                27728,
+                27728,
+                27708,
+                27694,
+                27678,
+                27650,
+                27630,
+                27616,
+                27600,
+                27572,
+                27552,
+                27538,
+                27522,
+                27494,
+                27474,
+                27460,
+                27444,
+                27416,
+                27396,
+                27382,
+                27366,
+                27338,
+                27318,
+                27304,
+                27288,
+                27260,
+                27240,
+                27226,
+                27210,
+                27182,
+                27162,
+                27148,
+                27132,
+                27104,
+                27084,
+                27070,
+                27054,
+                27026,
+                27006,
+                26992,
+                26976,
+                26948,
+                26928,
+                26914,
+                26898,
+                26870,
+                26850,
+                26836,
+                26820,
+                26792,
+                26772,
+                26758,
+                26742,
+                26714,
+                26694,
+                26680,
+                26664,
+                26636,
+                26616
+              ],
+              "windows": 27728,
+              "windows_reaching_seconds": {
+                "0.1": 27728,
+                "0.5": 27494,
+                "1.0": 27210,
+                "2.0": 26616
+              }
+            },
+            "taco": {
+              "maximum_observed_seconds": 2.000000000000001,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                7152,
+                7152,
+                7152,
+                7080,
+                7032,
+                6998,
+                6942,
+                6870,
+                6822,
+                6788,
+                6732,
+                6660,
+                6612,
+                6578,
+                6522,
+                6450,
+                6402,
+                6368,
+                6312,
+                6240,
+                6192,
+                6158,
+                6102,
+                6030,
+                5982,
+                5948,
+                5892,
+                5820,
+                5772,
+                5738,
+                5682,
+                5610,
+                5562,
+                5528,
+                5472,
+                5400,
+                5352,
+                5318,
+                5262,
+                5190,
+                5142,
+                5108,
+                5052,
+                4980,
+                4932,
+                4898,
+                4842,
+                4770,
+                4722,
+                4688,
+                4632,
+                4560,
+                4512,
+                4478,
+                4422,
+                4350,
+                4302,
+                4268,
+                4212,
+                4140
+              ],
+              "windows": 7152,
+              "windows_reaching_seconds": {
+                "0.1": 7152,
+                "0.5": 6522,
+                "1.0": 5738,
+                "2.0": 4140
+              }
+            },
+            "umetrack": {
+              "maximum_observed_seconds": 2.000000000000001,
+              "minimum_observed_seconds": 0.09999999999999964,
+              "valid_windows_by_step": [
+                18008,
+                18008,
+                18008,
+                17873,
+                17854,
+                17826,
+                17801,
+                17668,
+                17650,
+                17622,
+                17597,
+                17464,
+                17446,
+                17419,
+                17394,
+                17261,
+                17244,
+                17219,
+                17194,
+                17062,
+                17045,
+                17020,
+                16996,
+                16864,
+                16848,
+                16823,
+                16800,
+                16668,
+                16653,
+                16628,
+                16605,
+                16473,
+                16458,
+                16433,
+                16410,
+                16279,
+                16264,
+                16239,
+                16216,
+                16085,
+                16070,
+                16046,
+                16023,
+                15892,
+                15877,
+                15853,
+                15830,
+                15699,
+                15684,
+                15660,
+                15637,
+                15506,
+                15491,
+                15467,
+                15445,
+                15314,
+                15299,
+                15276,
+                15255,
+                15125
+              ],
+              "windows": 18008,
+              "windows_reaching_seconds": {
+                "0.1": 18008,
+                "0.5": 17394,
+                "1.0": 16628,
+                "2.0": 15125
+              }
+            }
+          },
+          "gt_policy": "complete 17-group MANO only; padded targets have false GT masks",
+          "history_frames": 30,
+          "min_future_frames": 3,
+          "query_time": "actual source offsets; padded queries continue last valid cadence",
+          "target_policy": "next contiguous frames, masked at first timestamp gap or sequence end",
+          "timestamp_units": "seconds",
+          "window_stride": 4
+        },
+        "sequences": {
+          "arctic": 68,
+          "dexycb": 40,
+          "gigahands": 3700,
+          "ho3d": 2,
+          "hot3d": 508,
+          "interhand": 6,
+          "oakink2": 78,
+          "taco": 210,
+          "umetrack": 182
+        },
+        "source_revisions": {
+          "arctic": [
+            "49f3eb4b7f01663172576357bb3d95695d7a7689"
+          ],
+          "dexycb": [
+            "64551b001d360ad83bc383157a559ec248fb9100"
+          ],
+          "gigahands": [
+            "8ad3ef9a50157f44a7eef5645b0766362110a961"
+          ],
+          "ho3d": [
+            "2fd6ee17dc1383d0b3922bc10595a67058fca776"
+          ],
+          "hot3d": [
+            "30fe9674782f32e1e5edba98476b6ff4300132c5"
+          ],
+          "interhand": [
+            "None"
+          ],
+          "oakink2": [
+            "21705616140d726607027e70d58b7837f442ffd8"
+          ],
+          "taco": [
+            "fd3b5a6b39565ca6935a91d35d5e91dde03c5142"
+          ],
+          "umetrack": [
+            "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+          ]
+        },
+        "total_windows": 310192,
+        "windows": {
+          "arctic": 12402,
+          "dexycb": 394,
+          "gigahands": 228794,
+          "ho3d": 420,
+          "hot3d": 15240,
+          "interhand": 54,
+          "oakink2": 27728,
+          "taco": 7152,
+          "umetrack": 18008
+        }
+      }
+    }
+  },
+  "execution_acceptance": {
+    "accepted": true,
+    "checked_utc": "2026-10-17T04:49:42.393400+00:00",
+    "checkpoint": {
+      "checkpoint_model_hash_matches_ranks": true,
+      "file_sha256": "bbb96151c957f78dbee1ae6e570064687bab1c5fcc5a8c6069381078124fa5b3",
+      "live_path_still_same_inode": true,
+      "model_finite": {
+        "all_tensor_devices_cpu": true,
+        "all_tensors": 325,
+        "finite": true,
+        "floating_elements": 13530038,
+        "floating_numpy_arrays": 0,
+        "floating_tensors": 322,
+        "nonfinite_paths": [],
+        "python_float_values": 0
+      },
+      "model_state_sha256": "4895e74dd8f9ec43c4989ddb53156ed95d8e0efbef9fbab869c689694730e116",
+      "opened_file": {
+        "bytes": 162803377,
+        "device": 205,
+        "inode": 1964947629781,
+        "mtime_ns": 1792212565496803912
+      },
+      "opened_inode_unchanged": true,
+      "optimizer_finite": {
+        "all_tensor_devices_cpu": true,
+        "all_tensors": 963,
+        "finite": true,
+        "floating_elements": 27060385,
+        "floating_numpy_arrays": 0,
+        "floating_tensors": 963,
+        "nonfinite_paths": [],
+        "python_float_values": 10
+      },
+      "optimizer_parameter_step_max": 10.0,
+      "optimizer_parameter_step_min": 10.0,
+      "path": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017/latest.pt",
+      "race_policy": "an atomic replacement of live path is allowed; audit refers only to this immutable opened inode",
+      "rank_hashes_equal": true,
+      "same_open_fd_for_hash_and_load": true,
+      "step": 10
+    },
+    "completed_utc": "2026-10-17T04:49:51.301292+00:00",
+    "metadata": {
+      "code_version": "170c3473e1288d3d5a2877d0553185ce180af36a",
+      "global_batch_size": 1024,
+      "per_gpu_batch_size": 512,
+      "sampling": "full shuffled coverage, disjoint rank shards, no dropped final batch",
+      "sha256": "e406a2e488160cde9a2915c938adc69c728de53f5ced01aa69e36004dac83aa7",
+      "world_size": 2
+    },
+    "phase": "accepted",
+    "read_only": true,
+    "required_minimum_updates": 10,
+    "run_directory": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
+    "source_coverage": {
+      "all_nine_train_and_val_sources_positive": true,
+      "collection_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+      "collection_manifest_sha256": "a1c09d67b3528c6f108a0d36825382a6054e8ae5865367a1431dba9085c2fe90",
+      "early_sampling_note": "window availability is checked for all nine; zero early observed samples is not treated as a missing source",
+      "observed_training_samples": {
+        "arctic": 888,
+        "dexycb": 58,
+        "gigahands": 12473,
+        "ho3d": 62,
+        "hot3d": 1373,
+        "interhand": 10,
+        "oakink2": 3568,
+        "taco": 564,
+        "umetrack": 1484
+      },
+      "samplers": [
+        {
+          "batch_cursor": 10,
+          "batch_size": 512,
+          "epoch": 0,
+          "num_samples": 1018946,
+          "rank": 0,
+          "replicas": 2
+        },
+        {
+          "batch_cursor": 10,
+          "batch_size": 512,
+          "epoch": 0,
+          "num_samples": 1018946,
+          "rank": 1,
+          "replicas": 2
+        }
+      ],
+      "source_manifests": {
+        "arctic": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1/manifest.json",
+          "phase": "complete",
+          "sha256": "528eef1b579cee8f17e2d6988ef326e6b216a9b1b07f8fc747c8ac512431f6da"
+        },
+        "dexycb": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+          "phase": "complete",
+          "sha256": "b36f171ad3af1951d08db25cab5876db92bf703378fa54e9e6bc1208f289a911"
+        },
+        "gigahands": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v5/manifest.json",
+          "phase": "complete",
+          "sha256": "3a7a8a9541c1a165f1f4897d5ec9fcce6c89b5f7159856c53f0a1a460544dda6"
+        },
+        "ho3d": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2/manifest.json",
+          "phase": "complete",
+          "sha256": "ca3776ffa7e1530087ab8037f8eadd962fb2412a48ecfdd6945a95b059722cf8"
+        },
+        "hot3d": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+          "phase": "complete",
+          "sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0"
+        },
+        "interhand": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1/manifest.json",
+          "phase": "complete",
+          "sha256": "977e2c612dfd7cecd4c88eb22ebc7a3fb003e212f1a8e0fce991ad87eba66e95"
+        },
+        "oakink2": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+          "phase": "complete",
+          "sha256": "570e423e28ae36a9e03bef087f00a053a9bb93e2c6d81feaf8c96ff818b64291"
+        },
+        "taco": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1/manifest.json",
+          "phase": "complete",
+          "sha256": "506e7565739edf8b2dbaf637de1f7ed2567aa261ebf0ab18ee293c97d6fe7347"
+        },
+        "umetrack": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+          "phase": "complete",
+          "sha256": "77623ccab62e733f64196201720d22219f62341cac07ae2724da2fb67cae8a24"
+        }
+      },
+      "train_windows": {
+        "arctic": 91972,
+        "dexycb": 6352,
+        "gigahands": 1245932,
+        "ho3d": 5588,
+        "hot3d": 132008,
+        "interhand": 1215,
+        "oakink2": 346860,
+        "taco": 56574,
+        "umetrack": 151390
+      },
+      "val_windows": {
+        "arctic": 12402,
+        "dexycb": 394,
+        "gigahands": 228794,
+        "ho3d": 420,
+        "hot3d": 15240,
+        "interhand": 54,
+        "oakink2": 27728,
+        "taco": 7152,
+        "umetrack": 18008
+      }
+    },
+    "status": {
+      "grad_norm": 9.29200267791748,
+      "loss": -0.3521215617656708,
+      "lr": 8.000000000000001e-06,
+      "phase": "training",
+      "samples_by_dataset": {
+        "arctic": 888,
+        "dexycb": 58,
+        "gigahands": 12473,
+        "ho3d": 62,
+        "hot3d": 1373,
+        "interhand": 10,
+        "oakink2": 3568,
+        "taco": 564,
+        "umetrack": 1484
+      },
+      "sha256": "d1a5484f6dd6e5be19238af83755c249b0257e39322ec55d7dc920b5b2fe4936",
+      "step": 20,
+      "utc": "2026-10-17T04:49:36.325536+00:00"
+    },
+    "wandb_server": {
+      "identity": {
+        "entity": "black-ant",
+        "id": "fa17b1ef",
+        "project": "handloop-twm"
+      },
+      "private_credentials_printed": false,
+      "server_history_verified": true,
+      "state": "running",
+      "summary": {
+        "optimizer_step": 10.0,
+        "train/loss": -0.2205153852701187
+      },
+      "training_rows": [
+        {
+          "optimizer_step": 10,
+          "train/loss": -0.2205153852701187
+        }
+      ],
+      "url": "https://wandb.ai/black-ant/handloop-twm/runs/fa17b1ef"
+    }
+  },
+  "totals": {
+    "train": 9480866,
+    "val": 1460978
   },
   "giga_source_reference_diagnostic": {
     "artifact": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/giga_wrist_semantics_20261017/report.json",
