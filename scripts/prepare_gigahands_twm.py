@@ -12,6 +12,9 @@ The official text-motion loader randomly splits annotation ROWS with seed42.
 This adapter instead defaults to a documented SUBJECT-disjoint engineering
 90/10 train/val split. A supplied split JSON can replace
 that engineering split; all assignments are made before any smoke limits.
+Annotation end_frame_id follows the pinned loader's inclusive [start:end+1]
+NumPy slice; -1 means through sequence end. Native slice.indices(N) records
+any source-bound saturation explicitly without changing it to exclusive end.
 
 Reference decoder: GigaHands 8ad3ef9..., EasyMoCap submodule b61bf714....
 MANO poses are 48 axis-angle offsets, nonflat mean added once. EasyMoCap
@@ -324,15 +327,31 @@ def convert(job: dict) -> dict:
                              f"{n} pose rows vs {len(union)} sorted chosen-frame union")
         rh, th, beta = (rows(params[key], width, n) for key, width in (("Rh", 3), ("Th", 3), ("shapes", 10)))
         in_annotation = np.zeros(n, dtype=np.bool_)
+        annotation_slices = []
         for begin, end in job["annotation_ranges"]:
-            if begin >= n or end >= n:
-                raise ValueError(f"Annotation range exceeds source rows: {job['recording']} {begin}:{end}, n={n}")
-            in_annotation[begin:n if end == -1 else end + 1] = True
+            # Match fixed official dataset_hands.py lines 66-70 / 257-261:
+            # np.array(motion)[start:] if end==-1, else [start:end+1].
+            # In particular, an annotation end==N is not evidence of exclusive
+            # semantics: Python's inclusive stop N+1 naturally saturates at N.
+            source_slice = slice(begin, None if end == -1 else end + 1)
+            effective_begin, effective_stop, step = source_slice.indices(n)
+            in_annotation[source_slice] = True
+            annotation_slices.append({"source_begin": begin, "source_end": end,
+                                      "source_end_semantics": "inclusive; -1 means through end",
+                                      "effective_begin": effective_begin,
+                                      "effective_stop_exclusive": effective_stop, "step": step,
+                                      "source_rows": n,
+                                      "end_saturated_by_native_slice": end >= n,
+                                      "start_saturated_by_native_slice": begin > n})
         finite = np.isfinite(np.concatenate((pose, rh, th, beta), axis=-1)).all(axis=-1)
         own = np.isin(union, selected[side])
         indices = np.flatnonzero(in_annotation & finite & own)
         skipped[side] = {"outside_annotation": int((~in_annotation).sum()), "nonfinite": int((~finite).sum()),
-                         "hand_not_chosen": int((~own).sum()), "source_pose_rows": n}
+                         "hand_not_chosen": int((~own).sum()), "source_pose_rows": n,
+                         "annotation_empty_intervals": sum(item["effective_begin"] >= item["effective_stop_exclusive"]
+                                                           for item in annotation_slices),
+                         "annotation_end_saturations": sum(item["end_saturated_by_native_slice"]
+                                                          for item in annotation_slices)}
         if job["max_frames"]:
             indices = indices[:job["max_frames"]]
         if len(indices) < 2:
@@ -415,6 +434,7 @@ def convert(job: dict) -> dict:
                                                   for name in ("left", "right")},
                         "source_frame_mapping": "official set-union expression equals sorted union and exact pose-row count; original side frame IDs retained",
                         "official_frame_order_checked": True,
+                        "annotation_slices": annotation_slices,
                         "triangulated_wrist_audit": raw_wrist_audit,
                         "beta_span": beta_span, "beta_provenance": "source shapes, static only if exactly equal; per-frame otherwise",
                         "fk_roundtrip": {"checked": True, "all_frames": len(check) == len(indices),
@@ -505,6 +525,8 @@ def main():
                                        "left_shapedirs_fix": False, "coordinate_transform": "none; original source world preserved"},
                 "scope": "train/val only, one original motion per session/clip/hand; no views/captions duplication",
                 "annotation_sequence_list_rule": "first entry, matching pinned official dataset_hands.py; no clip concatenation",
+                "annotation_end_semantics": "source end_frame_id is inclusive: motion[start:end+1]; end==-1 uses motion[start:]; native Python slice saturation is preserved and per-sequence effective bounds recorded",
+                "annotation_slice_source": f"https://github.com/brown-ivl/GigaHands/blob/{GIGA_REVISION}/dataset/dataset_hands.py#L66-L70",
                 "split_provenance": split_meta, "source_recording_counts": dict(all_split_counts),
                 "missing_annotated_params": missing, "source_params_complete": not missing,
                 "annotation_sha256": sha256(args.annotations),

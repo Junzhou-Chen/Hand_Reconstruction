@@ -4,8 +4,11 @@
 Official vis_HO3D.py sets MANO fullpose=handPose, trans=handTrans and
 beta=handBeta with flat_hand_mean=True. handTrans is native MANO translation,
 NOT anatomical wrist J0. Actual wrist is obtained with licensed MANO FK and
-checked against supplied handJoints3D. HO3D's official setup_mano.py uses tip
-vertices [744,333,444,555,672] in native MANO16+tips order (not DexYCB's tips).
+checked against supplied handJoints3D. The ORIGINAL HOnnotate TensorFlow
+annotator uses tips [728,353,442,576,694] in native MANO16+tips order. The later
+ho3d visualization setup uses different tips and does not reproduce the
+released handJoints3D; a remote nine-frame / three-recording audit confirmed
+the original annotator's exact vertices before this codec was accepted.
 
 Keep the source right-handed OpenGL camera gauge. Select ONE fixed camera per
 physical recording to avoid counting views as independent motions, and group
@@ -43,10 +46,12 @@ from prepare_taco_twm import get_decoder, digest
 
 
 SOURCE_REVISION = "2fd6ee17dc1383d0b3922bc10595a67058fca776"
+ANNOTATOR_REVISION = "d94f6b7e1c09a8c7229799a0d48fdc5f2b416780"
+ANNOTATOR_TIP_SOURCE = f"https://github.com/shreyashampali/HOnnotate/blob/{ANNOTATOR_REVISION}/optimization/manoTF/batch_mano.py#L230-L237"
 HMP_REVISION = "35d799f76b2b2bc1d1e945117b021014b099e7e6"
 HMP_TIME_EVIDENCE = f"https://github.com/enesduran/HMP/blob/{HMP_REVISION}/configs/in_the_lab_sample_config.yaml"
 MULTICAM_GROUPS = ("ABF1", "BB1", "GPMF1", "GSF1", "MDF1", "SB1", "ShSu1", "SiBF1", "SMu4", "MPM1", "AP1")
-FINGERTIPS = (744, 333, 444, 555, 672)
+FINGERTIPS = (728, 353, 442, 576, 694)
 ADAPTER_VERSION = 1
 _ZIP_ARCHIVES = {}
 
@@ -218,7 +223,8 @@ def convert_sequence(job: dict) -> dict:
              "source_num_listed_frames": len(source_frames), "skipped": dict(skipped),
              "fk_against_supplied_joints": {"checked": True, "all_retained_frames": True,
                  "joint_order": "unpermuted MANO16 followed by five official HO3D tips",
-                 "tip_vertices": list(FINGERTIPS), "joint_max_m": float(errors.max()), "joint_mean_m": float(errors.mean()),
+                 "tip_vertices": list(FINGERTIPS), "tip_vertex_source": ANNOTATOR_TIP_SOURCE,
+                 "joint_max_m": float(errors.max()), "joint_mean_m": float(errors.mean()),
                  "wrist_max_m": float(errors[:, 0].max()), "tolerance_m": job["fk_tolerance_m"],
                  "independent_physical_gt": False},
              "fk_roundtrip": {"checked": True, "frames_checked": len(sample_ids),
@@ -346,12 +352,16 @@ def main():
     manifest = {"phase": "indexed" if args.index_only else "preparing", "utc": now(), "dataset": "ho3d",
         "release": "HO3D_v2", "adapter_version": ADAPTER_VERSION, "source_revision": args.source_revision,
         "source_urls": [f"https://github.com/shreyashampali/ho3d/tree/{args.source_revision}",
-                        "https://arxiv.org/abs/1907.01481", HMP_TIME_EVIDENCE],
+                        "https://arxiv.org/abs/1907.01481", HMP_TIME_EVIDENCE, ANNOTATOR_TIP_SOURCE],
+        "source_annotator_revision": ANNOTATOR_REVISION,
         "source_code_sha256": source_hashes, "rotation6d": "columns_c0xyz_c1xyz",
         "position": "actual MANO FK wrist J0, not native handTrans; metres in original fixed OpenGL camera gauge",
         "source_convention": {"full_pose": "48 full axis-angle radians; flat_hand_mean=True",
             "translation": "native MANO transl, uncentred source decoder", "handedness": "right only",
-            "left_shapedirs_fix": False, "tip_vertices": list(FINGERTIPS), "world_transform_applied": False},
+            "left_shapedirs_fix": False, "tip_vertices": list(FINGERTIPS),
+            "tip_vertex_source": ANNOTATOR_TIP_SOURCE,
+            "tip_mapping_audit": "original HOnnotate label generator matches released metadata; later HO3D visualization patch tips differ",
+            "world_transform_applied": False},
         "nominal_fps": args.nominal_fps, "capture_fps_independently_verified": False,
         "timestamp_source": "original numeric meta frame ID / explicit nominal FPS; not measured",
         "nominal_fps_evidence": HMP_TIME_EVIDENCE,
