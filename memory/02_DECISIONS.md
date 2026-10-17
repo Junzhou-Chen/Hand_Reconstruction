@@ -1,5 +1,7 @@
 # HandLoop 决策与演进记忆
 
+**2026-10-16夜间用户新指令（暂缓获取／调查范围）：** 在授权获取DexWild trajectory并询问HumanTouch后，用户明确“DexWild这个先放一放”，并在澄清选项中指定“可直接下载、适配99D的人手运动数据集”。本轮不自动续跑DexWild；继续已授权HumanTouch数值下载，调查重点转为真实人手连续运动、可获取的完整MANO或可审计原生旋转。该指令暂替代前轮DexWild作为当晚主要获取项，不代表永久否定该库、取消sensor精度原则或批准新的数据混合／训练。其他候选仅调研未下载。[实际执行与失败](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)、[新选库核查](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)。
+
 **2026-10-16用户新增可视化要求及执行：** 用户明确希望取任意现有视频，把重建手叠加回原图检查与真人手的重合。已选择可审计的Dex测试左右手片段，制作原RGB／官方HaWoR／验证best4200的并排mesh＋骨架视频及共同放大窗；这是输出可视化授权，不是新训练、模型／split修改或按test择优。禁止用PA／GT位姿／GT β美化投影，已有GT crop／标定和物体透视叠加边界注明。[实际产物](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)。
 
 **2026-10-16最新用户决定：先用已验收Dex＋HOT跑5000步，其他数据继续后台准备。** 用户明确效果优先、不必完全复现HaWoR，可增加与测试隔离的来源；当前指定此前63652独立RGB／73524 train手状态池立即重训5k。本条替代等四库就绪才启动、tiny Dex-only及前轮等用户回来再训练的安排。固定6314ec2…混源清单／2773train窗，原fixed8验证、两主干全量低LR／每卡8段／两轮／history30／噪声与geometry目标均保持；5000总更新＝3750视觉＋1250 motion回放。从官方HaWoR＋D37重新初始化，全新Adam和5000步cosine；不续用旧100步优化器。ARCTIC／HO3D下载与HOT全clips预处理继续，新来源不在本run中自动入池；旧best与旧100步保存。已于08:25UTC／纽约04:25正式双卡开训，源码a642e6e，08:40实测30/5000。step4的1076 model／3135 Adam浮点张量finite且CPU／双rank hash一致，step8两rank14组梯度seen非零／代表参数改变均通过，每卡peak63.50GiB，W&B ff3108fd online。HO3D下载校验与HOT全clips预处理随后complete，ARCTIC仍下载；本run数据不变。见[两库5k协议](../docs/VISUAL_DEX_HOT_GEOMETRY_5K_2026-10-16.md)；启动通过不代表新精度结论。

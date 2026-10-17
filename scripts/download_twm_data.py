@@ -54,7 +54,7 @@ def verified(path, entry):
             and digest(path, entry["hash_kind"] == "git_blob_sha1") == entry["hash"])
 
 
-def fetch_file(entry, destination, progress=lambda size: None, attempts=6):
+def fetch_file(entry, destination, progress=lambda size: None, attempts=6, request_get=None):
     """Resume from a partial file; only verified bytes get the final name."""
     destination.parent.mkdir(parents=True, exist_ok=True)
     if verified(destination, entry):
@@ -74,7 +74,7 @@ def fetch_file(entry, destination, progress=lambda size: None, attempts=6):
             if offset < entry["size"]:
                 headers = {"Range": f"bytes={offset}-"} if offset else {}
                 # A fresh resolve request renews CDN signatures; never persist signed URLs.
-                with requests.get(entry["url"], headers=headers, stream=True,
+                with (request_get or requests.get)(entry["url"], headers=headers, stream=True,
                                   params={"download": "true", "request_time": time.time_ns()},
                                   timeout=(30, 90)) as response:
                     response.raise_for_status()
@@ -230,7 +230,7 @@ def plan(dataset, directory):
     print("selected_files", len(entries), flush=True)
 
 
-def download(directory, workers):
+def download(directory, workers, fetcher=None):
     manifest = json.loads((directory / "download_manifest.json").read_text())
     mutex, stop = threading.Lock(), threading.Event()
     state = {x["path"]: {"status": "pending", "bytes": 0} for x in manifest["files"]}
@@ -259,7 +259,7 @@ def download(directory, workers):
         p = entry["path"]
         update(p, status="downloading")
         try:
-            fetch_file(entry, directory / p, lambda size: update(p, bytes=size))
+            (fetcher or fetch_file)(entry, directory / p, lambda size: update(p, bytes=size))
             update(p, status="verified", bytes=entry["size"])
         except Exception as error:
             # Avoid logging transient signed URLs or credentials from HTTP exceptions.

@@ -1,0 +1,255 @@
+{
+  "queried_utc": "2026-10-17T03:28:00.634367+00:00",
+  "pod": "jchen57-fineturn-tl4zr",
+  "checks": {
+    "shared_http_resume_checks": 4,
+    "http_range_fixture": "6672-byte real HDF5 fileobj plus cross-part and invalid HTTP checks passed",
+    "humantouch_429_cooldown_close_resume": "passed"
+  },
+  "scope": "HumanTouch numerical download continues; DexWild held at user request; no new training or 99D conversion",
+  "humantouch_trajectories_v1": {
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/humantouch_trajectories_v1",
+    "process_alive": true,
+    "process": {
+      "pid": 6739,
+      "pod": "jchen57-fineturn-tl4zr",
+      "started_utc": "2026-10-17T03:24:29.622521+00:00",
+      "workers": 4,
+      "code_path": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/sensor_trajectory_download_20261017",
+      "script_sha256": "239f724f6bc2b92389f755e54954db36c31b80a47168efaf0b702af4dad2cf4b",
+      "shared_downloader_sha256": "c9abf0feb47a2b7860dfe0aa49683dd455fa230bc81005eefd9bd0ce0aa30fe1",
+      "rate_limit_policy": "at most 4 resolver requests/s with shared-quota adaptive slowdown and HTTP429 reset cooldown"
+    },
+    "status": {
+      "dataset": "humantouch",
+      "started_utc": "2026-10-17T03:24:29.974112+00:00",
+      "updated_utc": "2026-10-17T03:27:51.122105+00:00",
+      "phase": "running",
+      "total_bytes": 110417888793,
+      "present_bytes": 17417580448,
+      "counts": {
+        "pending": 29824,
+        "downloading": 4,
+        "verified": 5418,
+        "failed": 0
+      },
+      "errors": {}
+    },
+    "revision": "81822a10cac5def2638db546eaeced581d71a8b5",
+    "training_ready": false,
+    "source_summary": {
+      "files": 35246,
+      "total_bytes": 110417888793,
+      "parquet_files": 17576,
+      "parquet_bytes": 108985108170,
+      "metadata_files": 17669,
+      "metadata_bytes": 1432776863
+    },
+    "source_gaps": {
+      "X008": {
+        "episode_metadata_without_parquet": [
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          228
+        ],
+        "parquet_without_episode_metadata": []
+      }
+    },
+    "http_rate_limit": {
+      "updated_utc": "2026-10-17T03:28:00.433116+00:00",
+      "last_http_status": 200,
+      "remaining_resolver_quota": null,
+      "reset_seconds": null,
+      "request_interval_seconds": 0.25,
+      "http_429_responses": 0,
+      "cooldown_seconds": 0,
+      "policy": "at most 4 resolver requests/s; shared-quota-aware throttle; honor 429 reset"
+    },
+    "before_rate_limit_resume": {
+      "dataset": "humantouch",
+      "started_utc": "2026-10-17T03:11:36.094330+00:00",
+      "updated_utc": "2026-10-17T03:23:00.311927+00:00",
+      "phase": "running",
+      "total_bytes": 110417888793,
+      "present_bytes": 16531460649,
+      "counts": {
+        "pending": 30232,
+        "downloading": 8,
+        "verified": 4990,
+        "failed": 16
+      },
+      "errors": {
+        "X001/meta/humantouch/episodes/episode_001241.json": "Download failed: X001/meta/humantouch/episodes/episode_001241.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001245.json": "Download failed: X001/meta/humantouch/episodes/episode_001245.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001246.json": "Download failed: X001/meta/humantouch/episodes/episode_001246.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001247.json": "Download failed: X001/meta/humantouch/episodes/episode_001247.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001248.json": "Download failed: X001/meta/humantouch/episodes/episode_001248.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001249.json": "Download failed: X001/meta/humantouch/episodes/episode_001249.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001250.json": "Download failed: X001/meta/humantouch/episodes/episode_001250.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001251.json": "Download failed: X001/meta/humantouch/episodes/episode_001251.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001252.json": "Download failed: X001/meta/humantouch/episodes/episode_001252.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001253.json": "Download failed: X001/meta/humantouch/episodes/episode_001253.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001254.json": "Download failed: X001/meta/humantouch/episodes/episode_001254.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001255.json": "Download failed: X001/meta/humantouch/episodes/episode_001255.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001256.json": "Download failed: X001/meta/humantouch/episodes/episode_001256.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001257.json": "Download failed: X001/meta/humantouch/episodes/episode_001257.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001258.json": "Download failed: X001/meta/humantouch/episodes/episode_001258.json (HTTPError HTTP 429)",
+        "X001/meta/humantouch/episodes/episode_001259.json": "Download failed: X001/meta/humantouch/episodes/episode_001259.json (HTTPError HTTP 429)"
+      }
+    }
+  },
+  "dexwild_human_trajectories_v1": {
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/dexwild_human_trajectories_v1",
+    "process_alive": false,
+    "process": {
+      "pid": 6530,
+      "pod": "jchen57-fineturn-tl4zr",
+      "started_utc": "2026-10-17T03:19:18.144487+00:00",
+      "workers": 5,
+      "code_path": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/sensor_trajectory_download_20261017",
+      "python": "/sciclone/data10/jchen57/Hand_Reconstruction/runtimes/sensor_trajectory_download/bin/python",
+      "script_sha256": "9bf69ff6946845de5b7088b7b0b531fe9005c7cbac258d3bb1f0a2660f26e3dd",
+      "range_helper_sha256": "0e26767862da13b2022a1cebf0eaa47b2ecf023463579d8c7f2fb3cc2ef48fb8"
+    },
+    "status": {
+      "dataset": "dexwild_human_trajectories",
+      "phase": "stopped_by_user",
+      "started_utc": "2026-10-17T03:19:18.394232+00:00",
+      "updated_utc": "2026-10-17T03:22:04.123347+00:00",
+      "workers": 5,
+      "tasks": {
+        "clothes": {
+          "task": "clothes",
+          "phase": "failed",
+          "started_utc": "2026-10-17T03:19:18.404122+00:00",
+          "episodes_total": null,
+          "verified_episodes": 0,
+          "file_bytes": 0,
+          "logical_bytes": 0,
+          "network_bytes": 0,
+          "errors": {
+            "exception": "HTTPRangeError"
+          },
+          "training_ready": false,
+          "updated_utc": "2026-10-17T03:19:22.145957+00:00"
+        },
+        "florist": {
+          "task": "florist",
+          "phase": "failed",
+          "started_utc": "2026-10-17T03:19:18.452541+00:00",
+          "episodes_total": null,
+          "verified_episodes": 0,
+          "file_bytes": 0,
+          "logical_bytes": 0,
+          "network_bytes": 0,
+          "errors": {
+            "exception": "HTTPRangeError"
+          },
+          "training_ready": false,
+          "updated_utc": "2026-10-17T03:19:22.145511+00:00"
+        },
+        "pour": {
+          "task": "pour",
+          "phase": "failed",
+          "started_utc": "2026-10-17T03:19:18.452982+00:00",
+          "episodes_total": null,
+          "verified_episodes": 0,
+          "file_bytes": 0,
+          "logical_bytes": 0,
+          "network_bytes": 0,
+          "errors": {
+            "exception": "HTTPRangeError"
+          },
+          "training_ready": false,
+          "updated_utc": "2026-10-17T03:19:22.164907+00:00"
+        },
+        "spray": {
+          "task": "spray",
+          "phase": "failed",
+          "started_utc": "2026-10-17T03:19:18.453248+00:00",
+          "episodes_total": null,
+          "verified_episodes": 0,
+          "file_bytes": 0,
+          "logical_bytes": 0,
+          "network_bytes": 0,
+          "errors": {
+            "exception": "HTTPRangeError"
+          },
+          "training_ready": false,
+          "updated_utc": "2026-10-17T03:19:22.145405+00:00"
+        },
+        "toy": {
+          "task": "toy",
+          "phase": "failed",
+          "started_utc": "2026-10-17T03:19:18.453573+00:00",
+          "episodes_total": null,
+          "verified_episodes": 0,
+          "file_bytes": 0,
+          "logical_bytes": 0,
+          "network_bytes": 0,
+          "errors": {
+            "exception": "HTTPRangeError"
+          },
+          "training_ready": false,
+          "updated_utc": "2026-10-17T03:19:22.148257+00:00"
+        }
+      },
+      "training_ready": false,
+      "source_container_bytes": 1817035653120,
+      "verified_episodes": 0,
+      "file_bytes": 0,
+      "network_bytes": 0,
+      "phase_before_user_stop": "failed",
+      "reason": "User requested DexWild be put on hold; no automatic resume",
+      "preserved_receipts": 0
+    },
+    "revision": "df5cd775f985e79036ff23ad579abbe7752b8df1",
+    "training_ready": false
+  },
+  "dexwild_single_episode_smoke": {
+    "task": "pour",
+    "phase": "sample_complete",
+    "started_utc": "2026-10-17T03:17:23.900923+00:00",
+    "episodes_total": 1,
+    "verified_episodes": 1,
+    "file_bytes": 558096,
+    "logical_bytes": 534344,
+    "network_bytes": 43515904,
+    "errors": {},
+    "training_ready": false,
+    "updated_utc": "2026-10-17T03:18:29.661918+00:00",
+    "source_episodes_total": 621,
+    "network_requests": 171,
+    "current_episode": "ep_0000"
+  }
+}

@@ -4,6 +4,8 @@
 
 用户本轮希望今晚重新训练，先总结可以扩充的pretrain数据。保持纯轨迹输入、当前受损状态恢复及约2秒未来分布任务、每手99D输出；不因候选含RGB改成视觉预训练。
 
+**同夜后续用户指令与实测勘误：** 用户先授权两库数值下载，随后明确暂缓DexWild，优先寻找可直接下载适配99D的人手运动数据。HumanTouch全量数值下载已启动并处理限流；DexWild公开HDF5的pour样本实际只有71列／10点MANUS short，不能继续以采集SDK full25点字段推断公开包。批量Range任务失败，现不续跑。[获取与失败记录](SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)、[新的人手／MANO选库核查](TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)为后续执行依据；下文是此前建议，不表示DexWild仍获准继续获取。
+
 ## 1. 实际已用的数据
 
 当前motion collection仍是远程`prepared/twm_four_sources_99d_v1/manifest.json`，SHA256为`f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f`。已完成D37纯轨迹10k及后续联合motion回放使用的是同一个四库池。

@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16夜间下载HumanTouch、暂缓DexWild并广查直接人手motion：** 新增HumanTouch全数值下载器及限流退避，复用shared downloader可选callback且旧默认保持；远程4项续传／hash、429关闭恢复通过。新增Range拼接器及小fixture检查、DexWild源探测与单episode数值回读；批量失败及用户叫停均保留，不宣称全量成功。新增[获取记录](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)、[官方直接MANO与BVH源核查](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)、小型JSON状态；纠正Dex公开10点而非full25、Inter/Re帧编号不等于30Hz单位等。更新用户决定、数据、状态与sensor记忆；无新训练、模型或数据本体提交。
+
 **2026-10-16夜间重训前的数据扩充总结：** 新增[候选优先级与接入状态](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)，链接既有池统计／官方发布，区分完整MANO适配、native部分监督和视觉估计扩展。补MySign、SynData glove子集精确口径、HOI4D当前直链；纠正ARCTIC subject模板属于SMPL-X。ARCTIC下载完成但未入训、HumanTouch样本ready=false，未启动新任务或变更训练方案；仅同步本轮调研文档与新增事实记忆。
 
 **2026-10-16制作并实际验收视频重建demo：** 新增remote-only renderer、[使用与来源文档](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)、[约15KB验收摘要](../reports/hand_overlay_demo_20261016.json)，.gitignore忽略demos。用户现有Dex测试片段与保存预测生成原RGB／baseline／best4200三列、mesh骨架及放大窗；5秒原速／约10秒慢放，四视频完整解码和本机SHA通过。v1显示窗口不够放大，v2仅共同裁切改进且几何／原视频SHA不变；左右手中帧人工查看通过。媒体留忽略目录，无新模型实验。
