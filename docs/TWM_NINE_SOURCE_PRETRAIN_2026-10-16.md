@@ -2,9 +2,13 @@
 
 本轮最终范围是原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。七库、八库及暂不加HO-3D的讨论已被此用户决定替代。HumanTouch已按用户要求停止，DexWild继续暂缓。
 
-## 当前实际状态
+## 当前执行：30k重跑
 
-**2026-10-17T04:49:42.393400+00:00，九库全部准备完成，双卡已经实际训练到step 20，checkpoint step 10验收通过，在线W&B服务端已收到真实训练指标。** [打开W&B](https://wandb.ai/black-ant/handloop-twm/runs/fa17b1ef)。这不是仅有PID、step0验证或准备队列的启动记录。模型仍在后台继续运行，不要求本轮等待10k全部完成。
+用户已改为30,000步；旧10k run合作停止于816步，完整checkpoint保留。新run已实际完成更新并通过在线验收，见[当前30k重启与W&B](TWM_NINE_SOURCE_30K_RESTART_2026-10-17.md)。下方数据、split与QC保持不变。
+
+## 旧10k启动验收快照（已在816步暂停）
+
+**2026-10-17T04:49:42.393400+00:00，九库全部准备完成，双卡已经实际训练到step 20，checkpoint step 10验收通过，在线W&B服务端已收到真实训练指标。** [打开W&B](https://wandb.ai/black-ant/handloop-twm/runs/fa17b1ef)。这不是仅有PID、step0验证或准备队列的启动记录。这是旧10k启动时的历史快照；该run现已在816步合作停止，当前训练为上方30k新run。
 
 计算在ds的`jchen57-fineturn-tl4zr` Pod；代码commit `170c3473e1288d3d5a2877d0553185ce180af36a`，独立worktree `code/twm_nine_sources_20261017`。2×RTX PRO 6000 Blackwell，每卡512、global batch1024、从头训练10,000步，保持原D37 v3的模型／损失／噪声／优化器预算。使用更多数据后自然窗口比例改变，未声称此预算或混合比例已最优。
 
@@ -59,7 +63,7 @@
 
 [独立验收JSON](../reports/twm_nine_source_launch_acceptance_20261017.json)记录具体step、SHA、计数和在线记录；[准备摘要](../reports/twm_nine_source_preparation_20261017.json)记录九库路径、SHA、split、source与失败历史；[实际recipe](../reports/twm_nine_source_queue_recipe_20261017.json)可复现执行。
 
-远程根`/sciclone/data10/jchen57/Hand_Reconstruction`。集合为`prepared/twm_nine_sources_99d_v1/manifest.json`；训练为`runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017`，其中`status.json`、`metrics.jsonl`、`latest.pt`／`best.pt`与`train.log`留远程。save每100步、首次10步另存；val每500步，checkpoint按既有验证规则选best，不读test。训练合作截止2026-10-20T05:10Z，早于现Pod时限；写run/STOP可合作保存停止。主队列STOP仅控制准备阶段。
+远程根`/sciclone/data10/jchen57/Hand_Reconstruction`。集合为`prepared/twm_nine_sources_99d_v1/manifest.json`；旧10k训练为`runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017`（已停止；当前路径见30k重启记录），其中`status.json`、`metrics.jsonl`、`latest.pt`／`best.pt`与`train.log`留远程。save每100步、首次10步另存；val每500步，checkpoint按既有验证规则选best，不读test。训练合作截止2026-10-20T05:10Z，早于现Pod时限；写run/STOP可合作保存停止。主队列STOP仅控制准备阶段。
 
 Pod无Git binary；登录端从clean HEAD导出142个源／配置文件SHA，Pod按同一完整commit逐字节核验。最终aggregate `ea2b9c57fa71eefd3daefe11812b0e5aa80997b4ca0866b3b00f61231b3c33e8`。无Git positive与modified／unknown-file／symlink／wrong-commit拒绝fixture已验证，不要求安装Git或修改CUDA runtime。
 
