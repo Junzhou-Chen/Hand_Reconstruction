@@ -15,6 +15,8 @@ import os
 from pathlib import Path
 import subprocess
 
+from verify_code_snapshot import verify_code_snapshot
+
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -36,11 +38,8 @@ def main():
     if any(args.output.glob('*')):
         raise RuntimeError('Training output is not empty; inspect it and use a fresh path')
     code = args.code.resolve()
-    head = subprocess.check_output(['git', '-C', str(code), 'rev-parse', 'HEAD'], text=True).strip()
-    dirty = subprocess.check_output(['git', '-C', str(code), 'status', '--porcelain',
-                                     '--untracked-files=no'], text=True).strip()
-    if head != args.code_version or dirty:
-        raise RuntimeError('Require the exact clean committed training code')
+    provenance = verify_code_snapshot(code, args.code_version)
+    head = provenance['effective_git_head']
     config = json.loads(args.config.read_text())
     manifest = json.loads(args.manifest.read_text())
     expected = set(config['required_datasets'])
@@ -82,6 +81,7 @@ def main():
         process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=log,
                                    stderr=subprocess.STDOUT, cwd=code, env=env, start_new_session=True)
     receipt = {'pid': process.pid, 'command': command, 'code_version': head,
+               'code_provenance': provenance,
                'started_utc': datetime.now(timezone.utc).isoformat(),
                'manifest_sha256': sha(args.manifest), 'config_sha256': sha(args.config),
                'gpus': devices, 'status': 'launcher_created; inspect status.json and online W&B for actual updates'}

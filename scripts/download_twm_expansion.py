@@ -304,6 +304,28 @@ def interhand(root):
         save(receipt_path, {"source": "InterHand2.6M-30fps", "files": files})
 
 
+def mark_taco_trajectory_ready(root):
+    """Hand trajectories do not depend on optional camera ZIP extraction."""
+    archive = root / 'Hand_Poses.zip'
+    receipt_path = root / 'Hand_Poses.zip.receipt.json'
+    marker = root / 'extracted' / '.extracted.json'
+    receipt = json.loads(receipt_path.read_text())
+    expected = 'db649d185ae818e63e9f14577067c1318d0751d35b213de8a06688637a1ece51'
+    if (archive.stat().st_size != 15231790511 or
+            receipt.get('official_sha256') != expected or receipt.get('local_sha256') != expected):
+        raise ValueError('TACO requires the verified official hand archive')
+    extracted = json.loads(marker.read_text())
+    if extracted.get('archive') != str(archive) or extracted.get('files', 0) != 9268:
+        raise ValueError('TACO hand extraction is not complete')
+    if not (root / 'source_revision.json').is_file():
+        raise ValueError('TACO official split/source revision not yet available')
+    save(root / 'trajectory_ready.json', {
+        'phase': 'complete', 'dataset': 'taco', 'completed_utc': now(),
+        'archive_sha256': expected, 'archive_receipt_sha256': sha(receipt_path),
+        'extraction_marker_sha256': sha(marker), 'extracted_pose_files': extracted['files'],
+        'scope': 'complete hand parameters and official split metadata; optional camera extraction is independent'})
+
+
 def taco(root):
     api = get(f"https://huggingface.co/api/datasets/leolyliu/TACO/tree/{HF_REV}?recursive=true&expand=false&limit=1000").json()
     save(root / "hf_tree.json", api)
@@ -328,6 +350,8 @@ def taco(root):
     save(revision_path, {"github": repo, "revision": revision, "hf_revision": HF_REV})
     for name in files:
         extract(root / name, root / ("extracted" if name == "Hand_Poses.zip" else "camera"))
+        if name == 'Hand_Poses.zip':
+            mark_taco_trajectory_ready(root)
 
 
 def gigahands(root):

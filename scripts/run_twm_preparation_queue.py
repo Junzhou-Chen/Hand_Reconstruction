@@ -35,6 +35,8 @@ import subprocess
 import sys
 import time
 
+from verify_code_snapshot import verify_code_snapshot
+
 
 SUCCESS_PHASES = {"complete", "skipped"}
 TERMINAL_SOURCE_FAILURES = {"failed", "error", "blocked", "cancelled", "canceled", "stopped", "terminated"}
@@ -84,37 +86,19 @@ def stopped_reason(stop_file, deadline):
     return None
 
 
-def git_metadata(root):
-    def run(*arguments):
-        try:
-            result = subprocess.run(["git", "-C", str(root), *arguments], capture_output=True,
-                                    timeout=10, check=False)
-            return result.stdout.decode().strip() if result.returncode == 0 else None
-        except (OSError, subprocess.TimeoutExpired):
-            return None
-    head = run("rev-parse", "HEAD")
-    dirty = run("status", "--porcelain", "--untracked-files=no")
-    return {"git_head": head, "tracked_worktree_dirty": bool(dirty) if dirty is not None else None}
-
-
 def code_snapshot(root, requested_version):
-    """Small source files only; never traverse datasets, runs or model assets."""
-    files = {}
-    for directory in (root / "src", root / "scripts"):
-        if directory.is_dir():
-            for path in sorted(directory.rglob("*.py")):
-                if path.is_file() and not path.is_symlink():
-                    files[path.relative_to(root).as_posix()] = sha256(path)
-    if not files:
-        raise ValueError("code_root contains no Python source files under src/ or scripts/")
-    digest = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
-    metadata = git_metadata(root)
+    """Verify clean HEAD or exact trusted deployment bytes, including config."""
     exact_git_request = bool(re.fullmatch(r"[0-9a-fA-F]{7,40}", requested_version))
-    if exact_git_request and (not metadata["git_head"] or not metadata["git_head"].startswith(requested_version.lower())):
-        raise ValueError("recipe code_version is a Git SHA that does not match code_root HEAD")
-    return {"requested_code_version": requested_version, "python_source_sha256": digest,
-            "files": files, "scope": "all regular .py files under code_root/src and code_root/scripts",
-            "requested_git_sha_matches_head": exact_git_request, **metadata}
+    verified = verify_code_snapshot(root, requested_version if len(requested_version) == 40 and exact_git_request else None)
+    if exact_git_request and not verified["effective_git_head"].startswith(requested_version.lower()):
+        raise ValueError("recipe code_version differs from verified effective Git HEAD")
+    return {"requested_code_version": requested_version,
+            # Keep the old receipt field for readers; scope now explicitly
+            # includes config JSON and is identified by the verifier below.
+            "python_source_sha256": verified["files_aggregate_sha256"],
+            "git_head": verified["effective_git_head"],
+            "tracked_worktree_dirty": False if not verified["git_binary_missing"] else None,
+            "requested_git_sha_matches_head": exact_git_request, **verified}
 
 
 def read_manifest(path):
@@ -336,11 +320,21 @@ def run_queue(args, recipe, stages, root, recipe_hash, deadline, stop_file):
                 if reason:
                     global_stop = reason
                     raise InterruptedError(reason)
-                snapshot_path = output / "code_snapshots" / (snapshot["python_source_sha256"] + ".json")
+                # Identical source bytes can belong to different commits or
+                # freshly exported deployment receipts. Name the metadata by
+                # its entire identity, so the saved provenance never points
+                # silently at an older HEAD/receipt with the same source hash.
+                snapshot_metadata_sha = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()
+                snapshot_path = output / "code_snapshots" / (snapshot_metadata_sha + ".json")
                 if not snapshot_path.exists():
                     atomic_json(snapshot_path, snapshot)
                 current["code_snapshot_sha256"] = snapshot["python_source_sha256"]
                 current["code_snapshot_path"] = str(snapshot_path)
+                current["code_snapshot_metadata_sha256"] = snapshot_metadata_sha
+                current["effective_git_head"] = snapshot["effective_git_head"]
+                current["code_verification_mode"] = snapshot["mode"]
+                current["git_binary_missing"] = snapshot["git_binary_missing"]
+                current["deployment_receipt_sha256"] = snapshot["deployment_receipt_sha256"]
                 if expected is not None and expected.exists():
                     existing = read_manifest(expected)
                     previous = json.loads(receipt_path.read_text()) if receipt_path.is_file() else {}
