@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16广泛复核其他论文如何报告精度：** 新增[11篇官方全文／主表审计](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)，覆盖2024–2025代表作与2026 Hand3R／ScaleHP／InfiniHand；纠正助手“PA仅辅助”的笼统表述，推荐局部与绝对空间并列。记录W对齐、joint数和动态GT定义差异。更新记忆入口／数据／状态／写作／来源；只调研和文档，无远程实验、指标实现或研究方案新增决定。
+
 **2026-10-16完整DexYCB测试最终汇总：** 新增[双指标结果表、分支／左右手诊断与协议边界](../docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)、[约90KB机器可读报告](../reports/dexycb_full_test_final_20261016.json)，完整测试协议链接最终结果；核对1280视角／78768状态、三方逐帧覆盖及W&B finished终值。best相对官方绝对MPJPE下降53.36%、PA下降12.02%，finger稍退化且不能独归因TWM。官方全文与fork evaluator复核PA／AUC；遮挡组未测。只读取数／更新文档和新增事实记忆，无新实验。
 
 ## 2026-10-16 复核HaWoR状态如何进入视觉插件及改进候选
