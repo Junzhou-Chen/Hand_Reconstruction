@@ -1,5 +1,7 @@
 # 开发、GitHub同步和远程实验约定
 
+**2026-10-17凌晨九库后台入口：** 当前Pod jchen57-fineturn-tl4zr内队列PID7490、queues/twm_nine_sources_v2_20261017/queue_status.json；准备数据位于data10/prepared，原四manifest固定保留。code/twm_nine_sources_20261017为独立clean Git worktree @6e294315…；Pod无Git binary，登录端从clean HEAD导出141个src/scripts/config文件SHA到.codex/deployment.json，Pod逐bytes核同一版本，最新aggregate22b5646d…。真实positive及modified-byte／unknown-file／symlink／wrong-commit隔离拒绝测试通过，无环境安装。source完成→九库loader验收→空闲GPU0,1启动，新run合作deadline10-20 05:10UTC；队列STOP与已启动trainer的run/STOP不同。源包／模型／日志不进Git，代码和小摘要已同步。[流程](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
+
 **2026-10-16视频渲染运行事实：** 新增scripts/render_hand_overlay_demo.py，remote-only执行防护；在Pod GPU batch256解码既有状态，CPU双面透视z-buffer并编码H264。独立runtime/demo_video_tools_v1安装imageio-ffmpeg，未改训练runtime；source固定完整Dex code/src。远程demos/dexycb_overlay_20261016/{selection.json,render_v1,render_v2}与demo_code/overlay_20261016/scripts保存代码／选择／验收，v1源码snapshot保留。4视频完整解码，148／148／148／295帧；本机仅取小型视频／截图和轻量文件SHA检查、观看，输出目录忽略。新增.gitignore /demos/，不上传媒体／数据／权重。[命令与证据](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)。
 
 **2026-10-16完整评测持久产物已核验：** `evaluations/dexycb_s0_full_three_models_20261016/comparison.json`于UTC10-17 00:28:05完成；Pod只读核对各report／accumulator的1280键、78768帧、manifest／frame-ID hash一致，W&B三个正式run均finished／progress complete1，所有分支终值吻合。本轮只读取现存结果，无新模型前向／训练／改batch。各model report SHA、代码／冻结模型identity与小型结果见[最终JSON](../reports/dexycb_full_test_final_20261016.json)，完整数值与预测仍在data10，Git只提交自有汇总与此类新增记忆段，其他聊天本地写作不提交。

@@ -1,5 +1,7 @@
 # HandLoop 记忆来源索引
 
+**2026-10-17九库预训练执行新增索引：** [九库范围、源decoder、时基、split、真实失败及修复](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)；[小型实际状态](../reports/twm_nine_source_preparation_20261017.json)；[可复现queue recipe](../reports/twm_nine_source_queue_recipe_20261017.json)。源码为五库prepare脚本、download_twm_expansion、prepare_twm_expanded_collection、run_twm_preparation_queue、verify_code_snapshot与launch_prepared_twm；source full labels／独立物理精度／已有新训练收益不得混用。
+
 **2026-10-16新增精度指标源表：** [手部重建／恢复／世界轨迹精度报告审计](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)，11篇官方全文与具体表号，另含Ego-Exo4D官方benchmark。重点记录PA主表地位、CS/R/P、W/WA同名异义、16/21joint、漏检及加速度单位；不将未计算的时序或PA-mesh指标写成已完成。
 
 整理日期：2026-10-13。索引用于快速回查主张的出处，区分原始设计、历史讨论、本次实现审计和外部事实。

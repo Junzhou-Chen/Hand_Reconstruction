@@ -40,11 +40,34 @@ HumanTouch PID6739已按本轮用户明确指令发送SIGTERM，已下载部分�
 
 ## 代码与训练状态
 
-新增适配入口为 `prepare_interhand_twm.py`、`prepare_taco_twm.py`、`prepare_gigahands_twm.py`、`prepare_arctic_twm.py`；HO-3D适配继续核对实包与源资产。静态通过与真实源/FK验收分别记录，不能把脚本存在当成已经入训。
+新增五库适配入口为 `prepare_interhand_twm.py`、`prepare_taco_twm.py`、`prepare_gigahands_twm.py`、`prepare_arctic_twm.py`、`prepare_ho3d_twm.py`。五库真实Pod bounded smoke均通过；静态通过、bounded验收、整库准备和模型精度分开记录。
 
 `config/twm_nine_sources_moe_transient_v3_b512_10k.json` 只扩展required_datasets及W&B标识，其余沿用上次v3的模型、噪声、损失、global batch1024、10k步和2秒/60步目标。保持旧预算是工程起点，不声称在更大数据池上已经充分训练或混合最优。full_coverage下新旧库的自然窗口比例会变化，须记录每源实际samples。
 
 新训练必须等待九库完整manifest、旧四库保留核验、实际loader及源解码验收；不得把下载中／队列等待／CPU准备称为GPU训练已启动。源码、文档和小型摘要同步GitHub；数据、模型资产、权重、完整日志留远程，沿用根`.gitignore`。
+
+## 04:10 UTC实际队列与已完成产物
+
+完整ARCTIC已准备602条hand sequences：train384,780／val51,766状态，全部保留帧FK往返通过。完整InterHand已准备1,024条hand sequences：train83,730／val14,210状态；稀疏时基、源无效joint和太短片段的拒绝原因保存，不插值补造运动。
+
+TACO bounded smoke为train/val各192状态、4条hand sequences。GigaHands v2 smoke为train384／val376状态、8条hand sequences，独立固定EasyMoCap versus共享smplx的vertex最大误差约1.37e-7m。原始三角化wrist与fitted MANO J0另有约36mm小样本均值差异。独立CPU进一步核得virtual landmark0与J0仅约1.73／1.56mm，raw与virtual仍约36.05／35.31mm，故不能用两个wrist定义解释这项差异；带／不带extra regressor的完整mesh差为0，也无源码证据需要额外optim_params世界变换。这保留为源拟合／处理差异的未完全分解诊断，不调frame shift、筛样或宣称独立GT精度。
+
+HO-3D v2 smoke为ABF10／SS2各96帧，source21 joint最大差2.17e-7m，roundtrip vertex最大1.25e-7m。首次失败源于后续可视化patch与原HOnnotate标注器的指尖顶点不同，已按真实meta及[原标注器](https://github.com/shreyashampali/HOnnotate/blob/d94f6b7e1c09a8c7229799a0d48fdc5f2b416780/optimization/manoTF/batch_mano.py#L230-L237)固定为`[728,353,442,576,694]`，不是放宽阈值。Giga首次边界失败按固定作者包含式切片`[start:end+1]`自然饱和修正，并保存原／有效bounds，未改成exclusive。
+
+04:04首队列PID7413已完成TACO全量（train279,662／val35,192状态），但HO-3D full遇到BB10逐帧beta变化（span28.7003），触发工程上的固定shape检查。已保留失败产物并合作停止该队列，没有删库或训练权重。修复为完全保留逐帧beta[N,10]、不平均／不取首帧，源FK与roundtrip阈值均不变；这属于source拟合变量，不称人体真实瞬时形变。
+
+04:10:17 UTC（纽约10-17 00:10）已启动替代后台队列PID7490：
+
+1. 接纳已完成且已验收的InterHand、ARCTIC、TACO产物，保留其原producer未知／源码快照证据，不将它们冒称由新Git提交重新生成。
+2. 重新准备HO-3D v2（保留逐帧shape），随后完整准备GigaHands；TACO／Giga使用未压缩NPZ减少海量小文件，sampled FK范围明确保存。TACO轨迹不依赖可选camera ZIP解压，独立`trajectory_ready.json`绑定官方手参数包receipt与完整9,268个pose/shape文件。
+3. 九库真实Forecast loader及旧四固定SHA验收；任一失败则阻止聚合／训练，独立来源仍可继续准备。
+4. 通过后由`launch_prepared_twm.py`在空闲GPU0,1启动全新训练，在线W&B使用原私有key文件，不把key写入recipe或日志。
+
+代码为干净独立worktree `code/twm_nine_sources_20261017`，commit `6e294315c114a6dc65a56f2e9973974f59b2e8fd`。Pod无Git binary，因此登录端从clean HEAD导出141个源/配置文件SHA，Pod逐字节核验同一代码；最新aggregate `22b5646dafc7d2bd571513cfc51fe260de832deaceef7f1b1db9a18b08d2c04b`（旧cc0dcd5首次部署aggregate26ae330…与receipt296d64…保留在初次验收记录）。真实positive与隔离fixture的modified-bytes／unknown-file／symlink／wrong-commit四项拒绝检查通过；不要求修改训练runtime或安装Git。
+
+当前队列根`/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_v2_20261017`（旧不带v2目录保留失败／停止记录），其中`queue_status.json`、`logs/`、`receipts/`和`recipe.json`用于检查。队列STOP只控制准备阶段；GPU训练若已启动，合作停止请求写入对应run的`STOP`。计划run为`runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017`，使用trainer自身UTC10-20 05:10合作截止；队列准备截止04:30，避免临近Pod结束才开始。
+
+**此处04:10快照仅证明替代队列已启动并进入HO-3D完整准备，尚不证明九库GPU训练已产生更新或W&B已建立新run。** 后续以run目录`status.json`和在线服务端实际step为准。
 
 ## 官方来源
 
@@ -53,3 +76,5 @@ HumanTouch PID6739已按本轮用户明确指令发送SIGTERM，已下载部分�
 - [GigaHands官方仓库](https://github.com/brown-ivl/GigaHands)，[原始姿态包](https://g-ad09a0.56197.5898.data.globus.org/hand_poses.tar.gz)。
 - [ARCTIC数据文档](https://github.com/zc-alexfan/arctic/blob/master/docs/data/data_doc.md)。
 - [HO-3D官方代码与版本说明](https://github.com/shreyashampali/ho3d)，[HOnnotate论文](https://arxiv.org/abs/1907.01481)。v3是标注升级，不与v2重复计独立运动。
+
+可跟踪的小型[状态摘要](../reports/twm_nine_source_preparation_20261017.json)与[实际队列recipe](../reports/twm_nine_source_queue_recipe_20261017.json)保存完整路径、版本和失败原因；状态快照不等于持续监控。

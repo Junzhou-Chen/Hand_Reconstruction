@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "checked_utc": "2026-10-17T04:11:45Z",
+  "user_decision": "Nine selected sources together, previous four unchanged; HumanTouch and DexWild excluded",
+  "code_version": "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+  "pod": "jchen57-fineturn-tl4zr",
+  "runtime": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+  "state": "per-hand actual wrist p3 + root6D6 + finger6D90, beta10 separate, metres, seconds",
+  "preservation": {
+    "user_requirement": "retain every dataset used by previous TWM pretraining; add new sources without removing/replacing old data",
+    "previous_collection": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_four_sources_99d_v1/manifest.json",
+    "previous_collection_sha256": "f733aa15cd18ed6f57ee0f16ebdadb3bd0d52924c7d99d08cea988544710b26f",
+    "preserved_original_sources": {
+      "oakink2": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+        "manifest_sha256": "570e423e28ae36a9e03bef087f00a053a9bb93e2c6d81feaf8c96ff818b64291"
+      },
+      "hot3d": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+        "manifest_sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0"
+      },
+      "umetrack": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+        "manifest_sha256": "77623ccab62e733f64196201720d22219f62341cac07ae2724da2fb67cae8a24"
+      },
+      "dexycb": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+        "manifest_sha256": "b36f171ad3af1951d08db25cab5876db92bf703378fa54e9e6bc1208f289a911"
+      }
+    },
+    "old_source_splits_or_sequences_changed": false,
+    "verification": "same resolved source manifest paths and prior pinned SHA256 values"
+  },
+  "prepared": {
+    "oakink2": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+      "manifest_sha256": "570e423e28ae36a9e03bef087f00a053a9bb93e2c6d81feaf8c96ff818b64291",
+      "hand_states_by_split": {
+        "train": 1414552,
+        "val": 113382
+      },
+      "hand_sequences_by_split": {
+        "train": 862,
+        "val": 78
+      },
+      "full_fk_verified": false,
+      "source_revision": "21705616140d726607027e70d58b7837f442ffd8"
+    },
+    "hot3d": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+      "manifest_sha256": "d6d79e98f2fd5357d9aa153788ae7714804b7b0d9e3243a00c4f93dbeea551c0",
+      "hand_states_by_split": {
+        "train": 660300,
+        "val": 76200
+      },
+      "hand_sequences_by_split": {
+        "train": 4402,
+        "val": 508
+      },
+      "full_fk_verified": null,
+      "source_revision": "30fe9674782f32e1e5edba98476b6ff4300132c5"
+    },
+    "umetrack": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+      "manifest_sha256": "77623ccab62e733f64196201720d22219f62341cac07ae2724da2fb67cae8a24",
+      "hand_states_by_split": {
+        "train": 662422,
+        "val": 78677
+      },
+      "hand_sequences_by_split": {
+        "train": 1546,
+        "val": 182
+      },
+      "full_fk_verified": null,
+      "source_revision": "19f6b2cad9eb17be4ebedfe4503203980a25e016"
+    },
+    "dexycb": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+      "manifest_sha256": "b36f171ad3af1951d08db25cab5876db92bf703378fa54e9e6bc1208f289a911",
+      "hand_states_by_split": {
+        "train": 50861,
+        "val": 2841
+      },
+      "hand_sequences_by_split": {
+        "train": 800,
+        "val": 40
+      },
+      "full_fk_verified": true,
+      "source_revision": "64551b001d360ad83bc383157a559ec248fb9100"
+    },
+    "arctic": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1/manifest.json",
+      "manifest_sha256": "528eef1b579cee8f17e2d6988ef326e6b216a9b1b07f8fc747c8ac512431f6da",
+      "hand_states_by_split": {
+        "train": 384780,
+        "val": 51766
+      },
+      "hand_sequences_by_split": {
+        "train": 534,
+        "val": 68
+      },
+      "full_fk_verified": true,
+      "source_revision": "49f3eb4b7f01663172576357bb3d95695d7a7689"
+    },
+    "interhand": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1/manifest.json",
+      "manifest_sha256": "977e2c612dfd7cecd4c88eb22ebc7a3fb003e212f1a8e0fce991ad87eba66e95",
+      "hand_states_by_split": {
+        "train": 83730,
+        "val": 14210
+      },
+      "hand_sequences_by_split": {
+        "train": 1010,
+        "val": 14
+      },
+      "full_fk_verified": false,
+      "source_revision": null
+    },
+    "taco": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1/manifest.json",
+      "manifest_sha256": "506e7565739edf8b2dbaf637de1f7ed2567aa261ebf0ab18ee293c97d6fe7347",
+      "hand_states_by_split": {
+        "train": 279662,
+        "val": 35192
+      },
+      "hand_sequences_by_split": {
+        "train": 1696,
+        "val": 210
+      },
+      "full_fk_verified": false,
+      "source_revision": "fd3b5a6b39565ca6935a91d35d5e91dde03c5142"
+    },
+    "gigahands": {
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v2/manifest.json",
+      "phase": "not_ready",
+      "preparation_status": null
+    },
+    "ho3d": {
+      "phase": "complete",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2/manifest.json",
+      "manifest_sha256": "ca3776ffa7e1530087ab8037f8eadd962fb2412a48ecfdd6945a95b059722cf8",
+      "hand_states_by_split": {
+        "train": 23011,
+        "val": 1744
+      },
+      "hand_sequences_by_split": {
+        "train": 21,
+        "val": 2
+      },
+      "full_fk_verified": true,
+      "source_revision": "2fd6ee17dc1383d0b3922bc10595a67058fca776"
+    }
+  },
+  "queue": {
+    "phase": "running",
+    "stage": "gigahands_full",
+    "pid": 7490,
+    "child_pid": null,
+    "updated_utc": "2026-10-17T04:11:29.647791+00:00",
+    "recipe_sha256": "e0ca8c353333d3e351046b101a32c6e04e9dbbb52962165fbf297aa6e9f8e770",
+    "stages": {
+      "interhand_full": {
+        "phase": "skipped",
+        "pid": null,
+        "returncode": 0,
+        "error": null,
+        "completed_utc": "2026-10-17T04:10:17.866560+00:00"
+      },
+      "arctic_full": {
+        "phase": "skipped",
+        "pid": null,
+        "returncode": 0,
+        "error": null,
+        "completed_utc": "2026-10-17T04:10:17.941586+00:00"
+      },
+      "ho3d_full": {
+        "phase": "complete",
+        "pid": 7491,
+        "returncode": 0,
+        "error": null,
+        "completed_utc": "2026-10-17T04:10:29.521327+00:00"
+      },
+      "taco_full": {
+        "phase": "skipped",
+        "pid": null,
+        "returncode": 0,
+        "error": null,
+        "completed_utc": "2026-10-17T04:10:29.590125+00:00"
+      },
+      "gigahands_full": {
+        "phase": "waiting_for_source",
+        "pid": null,
+        "returncode": null,
+        "error": null,
+        "completed_utc": null
+      },
+      "collection_audit": {
+        "phase": "pending",
+        "pid": null,
+        "returncode": null,
+        "error": null,
+        "completed_utc": null
+      },
+      "launch_training": {
+        "phase": "pending",
+        "pid": null,
+        "returncode": null,
+        "error": null,
+        "completed_utc": null
+      }
+    }
+  },
+  "downloads": {
+    "updated_utc": "2026-10-17T04:11:44.265400+00:00",
+    "sources": {
+      "interhand": {
+        "phase": "complete",
+        "root": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/interhand",
+        "started_utc": "2026-10-17T03:40:27.935194+00:00",
+        "completed_utc": "2026-10-17T03:41:28.764719+00:00"
+      },
+      "taco": {
+        "phase": "complete",
+        "root": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/taco",
+        "started_utc": "2026-10-17T03:40:27.950149+00:00",
+        "completed_utc": "2026-10-17T04:00:21.845628+00:00"
+      },
+      "gigahands": {
+        "phase": "running",
+        "root": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/gigahands",
+        "started_utc": "2026-10-17T03:40:27.948041+00:00"
+      }
+    }
+  },
+  "training": {
+    "run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
+    "status": null,
+    "process": null
+  },
+  "queue_smoke": {
+    "phase": "complete",
+    "started_utc": "2026-10-17T03:52:03.515716+00:00",
+    "completed_utc": "2026-10-17T03:52:07.151219+00:00",
+    "queue_sha256": "f3a00e693fd2ff24e6dad3920126195ced202d1ecf23e24d780f544d1bda13ac",
+    "isolated_root": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/queue_smoke_20261017",
+    "scope": "CPU-only synthetic control-flow validation; no real datasets/downloads/training/weights read or modified",
+    "cases": {
+      "independent_failure": {
+        "passed": true,
+        "returncode": 1,
+        "phases": {
+          "fail7": "failed",
+          "independent": "complete",
+          "aggregate": "blocked"
+        },
+        "manifest_sha256": "a5d77f1cbd0a22f0323bf5d301afcf8fda9e656bd5922734fb9548f8576d8aeb",
+        "status": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/queue_smoke_20261017/independent_failure/queue/queue_status.json"
+      },
+      "stop_group": {
+        "passed": true,
+        "returncode": 2,
+        "stop_elapsed_seconds": 0.665179549716413,
+        "all_child_pids_absent": true,
+        "child_pids": {
+          "parent": 7284,
+          "child": 7285
+        },
+        "status": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/queue_smoke_20261017/stop_group/queue/queue_status.json"
+      },
+      "adopt_skip": {
+        "passed": true,
+        "returncodes": [
+          0,
+          0
+        ],
+        "manifest_sha256": "4a3af568ec3e49fb6b8a36ee3dc4d30dcfd7d75a66d46885fdca156344cf3348",
+        "manifest_unchanged": true,
+        "producer_identity_not_upgraded": true,
+        "first_skip": "explicit_existing_output_adoption",
+        "second_skip": "matching_prior_queue_receipt",
+        "status": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/queue_smoke_20261017/adopt_skip/queue/queue_status.json"
+      }
+    }
+  },
+  "code_verification_smoke": {
+    "phase": "complete",
+    "started_utc": "2026-10-17T04:04:15.140835+00:00",
+    "completed_utc": "2026-10-17T04:04:15.524900+00:00",
+    "scope": "CPU-only stdlib code integrity checks; real deployment read-only; negative mutations only in isolated fixture directories",
+    "real_code_root": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017",
+    "real_expected_commit": "cc0dcd5b44cc84e67815d97e3f3ac955d03a618d",
+    "helper_sha256": "e50db4f093afcab7358223790e416babd67fd46d0f0cff68fd26902dc55e8064",
+    "fixture_fake_commit": "1111111111111111111111111111111111111111",
+    "fixture_fake_commit_is_not_Git_proof": true,
+    "cases": {
+      "real_positive": {
+        "mode": "deployment_receipt_verified",
+        "effective_git_head": "cc0dcd5b44cc84e67815d97e3f3ac955d03a618d",
+        "expected_commit": "cc0dcd5b44cc84e67815d97e3f3ac955d03a618d",
+        "expected_commit_verified": true,
+        "git_binary_missing": true,
+        "git_binary": null,
+        "deployment_receipt": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017/.codex/deployment.json",
+        "deployment_receipt_sha256": "296d64eaa246554c8ec04f014b4e1daa3a658fe95cbec31fe23549a59adc9df8",
+        "scope": [
+          "src",
+          "scripts",
+          "config"
+        ],
+        "file_count": 141,
+        "files_aggregate_sha256": "26ae33012de433c630530d70cc0d0dcbcfe70e8c0bb50dcdc87b9be963fbbf98",
+        "trust_boundary": "clean local Git HEAD or exact hashes from trusted login-host deployment receipt",
+        "passed": true
+      },
+      "tiny_valid": {
+        "passed": true,
+        "fixture_only": true,
+        "fake_commit_not_git_authentication": true,
+        "files_aggregate_sha256": "437af3112223a4f9e63006685a6f6fc96279d3e445e5a71533fc74d0910f36fd"
+      },
+      "modified_bytes": {
+        "passed": true,
+        "rejected": true,
+        "error_type": "ValueError",
+        "error": "Source SHA256 differs: [\"src/a.py\"]",
+        "fixture": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/code_snapshot_smoke_20261017/modified_bytes"
+      },
+      "unknown_source": {
+        "passed": true,
+        "rejected": true,
+        "error_type": "ValueError",
+        "error": "Source path set differs: {\"missing\": [], \"unknown\": [\"src/unlisted.py\"]}",
+        "fixture": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/code_snapshot_smoke_20261017/unknown_source"
+      },
+      "symlink_source": {
+        "passed": true,
+        "rejected": true,
+        "error_type": "ValueError",
+        "error": "Symlink within source scope rejected: /sciclone/data10/jchen57/Hand_Reconstruction/tools/code_snapshot_smoke_20261017/symlink_source/src/link.py",
+        "fixture": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/code_snapshot_smoke_20261017/symlink_source"
+      },
+      "wrong_expected_commit": {
+        "passed": true,
+        "rejected": true,
+        "error_type": "ValueError",
+        "error": "Expected commit differs from deployment receipt git_commit",
+        "fixture": "/sciclone/data10/jchen57/Hand_Reconstruction/tools/code_snapshot_smoke_20261017/wrong_expected_commit"
+      }
+    }
+  },
+  "human_touch": {
+    "dataset": "humantouch",
+    "started_utc": "2026-10-17T03:24:29.974112+00:00",
+    "updated_utc": "2026-10-17T03:44:14.076041+00:00",
+    "phase": "stopped_by_user",
+    "total_bytes": 110417888793,
+    "present_bytes": 25936046593,
+    "counts": {
+      "pending": 26151,
+      "downloading": 4,
+      "verified": 9091,
+      "failed": 0
+    },
+    "errors": {},
+    "stopped_utc": "2026-10-17T04:04:15.460376+00:00",
+    "stop_reason": "User excludes HumanTouch from nine-source run",
+    "observed_process_state": "State:\tZ (zombie)",
+    "status_note": "Byte/count fields retain last downloader snapshot; downloaded files preserved"
+  },
+  "giga_source_reference_diagnostic": {
+    "artifact": "/sciclone/data10/jchen57/Hand_Reconstruction/audits/giga_wrist_semantics_20261017/report.json",
+    "recording": "p001-folder/000",
+    "frames_per_hand": 96,
+    "raw_to_kinematic_j0_mean_mm": {
+      "left": 35.966,
+      "right": 35.52
+    },
+    "virtual_landmark0_to_j0_mean_mm": {
+      "left": 1.73,
+      "right": 1.555
+    },
+    "raw_to_virtual_landmark0_mean_mm": {
+      "left": 36.05,
+      "right": 35.311
+    },
+    "vertices_difference_with_without_extra_regressor_m": 0.0,
+    "interpretation": "Source triangulation versus source MANO fit discrepancy remains; wrist definition alone does not explain it. No evidence of extra camera transform or state99D serialization error. Not independent physical accuracy or a dataset-wide estimate.",
+    "alignment": "none; no time shift, PA, scale or affine fit",
+    "execution": "remote CPU one thread; GPU disabled; no adapter/data/queue change"
+  },
+  "superseded_queue": {
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_20261017",
+    "phase": "stopped_for_recipe_repair",
+    "reason": "Full HO3D BB10 violates assumed static beta, span28.70027446746826; v2 preserves source per-frame beta. Complete InterHand, ARCTIC, TACO retained. No weights or data deleted."
+  }
+}

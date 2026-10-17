@@ -1,0 +1,193 @@
+{
+  "code_version": "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+  "code_root": "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017",
+  "python": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+  "deadline_utc": "2026-10-20T04:30:00Z",
+  "scope": "Authorized nine-source pretraining; original four immutable; only launch after every source and actual forecast loader pass",
+  "stages": [
+    {
+      "name": "interhand_full",
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_interhand_twm.py",
+        "--root",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/interhand",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--mano-asset-version",
+        "mano-v1.2"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1/manifest.json",
+      "adopt_existing_complete": true
+    },
+    {
+      "name": "arctic_full",
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_arctic_twm.py",
+        "--root",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/arctic",
+        "--workers",
+        "2",
+        "--sample-frames",
+        "0",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--mano-asset-version",
+        "mano-v1.2"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1/manifest.json",
+      "adopt_existing_complete": true
+    },
+    {
+      "name": "ho3d_full",
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_ho3d_twm.py",
+        "--archive",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/ho3d_v2/HO3D_v2.zip",
+        "--exclude-evaluation-physical-overlap",
+        "--workers",
+        "2",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--mano-asset-version",
+        "mano-v1.2"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2/manifest.json"
+    },
+    {
+      "name": "taco_full",
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_taco_twm.py",
+        "--root",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/taco/extracted",
+        "--split-file",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/taco/source/data_lists/v1_overall_data_train_test_split.txt",
+        "--sequence-list",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/taco/source/data_lists/v1_overall_data_sequences.txt",
+        "--source-revision",
+        "fd3b5a6b39565ca6935a91d35d5e91dde03c5142",
+        "--workers",
+        "2",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--mano-asset-version",
+        "mano-v1.2",
+        "--storage",
+        "npz"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1/manifest.json",
+      "wait_for_json": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/taco/trajectory_ready.json",
+        "phase": "complete"
+      },
+      "adopt_existing_complete": true
+    },
+    {
+      "name": "gigahands_full",
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_gigahands_twm.py",
+        "--root",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/gigahands/extracted",
+        "--annotations",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/gigahands/annotations_v2.jsonl",
+        "--source-easymocap",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/gigahands/source_easymocap",
+        "--workers",
+        "2",
+        "--sample-frames",
+        "32",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v2",
+        "--mano-models",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/mano_v1_2/prepared_v1/derived",
+        "--mano-asset-version",
+        "mano-v1.2",
+        "--storage",
+        "npz"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v2/manifest.json",
+      "wait_for_json": {
+        "path": "/sciclone/data10/jchen57/Hand_Reconstruction/datasets/twm_expansion_20261017/all_status.json",
+        "source": "gigahands",
+        "phase": "complete"
+      }
+    },
+    {
+      "name": "collection_audit",
+      "requires": [
+        "interhand_full",
+        "arctic_full",
+        "ho3d_full",
+        "taco_full",
+        "gigahands_full"
+      ],
+      "command": [
+        "{python}",
+        "{code_root}/scripts/prepare_twm_expanded_collection.py",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+        "--code-version",
+        "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+        "--source",
+        "oakink2=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/oakink2_99d_full_v2/manifest.json",
+        "--source",
+        "hot3d=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/hot3d_99d_full_v3/manifest.json",
+        "--source",
+        "umetrack=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/umetrack_99d_full_v3/manifest.json",
+        "--source",
+        "dexycb=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/dexycb_99d_full_v1/manifest.json",
+        "--source",
+        "interhand=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/interhand_99d_full_v1/manifest.json",
+        "--source",
+        "arctic=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/arctic_99d_full_v1/manifest.json",
+        "--source",
+        "ho3d=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/ho3d_99d_full_v2/manifest.json",
+        "--source",
+        "taco=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/taco_99d_full_v1/manifest.json",
+        "--source",
+        "gigahands=/sciclone/data10/jchen57/Hand_Reconstruction/prepared/gigahands_99d_full_v2/manifest.json"
+      ],
+      "expected_manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json"
+    },
+    {
+      "name": "launch_training",
+      "requires": [
+        "collection_audit"
+      ],
+      "command": [
+        "{python}",
+        "{code_root}/scripts/launch_prepared_twm.py",
+        "--code",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017",
+        "--code-version",
+        "6e294315c114a6dc65a56f2e9973974f59b2e8fd",
+        "--python",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/twm_mamba_torch210_v1/bin/python",
+        "--manifest",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/twm_nine_sources_99d_v1/manifest.json",
+        "--config",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/code/twm_nine_sources_20261017/config/twm_nine_sources_moe_transient_v3_b512_10k.json",
+        "--output",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/runs/twm_nine_sources_moe_transient_v3_b512_10k_20261017",
+        "--wandb-key-file",
+        "/sciclone/data10/jchen57/Hand_Reconstruction/private/wandb_api_key",
+        "--gpus",
+        "0,1"
+      ]
+    }
+  ],
+  "supersedes_queue": "/sciclone/data10/jchen57/Hand_Reconstruction/queues/twm_nine_sources_20261017",
+  "supersedes_reason": "Real HO3Dv2 fits vary beta across frames; preserve per-frame labels and restart only affected preparation"
+}
