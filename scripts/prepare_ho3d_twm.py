@@ -52,7 +52,7 @@ HMP_REVISION = "35d799f76b2b2bc1d1e945117b021014b099e7e6"
 HMP_TIME_EVIDENCE = f"https://github.com/enesduran/HMP/blob/{HMP_REVISION}/configs/in_the_lab_sample_config.yaml"
 MULTICAM_GROUPS = ("ABF1", "BB1", "GPMF1", "GSF1", "MDF1", "SB1", "ShSu1", "SiBF1", "SMu4", "MPM1", "AP1")
 FINGERTIPS = (728, 353, 442, 576, 694)
-ADAPTER_VERSION = 1
+ADAPTER_VERSION = 2
 _ZIP_ARCHIVES = {}
 
 
@@ -163,8 +163,10 @@ def convert_sequence(job: dict) -> dict:
     poses, translations, betas = np.asarray(poses), np.asarray(translations), np.asarray(betas)
     reference_joints, ids = np.asarray(reference_joints), np.asarray(frame_ids, dtype=np.int64)
     span = float(np.ptp(betas, axis=0).max())
-    if span > 1e-5:
-        raise ValueError(f"Source per-person beta varies in {sequence}: {span}; preserve/re-audit rather than averaging")
+    # Some release sequences contain varying per-frame fitted shape variables.
+    # Keep them exactly, as supported by TrajectoryWindows' [N,10] contract;
+    # do not average them or interpret their variation as human tissue motion.
+    beta_is_static = span == 0.0
     states, errors = [], []
     wrist_offsets, roundtrip_joints, roundtrip_vertices = [], [], []
     ortho_error, determinant_error = 0.0, 0.0
@@ -206,7 +208,8 @@ def convert_sequence(job: dict) -> dict:
         raise ValueError(f"SO(3) conversion failed: {sequence}")
     states, errors = np.concatenate(states), np.concatenate(errors)
     arrays = {"state": states.astype(np.float32), "timestamps": ids.astype(np.float64) / job["nominal_fps"],
-              "frame_ids": ids, "beta": betas[0].astype(np.float32), "beta_valid": np.bool_(True),
+              "frame_ids": ids, "beta": (betas[0] if beta_is_static else betas).astype(np.float32),
+              "beta_valid": np.bool_(True),
               "gt_mask": np.ones((len(ids), 17), dtype=np.bool_),
               "joint_3d": reference_joints.astype(np.float32), "joint_valid": np.ones((len(ids), 21), dtype=np.bool_)}
     relative = save_sequence_arrays(output, f"{job['split']}/{sequence}__right", arrays, job["storage"])
@@ -214,6 +217,9 @@ def convert_sequence(job: dict) -> dict:
     entry = {"path": relative, "storage": job["storage"], "dataset": "ho3d", "source": "HO3D_v2",
              "split": job["split"], "official_split": "train", "recording": job["physical_recording"],
              "camera_sequence": sequence, "handedness": 1, "frames": len(ids), "beta_span": span,
+             "beta_storage": "static10" if beta_is_static else "per_frame_N10",
+             "beta_axis_min": betas.min(axis=0).tolist(), "beta_axis_max": betas.max(axis=0).tolist(),
+             "beta_interpretation": "original source fit variables; temporal variation is not asserted to be physical human shape change",
              "coordinate_frame": f"source_OpenGL_fixed_camera_{sequence}", "units": "metres",
              "nominal_dt": 1 / job["nominal_fps"], "timestamp_source": "original frame IDs / explicit nominal FPS convention, not measured timestamps",
              "capture_fps_independently_verified": False, "nominal_fps_evidence": HMP_TIME_EVIDENCE,
@@ -367,6 +373,8 @@ def main():
         "nominal_fps_evidence": HMP_TIME_EVIDENCE,
         "nominal_fps_evidence_limit": "HMP's lab config uses 30Hz for HO3Dv3; it does not establish original HO3Dv2 sensor timing",
         "source_quality": "RGB-D multiview/singleview temporal MANO fitting, not independent MoCap",
+        "shape_policy": "preserve each source beta exactly; [10] only if every retained frame is identical, otherwise [N,10]; no averaging or first-frame substitution",
+        "shape_interpretation": "per-frame fitted shape changes are annotation variables, not ground truth of instantaneous human morphology",
         "source_archive": archive_identity, "source_read_policy": "ZIP selected train/meta members only; no RGB/depth/evaluation annotations" if args.archive else "extracted train/meta only",
         "train_list_sha256": hashlib.sha256(train_bytes).hexdigest(), "evaluation_list_sha256": hashlib.sha256(evaluation_bytes).hexdigest(),
         "official_train_camera_sequences": len(train), "official_train_listed_images": sum(map(len, train.values())),
