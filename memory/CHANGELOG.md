@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16补算并核验完整Dex测试五指标：** 新增remote-only saved预测评测器、冻结官方函数独立校验器和TF32／分组精度探针；在Pod完成1280视角／78768状态W／WA／PA／Accel／RTE，保留proper PA与reset／T−2诊断。保存初次严格PA验收失败及TF32修复证据；13自测、37官方／真实案例和12旧几何对照通过。新增[结果／定义／分母文档](../docs/DEXYCB_WORLD_METRICS_2026-10-16.md)、[身份与数值摘要](../reports/dexycb_world_metrics_20261016.json)，链接原完整结果并更新本轮事实记忆。原始逐帧audit／fixture／预测及MANO资产仅远程／忽略目录，无新训练或神经推理。
+
 **2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 InterHand四JSON约394.87MB已下载，真实时序index与8手序列FK smoke通过；ARCTIC双录制／双手384状态逐帧FK smoke通过，03:50UTC两库完整CPU预处理PID7186／7187启动。TACO15.23GB和Giga11.30GB数值包已在Pod后台下载／验hash／解压，真实字段已抽查，尚未完成整库适配验收。HO-3D按物理录制去重，并从motion train排除与evaluation相同SB1组；参考来源精度、转换一致性和真实模型收益分开，不把任何脚本存在或下载中称为已训练。 新增三个数值下载／五库99D适配／严格保留原四的collection builder／带失败依赖和STOP的CPU准备队列以及九库配置。队列Pod隔离验收通过（失败后独立阶段继续、依赖blocked、STOP父子退出、已有manifest身份不升级）；无模型架构或效果结论变更。 [执行文档](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
 
 **2026-10-16升级真实手部渲染并筛选优势test案例：** 新增[持续窗口选样脚本](../scripts/select_hand_demo_cases.py)，扩展renderer平滑法线／柔光／抗锯齿、默认去骨架、直接高清裁切、明示整段指标及腕口显示端面；全部保存预测／ownβ／真实投影保持，端面不进指标。扫描1280视角，解码159候选9768帧，三段45帧的绝对／投影／腕对齐／PA均值改善；按test主动挑选及候选范围明确披露。Pod实际渲染v2，四视频完整解码、135／269帧、faststart与本机SHA及首中末帧视觉验收通过，cap前后投影0变化及原RGB视频SHA一致。新增[文档](../docs/HAND_SHOWCASE_2026-10-16.md)及[约20KB报告](../reports/hand_showcase_20261016.json)，更新入口／决策／数据／状态；媒体、资产和逐帧预测仍忽略，无新训练或神经推理。

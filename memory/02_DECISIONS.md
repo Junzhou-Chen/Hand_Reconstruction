@@ -1,5 +1,7 @@
 # HandLoop 决策与演进记忆
 
+**2026-10-16用户新增五指标统计要求，已完成：** 用户要求统计截图的W-MPJPE／WA-MPJPE／PA-MPJPE／加速度误差／RTE；执行范围取刚完成的全部DexYCB s0 test冻结预测，非主动选优的展示片段。工程上保留既有Dex O(3) PA主口径并另报HaWoR proper SO(3) PA；W／WA／Accel／RTE参考冻结官方函数迁移至Dex21固定相机。该迁移与按帧聚合是明确披露的执行口径，不代表用户新定HOT3D benchmark或方法／训练变更。[实际定义与结果](../docs/DEXYCB_WORLD_METRICS_2026-10-16.md)。
+
 **2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 用户最后明确“这个也加进来，9个dataset一起pre train”。99D、纯轨迹输入、既有current restoration＋60步future任务保持；新10k配置沿旧预算是工程起点，不是用户本轮指定新超参。 [执行与来源](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
 
 **2026-10-16用户新增展示要求：改进手模型渲染，按test优势挑选案例。** 用户明确希望“渲染的手的那个模型好看一点”并找“我们的方法明显优秀”的test样本；授权主动按真实test参考误差选定性优势段，替代仅针对旧demo的最长连续片段、不看误差选样规则，旧版仍保留。checkpoint仍固定验证best4200，不按test重选模型；本轮材质、光照、抗锯齿、默认去骨架、共同高清裁切与腕口显示端面属于展示工程实现，不是研究模型／数据split／训练的新决定。精选须明示，不代表随机样本或整库平均；不得用PA、GT位移／旋转／尺度／β改变显示预测。[执行与边界](../docs/HAND_SHOWCASE_2026-10-16.md)。

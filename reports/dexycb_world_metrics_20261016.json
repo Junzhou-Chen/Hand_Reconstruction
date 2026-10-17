@@ -1,0 +1,1039 @@
+{
+  "schema": "handloop.dexycb_saved_world_metrics_summary.v1",
+  "status": "complete",
+  "recorded_local_date": "2026-10-16",
+  "scope_note": "Full frozen DexYCB s0 test, not the selected showcase cases. Fixed-camera adaptation of HaWoR trajectory metrics; not HOT3D benchmark reproduction.",
+  "labels": {
+    "baseline": "official HaWoR raw",
+    "best": "validation-selected step4200 final",
+    "last": "paused step4311 final"
+  },
+  "main_metric_order": [
+    "w_mpjpe21_mm",
+    "wa_mpjpe21_mm",
+    "pa_freihand_o3_mpjpe21_mm",
+    "accel_hawor_m_s2",
+    "rte_percent"
+  ],
+  "main_pa_convention": "Keep existing DexYCB FreiHAND unrestricted O(3); proper SO(3) result is separately included.",
+  "lower_is_better": true,
+  "full_report": {
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_world_metrics_20261016/full.json",
+    "sha256": "a9f738de8c6f48008462d8c26d1077497c4ca6e225e4b75104c53db073ca1017"
+  },
+  "completed_utc": "2026-10-17T03:51:34.059125+00:00",
+  "elapsed_seconds": 101.71690034680068,
+  "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+  "evaluation_root": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016",
+  "source_index_sha256": "91ac13566b4292521e2166f78acc4f62424a9042239407f2a7976256e0dab9d8",
+  "source_selection_sha256": "9cb1ae439a1c32c8b5ff6f3fb03bcb290bde4580e207554120b94d815cd15d82",
+  "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+  "coverage_key_and_frame_hash_sha256": "8a5ff77ce1845604b23d50284b01439a9412a1dbfb28c5d1f4b66fade6741757",
+  "coverage_audit": {
+    "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_world_metrics_20261016/full.coverage_audit.json",
+    "sha256": "6834db6b31708ce729867bceff03b760b49195c2f0ee122f0c73e6394fdbf2c6"
+  },
+  "coverage": {
+    "clips32": 2992,
+    "completed_shards": 1280,
+    "empty_shards": 0,
+    "frames": 78768,
+    "left_frames": 39160,
+    "right_frames": 39608,
+    "run_length_histogram": {
+      "35": 8,
+      "45": 8,
+      "47": 8,
+      "49": 8,
+      "51": 40,
+      "53": 104,
+      "55": 136,
+      "57": 104,
+      "59": 144,
+      "61": 152,
+      "63": 136,
+      "65": 112,
+      "66": 8,
+      "67": 40,
+      "69": 48,
+      "70": 8,
+      "71": 24,
+      "72": 104,
+      "74": 88
+    }
+  },
+  "formal_branches": {
+    "baseline": "raw",
+    "best": "final",
+    "last": "final"
+  },
+  "identities": {
+    "baseline": {
+      "checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+      "clip_length": 32,
+      "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+      "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+      "label": "baseline",
+      "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+      "precision": "bf16",
+      "smoke_shards": 0,
+      "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+      "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+    },
+    "best": {
+      "checkpoint_sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+      "clip_length": 32,
+      "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+      "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+      "label": "best",
+      "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+      "precision": "bf16",
+      "smoke_shards": 0,
+      "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+      "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+    },
+    "last": {
+      "checkpoint_sha256": "6693a48808cef21a5e264627f683a5b9981cdc3f351daa017d62acb413ee3f6c",
+      "clip_length": 32,
+      "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+      "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+      "label": "last",
+      "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+      "precision": "bf16",
+      "smoke_shards": 0,
+      "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+      "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+    }
+  },
+  "geometry_execution": {
+    "cuda_matmul_allow_tf32": true,
+    "decode_batch_size_upper_cap": 512,
+    "device": "cuda:0",
+    "grouping": "original-clips32",
+    "precision_rationale": "Match completed full-test MANO geometry precision; fixed8-shard probe distinguished TF32 convention from small batch-size roundoff."
+  },
+  "mano_assets_sha256": {
+    "left": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762",
+    "right": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732"
+  },
+  "predicted_beta_policy": "Each branch decodes its own saved predicted beta; GT beta only restores GT native transl.",
+  "prediction_left_shapedirs_fix": true,
+  "reference_left_shapedirs_fix": false,
+  "protocol": {
+    "accel": "Absolute joints, ||pred_second_difference-GT_second_difference||, mean21, multiplied by30^2; official additionally trims first/last valid second differences, leaving T-4 centers.",
+    "alignment_chunk_frames": 100,
+    "alignment_tail": "Retained, including a one-frame tail.",
+    "continuous_runs": "Split on diff(frame_ids)!=1; never bridge omitted invalid-GT frames.",
+    "fps": 30,
+    "joint_set": "DexYCB supplied Dex21, 21 landmarks; Dex tip vertices differ from official HOT3D OpenPose21 tips.",
+    "pa_hawor": "Per-frame proper SO(3)+scale+translation; separate from existing FreiHAND unrestricted O(3).",
+    "reset_policy": "Primary includes independent32-frame inference resets; diagnostic excludes centers at run-relative indices32k-1 and32k.",
+    "rte": "Per continuous run native MANO transl=p3-rest_wrist(own beta); rigid SE(3), scale fixed1; each frame error divided by entire GT transl path length, times100.",
+    "rte_near_zero_threshold_m": 0.001,
+    "rte_zero_path": "GT path<=1e-12m explicitly undefined and counted; no epsilon denominator.",
+    "scopes": "Full78768-frame coverage plus a separately named official-min16-run sensitivity subset.",
+    "source": "HaWoR 66c7d4108d58a716deccd192cb7645170cdc7bd7 lib/eval_utils/eval_utils.py and scripts/scripts_eval/eval_hawor_hot3d.py",
+    "timestamps": "frame_id/nominal30Hz; not measured capture timestamps",
+    "w_mpjpe": "Proper SO(3)+positive scale+translation fitted to first min(2,T) complete frames of each block.",
+    "wa_mpjpe": "Proper SO(3)+positive scale+translation fitted jointly to all frame/joint points in each block.",
+    "weighting": "All frame/center weighted, equal100-frame-block weighted, and equal-continuous-run weighted reported; Accel and RTE blocks equal whole runs.",
+    "world_gauge": "Each calibrated static camera defines an independent identity world gauge; not HOT3D SLAM evaluation."
+  },
+  "script_sha256": "a3bebbb470998d54969a0684b2db92dc3826819092e2737c279a57895b2c6acc",
+  "gt_note": "DexYCB supplied joints and fitted MANO, not independent MoCap; predict own beta, reference beta only for reference geometry/transl.",
+  "source_geometry_note": "99D saved state; all spatial inputs meters, angular root/finger rotation6D; output MPJPE mm, Accel m/s^2, RTE percent.",
+  "scope_comparison": {
+    "all_contiguous_runs_equals_hawor_min16_contiguous_runs": true,
+    "min_run_frames": 35,
+    "max_run_frames": 74,
+    "excluded_runs": 0
+  },
+  "main_frame_or_center_weighted": {
+    "baseline": {
+      "w_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 155.10869238611298,
+        "sum": 12217601.481869347
+      },
+      "wa_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 26.404640865368393,
+        "sum": 2079840.7516833376
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.866679886529161,
+        "sum": 462106.6413021289
+      },
+      "accel_hawor_m_s2": {
+        "unit": "m/s^2",
+        "count": 73648,
+        "mean": 16.599615239354048,
+        "sum": 1222528.4631479469
+      },
+      "rte_percent": {
+        "unit": "%",
+        "count": 78768,
+        "mean": 4.106690360132875,
+        "sum": 323475.78628694627
+      }
+    },
+    "best": {
+      "w_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 120.343403870354,
+        "sum": 9479209.236060044
+      },
+      "wa_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 19.679737563324785,
+        "sum": 1550133.5683879666
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.1614518502504545,
+        "sum": 406557.2393405278
+      },
+      "accel_hawor_m_s2": {
+        "unit": "m/s^2",
+        "count": 73648,
+        "mean": 8.53110890139643,
+        "sum": 628299.1083700443
+      },
+      "rte_percent": {
+        "unit": "%",
+        "count": 78768,
+        "mean": 2.634208990063988,
+        "sum": 207491.3737293602
+      }
+    },
+    "last": {
+      "w_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 120.55606590304207,
+        "sum": 9495960.199050818
+      },
+      "wa_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 19.672192016983843,
+        "sum": 1549539.2207937832
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.166845529517548,
+        "sum": 406982.08866903826
+      },
+      "accel_hawor_m_s2": {
+        "unit": "m/s^2",
+        "count": 73648,
+        "mean": 8.51767963877225,
+        "sum": 627310.0700362987
+      },
+      "rte_percent": {
+        "unit": "%",
+        "count": 78768,
+        "mean": 2.6348698580860868,
+        "sum": 207543.4289817249
+      }
+    }
+  },
+  "diagnostics_frame_or_center_weighted": {
+    "baseline": {
+      "pa_hawor_so3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.86675622118239,
+        "sum": 462112.6540300945
+      },
+      "accel_all_valid_triples_m_s2": {
+        "unit": "m/s^2",
+        "count": 76208,
+        "mean": 16.98950670772009,
+        "sum": 1294736.3271819325
+      },
+      "accel_hawor_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 70456,
+        "mean": 16.341954942324886,
+        "sum": 1151388.7774164423
+      },
+      "accel_all_valid_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 72896,
+        "mean": 16.763211595584217,
+        "sum": 1221971.0724717071
+      }
+    },
+    "best": {
+      "pa_hawor_so3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.162860411476822,
+        "sum": 406668.1888912063
+      },
+      "accel_all_valid_triples_m_s2": {
+        "unit": "m/s^2",
+        "count": 76208,
+        "mean": 8.777087900865164,
+        "sum": 668884.3147491324
+      },
+      "accel_hawor_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 70456,
+        "mean": 8.046236282682846,
+        "sum": 566905.6235327026
+      },
+      "accel_all_valid_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 72896,
+        "mean": 8.316075870939256,
+        "sum": 606208.6666879881
+      }
+    },
+    "last": {
+      "pa_hawor_so3_mpjpe21_mm": {
+        "unit": "mm",
+        "count": 78768,
+        "mean": 5.1683148742318075,
+        "sum": 407097.826013491
+      },
+      "accel_all_valid_triples_m_s2": {
+        "unit": "m/s^2",
+        "count": 76208,
+        "mean": 8.764192620193116,
+        "sum": 667901.591199677
+      },
+      "accel_hawor_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 70456,
+        "mean": 8.012356155845833,
+        "sum": 564518.565316274
+      },
+      "accel_all_valid_excluding_reset_m_s2": {
+        "unit": "m/s^2",
+        "count": 72896,
+        "mean": 8.282764106526171,
+        "sum": 603780.3723093318
+      }
+    }
+  },
+  "coverage_by_model": {
+    "baseline": {
+      "accel_all_reset_crossing_triples": 3312,
+      "accel_all_valid_triples": 76208,
+      "accel_hawor_trimmed_centers": 73648,
+      "accel_hawor_trimmed_excluding_reset_centers": 70456,
+      "accel_hawor_trimmed_reset_crossing_centers": 3192,
+      "alignment_blocks": 1280,
+      "alignment_singleton_blocks": 0,
+      "alignment_tail_blocks": 1280,
+      "continuous_runs": 1280,
+      "frames": 78768,
+      "joint_observations": 1654128,
+      "pa_unconstrained_reflection_frames": 23,
+      "rte_defined_frames": 78768,
+      "rte_defined_runs": 1280,
+      "rte_degenerate_pred_cloud_runs": 0,
+      "rte_gt_near_zero_nonzero_path_runs": 0,
+      "rte_gt_path_sum_m": 960.0285203578735,
+      "rte_gt_zero_path_frames": 0,
+      "rte_gt_zero_path_runs": 0,
+      "rte_pred_path_sum_m": 1544.107336947109,
+      "rte_pred_zero_path_runs": 0,
+      "rte_runs": 1280,
+      "rte_unconstrained_reflection_runs": 117,
+      "runs_under_16_frames": 0,
+      "runs_under_2_frames": 0,
+      "runs_under_3_frames": 0,
+      "runs_under_5_frames": 0,
+      "w_unconstrained_reflection_blocks": 12,
+      "wa_unconstrained_reflection_blocks": 3
+    },
+    "best": {
+      "accel_all_reset_crossing_triples": 3312,
+      "accel_all_valid_triples": 76208,
+      "accel_hawor_trimmed_centers": 73648,
+      "accel_hawor_trimmed_excluding_reset_centers": 70456,
+      "accel_hawor_trimmed_reset_crossing_centers": 3192,
+      "alignment_blocks": 1280,
+      "alignment_singleton_blocks": 0,
+      "alignment_tail_blocks": 1280,
+      "continuous_runs": 1280,
+      "frames": 78768,
+      "joint_observations": 1654128,
+      "pa_unconstrained_reflection_frames": 52,
+      "rte_defined_frames": 78768,
+      "rte_defined_runs": 1280,
+      "rte_degenerate_pred_cloud_runs": 0,
+      "rte_gt_near_zero_nonzero_path_runs": 0,
+      "rte_gt_path_sum_m": 960.0285203578735,
+      "rte_gt_zero_path_frames": 0,
+      "rte_gt_zero_path_runs": 0,
+      "rte_pred_path_sum_m": 1152.6324999566457,
+      "rte_pred_zero_path_runs": 0,
+      "rte_runs": 1280,
+      "rte_unconstrained_reflection_runs": 63,
+      "runs_under_16_frames": 0,
+      "runs_under_2_frames": 0,
+      "runs_under_3_frames": 0,
+      "runs_under_5_frames": 0,
+      "w_unconstrained_reflection_blocks": 7,
+      "wa_unconstrained_reflection_blocks": 1
+    },
+    "last": {
+      "accel_all_reset_crossing_triples": 3312,
+      "accel_all_valid_triples": 76208,
+      "accel_hawor_trimmed_centers": 73648,
+      "accel_hawor_trimmed_excluding_reset_centers": 70456,
+      "accel_hawor_trimmed_reset_crossing_centers": 3192,
+      "alignment_blocks": 1280,
+      "alignment_singleton_blocks": 0,
+      "alignment_tail_blocks": 1280,
+      "continuous_runs": 1280,
+      "frames": 78768,
+      "joint_observations": 1654128,
+      "pa_unconstrained_reflection_frames": 56,
+      "rte_defined_frames": 78768,
+      "rte_defined_runs": 1280,
+      "rte_degenerate_pred_cloud_runs": 0,
+      "rte_gt_near_zero_nonzero_path_runs": 0,
+      "rte_gt_path_sum_m": 960.0285203578735,
+      "rte_gt_zero_path_frames": 0,
+      "rte_gt_zero_path_runs": 0,
+      "rte_pred_path_sum_m": 1151.3008252769819,
+      "rte_pred_zero_path_runs": 0,
+      "rte_runs": 1280,
+      "rte_unconstrained_reflection_runs": 64,
+      "runs_under_16_frames": 0,
+      "runs_under_2_frames": 0,
+      "runs_under_3_frames": 0,
+      "runs_under_5_frames": 0,
+      "w_unconstrained_reflection_blocks": 7,
+      "wa_unconstrained_reflection_blocks": 1
+    }
+  },
+  "hand_summaries": {
+    "left": {
+      "baseline": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 143.84195417057347,
+          "sum": 5632850.925319658
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 27.322350093843635,
+          "sum": 1069943.2296749167
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 5.750710714149836,
+          "sum": 225197.83156610758
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 36632,
+          "mean": 17.01311449362876,
+          "sum": 623224.4101306087
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39160,
+          "mean": 4.282030120982485,
+          "sum": 167684.29953767412
+        }
+      },
+      "best": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 110.31649982223988,
+          "sum": 4319994.133038914
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 20.410793809419967,
+          "sum": 799286.6855768859
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 5.084916198759862,
+          "sum": 199125.3183434362
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 36632,
+          "mean": 8.383018603675684,
+          "sum": 307086.73748984764
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39160,
+          "mean": 2.718895596386655,
+          "sum": 106471.95155450141
+        }
+      },
+      "last": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 110.7594078158848,
+          "sum": 4337338.410070049
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 20.382898064948023,
+          "sum": 798194.2882233646
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39160,
+          "mean": 5.083361986304672,
+          "sum": 199064.45538369095
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 36632,
+          "mean": 8.379258045505058,
+          "sum": 306948.9807229413
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39160,
+          "mean": 2.7176577515788645,
+          "sum": 106423.47755182833
+        }
+      }
+    },
+    "right": {
+      "baseline": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 166.24799425746565,
+          "sum": 6584750.5565497
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 25.497311704918783,
+          "sum": 1009897.5220084231
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 5.981337349424892,
+          "sum": 236908.8097360211
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 37016,
+          "mean": 16.190405581838593,
+          "sum": 599304.0530173373
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39608,
+          "mean": 3.933333840367404,
+          "sum": 155791.48674927212
+        }
+      },
+      "best": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 130.2568951479782,
+          "sum": 5159215.103021122
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 18.956950182061206,
+          "sum": 750846.8828110802
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 5.237121818751032,
+          "sum": 207431.9209970909
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 37016,
+          "mean": 8.677662926307434,
+          "sum": 321212.370880196
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39608,
+          "mean": 2.550480260928573,
+          "sum": 101019.42217485892
+        }
+      },
+      "last": {
+        "w_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 130.2419154963842,
+          "sum": 5158621.788980785
+        },
+        "wa_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 18.96952465588822,
+          "sum": 751344.9325704206
+        },
+        "pa_freihand_o3_mpjpe21_mm": {
+          "unit": "mm",
+          "count": 39608,
+          "mean": 5.249384803205091,
+          "sum": 207917.63328534723
+        },
+        "accel_hawor_m_s2": {
+          "unit": "m/s^2",
+          "count": 37016,
+          "mean": 8.654665261329109,
+          "sum": 320361.0893133583
+        },
+        "rte_percent": {
+          "unit": "%",
+          "count": 39608,
+          "mean": 2.5530183657315817,
+          "sum": 101119.9514298965
+        }
+      }
+    }
+  },
+  "best_reduction_percent_from_baseline": {
+    "w_mpjpe21_mm": 22.413501126821146,
+    "wa_mpjpe21_mm": 25.468641426832683,
+    "pa_freihand_o3_mpjpe21_mm": 12.02090534883321,
+    "accel_hawor_m_s2": 48.606586487793756,
+    "rte_percent": 35.855670648157755
+  },
+  "existing_geometry_crosscheck": {
+    "baseline": {
+      "absolute_mpjpe21_mm": {
+        "count": 78768,
+        "difference": 3.820417759925476e-09,
+        "existing": 65.52163677725466,
+        "passed": true,
+        "recomputed": 65.52163678107507,
+        "tolerance_mm": 0.0001
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": 3.552713678800501e-15,
+        "existing": 5.866679886529157,
+        "passed": true,
+        "recomputed": 5.866679886529161,
+        "tolerance_mm": 1e-05
+      },
+      "pa_hawor_so3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": 2.6645352591003757e-15,
+        "existing": 5.866756221182388,
+        "passed": true,
+        "recomputed": 5.86675622118239,
+        "tolerance_mm": 1e-05
+      },
+      "wrist_aligned_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -5.760789179021231e-09,
+        "existing": 16.498519585605816,
+        "passed": true,
+        "recomputed": 16.498519579845027,
+        "tolerance_mm": 0.0001
+      }
+    },
+    "best": {
+      "absolute_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -3.475268073316329e-09,
+        "existing": 30.5582838504347,
+        "passed": true,
+        "recomputed": 30.558283846959434,
+        "tolerance_mm": 0.0001
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -1.7763568394002505e-15,
+        "existing": 5.161451850250456,
+        "passed": true,
+        "recomputed": 5.1614518502504545,
+        "tolerance_mm": 1e-05
+      },
+      "pa_hawor_so3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -1.7763568394002505e-15,
+        "existing": 5.1628604114768235,
+        "passed": true,
+        "recomputed": 5.162860411476822,
+        "tolerance_mm": 1e-05
+      },
+      "wrist_aligned_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -2.151086420099091e-09,
+        "existing": 12.223245365449143,
+        "passed": true,
+        "recomputed": 12.223245363298057,
+        "tolerance_mm": 0.0001
+      }
+    },
+    "last": {
+      "absolute_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -3.200309350859243e-09,
+        "existing": 30.365148372147036,
+        "passed": true,
+        "recomputed": 30.365148368946727,
+        "tolerance_mm": 0.0001
+      },
+      "pa_freihand_o3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": 0.0,
+        "existing": 5.166845529517548,
+        "passed": true,
+        "recomputed": 5.166845529517548,
+        "tolerance_mm": 1e-05
+      },
+      "pa_hawor_so3_mpjpe21_mm": {
+        "count": 78768,
+        "difference": 0.0,
+        "existing": 5.1683148742318075,
+        "passed": true,
+        "recomputed": 5.1683148742318075,
+        "tolerance_mm": 1e-05
+      },
+      "wrist_aligned_mpjpe21_mm": {
+        "count": 78768,
+        "difference": -1.992965792396717e-09,
+        "existing": 12.297768725564527,
+        "passed": true,
+        "recomputed": 12.297768723571561,
+        "tolerance_mm": 0.0001
+      }
+    }
+  },
+  "validation": {
+    "self_test": {
+      "passed": true,
+      "checks": 13
+    },
+    "official_reference": {
+      "passed": true,
+      "source": "HaWoR 66c7d4108d58a716deccd192cb7645170cdc7bd7",
+      "reference_sha256": "dee3d6e09c2c743f0ccb10ca58f259b1b6dc7fdd65aca5dedf82821c860e33a4",
+      "implementation_sha256": "a3bebbb470998d54969a0684b2db92dc3826819092e2737c279a57895b2c6acc",
+      "checker_sha256": "1086ac1dc9ff578bbf6975ee71c8d6046f966c45c4071f1e7e155050e248e4d0",
+      "fixture_sha256": "fa1a6cd14fea2bbc5c2953d3377e400c68b09b2ae3a63d0090a6c2f53a719a32",
+      "ast_extracted_functions": [
+        "compute_error_accel",
+        "batch_compute_similarity_transform_torch",
+        "compute_jpe",
+        "global_align_joints",
+        "first_align_joints",
+        "align_pcl",
+        "compute_rte"
+      ],
+      "reference_dtype": "float32, unchanged official functions",
+      "boundary_checks": {
+        "passed": true,
+        "source_frame_ids": [
+          29,
+          30,
+          31,
+          32,
+          33,
+          36,
+          37,
+          38,
+          39,
+          63,
+          64,
+          65
+        ],
+        "expected_runs": [
+          [
+            0,
+            5
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            9,
+            12
+          ]
+        ],
+        "actual_runs": [
+          [
+            0,
+            5
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            9,
+            12
+          ]
+        ],
+        "reset_boundaries_remain_in_main_metric": true,
+        "no_temporal_gap_crossed": true,
+        "standard_acceleration_centers": 6,
+        "official_trimmed_acceleration_centers": 1
+      },
+      "fixture_case_count": 37
+    },
+    "official_reference_metric_comparison": {
+      "w_mpjpe_mm": {
+        "max_abs_difference": 0.00020751734217583362,
+        "absolute_tolerance": 0.003,
+        "relative_tolerance": 2e-05,
+        "all_cases_passed": true
+      },
+      "wa_mpjpe_mm": {
+        "max_abs_difference": 0.0005072581898630801,
+        "absolute_tolerance": 0.003,
+        "relative_tolerance": 2e-05,
+        "all_cases_passed": true
+      },
+      "pa_mpjpe_so3_mm": {
+        "max_abs_difference": 0.00011427265403795671,
+        "absolute_tolerance": 0.003,
+        "relative_tolerance": 2e-05,
+        "all_cases_passed": true
+      },
+      "accel_official_mps2": {
+        "max_abs_difference": 3.536022627997826e-05,
+        "absolute_tolerance": 0.0005,
+        "relative_tolerance": 2e-05,
+        "all_cases_passed": true
+      },
+      "rte_percent": {
+        "max_abs_difference": 0.0027107970067601628,
+        "absolute_tolerance": 0.003,
+        "relative_tolerance": 2e-05,
+        "all_cases_passed": true
+      }
+    },
+    "reference_artifacts": {
+      "self_test.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/self_test.json",
+        "sha256": "b09bdf23bdd798e25a61a902d66e2777af8d00a34ccba62ee129f13a060f4f59"
+      },
+      "reference_synthetic_checks.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/reference_synthetic_checks.json",
+        "sha256": "7c378d4d1de138e65ac42cb3eb77952ce3730b88ce4127db5b4a6943c428779b"
+      },
+      "reference_real_checks.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/reference_real_checks.json",
+        "sha256": "7929e37dee281fefbaf6f805f13432e3ba341b2fa0092b9f7960607e89b2ddb0"
+      },
+      "smoke_tf32.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/smoke_tf32.json",
+        "sha256": "1eac4d7bdf937cd8aed850ef9642019da24d7f24641eeef11ab6d1ac0e2449f6"
+      },
+      "precision_probe.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/precision_probe.json",
+        "sha256": "c7a420783e49a9e9fe79b1971ccfb86af20b071839a6334c0e7320e1123e075d"
+      },
+      "preflight_failure.json": {
+        "path": "outputs/evaluations/dexycb_world_metrics_20261016/preflight_failure.json",
+        "sha256": "c22102496194fd51a3ef7483aae00002feced4cbe07a6af535c5bc2e35c42df0"
+      }
+    },
+    "precision_preflight": {
+      "status": "resolved_before_full_run",
+      "initial_failure": {
+        "phase": "failed_preflight",
+        "scope": "first8_nonempty_shards_568_states",
+        "source_script_sha256": "de4f578208e703eb9ab08b096435c44c9e83615616f4c02cc5e30d7e0349f22d",
+        "metric": "baseline PA-FreiHAND-O3 mm",
+        "recomputed": 5.26415195921077,
+        "existing": 5.264411237086356,
+        "difference_mm": -0.0002592778755854397,
+        "initial_tolerance_mm": 1e-05,
+        "status": "Investigating original TF32 flag and geometry batch granularity; no full evaluation launched yet."
+      },
+      "root_cause": "Original evaluator explicitly enables CUDA matmul TF32; initial supplementary decoder defaulted False. Original clip32 grouping also retained for exact prior-metric reproduction.",
+      "resolution": "TF32=True plus original-clips32; strict tolerances unchanged; all12 previous geometry checks pass on full78768 frames.",
+      "probe_script_sha256": "88d9500051550a7e4d90eac1dd07a2f08fdf6d2e2e8edec0e7b32f63d2904235",
+      "probe_frames": 568,
+      "probe_configurations": [
+        {
+          "allow_tf32": false,
+          "grouping": "all512",
+          "frames": 568,
+          "float32_matmul_precision": "highest",
+          "max_per_joint_geometry_change_from_false512_mm": 0.0,
+          "max_per_frame_pa_change_from_false512_mm": 0.0,
+          "metrics": {
+            "pa_mpjpe21_mm": {
+              "recomputed": 5.26415195921077,
+              "prior": 5.264411237086356,
+              "difference_mm": -0.0002592778755850394,
+              "max_abs_per_shard_difference_mm": 0.0009018760467967013
+            },
+            "pa_proper_mpjpe21_mm": {
+              "recomputed": 5.26415195921077,
+              "prior": 5.264411237086356,
+              "difference_mm": -0.0002592778755850394,
+              "max_abs_per_shard_difference_mm": 0.0009018760467967013
+            },
+            "mpjpe21_mm": {
+              "recomputed": 42.782612153357064,
+              "prior": 42.78260823520117,
+              "difference_mm": 3.918155900310908e-06,
+              "max_abs_per_shard_difference_mm": 0.0013642747637163666
+            },
+            "wrist_aligned_mpjpe21_mm": {
+              "recomputed": 15.210478002296684,
+              "prior": 15.210155223426922,
+              "difference_mm": 0.0003227788697618245,
+              "max_abs_per_shard_difference_mm": 0.0017012540803165166
+            }
+          }
+        },
+        {
+          "allow_tf32": true,
+          "grouping": "all512",
+          "frames": 568,
+          "float32_matmul_precision": "high",
+          "max_per_joint_geometry_change_from_false512_mm": 0.11414962146773343,
+          "max_per_frame_pa_change_from_false512_mm": 0.007888339988023851,
+          "metrics": {
+            "pa_mpjpe21_mm": {
+              "recomputed": 5.2644124652878155,
+              "prior": 5.264411237086356,
+              "difference_mm": 1.2282014604096103e-06,
+              "max_abs_per_shard_difference_mm": 1.1496609312544592e-05
+            },
+            "pa_proper_mpjpe21_mm": {
+              "recomputed": 5.2644124652878155,
+              "prior": 5.264411237086356,
+              "difference_mm": 1.2282014604096103e-06,
+              "max_abs_per_shard_difference_mm": 1.1496609312544592e-05
+            },
+            "mpjpe21_mm": {
+              "recomputed": 42.78260813048327,
+              "prior": 42.78260823520117,
+              "difference_mm": -1.0471789414943589e-07,
+              "max_abs_per_shard_difference_mm": 6.207517934342377e-06
+            },
+            "wrist_aligned_mpjpe21_mm": {
+              "recomputed": 15.21015618174349,
+              "prior": 15.210155223426922,
+              "difference_mm": 9.58316566308421e-07,
+              "max_abs_per_shard_difference_mm": 5.092699206343809e-06
+            }
+          }
+        },
+        {
+          "allow_tf32": true,
+          "grouping": "run32",
+          "frames": 568,
+          "float32_matmul_precision": "high",
+          "max_per_joint_geometry_change_from_false512_mm": 0.11416396549307871,
+          "max_per_frame_pa_change_from_false512_mm": 0.007887703564203541,
+          "metrics": {
+            "pa_mpjpe21_mm": {
+              "recomputed": 5.264411237086355,
+              "prior": 5.264411237086356,
+              "difference_mm": -8.006115332508171e-16,
+              "max_abs_per_shard_difference_mm": 1.7763568394002505e-15
+            },
+            "pa_proper_mpjpe21_mm": {
+              "recomputed": 5.264411237086355,
+              "prior": 5.264411237086356,
+              "difference_mm": -8.006115332508171e-16,
+              "max_abs_per_shard_difference_mm": 1.7763568394002505e-15
+            },
+            "mpjpe21_mm": {
+              "recomputed": 42.78260823520116,
+              "prior": 42.78260823520117,
+              "difference_mm": -6.404892266006537e-15,
+              "max_abs_per_shard_difference_mm": 7.105427357601002e-15
+            },
+            "wrist_aligned_mpjpe21_mm": {
+              "recomputed": 15.210155223426922,
+              "prior": 15.210155223426922,
+              "difference_mm": 0.0,
+              "max_abs_per_shard_difference_mm": 3.552713678800501e-15
+            }
+          }
+        },
+        {
+          "allow_tf32": false,
+          "grouping": "run32",
+          "frames": 568,
+          "float32_matmul_precision": "highest",
+          "max_per_joint_geometry_change_from_false512_mm": 6.143906154658885e-05,
+          "max_per_frame_pa_change_from_false512_mm": 2.9770097778047955e-06,
+          "metrics": {
+            "pa_mpjpe21_mm": {
+              "recomputed": 5.264151956344188,
+              "prior": 5.264411237086356,
+              "difference_mm": -0.00025928074216742867,
+              "max_abs_per_shard_difference_mm": 0.0009018895215833211
+            },
+            "pa_proper_mpjpe21_mm": {
+              "recomputed": 5.264151956344188,
+              "prior": 5.264411237086356,
+              "difference_mm": -0.00025928074216742867,
+              "max_abs_per_shard_difference_mm": 0.0009018895215833211
+            },
+            "mpjpe21_mm": {
+              "recomputed": 42.78261214202379,
+              "prior": 42.78260823520117,
+              "difference_mm": 3.9068226227831935e-06,
+              "max_abs_per_shard_difference_mm": 0.001364320816399811
+            },
+            "wrist_aligned_mpjpe21_mm": {
+              "recomputed": 15.210478015448883,
+              "prior": 15.210155223426922,
+              "difference_mm": 0.00032279202196150436,
+              "max_abs_per_shard_difference_mm": 0.0017013405890047295
+            }
+          }
+        }
+      ]
+    },
+    "independent_full_summary_review": {
+      "passed": true,
+      "unique_view_keys": 1280,
+      "frame_count": 78768,
+      "accel_count_identity": "78768 - 4*1280 = 73648",
+      "rte_defined_runs": 1280,
+      "coverage_audit_sha_verified": true,
+      "sum_count_and_hand_reaggregation_verified": true,
+      "all12_existing_geometry_crosschecks_passed": true
+    }
+  },
+  "interpretation_limits": [
+    "W alignment fits only the initial two frames; it need not reduce subsequent errors relative to unaligned coordinates.",
+    "Do not relabel prior absolute MPJPE or wrist-only MPJPE as W or WA.",
+    "All1280 views have35-74 frames, one short alignment block each; no100-frame block reached.",
+    "Main acceleration includes saved32-frame inference reset boundaries.",
+    "No new neural inference or training; remote MANO FK/metrics only.",
+    "The full result cannot by itself attribute all improvement to TWM."
+  ]
+}
