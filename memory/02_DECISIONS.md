@@ -1,5 +1,7 @@
 # HandLoop 决策与演进记忆
 
+**2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 用户最后明确“这个也加进来，9个dataset一起pre train”。99D、纯轨迹输入、既有current restoration＋60步future任务保持；新10k配置沿旧预算是工程起点，不是用户本轮指定新超参。 [执行与来源](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
+
 **2026-10-16用户新增展示要求：改进手模型渲染，按test优势挑选案例。** 用户明确希望“渲染的手的那个模型好看一点”并找“我们的方法明显优秀”的test样本；授权主动按真实test参考误差选定性优势段，替代仅针对旧demo的最长连续片段、不看误差选样规则，旧版仍保留。checkpoint仍固定验证best4200，不按test重选模型；本轮材质、光照、抗锯齿、默认去骨架、共同高清裁切与腕口显示端面属于展示工程实现，不是研究模型／数据split／训练的新决定。精选须明示，不代表随机样本或整库平均；不得用PA、GT位移／旋转／尺度／β改变显示预测。[执行与边界](../docs/HAND_SHOWCASE_2026-10-16.md)。
 
 **2026-10-16夜间用户新指令（暂缓获取／调查范围）：** 在授权获取DexWild trajectory并询问HumanTouch后，用户明确“DexWild这个先放一放”，并在澄清选项中指定“可直接下载、适配99D的人手运动数据集”。本轮不自动续跑DexWild；继续已授权HumanTouch数值下载，调查重点转为真实人手连续运动、可获取的完整MANO或可审计原生旋转。该指令暂替代前轮DexWild作为当晚主要获取项，不代表永久否定该库、取消sensor精度原则或批准新的数据混合／训练。其他候选仅调研未下载。[实际执行与失败](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)、[新选库核查](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)。

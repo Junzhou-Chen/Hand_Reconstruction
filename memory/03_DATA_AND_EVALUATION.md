@@ -1,5 +1,7 @@
 # HandLoop 数据与评测记忆
 
+**2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 InterHand四JSON约394.87MB已下载，真实时序index与8手序列FK smoke通过；ARCTIC双录制／双手384状态逐帧FK smoke通过，03:50UTC两库完整CPU预处理PID7186／7187启动。TACO15.23GB和Giga11.30GB数值包已在Pod后台下载／验hash／解压，真实字段已抽查，尚未完成整库适配验收。HO-3D按物理录制去重，并从motion train排除与evaluation相同SB1组；参考来源精度、转换一致性和真实模型收益分开，不把任何脚本存在或下载中称为已训练。 [新增source decoder、时间与split](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
+
 **2026-10-16优势案例选样与benchmark分开：** 用户已授权按test误差主动挑选展示，完整1280视角／78768状态仅粗排已有3D指标，实际2D窗口排序在159候选／9768状态内；54合格视角中取3被试、3录制、2相机、左右手及2种抓取目标，各45帧。不能写成全test最优2D窗口或整库均值。绝对MPJPE为60.441→27.231／83.625→17.725／142.091→32.117mm，投影10.277→4.541／9.019→3.357／11.727→5.466px，三段逐帧2D全改善，腕对齐及PA均值也均改善。GT为supplied21／fitted MANO，ownβ与真实K未对齐显示；腕口追加14个三角面仅渲染、不进指标。完整测试与模型选择不变，无新神经推理／训练。[选样协议](../docs/HAND_SHOWCASE_2026-10-16.md)、[来源与验收](../reports/hand_showcase_20261016.json)。
 
 **2026-10-16夜间完整MANO可获取池扩查：** [新核查表](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)记录InterHand2.6M30fps train326.64MB、TACO Hand_Poses15.23GB、GigaHands hand_poses11.30GB、ReInterHand七train5.52GB的官方公开数值入口；HO3Dv2／ARCTIC已下载但未motion入训。HOI4D已官方直链但未核包，H₂O-3D不同于注册H2O且程序化获取仍待验。Inter/Re正常frame编号步长不恒1，不能统一frame_idx/30；只取官方train、原录制去重并验2秒时间。UNOC／CeTI公开BVH新增sensor候选，非现成MANO；CLUTCH99D／EgoSteer是HaWoR等视觉伪标签，不能因格式相同当独立干净GT。所有新adapter／效果均未验证。

@@ -1,5 +1,7 @@
 # 传感器轨迹优先的TWM预训练
 
+**2026-10-16夜间用户最终确定九库联合TWM预训练：** 原OakInk2／HOT3D／独立UmeTrack／DexYCB全部保留，新增ARCTIC／InterHand30fps／TACO／GigaHands／HO-3D v2。此明确决定替代本轮七库／八库和暂不加HO-3D的中间范围；HumanTouch退出并已对匹配PID6739发送SIGTERM、保留已下载文件，DexWild继续暂缓。旧四库prepared manifest路径与原固定SHA必须一致，不因扩充删库、换库或重分旧split。 本轮是用户明确选择完整MANO参考的混合池，并未实测证明视觉拟合与glove／MoCap等精度。InterHand／TACO／Giga／HO-3D记录视觉拟合来源，ARCTIC记录Vicon→MoSh++；不将原生格式方便等同独立物理GT。此前HumanTouch“继续下载／优先候选”的执行状态被此次退出决定替代。 [范围与来源](../docs/TWM_NINE_SOURCE_PRETRAIN_2026-10-16.md)。
+
 **2026-10-16夜间源文件实测修正与扩查：** 用户本轮暂缓DexWild获取、明确广查可直下适配99D的人手运动；HumanTouch继续下载。公开DexWild pour的manus仅timestamp＋10×xyz/xyzw＝71列，没有采集SDK full25点，不能再凭README原目录推断已公开full骨架；腕来自ZED cube／SLAM链也未world验收。当前完整99D输出仍不变，native需partial／输入桥接。新UNOC公开918MB、120Hz、光学body＋16IMU每手，务必combined calibrated BVH；CeTI公开3.10GB、100Hz Rokoko，但world漂移校正。两者均需rest轴／额外thumb／腕J0映射。InterHand/TACO/Giga/Re有完整MANO拟合数值入口但非独立sensor GT，格式贴合与精度分别排名。[新来源依据](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)、[真实下载和失败](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)。
 
 **2026-10-16夜间扩查（建议，未开训）：** 新[重训前来源总结](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)汇总已用四库与ARCTIC、HumanTouch、DexWild、DexCap、DexterHand、MySign等候选；保留传感器参考精度／可审计标定优先。MySign实际5000FBX／5人，硬件采集按官方自述，孤立手语且retarget后发布，不能推导毫米级finger GT；SynData95383clips／793volumes严格为glove-origin，10Hz ITW重定向而非原生全MANO。ARCTIC官方MANO use_pca=False／flat_hand_mean=False，meta subject_vtemplates用于SMPL-X，不能照搬GRAB手模板处理。HOI4D官方新增独立HandPose／CameraParameters直链，纠正必须申请的旧概括，但未成功核包且仍视觉拟合来源。当前完整17组loader不接native partial；99D输出保持，来源有效字段分别监督。无新训练结果或用户已定数据混合。
