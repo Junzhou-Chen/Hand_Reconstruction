@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-16完整测试已结束，替代下方运行中状态：** 三模型于纽约20:28全部完成，1280视角／78768有效状态完全配对，W&B85qboyf8／wb42qkka／f2fzfdu6均finished，服务端标量与最终report一致。best4200绝对MPJPE30.558mm、PA5.161mm／PA-AUC89.682%，相对官方65.522／5.867／88.273分别降低53.36%、12.02%及提高1.409个百分点；last4311绝对30.365、PA5.167，未按test重选best。finger略差、微调raw已约30.6mm等边界保留，无新推理、训练、遮挡分组或独立TWM消融。[最终两组指标、分支与左右手](../docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)、[可审计小型结果](../reports/dexycb_full_test_final_20261016.json)。
+
 **2026-10-16视觉插件职责与改进讨论完成（未改训）：** 用户要求重讲HaWoR状态流及改进空间；源码确认Z同时进入插件与两轮TWM，不仅使用图像feature。发现插件共享投影相加的局部角色对称、candidate-only局部查询与固定尺度、逐组图像质量尚缺及同帧分布反馈未用；未认定它们为误差主因。新增[插件复核与分阶段建议](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)，对照WiLoR／DIR／GeoHand全文与源码，优先建议角色／分歧、双假设取证、候选证据质量及逐阶段几何诊断，99D与纯数值TWM保持。仅代码／文献分析，无模型执行、训练修改或新架构落地。
 
 **2026-10-16纽约11:00，TWM数据扩容只读复核：** 用户要求看当前预训练来源与扩大可能性，未要求启动新训。原四库实际2788135 train手状态／636610重叠窗，D37完整10k后当前回放未变。ARCTIC已08:38纽约完成343/343，267官方train原参数有384780个双手状态（QC前，未适配入池）；HumanTouch约100h、DexWild人类7917ep／2924588transitions是公开候选，glove仍未参与训练。原motion loader只接17组完整GT，需先native骨架标定与partial监督支持；99D输出不用改。D37完整60步future覆盖Dex0／HOT49.96%／Ume83.60%／Oak96.45%，新增长连续运动值得验证，不据此断言仅量不足。建议ARCTIC先适配、并行glove小样本，等预算检验；未动正在运行的5k或loss／模型／采样。见[来源与边界](../docs/DATA_EXPANSION_SOURCE_AUDIT_2026-10-16.md)、[远程计数摘要](../reports/twm_data_pool_inventory_20261016.json)、[候选当前发布](../reports/twm_public_candidate_review_20261016.json)。

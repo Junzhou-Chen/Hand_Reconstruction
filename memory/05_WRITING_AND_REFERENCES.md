@@ -1,5 +1,7 @@
 # HandLoop 写作与外部核验记忆
 
+**2026-10-16新增可引用的本项目完整测试结果：** [DexYCB full s0三模型结果](../docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)已完成覆盖与W&B终态验收。正式baseline／best4200／last4311的绝对MPJPE65.522／30.558／30.365mm，PA5.867／5.161／5.167mm，PA-AUC88.273／89.682／89.671%。可写系统配对改善；不可写finger全面提高、TWM独立收益、与论文所有条件完全一致或世界轨迹主benchmark完成。旧test1015／旧best300并非本轮数值。记录与实验小摘要同步Git，论文工作稿仍按原本地写作约定保留。
+
 **2026-10-15损失专题：** 已重新核读WestWorld、DreamerV3、TD-MPC2、StableHand v1、HMP、HaWoR、DIP、Diffusion Forcing、CSDI、MDM、HumanMAC、RFM原文/补充与关键官方代码。记录单目标/带权目标、归一/mask/stopgrad、生成噪声与观测错误、任务/数据/上下文差异及公开版本边界。StableHand v1三项不与Enhanced未发布训练混用；HaWoR gamma来自完整PDF§8；HMP通用VAE配置不冒充论文world prior。DIP §4.1另含geometry/trajectory consistency，不把Eq8当完整实现。DIP等已覆盖纯motion恢复，不能笼统称我们首个。没有新论文性能复现或训练改动。[12项来源及候选消融](../docs/TWM_LOSS_LITERATURE_REVIEW_2026-10-15.md)。
 
 更新日期：2026-10-15。项目已有中英文 Introduction 草稿，以及合成验证/小型接入结果；尚非完整方法的正式性能证据。下列外部核验采用原论文、作者项目页和官方源码，范围是引用与接口，不是实验复现；网页和 main 分支会变化，实际实现仍需 pin commit。

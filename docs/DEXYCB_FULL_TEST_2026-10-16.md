@@ -71,3 +71,7 @@ W&B服务端在同一查询期间较本地略滞后，分别已收到24／8／8�
 best／last CPU模型与optimizer有限性及saved-rank hash一致性均通过。独立数值checker v3共14项通过，包含真实左右手参考；原两份失败报告保留。三模型真实RGB smoke分别完成相同2视角／6clips／142状态，逐视角manifest SHA、frame-ID hash与分母完全一致，保存`real_rgb_smoke_acceptance.json`；正式测试使用另外三个run，不把smoke数据累计两遍。
 
 [小型启动报告](../reports/dexycb_full_test_launch_20261016.json)保存冻结权重SHA／step、代码基底3b0574e＋overlay488769b及脚本SHA、全部验收、源准备与进程／W&B服务端证据。三模型进程与controller均由Pod内脱离SSH的持久进程运行，结束当前聊天不会停止测试。未改训练权重或按测试结果选best；没有承诺自动追加新实验。
+
+## 最终完成（替代上文运行中快照）
+
+2026-10-17 00:28:05UTC／纽约10月16日20:28，三模型完整测试全部结束；各1280视角／2992 clips／78768有效状态，逐帧覆盖与manifest完全一致，W&B均finished。最终值见[完整结果与两组指标](DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)及[小型JSON](../reports/dexycb_full_test_final_20261016.json)。上文18:40的分母与preparing状态保留为启动历史，不再代表当前进度。

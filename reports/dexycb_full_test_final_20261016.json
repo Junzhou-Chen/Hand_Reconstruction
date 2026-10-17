@@ -1,0 +1,2477 @@
+{
+  "schema": "handloop.dexycb_full_test_final_summary.v1",
+  "queried_utc": "2026-10-17T00:57:25.337221+00:00",
+  "evaluation_root": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016",
+  "controller": {
+    "comparison": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/comparison.json",
+    "phase": "complete",
+    "utc": "2026-10-17T00:28:05.649238+00:00"
+  },
+  "coverage": {
+    "completed_shards": 1280,
+    "eval_only": true,
+    "expected_shards": 1280,
+    "frames": 78768,
+    "invalid_joint_gt_frames": 14496,
+    "phase": "complete",
+    "raw_frames": 93264,
+    "schema": "handloop.dexycb_full_test_shards.v1",
+    "selection_sha256": "9cb1ae439a1c32c8b5ff6f3fb03bcb290bde4580e207554120b94d815cd15d82",
+    "training_allowed": false,
+    "updated_utc": "2026-10-16T22:43:20.856408+00:00"
+  },
+  "selection_sha256": "9cb1ae439a1c32c8b5ff6f3fb03bcb290bde4580e207554120b94d815cd15d82",
+  "source_manifest_sha256": "f5ec373777bc91b1df526137d5174336940bbaa847926a1e7e8dde67b4de61d0",
+  "deployment": null,
+  "frozen_models": {
+    "frozen_utc": "2026-10-16T22:31:57.275000+00:00",
+    "models": {
+      "baseline": {
+        "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/model_assets/hawor_v1/weights/hawor.ckpt",
+        "kind": "official pretrained HaWoR raw",
+        "sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2"
+      },
+      "best": {
+        "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/models/best.pt",
+        "model_sha256": "9cd8d02dd5f3b2721b90fc5d02c0e96c2820557efc4aee7105f867ebfe7bd5a0",
+        "selection": "validation geometry score",
+        "sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+        "step": 4200,
+        "training_code_version": "a642e6eb55e320fa5cae89d5b8565dff9d43efe7"
+      },
+      "last": {
+        "checkpoint": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/models/last.pt",
+        "model_sha256": "49f35f25852f9b8c2df773827c77c6765e95e6c9fb97443da543e57b1c1ab3a9",
+        "selection": "user-requested safe stop",
+        "sha256": "6693a48808cef21a5e264627f683a5b9981cdc3f351daa017d62acb413ee3f6c",
+        "step": 4311,
+        "training_code_version": "a642e6eb55e320fa5cae89d5b8565dff9d43efe7"
+      }
+    },
+    "schema": "handloop.dexycb_frozen_three_models.v1",
+    "training_run": "/sciclone/data10/jchen57/Hand_Reconstruction/runs/visual_feedback_dex_hot_geometry_5k_20261016",
+    "training_status": {
+      "phase": "stopped",
+      "step": 4311,
+      "target_steps": 5000,
+      "utc": "2026-10-16T22:24:49.100427+00:00",
+      "validation": {
+        "candidate/finger_deg": 13.85824086644628,
+        "candidate/root_deg": 3.6352629640080907,
+        "candidate/wrist_mm": 8.011429088609713,
+        "clips": 8,
+        "current_nll": 471.203070563239,
+        "final/finger_deg": 13.148435867584503,
+        "final/root_deg": 3.5350432159664393,
+        "final/wrist_mm": 8.386450559169322,
+        "final_mpjpe21_m": 0.010654100004051413,
+        "geometry_score": 0.10761575629045297,
+        "metric_counts": {
+          "candidate/finger_deg": 3330,
+          "candidate/root_deg": 222,
+          "candidate/wrist_mm": 222,
+          "current_nll": 222,
+          "final/finger_deg": 3330,
+          "final/root_deg": 222,
+          "final/wrist_mm": 222,
+          "final_mpjpe21_m": 4480,
+          "geometry_score": 222,
+          "raw/finger_deg": 3330,
+          "raw/root_deg": 222,
+          "raw/wrist_mm": 222,
+          "raw_wrist_geometry_m": 222,
+          "wrist_degradation_over_1mm": 222,
+          "xyz_90pct_ellipsoid_coverage": 222,
+          "xyz_std_mm": 222
+        },
+        "raw/finger_deg": 15.572281244638804,
+        "raw/root_deg": 3.642695673951158,
+        "raw/wrist_mm": 8.087476940842363,
+        "raw_wrist_geometry_m": 0.008087476648323171,
+        "valid_states": 222,
+        "wrist_degradation_over_1mm": 0.3468468481892938,
+        "xyz_90pct_ellipsoid_coverage": 0.5990991033949293,
+        "xyz_std_mm": 4.0462301786955415
+      },
+      "wandb_url": "https://wandb.ai/black-ant/handloop-twm/runs/ff3108fd"
+    }
+  },
+  "comparison_sha256": "8ae9d1c7ed139780958321d58d5355f49276b69647227a55efc74cbd7444a144",
+  "comparison_complete_utc": "2026-10-17T00:28:05.519315+00:00",
+  "exact_coverage_matches": true,
+  "formal_branches": {
+    "baseline": "raw",
+    "best": "final",
+    "last": "final"
+  },
+  "models": {
+    "baseline": {
+      "phase": "complete",
+      "completed_utc": "2026-10-16T23:11:10.120838+00:00",
+      "completed_shards": 1280,
+      "completed_clips": 2992,
+      "identity": {
+        "checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+        "clip_length": 32,
+        "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+        "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+        "label": "baseline",
+        "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+        "precision": "bf16",
+        "smoke_shards": 0,
+        "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+        "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+      },
+      "report_sha256": "e270efcf6dda6a4b6a7cbd7028b193e7f0d066e9f0710d2f4c259fcbed742059",
+      "coverage_check": {
+        "all_expected_keys": true,
+        "manifest_or_count_mismatches": [],
+        "covered_frames": 78768,
+        "covered_clips": 2992
+      },
+      "wandb": {
+        "entity": "black-ant",
+        "finished_utc": "2026-10-16T23:11:10.868934+00:00",
+        "id": "85qboyf8",
+        "last_event": 1282,
+        "last_log_utc": "2026-10-16T23:11:10.154698+00:00",
+        "project": "handloop-twm",
+        "state": "finished",
+        "url": "https://wandb.ai/black-ant/handloop-twm/runs/85qboyf8"
+      },
+      "wandb_server_state": "finished",
+      "wandb_scalar_max_abs_difference": 1.7763568394002505e-15,
+      "metric_protocol": {
+        "auc_protocol": "21 per-joint PCK(error<=threshold); 100 inclusive thresholds 0--50mm; trapezoid /50 then equal-joint mean.",
+        "pa_protocol": "Primary pa permits reflections, matching FreiHAND scipy orthogonal_procrustes; pa_proper_mpjpe21_mm is det+1 diagnostic. Reflection fits counted explicitly.",
+        "reference_mesh_scope": "Source MANO fitted surface; not an independent scan."
+      },
+      "reference_fk_audit": {
+        "joint_observations": 1654128,
+        "max_error_mm": 0.22194474877323955,
+        "mean_error_mm": 0.009400437381619667,
+        "passed": true,
+        "states": 78768,
+        "sum_error_mm": 15549.526685183779,
+        "tolerance_mm": 1.0
+      },
+      "all": {
+        "source_frames": 78768,
+        "complete_reference_states": 78768,
+        "branches": {
+          "raw": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 10.143306493387767
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 65.52163677725466
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 65.6305110027568
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.866679886529157
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.866756221182388
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.00029199674994921795
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.661039585305524
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 16.498519585605816
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 15.87277501855091
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 68.05111956584116
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 23
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.1999721333841789,
+                "auc_percent": 19.99721333841789,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.0374348297108809,
+                  "20": 0.138705710803517,
+                  "30": 0.24716890107657932,
+                  "5": 0.006657284079587553,
+                  "50": 0.4610417089850362
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.8827266228685589,
+                "auc_percent": 88.27266228685589,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.8701678467446292,
+                  "20": 0.9817202779954151,
+                  "30": 0.9959374365224457,
+                  "5": 0.5471765183830998,
+                  "50": 0.9996656848804929
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.6915236495078562,
+                "auc_percent": 69.15236495078561,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.36394341913080486,
+                  "20": 0.7329094241799909,
+                  "30": 0.8970913980054748,
+                  "5": 0.1460818026174516,
+                  "50": 0.9750339756052736
+                },
+                "valid_states": 78768
+              }
+            }
+          }
+        }
+      },
+      "hand": {
+        "left": {
+          "source_frames": 39160,
+          "complete_reference_states": 39160,
+          "branches": {
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.115170869524086
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 68.94524275948581
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 69.06621600269942
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.750710714149834
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.750864256743443
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0005873340143003064
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.480499514537094
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 15.744147069514064
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 15.183978993253596
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 71.57542581223522
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 23
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.1900874349801827,
+                  "auc_percent": 19.008743498018273,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.0359355999805438,
+                    "20": 0.13215380125492485,
+                    "30": 0.23486064497300452,
+                    "5": 0.006449730045235663,
+                    "50": 0.43850138625419527
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.8850331529213041,
+                  "auc_percent": 88.50331529213041,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.8793010360426091,
+                    "20": 0.98398025195778,
+                    "30": 0.9965015321756895,
+                    "5": 0.5514130064691862,
+                    "50": 0.9997507174473467
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.700141628601792,
+                  "auc_percent": 70.0141628601792,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.3741439272338149,
+                    "20": 0.7450094848971254,
+                    "30": 0.9077423512816771,
+                    "5": 0.14781725764871834,
+                    "50": 0.9812965124762878
+                  },
+                  "valid_states": 39160
+                }
+              }
+            }
+          }
+        },
+        "right": {
+          "source_frames": 39608,
+          "complete_reference_states": 39608,
+          "branches": {
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.171123879534552
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 62.136754676058686
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 62.233666733979064
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.981337349424891
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.981337349424891
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 0.0
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 11.839537595083643
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 17.24435951011989
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 16.553780177878398
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 64.5666762056919
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 0
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.2097450274838681,
+                  "auc_percent": 20.97450274838681,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.03891710188417924,
+                    "20": 0.145183512710275,
+                    "30": 0.25933794038722335,
+                    "5": 0.006862490502159256,
+                    "50": 0.48332708159005877
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8804461816227116,
+                  "auc_percent": 88.04461816227116,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8611379615469699,
+                    "20": 0.9794858662511662,
+                    "30": 0.9953797212684307,
+                    "5": 0.5429879485625799,
+                    "50": 0.9995816141039329
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.6830031470508143,
+                  "auc_percent": 68.30031470508143,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.35385828740706543,
+                    "20": 0.7209462253897722,
+                    "30": 0.8865609160246607,
+                    "5": 0.14436597705129314,
+                    "50": 0.968842273326216
+                  },
+                  "valid_states": 39608
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "best": {
+      "phase": "complete",
+      "completed_utc": "2026-10-17T00:26:31.368261+00:00",
+      "completed_shards": 1280,
+      "completed_clips": 2992,
+      "identity": {
+        "checkpoint_sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+        "clip_length": 32,
+        "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+        "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+        "label": "best",
+        "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+        "precision": "bf16",
+        "smoke_shards": 0,
+        "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+        "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+      },
+      "report_sha256": "6f6674f31ce46388fe31f6c4182377bed3687e1ade88799338bad117f3f9589f",
+      "coverage_check": {
+        "all_expected_keys": true,
+        "manifest_or_count_mismatches": [],
+        "covered_frames": 78768,
+        "covered_clips": 2992
+      },
+      "wandb": {
+        "entity": "black-ant",
+        "finished_utc": "2026-10-17T00:26:32.126333+00:00",
+        "id": "wb42qkka",
+        "last_event": 1282,
+        "last_log_utc": "2026-10-17T00:26:31.440513+00:00",
+        "project": "handloop-twm",
+        "state": "finished",
+        "url": "https://wandb.ai/black-ant/handloop-twm/runs/wb42qkka"
+      },
+      "wandb_server_state": "finished",
+      "wandb_scalar_max_abs_difference": 1.7763568394002505e-15,
+      "metric_protocol": {
+        "auc_protocol": "21 per-joint PCK(error<=threshold); 100 inclusive thresholds 0--50mm; trapezoid /50 then equal-joint mean.",
+        "pa_protocol": "Primary pa permits reflections, matching FreiHAND scipy orthogonal_procrustes; pa_proper_mpjpe21_mm is det+1 diagnostic. Reflection fits counted explicitly.",
+        "reference_mesh_scope": "Source MANO fitted surface; not an independent scan."
+      },
+      "reference_fk_audit": {
+        "joint_observations": 1654128,
+        "max_error_mm": 0.22194474877323955,
+        "mean_error_mm": 0.009400437381619674,
+        "passed": true,
+        "states": 78768,
+        "sum_error_mm": 15549.52668518379,
+        "tolerance_mm": 1.0
+      },
+      "all": {
+        "source_frames": 78768,
+        "complete_reference_states": 78768,
+        "branches": {
+          "candidate": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 10.508686101436078
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.1277718894934
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.112886290612533
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.188822392061093
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.19027643751977
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.0007490351411740809
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 9.052672257766858
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 12.072466635518607
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.692455647249089
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.121672643922352
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 59
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.4968697993593891,
+                "auc_percent": 49.68697993593891,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.17733029124711025,
+                  "20": 0.4583726289622085,
+                  "30": 0.6530292698025788,
+                  "5": 0.0405343480069257,
+                  "50": 0.8539720021667006
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.8962707086437537,
+                "auc_percent": 89.62707086437537,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.9031550158149793,
+                  "20": 0.9879882330750703,
+                  "30": 0.9973266881402165,
+                  "5": 0.6194695936469246,
+                  "50": 0.9997992900186684
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.7751038216773032,
+                "auc_percent": 77.51038216773031,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.5509355986961105,
+                  "20": 0.8764358018242845,
+                  "30": 0.9562065329889827,
+                  "5": 0.2327377325092133,
+                  "50": 0.9843669897371908
+                },
+                "valid_states": 78768
+              }
+            }
+          },
+          "final": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 10.202787210382033
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.5582838504347
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.53667570376411
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.161451850250456
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.1628604114768235
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.0006601665651025798
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 9.167088599216852
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 12.223245365449143
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.832593984521955
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.509250480597665
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 52
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.48883423712669094,
+                "auc_percent": 48.88342371266909,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.1658245311124653,
+                  "20": 0.44449039010282154,
+                  "30": 0.6445535049282765,
+                  "5": 0.03682604973738429,
+                  "50": 0.8511100712883163
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.8968201116091121,
+                "auc_percent": 89.68201116091122,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.9048471460491571,
+                  "20": 0.988241538744281,
+                  "30": 0.9974191840051072,
+                  "5": 0.6216647079307043,
+                  "50": 0.9998023127593512
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.7723514056098354,
+                "auc_percent": 77.23514056098354,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.543544997726899,
+                  "20": 0.8724427613824323,
+                  "30": 0.9546879080699922,
+                  "5": 0.22911588462319724,
+                  "50": 0.983866423880135
+                },
+                "valid_states": 78768
+              }
+            }
+          },
+          "raw": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 11.340804252033157
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.60438035164736
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.58288510259663
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.4226838728920335
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.42430074964983
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.0006347755433678651
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 8.734496345773806
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.768065169617579
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.405160940156478
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.4581142496783
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 50
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.4948816176281645,
+                "auc_percent": 49.48816176281645,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.1812773860305853,
+                  "20": 0.4566605486395249,
+                  "30": 0.6486493185533405,
+                  "5": 0.0424713202364025,
+                  "50": 0.8494536093941945
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.8915936830508738,
+                "auc_percent": 89.15936830508738,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.8899976301713047,
+                  "20": 0.986287639166981,
+                  "30": 0.9969881411837536,
+                  "5": 0.5960161486898233,
+                  "50": 0.9997805490264356
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.7809116423464891,
+                "auc_percent": 78.09116423464891,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.5683979716200923,
+                  "20": 0.884500473965739,
+                  "30": 0.9585612479808092,
+                  "5": 0.24105571031987852,
+                  "50": 0.9847200458489307
+                },
+                "valid_states": 78768
+              }
+            }
+          }
+        }
+      },
+      "hand": {
+        "left": {
+          "source_frames": 39160,
+          "complete_reference_states": 39160,
+          "branches": {
+            "candidate": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.47058381722822
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.172809869558286
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.18323234372543
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.095917869658657
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.098979543373891
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0014044943820224719
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 8.859518481219478
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.498777945414068
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.19090676934436
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.51459950503948
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 55
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.47506116296974304,
+                  "auc_percent": 47.506116296974305,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.15605695802325015,
+                    "20": 0.4280534072668904,
+                    "30": 0.6243567294129092,
+                    "5": 0.032728975144705484,
+                    "50": 0.8393756992071599
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.898108351376993,
+                  "auc_percent": 89.8108351376993,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.9120263631499587,
+                    "20": 0.9902755484216158,
+                    "30": 0.9977807772751593,
+                    "5": 0.6235772654311981,
+                    "50": 0.9998565105306678
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.7817951144304567,
+                  "auc_percent": 78.17951144304567,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.5597718760640109,
+                    "20": 0.8877389464468116,
+                    "30": 0.9635621868767936,
+                    "5": 0.23407023687922565,
+                    "50": 0.9883019602120726
+                  },
+                  "valid_states": 39160
+                }
+              }
+            },
+            "final": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.221879414279885
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.91907820957905
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.92672157987984
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.084916198759862
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.087817195997833
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0012768130745658835
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 8.982575922882122
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.706835754739473
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.38534204766652
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 33.27584930505904
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 50
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.46198726650718464,
+                  "auc_percent": 46.19872665071846,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.1392844982732623,
+                    "20": 0.4062843523517681,
+                    "30": 0.6095578578724646,
+                    "5": 0.02802665499294713,
+                    "50": 0.8329928498467825
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.8983341489214829,
+                  "auc_percent": 89.83341489214828,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.912839875480325,
+                    "20": 0.9905333430614329,
+                    "30": 0.9978780582713167,
+                    "5": 0.6242789046159832,
+                    "50": 0.9998613745804757
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.7780013828149682,
+                  "auc_percent": 77.80013828149683,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.5501410574444282,
+                    "20": 0.8820638163334793,
+                    "30": 0.961263923342575,
+                    "5": 0.2295065421469916,
+                    "50": 0.9876781458242132
+                  },
+                  "valid_states": 39160
+                }
+              }
+            },
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 11.37416086829987
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.58102545412972
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.57433357245325
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.363185150852195
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.36643740183427
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0012768130745658835
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 8.650527474702743
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.277750741440514
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 10.98580274539602
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.569491639624864
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 50
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.47583422139091197,
+                  "auc_percent": 47.5834221390912,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.1665864098448368,
+                    "20": 0.4309061724792062,
+                    "30": 0.6223442288049029,
+                    "5": 0.03793715647648232,
+                    "50": 0.8341140133274965
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.892765874366998,
+                  "auc_percent": 89.2765874366998,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.8979060265577119,
+                    "20": 0.9884940901794834,
+                    "30": 0.9975351427598619,
+                    "5": 0.5932462668417725,
+                    "50": 0.999847998443504
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.786326873482134,
+                  "auc_percent": 78.63268734821341,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.5739250449924608,
+                    "20": 0.8939393939393939,
+                    "30": 0.9651879955250742,
+                    "5": 0.24060873583345493,
+                    "50": 0.9886059633250645
+                  },
+                  "valid_states": 39160
+                }
+              }
+            }
+          }
+        },
+        "right": {
+          "source_frames": 39608,
+          "complete_reference_states": 39608,
+          "branches": {
+            "candidate": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.546357416563824
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.10586501968582
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.065957603481024
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.280676085690644
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.280540686528866
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 0.00010098969905069682
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 9.243641301636664
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.63966642102898
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.18833158288704
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 27.755811810723337
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 4
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5184317616149569,
+                  "auc_percent": 51.843176161495684,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.1983630050687211,
+                    "20": 0.48834891460118685,
+                    "30": 0.6813774994950516,
+                    "5": 0.048251435496436505,
+                    "50": 0.8684032085870098
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8944538512050128,
+                  "auc_percent": 89.44538512050127,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8943840109261236,
+                    "20": 0.9857267892008349,
+                    "30": 0.9968777351376826,
+                    "5": 0.6154083831068279,
+                    "50": 0.9997427167190851
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7684882131079869,
+                  "auc_percent": 76.84882131079868,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5421992671033269,
+                    "20": 0.865260505333218,
+                    "30": 0.9489340777716864,
+                    "5": 0.23142029989131585,
+                    "50": 0.9804765271085206
+                  },
+                  "valid_states": 39608
+                }
+              }
+            },
+            "final": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.183910955467876
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.22419207341771
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.17366326918796
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.237121818751033
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.237054824680126
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.049484952534841e-05
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 9.349514281030325
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.73381394642751
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.274787123465046
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 27.773944230196037
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 2
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5153775457880688,
+                  "auc_percent": 51.53775457880688,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.1920643737195949,
+                    "20": 0.4822642852333824,
+                    "30": 0.6791533215992921,
+                    "5": 0.04552591588038973,
+                    "50": 0.8690223716228563
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8953231993400647,
+                  "auc_percent": 89.53231993400647,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.896944821152052,
+                    "20": 0.9859756566734955,
+                    "30": 0.996965499995191,
+                    "5": 0.619080080022314,
+                    "50": 0.9997439189774071
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7667653344284328,
+                  "auc_percent": 76.67653344284328,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5370235450269787,
+                    "20": 0.8629305287051197,
+                    "30": 0.9481862730953824,
+                    "5": 0.228729645766608,
+                    "50": 0.9800978157370805
+                  },
+                  "valid_states": 39608
+                }
+              }
+            },
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 11.307824927325914
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.650092778096294
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.613961600284377
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.481509614032207
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.481509614032207
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 0.0
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 8.817515457850728
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.252833726661983
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 11.81977583883404
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.370618324857368
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 0
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5137135716942828,
+                  "auc_percent": 51.37135716942828,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.1958021948427927,
+                    "20": 0.48212362100970463,
+                    "30": 0.6746568754748921,
+                    "5": 0.04695419876696386,
+                    "50": 0.8646197016475748
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8904347502105532,
+                  "auc_percent": 89.04347502105531,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8821786844408537,
+                    "20": 0.9841061449827355,
+                    "30": 0.9964473266583951,
+                    "5": 0.5987547008300391,
+                    "50": 0.9997138625193563
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7755576620578639,
+                  "auc_percent": 77.5557662057864,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5629334141250926,
+                    "20": 0.8751683161650845,
+                    "30": 0.9520094545594444,
+                    "5": 0.24149762914658895,
+                    "50": 0.9808780813880794
+                  },
+                  "valid_states": 39608
+                }
+              }
+            }
+          }
+        }
+      },
+      "relative_to_official_baseline": {
+        "error_reduction_percent": {
+          "finger_deg": -0.5864036252186589,
+          "mpjpe21_mm": 53.36153772482866,
+          "mpvpe778_mm": 53.47183004185139,
+          "pa_mpjpe21_mm": 12.02090534883313,
+          "pa_proper_mpjpe21_mm": 11.998040879286796,
+          "root_deg": 21.3870381610863,
+          "wrist_aligned_mpjpe21_mm": 25.913077824792527,
+          "wrist_aligned_mpvpe778_mm": 25.45352674190301,
+          "wrist_mm": 55.167158637148944
+        },
+        "auc_gain_percentage_points": {
+          "absolute": 28.886210374251203,
+          "pa": 1.4093488740553255,
+          "wrist_aligned": 8.082775610197928
+        }
+      }
+    },
+    "last": {
+      "phase": "complete",
+      "completed_utc": "2026-10-17T00:27:59.754040+00:00",
+      "completed_shards": 1280,
+      "completed_clips": 2992,
+      "identity": {
+        "checkpoint_sha256": "6693a48808cef21a5e264627f683a5b9981cdc3f351daa017d62acb413ee3f6c",
+        "clip_length": 32,
+        "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+        "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+        "label": "last",
+        "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+        "precision": "bf16",
+        "smoke_shards": 0,
+        "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+        "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+      },
+      "report_sha256": "eaefe481dc573df49606b9931854dd536e18203410e1ba09f43490f913d2d693",
+      "coverage_check": {
+        "all_expected_keys": true,
+        "manifest_or_count_mismatches": [],
+        "covered_frames": 78768,
+        "covered_clips": 2992
+      },
+      "wandb": {
+        "entity": "black-ant",
+        "finished_utc": "2026-10-17T00:28:00.513041+00:00",
+        "id": "f2fzfdu6",
+        "last_event": 1282,
+        "last_log_utc": "2026-10-17T00:27:59.827290+00:00",
+        "project": "handloop-twm",
+        "state": "finished",
+        "url": "https://wandb.ai/black-ant/handloop-twm/runs/f2fzfdu6"
+      },
+      "wandb_server_state": "finished",
+      "wandb_scalar_max_abs_difference": 1.7763568394002505e-15,
+      "metric_protocol": {
+        "auc_protocol": "21 per-joint PCK(error<=threshold); 100 inclusive thresholds 0--50mm; trapezoid /50 then equal-joint mean.",
+        "pa_protocol": "Primary pa permits reflections, matching FreiHAND scipy orthogonal_procrustes; pa_proper_mpjpe21_mm is det+1 diagnostic. Reflection fits counted explicitly.",
+        "reference_mesh_scope": "Source MANO fitted surface; not an independent scan."
+      },
+      "reference_fk_audit": {
+        "joint_observations": 1654128,
+        "max_error_mm": 0.22194474877323955,
+        "mean_error_mm": 0.009400437381619674,
+        "passed": true,
+        "states": 78768,
+        "sum_error_mm": 15549.52668518379,
+        "tolerance_mm": 1.0
+      },
+      "all": {
+        "source_frames": 78768,
+        "complete_reference_states": 78768,
+        "branches": {
+          "candidate": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 10.538942574414778
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 29.94726403188497
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 29.92993569810522
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.195976432880269
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.197463473076169
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.0008379037172455819
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 9.087686439776041
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 12.137739433254058
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.755053781695933
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 29.811776331917592
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 66
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.49944559577278447,
+                "auc_percent": 49.94455957727845,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.18139345927280115,
+                  "20": 0.46278159852200074,
+                  "30": 0.6556826315738564,
+                  "5": 0.04233469235754428,
+                  "50": 0.8548473878684116
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.8961271467809656,
+                "auc_percent": 89.61271467809657,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.9029700240851978,
+                  "20": 0.9880087877117127,
+                  "30": 0.997327292688353,
+                  "5": 0.6186594991439598,
+                  "50": 0.999799894566805
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.773825058864669,
+                "auc_percent": 77.3825058864669,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.5470223586082819,
+                  "20": 0.8745435661569116,
+                  "30": 0.9557603764642156,
+                  "5": 0.2305740547285337,
+                  "50": 0.9843289032045888
+                },
+                "valid_states": 78768
+              }
+            }
+          },
+          "final": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 10.227641823817445
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.365148372147036
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.339656109383576
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.166845529517548
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.1683148742318075
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.000710948608572009
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 9.204681556514746
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 12.297768725564527
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.904272335522293
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.160079638983145
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 56
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.49170283635421763,
+                "auc_percent": 49.17028363542176,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.16988165365679078,
+                  "20": 0.44923790661907664,
+                  "30": 0.6476312594914058,
+                  "5": 0.03855203466720834,
+                  "50": 0.8520797664993277
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.896707448873303,
+                "auc_percent": 89.6707448873303,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.9046307178162754,
+                  "20": 0.9882633024771964,
+                  "30": 0.9974252294864726,
+                  "5": 0.6210033322693286,
+                  "50": 0.9998029173074877
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.7709283237226056,
+                "auc_percent": 77.09283237226056,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.5396704487198088,
+                  "20": 0.8701914241219543,
+                  "30": 0.9539908640685606,
+                  "5": 0.22701507984871788,
+                  "50": 0.983733423290096
+                },
+                "valid_states": 78768
+              }
+            }
+          },
+          "raw": {
+            "metrics": {
+              "finger_deg": {
+                "count": 1181520,
+                "count_unit": "finger_rotations",
+                "mean": 11.347676632348296
+              },
+              "mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.54986329229622
+              },
+              "mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.52775906539082
+              },
+              "pa_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.420162603276156
+              },
+              "pa_proper_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 5.421783364670171
+              },
+              "pa_reflection_fraction": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 0.0006347755433678651
+              },
+              "root_deg": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 8.742184551999694
+              },
+              "wrist_aligned_mpjpe21_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.771805869154376
+              },
+              "wrist_aligned_mpvpe778_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 11.408401461235675
+              },
+              "wrist_mm": {
+                "count": 78768,
+                "count_unit": "states",
+                "mean": 30.364972455147825
+              }
+            },
+            "covered_counts": {
+              "geometry_states": 78768,
+              "missing_geometry_states": 0,
+              "pa_reflection_fits": 50
+            },
+            "pck_auc": {
+              "absolute": {
+                "auc": 0.49575614230677184,
+                "auc_percent": 49.57561423067718,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.18213705348074635,
+                  "20": 0.45822693286130217,
+                  "30": 0.6500373610748382,
+                  "5": 0.04272099861679386,
+                  "50": 0.8494064546395442
+                },
+                "valid_states": 78768
+              },
+              "pa": {
+                "auc": 0.891643826960199,
+                "auc_percent": 89.1643826960199,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.8901693218420823,
+                  "20": 0.9863341893734947,
+                  "30": 0.9969911639244363,
+                  "5": 0.5961080400065775,
+                  "50": 0.9997835717671184
+                },
+                "valid_states": 78768
+              },
+              "wrist_aligned": {
+                "auc": 0.780859962640635,
+                "auc_percent": 78.0859962640635,
+                "joint_observations": 1654128,
+                "pck_at_mm": {
+                  "10": 0.5682710165114188,
+                  "20": 0.8845845061567182,
+                  "30": 0.9586077981873229,
+                  "5": 0.24068270411963283,
+                  "50": 0.9847115821750191
+                },
+                "valid_states": 78768
+              }
+            }
+          }
+        }
+      },
+      "hand": {
+        "left": {
+          "source_frames": 39160,
+          "complete_reference_states": 39160,
+          "branches": {
+            "candidate": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.45762081009959
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 31.761274890135255
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 31.76762066488017
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.093711157191388
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.096852216090565
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0015832482124616956
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 8.942554202767525
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.63985807636255
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.326018157172358
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 31.978103028138886
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 62
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.48091948105993043,
+                  "auc_percent": 48.09194810599304,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.16276083467094704,
+                    "20": 0.4362918916289703,
+                    "30": 0.6309572450021889,
+                    "5": 0.035308137555328564,
+                    "50": 0.8433107155017268
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.8981531903007898,
+                  "auc_percent": 89.81531903007898,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.9119558344277445,
+                    "20": 0.9902852765212316,
+                    "30": 0.9977661851257357,
+                    "5": 0.6240673184493409,
+                    "50": 0.9998577265431198
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.7790130499017118,
+                  "auc_percent": 77.90130499017118,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.5505435575660295,
+                    "20": 0.8843146553820711,
+                    "30": 0.9628508195923926,
+                    "5": 0.2284729315628192,
+                    "50": 0.9882241354151466
+                  },
+                  "valid_states": 39160
+                }
+              }
+            },
+            "final": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.209687232457375
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.47645413677622
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.47816902798238
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.083361986304669
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.086390911144977
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0013789581205311543
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 9.072610916780066
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.872072834107785
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.54286366743319
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.685387901135314
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 54
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.468427121057356,
+                  "auc_percent": 46.8427121057356,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.1457792207792208,
+                    "20": 0.4152621722846442,
+                    "30": 0.6172187363198599,
+                    "5": 0.029928498467824312,
+                    "50": 0.8371978209056861
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.8983548825479366,
+                  "auc_percent": 89.83548825479366,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.9126708497495014,
+                    "20": 0.9905163188871055,
+                    "30": 0.9978719782090568,
+                    "5": 0.6246595165134491,
+                    "50": 0.9998613745804757
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.7747889849907216,
+                  "auc_percent": 77.47889849907216,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.5401527311639671,
+                    "20": 0.8779159978598181,
+                    "30": 0.9601743761856122,
+                    "5": 0.22319057347147234,
+                    "50": 0.9874325113089159
+                  },
+                  "valid_states": 39160
+                }
+              }
+            },
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 587400,
+                  "count_unit": "finger_rotations",
+                  "mean": 11.381631546294152
+                },
+                "mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.431154550521846
+                },
+                "mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.4228361403022
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.358465220636903
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 5.36172528533261
+                },
+                "pa_reflection_fraction": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 0.0012768130745658835
+                },
+                "root_deg": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 8.656369053965113
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 11.27693154088717
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 10.984912548613684
+                },
+                "wrist_mm": {
+                  "count": 39160,
+                  "count_unit": "states",
+                  "mean": 32.36760860005806
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39160,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 50
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.47796161060972103,
+                  "auc_percent": 47.7961610609721,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.1678741670314704,
+                    "20": 0.4334087261053553,
+                    "30": 0.6256286784376672,
+                    "5": 0.03826547983851355,
+                    "50": 0.8356206527554843
+                  },
+                  "valid_states": 39160
+                },
+                "pa": {
+                  "auc": 0.892860993563241,
+                  "auc_percent": 89.2860993563241,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.8981528770854613,
+                    "20": 0.9885585388394377,
+                    "30": 0.997530278710054,
+                    "5": 0.5935539179921202,
+                    "50": 0.999847998443504
+                  },
+                  "valid_states": 39160
+                },
+                "wrist_aligned": {
+                  "auc": 0.7863617693546191,
+                  "auc_percent": 78.6361769354619,
+                  "joint_observations": 822360,
+                  "pck_at_mm": {
+                    "10": 0.573915316892845,
+                    "20": 0.8941424680188725,
+                    "30": 0.9652804124714237,
+                    "5": 0.24047375845128655,
+                    "50": 0.9886035313001605
+                  },
+                  "valid_states": 39160
+                }
+              }
+            }
+          }
+        },
+        "right": {
+          "source_frames": 39608,
+          "complete_reference_states": 39608,
+          "branches": {
+            "candidate": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.619344520753467
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.153771171627504
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.113036503525556
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.297085001754651
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.296936731598594
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 0.00010098969905069682
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 9.231177108359496
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.629989330645317
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.179236650215982
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 27.66995262397915
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 4
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5177621644497022,
+                  "auc_percent": 51.776216444970224,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.19981533312173586,
+                    "20": 0.4889716844119995,
+                    "30": 0.6801283530984601,
+                    "5": 0.04928177087841802,
+                    "50": 0.8662535707072164
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8941240195279783,
+                  "auc_percent": 89.41240195279782,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8940858508622597,
+                    "20": 0.9857580479172077,
+                    "30": 0.9968933644958691,
+                    "5": 0.6133128468515259,
+                    "50": 0.9997427167190851
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7686957483968188,
+                  "auc_percent": 76.86957483968187,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5435409873907148,
+                    "20": 0.8648829962200998,
+                    "30": 0.9487501322484154,
+                    "5": 0.2326514124130767,
+                    "50": 0.9804777293668426
+                  },
+                  "valid_states": 39608
+                }
+              }
+            },
+            "final": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 10.245393333554373
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.277723262500476
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.22533158170403
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.2493848032050865
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.249312207964383
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.049484952534841e-05
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 9.335258365543478
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.718649636225098
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.261593165717404
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 27.663334750428334
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 2
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5147152836129811,
+                  "auc_percent": 51.47152836129811,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.19371146762077887,
+                    "20": 0.4828293466447375,
+                    "30": 0.6776997912879553,
+                    "5": 0.047078031374133175,
+                    "50": 0.8667933846938088
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8950786490677421,
+                  "auc_percent": 89.50786490677422,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8966815265795269,
+                    "20": 0.986035769589597,
+                    "30": 0.9969835338700215,
+                    "5": 0.6173885025632148,
+                    "50": 0.9997451212357292
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7671113298006854,
+                  "auc_percent": 76.71113298006854,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5391936212982467,
+                    "20": 0.8625542218503236,
+                    "30": 0.9478772927066201,
+                    "5": 0.23079632782218118,
+                    "50": 0.980076175087284
+                  },
+                  "valid_states": 39608
+                }
+              }
+            },
+            "raw": {
+              "metrics": {
+                "finger_deg": {
+                  "count": 594120,
+                  "count_unit": "finger_rotations",
+                  "mean": 11.314105777214996
+                },
+                "mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.689851030326
+                },
+                "mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.654116915988467
+                },
+                "pa_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.481162136303668
+                },
+                "pa_proper_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 5.481162136303668
+                },
+                "pa_reflection_fraction": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 0.0
+                },
+                "root_deg": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 8.827029404126392
+                },
+                "wrist_aligned_mpjpe21_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 12.261082749959863
+                },
+                "wrist_aligned_mpvpe778_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 11.827100355859885
+                },
+                "wrist_mm": {
+                  "count": 39608,
+                  "count_unit": "states",
+                  "mean": 28.384987819854828
+                }
+              },
+              "covered_counts": {
+                "geometry_states": 39608,
+                "missing_geometry_states": 0,
+                "pa_reflection_fits": 0
+              },
+              "pck_auc": {
+                "absolute": {
+                  "auc": 0.5133494027909297,
+                  "auc_percent": 51.33494027909297,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.19623861461369035,
+                    "20": 0.48276442469534775,
+                    "30": 0.674169960854469,
+                    "5": 0.047126121707014454,
+                    "50": 0.8630363274374585
+                  },
+                  "valid_states": 39608
+                },
+                "pa": {
+                  "auc": 0.8904404275415183,
+                  "auc_percent": 89.04404275415183,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.8822760673649384,
+                    "20": 0.9841349991824644,
+                    "30": 0.9964581469832934,
+                    "5": 0.5986332727395139,
+                    "50": 0.9997198738109665
+                  },
+                  "valid_states": 39608
+                },
+                "wrist_aligned": {
+                  "auc": 0.7754203860167301,
+                  "auc_percent": 77.54203860167301,
+                  "joint_observations": 831768,
+                  "pck_at_mm": {
+                    "10": 0.5626905579440421,
+                    "20": 0.8751346529320676,
+                    "30": 0.9520106568177665,
+                    "5": 0.2408892864356407,
+                    "50": 0.980863654288215
+                  },
+                  "valid_states": 39608
+                }
+              }
+            }
+          }
+        }
+      },
+      "relative_to_official_baseline": {
+        "error_reduction_percent": {
+          "finger_deg": -0.8314382542285822,
+          "mpjpe21_mm": 53.65630367969064,
+          "mpvpe778_mm": 53.77202516660405,
+          "pa_mpjpe21_mm": 11.928967841223812,
+          "pa_proper_mpjpe21_mm": 11.905068501547795,
+          "root_deg": 21.064657321686127,
+          "wrist_aligned_mpjpe21_mm": 25.46138056960121,
+          "wrist_aligned_mpvpe778_mm": 25.001946278395106,
+          "wrist_mm": 55.68025944113599
+        },
+        "auc_gain_percentage_points": {
+          "absolute": 29.17307029700387,
+          "pa": 1.3980826004744102,
+          "wrist_aligned": 7.940467421474949
+        }
+      }
+    }
+  },
+  "paper_reference": {
+    "title": "HaWoR: World-Space Hand Motion Reconstruction from Egocentric Videos",
+    "url": "https://arxiv.org/html/2501.02973v1",
+    "table": "Table 1, DexYCB",
+    "all": {
+      "pa_mpjpe_mm": 4.76,
+      "pa_auc_percent": 90.5
+    },
+    "occlusion_50_75": {
+      "pa_mpjpe_mm": 5.03,
+      "pa_auc_percent": 89.9
+    },
+    "occlusion_75_100": {
+      "pa_mpjpe_mm": 5.07,
+      "pa_auc_percent": 89.9
+    },
+    "our_occlusion_groups": "not computed",
+    "comparison_scope": "Metric definitions aligned; original paper frame/input/temporal protocol not fully reproduced."
+  }
+}

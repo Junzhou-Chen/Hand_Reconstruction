@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16完整DexYCB测试最终汇总：** 新增[双指标结果表、分支／左右手诊断与协议边界](../docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)、[约90KB机器可读报告](../reports/dexycb_full_test_final_20261016.json)，完整测试协议链接最终结果；核对1280视角／78768状态、三方逐帧覆盖及W&B finished终值。best相对官方绝对MPJPE下降53.36%、PA下降12.02%，finger稍退化且不能独归因TWM。官方全文与fork evaluator复核PA／AUC；遮挡组未测。只读取数／更新文档和新增事实记忆，无新实验。
+
 ## 2026-10-16 复核HaWoR状态如何进入视觉插件及改进候选
 
 - 在[视觉反馈框架记录](../docs/VISUAL_FEEDBACK_FRAMEWORK_2026-10-15.md)补现行两轮职责与源码事实，保留D35单轮冻结历史。明确F／Z／β分别使用，raw是当前微调主干的固定帧内观测，Z每轮仍独立传入TWM。
