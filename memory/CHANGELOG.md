@@ -1,6 +1,6 @@
 # HandLoop 项目记忆变更记录
 
-**2026-10-17仅讨论下一阶段联合微调：** 已按用户要求只读审查现联合trainer／初始化／回放／两轮自身历史／验证覆盖，并回查HaWoR、StableHand、DIP与InfiniHand官方训练协议。用户选择官方HaWoR＋九库20k last重开；数据范围、冻结与损失预算待协商。记下20k执行边界及已有精确stop-after-updates恢复路径；未写控制器、改配置、暂停当前训练或启动新任务。
+**2026-10-17仅讨论下一阶段联合微调：** 已按用户要求只读审查现联合trainer／初始化／回放／两轮自身历史／验证覆盖，并回查HaWoR、StableHand、DIP与InfiniHand官方训练协议。用户选择官方HaWoR＋九库20k last重开；用户随后确定视觉四库DexYCB／HOT3D／ARCTIC／HO-3D全部验收后一起训练，主目标当前重建、九库回放保留并监测future60；冻结／损失系数／预算仍待协商。记下20k执行边界及已有精确stop-after-updates恢复路径；未写控制器、改配置、暂停当前训练或启动新任务。
 
 **2026-10-17核查九库30k预训练效果（未改训）：** 从实际run提取0–14k固定验证，远程CPU生成曲线与逐库摘要，核对best规则、九源腕改善、时域分母、双rank／GPU与W&B运行状态。新增[报告](../docs/TWM_NINE_SOURCE_30K_PROGRESS_2026-10-17.md)及[约225KB小型结果](../reports/twm_nine_source_30k_progress_20261017.json)，更新入口／数据／状态／来源记忆。明确clean/reanchor误改、missing部分finger退化、2s近平台及不确定性失配；模型、数据、原始日志均不入Git。
 
