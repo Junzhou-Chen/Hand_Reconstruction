@@ -26,6 +26,9 @@ The pinned source EasyMoCap LBS is required for actual source-vertex versus
 exported-state FK checks. --sample-frames 0 checks every retained frame;
 positive values check evenly spaced frames and are NOT full-FK certification.
 All numerical execution belongs in the authorized remote Pod.
+The official text loader admits only paths that exist. Full conversion here
+requires a complete archive-membership/gzip-CRC audit before excluding a
+source-unreleased MANO file; an extraction omission remains a fatal error.
 """
 from __future__ import annotations
 
@@ -33,6 +36,7 @@ import argparse
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import hashlib
+import gzip
 import importlib.util
 import json
 import math
@@ -41,6 +45,8 @@ from pathlib import Path
 import re
 import shutil
 import sys
+import tarfile
+import time
 import tempfile
 import types
 
@@ -147,6 +153,137 @@ def make_splits(recordings: list[dict], split_file: Path | None, seed: int) -> t
                      "subject_assignments": by_subject,
                      "official_equivalence": False,
                      "official_loader_note": "official random_state=42 split operates on annotation rows; not reused"}
+
+
+def audit_missing_source_params(root: Path, missing: list[str], cache_path: Path) -> dict:
+    """Prove a missing extracted label is also absent from the complete source TAR.
+
+    Never drop an extraction omission. Verify the gzip stream through EOF,
+    bind the cache to archive size/mtime plus the verified download receipt,
+    and retain all source param identities for later reproducible coverage.
+    """
+    candidates = [root.parent / "hand_poses.tar.gz", root / "hand_poses.tar.gz"]
+    archives = [path for path in candidates if path.is_file()]
+    if len(archives) != 1:
+        raise ValueError("Missing params require the complete official hand_poses.tar.gz for source-absence audit")
+    archive_path = archives[0]
+    receipt_path = archive_path.with_name(archive_path.name + ".receipt.json")
+    receipt = read_json(receipt_path)
+    stat = archive_path.stat()
+    identity = {"path": str(archive_path.resolve()), "bytes": stat.st_size, "mtime_ns": stat.st_mtime_ns,
+                "download_receipt_sha256": sha256(receipt_path), "download_local_sha256": receipt.get("local_sha256")}
+    if (receipt.get("url") != "https://g-ad09a0.56197.5898.data.globus.org/hand_poses.tar.gz"
+            or receipt.get("bytes") != stat.st_size or stat.st_size != 11304232382
+            or not re.fullmatch(r"[0-9a-f]{64}", str(receipt.get("local_sha256", "")))):
+        raise ValueError("Missing-param audit requires the byte-complete official archive and verified receipt")
+    missing = sorted(set(missing))
+    if cache_path.is_file():
+        previous = read_json(cache_path)
+        if (previous.get("archive_identity") == identity and previous.get("requested_missing") == missing
+                and previous.get("phase") == "complete" and previous.get("gzip_eof_crc_verified") is True):
+            if previous.get("missing_extracted_but_present_in_archive"):
+                raise ValueError("Source params exist in archive but were not extracted; repair extraction, do not exclude")
+            return previous
+    started = time.monotonic()
+    params, members, files = set(), 0, 0
+    with gzip.open(archive_path, "rb") as compressed:
+        with tarfile.open(fileobj=compressed, mode="r|") as archive:
+            for member in archive:
+                members += 1
+                if member.isfile():
+                    files += 1
+                    parts = Path(member.name).parts
+                    if len(parts) >= 3 and parts[-2] == "params" and parts[-1].endswith(".json"):
+                        session, filename = parts[-3], parts[-1]
+                        if re.fullmatch(r"p\d+-[A-Za-z0-9_.-]+", session) and filename[:-5].isdigit():
+                            params.add(session + "/" + str(int(filename[:-5])).zfill(3))
+                if members % 10000 == 0:
+                    print(json.dumps({"phase": "auditing_missing_source_params", "members": members,
+                                      "source_params": len(params), "elapsed_s": time.monotonic()-started}), flush=True)
+        while compressed.read(8 * 1024 * 1024):
+            pass  # Verify complete gzip EOF/CRC, including buffered bytes after TAR end-of-archive.
+    final = archive_path.stat()
+    if (final.st_size, final.st_mtime_ns) != (stat.st_size, stat.st_mtime_ns):
+        raise ValueError("Source archive changed during absence audit")
+    found = sorted(set(missing) & params)
+    result = {"utc": now(), "phase": "complete", "archive_identity": identity,
+              "requested_missing": missing, "missing_extracted_but_present_in_archive": found,
+              "source_absent_recordings": sorted(set(missing)-params), "gzip_eof_crc_verified": True,
+              "tar_members": members, "regular_files": files, "source_params_count": len(params),
+              "source_param_recordings": sorted(params), "elapsed_s": time.monotonic()-started,
+              "sha256_note": "previous verified download local SHA256 retained; current pass verifies TAR membership and complete gzip CRC, no second compressed-byte hash",
+              "policy": "exclude only annotations whose MANO params were not released in source; never synthesize GT or ignore extraction omissions"}
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    save_json(cache_path, result)
+    if found:
+        raise ValueError(f"Missing extracted params are PRESENT in archive, repair extraction: {found}")
+    print(json.dumps({"phase": "source_absence_audited", "excluded_recordings": result["source_absent_recordings"],
+                      "source_params_count": len(params), "elapsed_s": result["elapsed_s"]}), flush=True)
+    return result
+
+
+def annotation_mask(n: int, ranges: list) -> tuple[np.ndarray, list]:
+    """Pinned official inclusive Python slice semantics, with explicit receipts."""
+    mask = np.zeros(n, dtype=np.bool_)
+    slices = []
+    for begin, end in ranges:
+        source_slice = slice(begin, None if end == -1 else end + 1)
+        effective_begin, effective_stop, step = source_slice.indices(n)
+        mask[source_slice] = True
+        slices.append({"source_begin": begin, "source_end": end,
+                       "source_end_semantics": "inclusive; -1 means through end",
+                       "effective_begin": effective_begin, "effective_stop_exclusive": effective_stop,
+                       "step": step, "source_rows": n, "end_saturated_by_native_slice": end >= n,
+                       "start_saturated_by_native_slice": begin > n})
+    return mask, slices
+
+
+def inspect_source_schema(job: dict) -> dict:
+    """CPU-only complete structure preflight; no Torch, MANO FK, or output GT."""
+    root = Path(job["root"])
+    session, clip = job["session"], job["clip"]
+    base = root/session
+    if not (base/"optim_params.txt").is_file():
+        raise FileNotFoundError(f"Missing original camera provenance for {job['recording']}")
+    path = base/"params"/(clip+".json")
+    value = read_json(path)
+    selected = {side: chosen_ids(base/"keypoints_3d"/clip/f"chosen_frames_{side}.json")
+                for side in ("left", "right")}
+    union = np.union1d(selected["left"], selected["right"])
+    official_order = np.asarray(list(set(selected["left"].tolist()) | set(selected["right"].tolist())), dtype=np.int64)
+    result = {"recording": job["recording"], "split": job["split"], "source_params_bytes": path.stat().st_size,
+              "hands": {}, "retained_frames": 0}
+    if not np.array_equal(official_order, union):
+        return {**result, "rejected": "official_set_union_order_not_chronological"}
+    if not len(union):
+        return {**result, "rejected": "no_chosen_frames"}
+    for side in ("left", "right"):
+        params = value[side]
+        pose = rows(params["poses"], 48)
+        n = len(pose)
+        if n != len(union):
+            raise ValueError(f"{job['recording']}/{side}: params rows {n} differ from original union {len(union)}")
+        rh, th, beta = (rows(params[key], width, n) for key, width in (("Rh",3),("Th",3),("shapes",10)))
+        in_annotation, slices = annotation_mask(n, job["annotation_ranges"])
+        finite = np.isfinite(np.concatenate((pose,rh,th,beta),axis=-1)).all(axis=-1)
+        retained = int(np.count_nonzero(in_annotation & finite & np.isin(union,selected[side])))
+        raw_path = base/"keypoints_3d"/clip/(side+".jsonl")
+        raw_rows = 0
+        with raw_path.open("rb") as stream:
+            for raw_rows, line in enumerate(stream, 1):
+                if not line.strip():
+                    raise ValueError(f"{job['recording']}/{side}: blank dense JSONL row {raw_rows-1}")
+                shape = np.asarray(json.loads(line)).shape
+                if shape != (21,4):
+                    raise ValueError(f"{job['recording']}/{side}: JSONL row {raw_rows-1} shape {shape}, expected (21,4)")
+        if raw_rows <= int(union[-1]):
+            raise ValueError(f"{job['recording']}/{side}: dense JSONL {raw_rows} rows do not cover source ID {union[-1]}")
+        result["hands"][side] = {"pose_rows": n, "shape_rows": int(np.asarray(params["shapes"]).size//10),
+                                  "chosen_frames": len(selected[side]), "dense_jsonl_rows": raw_rows,
+                                  "nonfinite_params": int((~finite).sum()), "retained_frames": retained,
+                                  "annotation_end_saturations": sum(item["end_saturated_by_native_slice"] for item in slices)}
+        result["retained_frames"] += retained
+    return result
 
 
 def source_runtime(mano_models: str, easy_root: str, asset_version: str | None):
@@ -326,23 +463,7 @@ def convert(job: dict) -> dict:
             raise ValueError(f"Cannot prove pose-row/source-frame mapping {job['recording']}/{side}: "
                              f"{n} pose rows vs {len(union)} sorted chosen-frame union")
         rh, th, beta = (rows(params[key], width, n) for key, width in (("Rh", 3), ("Th", 3), ("shapes", 10)))
-        in_annotation = np.zeros(n, dtype=np.bool_)
-        annotation_slices = []
-        for begin, end in job["annotation_ranges"]:
-            # Match fixed official dataset_hands.py lines 66-70 / 257-261:
-            # np.array(motion)[start:] if end==-1, else [start:end+1].
-            # In particular, an annotation end==N is not evidence of exclusive
-            # semantics: Python's inclusive stop N+1 naturally saturates at N.
-            source_slice = slice(begin, None if end == -1 else end + 1)
-            effective_begin, effective_stop, step = source_slice.indices(n)
-            in_annotation[source_slice] = True
-            annotation_slices.append({"source_begin": begin, "source_end": end,
-                                      "source_end_semantics": "inclusive; -1 means through end",
-                                      "effective_begin": effective_begin,
-                                      "effective_stop_exclusive": effective_stop, "step": step,
-                                      "source_rows": n,
-                                      "end_saturated_by_native_slice": end >= n,
-                                      "start_saturated_by_native_slice": begin > n})
+        in_annotation, annotation_slices = annotation_mask(n, job["annotation_ranges"])
         finite = np.isfinite(np.concatenate((pose, rh, th, beta), axis=-1)).all(axis=-1)
         own = np.isin(union, selected[side])
         indices = np.flatnonzero(in_annotation & finite & own)
@@ -455,6 +576,8 @@ def main():
     parser.add_argument("--mano-models", type=Path)
     parser.add_argument("--mano-asset-version", default=None)
     parser.add_argument("--source-easymocap", type=Path)
+    parser.add_argument("--missing-params-audit", type=Path, help="reusable complete official archive membership/CRC audit cache")
+    parser.add_argument("--schema-only", action="store_true", help="parse all source params/chosen/denseJSONL shapes without MANO FK or writing states")
     parser.add_argument("--split-json", type=Path, help="train/val/test original session/clip lists; session-disjoint required")
     parser.add_argument("--seed", type=int, default=20261017)
     parser.add_argument("--fps", type=float, default=30.0, help="nominal original video frames per second, not pose-row rate")
@@ -466,12 +589,14 @@ def main():
     parser.add_argument("--fk-tolerance-m", type=float, default=1e-5)
     parser.add_argument("--index-only", action="store_true")
     args = parser.parse_args()
+    if args.index_only and args.schema_only:
+        parser.error("Choose only one of --index-only or --schema-only")
     if not Path("/sciclone/home/jchen57").is_dir():
         parser.error("Run numerical preparation only inside the authorized remote ds Pod")
     if (min(args.max_sequences, args.max_frames, args.sample_frames) < 0 or args.workers < 1 or
             not np.isfinite(args.fps) or args.fps <= 0 or not np.isfinite(args.fk_tolerance_m) or args.fk_tolerance_m <= 0):
         parser.error("Invalid positive rate/worker/tolerance or nonnegative limits")
-    if not args.index_only and (args.mano_models is None or args.source_easymocap is None):
+    if not (args.index_only or args.schema_only) and (args.mano_models is None or args.source_easymocap is None):
         parser.error("--mano-models and --source-easymocap are required for source-FK checked conversion")
     root = resolve_root(args.root)
     annotations = annotation_index(args.annotations)
@@ -493,11 +618,17 @@ def main():
                        "subject": identity.split("/", 1)[0].split("-", 1)[0]}
                       for identity in sorted(annotations)]
     assignments, split_meta = make_splits(all_identities, args.split_json, args.seed)
+    missing_audit = None
+    missing_audit_path = args.missing_params_audit or args.output/"missing_source_params_audit.json"
     if missing and not (args.max_sequences or args.index_only):
-        raise ValueError(f"Full conversion requires all annotated params; {len(missing)} absent. "
-                         "A positive --max-sequences explicitly permits an incomplete smoke tree.")
+        missing_audit = audit_missing_source_params(root, missing, missing_audit_path)
+    excluded_source = [{"recording": recording, "split": assignments[recording],
+                        "subject": recording.split("/",1)[0].split("-",1)[0],
+                        "annotation_ranges": annotations[recording],
+                        "reason": "MANO params absent from complete official release archive" if missing_audit else "not available in bounded/index-only source tree"}
+                       for recording in missing]
     args.output.mkdir(parents=True, exist_ok=True)
-    if (args.output / "manifest.json").exists() or (args.output / "index_manifest.json").exists():
+    if any((args.output/name).exists() for name in ("manifest.json","index_manifest.json","schema_manifest.json")):
         parser.error("Output already has a published manifest; choose a fresh directory")
     all_split_counts = Counter(assignments[entry["recording"]] for entry in recordings)
     save_json(args.output / "source_split_assignment.json", {
@@ -529,6 +660,13 @@ def main():
                 "annotation_slice_source": f"https://github.com/brown-ivl/GigaHands/blob/{GIGA_REVISION}/dataset/dataset_hands.py#L66-L70",
                 "split_provenance": split_meta, "source_recording_counts": dict(all_split_counts),
                 "missing_annotated_params": missing, "source_params_complete": not missing,
+                "missing_params_policy": "official loader gates on os.path.exists; here source absence must be proved by complete archive membership/CRC, while extraction omissions remain fatal",
+                "missing_params_source": f"https://github.com/brown-ivl/GigaHands/blob/{GIGA_REVISION}/dataset/dataset_hands.py#L29-L37",
+                "excluded_source_recordings": excluded_source,
+                "source_missing_params_audit": ({"path": str(missing_audit_path), "sha256": sha256(missing_audit_path),
+                                                 "source_absent_recordings": missing_audit["source_absent_recordings"],
+                                                 "gzip_eof_crc_verified": True,
+                                                 "source_params_count": missing_audit["source_params_count"]} if missing_audit else None),
                 "annotation_sha256": sha256(args.annotations),
                 "bounded_limits": {"max_sequences_per_split": args.max_sequences, "max_frames_per_hand": args.max_frames,
                                    "fk_sample_frames": args.sample_frames}, "sequences": [], "recordings_summary": []}
@@ -537,6 +675,41 @@ def main():
         metadata["indexed_recordings"] = selected
         save_json(args.output / "index_manifest.json", metadata)
         print(json.dumps({"phase": "indexed", "recordings": dict(all_split_counts), "missing": len(missing)}), flush=True)
+        return
+    if args.schema_only:
+        started = time.monotonic()
+        results, errors = [], []
+        schema_jobs = [{**entry, "root": str(root)} for entry in selected]
+        with ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")) as pool:
+            futures = {pool.submit(inspect_source_schema, job): job for job in schema_jobs}
+            for done, future in enumerate(as_completed(futures),1):
+                job = futures[future]
+                try:
+                    results.append(future.result())
+                except Exception as exc:
+                    errors.append({"recording": job["recording"], "split": job["split"],
+                                   "error_type": type(exc).__name__, "error": str(exc)})
+                if done % 100 == 0 or done == len(schema_jobs):
+                    status = {"phase": "schema_checking", "done": done, "total": len(schema_jobs),
+                              "errors": len(errors), "elapsed_s": time.monotonic()-started, "utc": now()}
+                    save_json(status_path,status)
+                    print(json.dumps(status),flush=True)
+        metadata.update(phase="failed" if errors else "schema_complete", completed_utc=now(),
+                        schema_results=sorted(results,key=lambda item:item["recording"]),
+                        schema_errors=sorted(errors,key=lambda item:item["recording"]),
+                        schema_elapsed_s=time.monotonic()-started)
+        metadata["frames_by_split"] = {split: sum(entry["retained_frames"] for entry in results
+                                                     if entry["split"]==split and not entry.get("rejected"))
+                                       for split in ("train","val")}
+        metadata["known_source_rejections"] = dict(Counter(entry["rejected"] for entry in results if entry.get("rejected")))
+        save_json(args.output/"schema_manifest.json",metadata)
+        summary = {"phase": metadata["phase"], "recordings": len(results), "errors": len(errors),
+                   "frames": metadata["frames_by_split"], "known_source_rejections": metadata["known_source_rejections"],
+                   "elapsed_s": metadata["schema_elapsed_s"], "report": str(args.output/"schema_manifest.json")}
+        save_json(status_path,summary)
+        print(json.dumps(summary),flush=True)
+        if errors:
+            raise ValueError(f"Source schema audit found {len(errors)} unknown exceptions; see schema_manifest.json")
         return
     decoder, _ = source_runtime(str(args.mano_models), str(args.source_easymocap), args.mano_asset_version)
     metadata["decoder_provenance"] = decoder.provenance()
