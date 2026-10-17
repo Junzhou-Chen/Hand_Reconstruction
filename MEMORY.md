@@ -1,5 +1,7 @@
 # HandLoop 项目记忆入口
 
+**2026-10-16已交付真实手部重建叠加视频：** 按用户要求把预测mesh／骨架投影回原视频，已在Pod复用完整Dex测试的官方baseline与best4200.final，固定最长连续片段并按ID破同分选左右各74帧，未按误差挑样；原速148帧4.933秒、0.5×慢放295帧9.833秒，三列原RGB／HaWoR／HandLoop＋同一逐帧手部放大。自身β＋真实K投影，无PA／GT腕移位／尺度修正，GT crop标定受控例，不冒称任意野外detector部署。v1固定并集zoom不清晰，v2仅改共同观看裁切，原RGB及单独overlay视频SHA相同。四H264完整解码／本机SHA及左右手中帧视觉验收通过；本机outputs/demos/dexycb_overlay_20261016/v2，媒体不进Git。[效果与复现](docs/HAND_OVERLAY_DEMO_2026-10-16.md)、[小型验收](reports/hand_overlay_demo_20261016.json)。
+
 **2026-10-16精度报告口径广泛文献复核：** 已核11篇手部论文及Ego-Exo4D官方协议，包含2026 Hand3R／ScaleHP／InfiniHand。单图主表普遍突出PA；时序恢复并报PA／非PA或腕对齐及GT动态误差；world方法并报局部与轨迹。助手修正前轮“PA仅辅助”的笼统建议，推荐本项目局部几何与绝对位置并列，未改协议或成为用户新决定。ScaleHP明确CS无对齐／R腕平移／P为PA；InfiniHand无对齐W不同于HaWoR／StableHand开头对齐W，StableHand16joint不同本项目21joint。当前速度／加速度GT误差和PA-MPVPE尚未测。[全文、主表与边界核验](docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)。
 
 **2026-10-16完整DexYCB三模型测试已完成：** 纽约20:28（UTC10-17 00:28）controller complete；每模型1280视角／2992 clips／78768有效状态，逐帧键／hash／manifest／分母三方一致，W&B均finished且终值吻合。官方baseline→best4200 final→last4311 final：绝对MPJPE65.522→30.558→30.365mm；PA-MPJPE5.867→5.161→5.167mm；PA-AUC88.273→89.682→89.671%。best绝对误差下降53.36%、PA下降12.02%，但finger10.143→10.203→10.228°略退化；联合微调raw已约30.6mm，不能将全部收益单独归因TWM。论文DexYCB整体4.76mm／90.5%仅参考，未做物体遮挡分组或完全复现作者输入流程。此条替代完整测试运行中快照，旧test1015仍是不同模型／子集历史。[完整结果](docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)、[最终小型JSON](reports/dexycb_full_test_final_20261016.json)。

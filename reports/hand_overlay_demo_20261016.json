@@ -1,0 +1,304 @@
+{
+  "schema": "handloop.hand_overlay_demo_summary.v1",
+  "recorded_utc": "2026-10-17T02:56:18.045962+00:00",
+  "remote_output": "/sciclone/data10/jchen57/Hand_Reconstruction/demos/dexycb_overlay_20261016/render_v2",
+  "local_output": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_overlay_20261016/v2",
+  "selection": {
+    "schema": "handloop.qualitative_video_selection.v1",
+    "created_utc": "2026-10-17T02:48:36.236894+00:00",
+    "selection_rule": "Per handedness, longest full contiguous GT-valid recording, tie broken lexicographic recording id; no prediction/error used for choice.",
+    "source_manifest_sha256": "f5ec373777bc91b1df526137d5174336940bbaa847926a1e7e8dde67b4de61d0",
+    "nominal_fps": 30,
+    "fps_source": "DexYCB nominal frame_ids/30, not measured camera timing",
+    "entries": [
+      {
+        "key": "20200820-subject-03++20200820_135810++836212060125",
+        "manifest": "shards/20200820-subject-03++20200820_135810++836212060125/source_manifest.json",
+        "handedness": 1,
+        "frames": 74,
+        "frame_id_minmax": [
+          0,
+          73
+        ]
+      },
+      {
+        "key": "20200928-subject-07++20200928_153732++836212060125",
+        "manifest": "shards/20200928-subject-07++20200928_153732++836212060125/source_manifest.json",
+        "handedness": 0,
+        "frames": 74,
+        "frame_id_minmax": [
+          0,
+          73
+        ]
+      }
+    ],
+    "encoder": "/sciclone/data10/jchen57/Hand_Reconstruction/runtime/demo_video_tools_v1/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+  },
+  "render_script_sha256": "53e66fd7b15f724efc1f7be1d50385992a7deda2fc161328474f2765c50cc7d3",
+  "render_started_utc": "2026-10-17T02:53:15.388809+00:00",
+  "render_finished_utc": "2026-10-17T02:53:53.393016+00:00",
+  "elapsed_seconds": 38.00424593035132,
+  "source_frames": 148,
+  "source_duration_seconds": 4.933333333333334,
+  "rendering": {
+    "alpha": 0.5,
+    "color_bgr": [
+      235,
+      210,
+      40
+    ],
+    "double_sided": true,
+    "self_depth_buffer": true,
+    "object_occlusion_available": false,
+    "camera": "original full-resolution calibrated K and inverse(camera_to_world)",
+    "predicted_shape": "each model own saved beta; left_shapedirs_fix=True",
+    "alignment": "none: no PA, GT wrist translation, rotation or scale correction",
+    "zoom_mode": "per-frame",
+    "zoom": "same per-frame crop in all three columns derived only from current common input GT bbox",
+    "protocol": "saved GT-crop full-test predictions, bidirectional16 blocks / reset32 feedback; not causal detector demo"
+  },
+  "native_image_dimensions": [
+    640,
+    480
+  ],
+  "source_rgb_identity_sha256": "2738e19decb77f57320156f6d869498f5d403764931e1737d69034ff781137bf",
+  "mano_sha256": {
+    "RIGHT": "e81515088bf55773e3b1c47398c596d69ce5c50029b932a10ce24e91e9570732",
+    "LEFT": "688ce11f46d33ec00125bea17bbf4f4197aa43b2c5cc223e741461f0bd51a762"
+  },
+  "encoder_version": "ffmpeg version 7.0.2-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2024 the FFmpeg developers",
+  "video_acceptance": {
+    "schema": "handloop.hand_overlay_video_acceptance.v1",
+    "queried_utc": "2026-10-17T02:54:35.311034+00:00",
+    "phase": "complete",
+    "frames": 148,
+    "source_duration_seconds": 4.933333333333334,
+    "videos": {
+      "comparison.mp4": {
+        "full_decode_passed": true,
+        "decoded_frames": 148,
+        "duration_progress_us": 4933333,
+        "stream_info": [
+          "Duration: 00:00:04.93, start: 0.000000, bitrate: 7938 kb/s",
+          "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x922, 7933 kb/s, 30 fps, 30 tbr, 15360 tbn (default)"
+        ],
+        "sha256": "2c94591873e895ff51d13a050c22485bdfa173b631208dbddf15cbb5c1679ace",
+        "bytes": 4895271
+      },
+      "original.mp4": {
+        "full_decode_passed": true,
+        "decoded_frames": 148,
+        "duration_progress_us": 4933333,
+        "stream_info": [
+          "Duration: 00:00:04.93, start: 0.000000, bitrate: 1260 kb/s",
+          "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 640x480, 1256 kb/s, 30 fps, 30 tbr, 15360 tbn (default)"
+        ],
+        "sha256": "2f9d05caa9f39bfb240fb19b98b992c94a58b19a2dba8e732635111b9f70e4fb",
+        "bytes": 777311
+      },
+      "handloop_overlay.mp4": {
+        "full_decode_passed": true,
+        "decoded_frames": 148,
+        "duration_progress_us": 4933333,
+        "stream_info": [
+          "Duration: 00:00:04.93, start: 0.000000, bitrate: 1413 kb/s",
+          "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 640x480, 1408 kb/s, 30 fps, 30 tbr, 15360 tbn (default)"
+        ],
+        "sha256": "ab3000c4d716971643c1fe557a212e66310595506494244546761eb1042bb8b8",
+        "bytes": 871438
+      },
+      "comparison_slow_0p5x.mp4": {
+        "full_decode_passed": true,
+        "decoded_frames": 295,
+        "duration_progress_us": 9833333,
+        "stream_info": [
+          "Duration: 00:00:09.83, start: 0.000000, bitrate: 4566 kb/s",
+          "Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1920x922, 4562 kb/s, 30 fps, 30 tbr, 15360 tbn (default)"
+        ],
+        "sha256": "e4ffaf5203a549ac37f2d4223c1e189e292ba32e9994f343962b4a29a152ab87",
+        "bytes": 5612888
+      }
+    },
+    "segments": [
+      {
+        "key": "20200820-subject-03++20200820_135810++836212060125",
+        "hand": "right",
+        "frames": 74,
+        "stats": {
+          "baseline": {
+            "positive_depth_vertices_all": 778,
+            "in_image_joints_min": 21,
+            "visible_mesh_pixels_min": 4270,
+            "visible_mesh_pixels_max": 9654,
+            "projected_joint_error_px_mean": 7.084362642185108,
+            "projection_error_max_change_vs_v1_px": 0.0
+          },
+          "best": {
+            "positive_depth_vertices_all": 778,
+            "in_image_joints_min": 21,
+            "visible_mesh_pixels_min": 5212,
+            "visible_mesh_pixels_max": 9992,
+            "projected_joint_error_px_mean": 5.478974332680574,
+            "projection_error_max_change_vs_v1_px": 0.0
+          }
+        }
+      },
+      {
+        "key": "20200928-subject-07++20200928_153732++836212060125",
+        "hand": "left",
+        "frames": 74,
+        "stats": {
+          "baseline": {
+            "positive_depth_vertices_all": 778,
+            "in_image_joints_min": 21,
+            "visible_mesh_pixels_min": 1499,
+            "visible_mesh_pixels_max": 5314,
+            "projected_joint_error_px_mean": 6.734858751296997,
+            "projection_error_max_change_vs_v1_px": 0.0
+          },
+          "best": {
+            "positive_depth_vertices_all": 778,
+            "in_image_joints_min": 21,
+            "visible_mesh_pixels_min": 1984,
+            "visible_mesh_pixels_max": 5794,
+            "projected_joint_error_px_mean": 4.22788198251982,
+            "projection_error_max_change_vs_v1_px": 0.0
+          }
+        }
+      }
+    ],
+    "display_only_revision_verified": true,
+    "original_video_sha_matches_v1": true,
+    "handloop_overlay_sha_matches_v1": true,
+    "passed": true
+  },
+  "segments": [
+    {
+      "index": 1,
+      "key": "20200820-subject-03++20200820_135810++836212060125",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016/shards/20200820-subject-03++20200820_135810++836212060125/source_manifest.json",
+      "manifest_sha256": "b4accc265b1f4f0b39863185708dc475b650ccfc2ccd7b1bf2ec8b410f9a7a29",
+      "reference_sha256": "18e542424029522f0fb22b5406e0e3b35af7e67064698a8c3da7a76b3ceb9061",
+      "physical_recording": "20200820-subject-03/20200820_135810",
+      "hand": "right",
+      "frame_id_first": 0,
+      "frame_id_last": 73,
+      "frames": 74,
+      "frame_ids_sha256": "43c1d95d7f2b69812dcabc66f3cf27a5936dfd308db322497595f39eb28f78b5",
+      "nominal_fps": 30,
+      "timestamp_source": "nominal_30hz_frame_index_not_measured",
+      "prediction_sources": {
+        "baseline": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/baseline/shards/20200820-subject-03++20200820_135810++836212060125/predictions.npz",
+          "sha256": "eb626ab55e8c02d0fd03075ef753f38f2e3dcf76c7a67b2fe8ee570e4c53636a",
+          "branch": "raw",
+          "model_identity": {
+            "checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+            "clip_length": 32,
+            "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+            "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+            "label": "baseline",
+            "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+            "precision": "bf16",
+            "smoke_shards": 0,
+            "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+            "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+          }
+        },
+        "best": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/best/shards/20200820-subject-03++20200820_135810++836212060125/predictions.npz",
+          "sha256": "b2d83168528c2c1dfe098c60126c13eeb519df8a2265778fbc3a7f678b1bb696",
+          "branch": "final",
+          "model_identity": {
+            "checkpoint_sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+            "clip_length": 32,
+            "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+            "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+            "label": "best",
+            "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+            "precision": "bf16",
+            "smoke_shards": 0,
+            "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+            "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+          }
+        }
+      },
+      "zoom_mode": "per-frame",
+      "segment_union_zoom_box_xyxy": [
+        -256.8500061035156,
+        -2.437835693359375,
+        750.3125,
+        501.1434020996094
+      ],
+      "decode_seconds": 0.19402467738837004,
+      "render_and_encode_seconds": 13.82880540098995
+    },
+    {
+      "index": 2,
+      "key": "20200928-subject-07++20200928_153732++836212060125",
+      "manifest": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016/shards/20200928-subject-07++20200928_153732++836212060125/source_manifest.json",
+      "manifest_sha256": "b2fa174fe0d36a1cde5e8f13bf6a3ce28d5bd8129e800788a368cfd0cc7ce118",
+      "reference_sha256": "b7ac8fa22f36bd3be5fad3bcdc919007adac7ccd3a97c242a9138022965b89ab",
+      "physical_recording": "20200928-subject-07/20200928_153732",
+      "hand": "left",
+      "frame_id_first": 0,
+      "frame_id_last": 73,
+      "frames": 74,
+      "frame_ids_sha256": "43c1d95d7f2b69812dcabc66f3cf27a5936dfd308db322497595f39eb28f78b5",
+      "nominal_fps": 30,
+      "timestamp_source": "nominal_30hz_frame_index_not_measured",
+      "prediction_sources": {
+        "baseline": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/baseline/shards/20200928-subject-07++20200928_153732++836212060125/predictions.npz",
+          "sha256": "376d108817edf96abaedb13621fa1fc1dbddaca6bd0d94c40c65cc96bdb8877c",
+          "branch": "raw",
+          "model_identity": {
+            "checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+            "clip_length": 32,
+            "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+            "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+            "label": "baseline",
+            "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+            "precision": "bf16",
+            "smoke_shards": 0,
+            "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+            "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+          }
+        },
+        "best": {
+          "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/best/shards/20200928-subject-07++20200928_153732++836212060125/predictions.npz",
+          "sha256": "cb4a53c67dd1fc8c6282ca4904d1922b19c8f59a51806cb7dd590920f62b12b8",
+          "branch": "final",
+          "model_identity": {
+            "checkpoint_sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+            "clip_length": 32,
+            "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+            "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+            "label": "best",
+            "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+            "precision": "bf16",
+            "smoke_shards": 0,
+            "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+            "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+          }
+        }
+      },
+      "zoom_mode": "per-frame",
+      "segment_union_zoom_box_xyxy": [
+        131.34625244140625,
+        219.9665985107422,
+        627.45947265625,
+        468.023193359375
+      ],
+      "decode_seconds": 0.006063658744096756,
+      "render_and_encode_seconds": 13.43808182515204
+    }
+  ],
+  "visual_review": {
+    "reviewer": "primary assistant",
+    "checked": "Both left/right segment-middle full-frame and common-zoom PNGs; hand side/orientation, source image continuity, same color/alpha, and readable crop verified.",
+    "v1_revision_reason": "Stable union crop could reduce hand magnification for large travel; v2 uses a common per-frame input bbox in all three columns.",
+    "no_pose_change": "v1/v2 original.mp4 and handloop_overlay.mp4 SHA identical; per-frame projection diagnostic change is exactly0."
+  },
+  "scope": "Saved full-test predictions only. No new neural inference/training, no GT shape/PA/wrist correction, no segmentation IoU, no claim of uncalibrated detector-based in-the-wild demo."
+}

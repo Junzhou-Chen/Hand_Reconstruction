@@ -1,5 +1,7 @@
 # HandLoop 数据与评测记忆
 
+**2026-10-16双片段定性视频与投影诊断：** [视频demo](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)固定右20200820_135810／左20200928_153732、相机836212060125，最长无gap＋ID规则预选，每段frame0–73。对21个GT joint真实K投影的平均像素距离baseline→best：右7.084→5.479px、左6.735→4.228px；这是两段640×480受控例的二维诊断，不是mask IoU或整库新精度。自身β、无PA／GT修正，原完整test预测保持；没有新神经推理。原速148帧／30fps、0.5×295帧／30fps完整解码通过。[完整来源与SHA](../reports/hand_overlay_demo_20261016.json)。
+
 **2026-10-16文献精度报告审计（建议，未改现行评测）：** [11篇逐表核查](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)确认PA是主流核心维度，完整99D需与绝对／腕对齐精度并列。ScaleHP三层CS／R／P与本项目三alignment相应；时序HMP／DIP／PoseBERT联合位置与GT加速度差，AUC并非所有方法必报。W在HaWoR／StableHand开头Sim(3)、InfiniHand无附加对齐，不能按同名横比；StableHand16joint、DIP／PoseBERT非PA root预处理未核源码、漏检处罚及加速度单位必须保留。当前未新增PA-MPVPE、velocity/acceleration、遮挡组或world指标。
 
 **2026-10-16完整s0测试最终证据：** 官方baseline、验证best4200、暂停last4311均完整覆盖160录制×8相机／1280视角／2992 clips／78768有效状态，原始93264中官方无效GT14496帧；无缺失预测，精确覆盖一致。正式branch为baseline.raw／best.final／last.final。绝对MPJPE65.521637／30.558284／30.365148mm，PA5.866680／5.161452／5.166846mm，PA-AUC88.272662／89.682011／89.670745%；finger10.143306／10.202787／10.227642°没有整体改善。主PA自由O(3)、AUC0–50mm／100点，论文All4.76／90.5供参考，物体遮挡两组未测。GT crop／固定camera gauge／32帧reset等见[最终协议与结果](../docs/DEXYCB_FULL_TEST_RESULTS_2026-10-16.md)，精确计数、SHA与所有分支见[JSON](../reports/dexycb_full_test_final_20261016.json)。

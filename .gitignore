@@ -93,6 +93,8 @@ wandb_api_key
 *.webm
 
 # Generated experiment state; curated small summaries belong in reports/.
+# Demo videos, extracted RGB and rendered frame previews stay outside Git.
+/demos/
 /outputs/
 /results/
 /runs/
