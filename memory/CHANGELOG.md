@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-17仅讨论下一阶段联合微调：** 已按用户要求只读审查现联合trainer／初始化／回放／两轮自身历史／验证覆盖，并回查HaWoR、StableHand、DIP与InfiniHand官方训练协议。用户选择官方HaWoR＋九库20k last重开；数据范围、冻结与损失预算待协商。记下20k执行边界及已有精确stop-after-updates恢复路径；未写控制器、改配置、暂停当前训练或启动新任务。
+
 **2026-10-17核查九库30k预训练效果（未改训）：** 从实际run提取0–14k固定验证，远程CPU生成曲线与逐库摘要，核对best规则、九源腕改善、时域分母、双rank／GPU与W&B运行状态。新增[报告](../docs/TWM_NINE_SOURCE_30K_PROGRESS_2026-10-17.md)及[约225KB小型结果](../reports/twm_nine_source_30k_progress_20261017.json)，更新入口／数据／状态／来源记忆。明确clean/reanchor误改、missing部分finger退化、2s近平台及不确定性失配；模型、数据、原始日志均不入Git。
 
 **2026-10-17用户改30k并已实际重启：** 九库10k旧run按指令在816步合作保存停止，model／Adam finite、双rank和真实字节hash一致，optimizer／RNG／sampler／日志完整保留。采用fresh完整30k cosine日程重跑（非改strict resume），warmup500、每卡512／global1024、九库固定manifest／split／QC、99D＋future60及模型／loss／噪声均不变。纽约2026-10-17 01:37:31 EDT已实际到step20，checkpoint10、九源采样及W&B服务端记录验收通过；新codee759bb1，新run为runs/twm_nine_sources_moe_transient_v3_b512_30k_20261017，deadline保持10-20 01:10EDT。此决定替代此前10k目标，旧启动验收为历史；不代表30k已完成或已证实精度收益。[当前运行](../docs/TWM_NINE_SOURCE_30K_RESTART_2026-10-17.md)、[验收](../reports/twm_nine_source_30k_restart_20261017.json)。
