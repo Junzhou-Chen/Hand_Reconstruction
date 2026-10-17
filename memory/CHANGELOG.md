@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16升级真实手部渲染并筛选优势test案例：** 新增[持续窗口选样脚本](../scripts/select_hand_demo_cases.py)，扩展renderer平滑法线／柔光／抗锯齿、默认去骨架、直接高清裁切、明示整段指标及腕口显示端面；全部保存预测／ownβ／真实投影保持，端面不进指标。扫描1280视角，解码159候选9768帧，三段45帧的绝对／投影／腕对齐／PA均值改善；按test主动挑选及候选范围明确披露。Pod实际渲染v2，四视频完整解码、135／269帧、faststart与本机SHA及首中末帧视觉验收通过，cap前后投影0变化及原RGB视频SHA一致。新增[文档](../docs/HAND_SHOWCASE_2026-10-16.md)及[约20KB报告](../reports/hand_showcase_20261016.json)，更新入口／决策／数据／状态；媒体、资产和逐帧预测仍忽略，无新训练或神经推理。
+
 **2026-10-16夜间下载HumanTouch、暂缓DexWild并广查直接人手motion：** 新增HumanTouch全数值下载器及限流退避，复用shared downloader可选callback且旧默认保持；远程4项续传／hash、429关闭恢复通过。新增Range拼接器及小fixture检查、DexWild源探测与单episode数值回读；批量失败及用户叫停均保留，不宣称全量成功。新增[获取记录](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)、[官方直接MANO与BVH源核查](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)、小型JSON状态；纠正Dex公开10点而非full25、Inter/Re帧编号不等于30Hz单位等。更新用户决定、数据、状态与sensor记忆；无新训练、模型或数据本体提交。
 
 **2026-10-16夜间重训前的数据扩充总结：** 新增[候选优先级与接入状态](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)，链接既有池统计／官方发布，区分完整MANO适配、native部分监督和视觉估计扩展。补MySign、SynData glove子集精确口径、HOI4D当前直链；纠正ARCTIC subject模板属于SMPL-X。ARCTIC下载完成但未入训、HumanTouch样本ready=false，未启动新任务或变更训练方案；仅同步本轮调研文档与新增事实记忆。

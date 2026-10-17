@@ -100,7 +100,7 @@ class VideoWriter:
             self.log.close()
 
 
-def raster_mesh(vertices_camera, pixels, faces, shape, color, alpha):
+def raster_mesh_legacy(vertices_camera, pixels, faces, shape, color, alpha):
     """Double-sided triangle rasterization with perspective-correct z buffer."""
     import numpy as np
     height, width = shape
@@ -148,6 +148,130 @@ def raster_mesh(vertices_camera, pixels, faces, shape, color, alpha):
                           'alpha': alpha, 'double_sided': True}
 
 
+def display_wrist_cap(faces):
+    """Close the unique MANO wrist boundary using existing vertices only.
+
+    These fan triangles belong to the display mesh, never the predicted mesh
+    used for metric decoding. The cycle follows original face winding; the
+    cap reverses it. No vertex is added, moved, smoothed, or thickened.
+    """
+    import numpy as np
+    faces = np.asarray(faces, dtype=np.int64)
+    counts, directed = {}, {}
+    for face in faces:
+        for start, end in zip(face, np.roll(face, -1)):
+            edge = (min(int(start), int(end)), max(int(start), int(end)))
+            counts[edge] = counts.get(edge, 0)+1
+            directed[edge] = (int(start), int(end))
+    boundary = [directed[edge] for edge, count in counts.items() if count == 1]
+    if not boundary:
+        raise ValueError('Expected one open wrist boundary, but MANO has no boundary')
+    outgoing, incoming = {}, {}
+    for start, end in boundary:
+        if start in outgoing or end in incoming:
+            raise ValueError('MANO wrist boundary is not a consistently oriented cycle')
+        outgoing[start], incoming[end] = end, start
+    if set(outgoing) != set(incoming):
+        raise ValueError('MANO wrist boundary is not closed')
+    first = min(outgoing)
+    cycle, current = [], first
+    while current not in cycle:
+        cycle.append(current)
+        current = outgoing[current]
+    if current != first or len(cycle) != len(boundary) or len(cycle) < 3:
+        raise ValueError('Expected exactly one simple MANO wrist boundary cycle')
+    cap = np.asarray([(cycle[0], cycle[index+1], cycle[index])
+                      for index in range(1, len(cycle)-1)], dtype=np.int64)
+    return np.concatenate((faces, cap), axis=0), {
+        'original_faces': int(len(faces)), 'added_display_faces': int(len(cap)),
+        'boundary_vertex_indices': cycle, 'new_vertices': 0,
+        'vertex_positions_changed': False, 'participates_in_metrics': False}
+
+
+def raster_mesh(vertices_camera, pixels, faces, shape, color, alpha, cap_face_start=None):
+    """Smooth, perspective-correct normals on unchanged predicted vertices.
+
+    Area-weighted vertex normals remove triangle facets without moving a
+    vertex. Camera-space studio lights and a restrained Blinn-Phong highlight
+    are identical for both methods. A z buffer handles self occlusion only.
+    """
+    import numpy as np
+    vertices = np.asarray(vertices_camera, dtype=np.float32)
+    triangles = vertices[faces]
+    face_normals = np.cross(triangles[:, 1]-triangles[:, 0],
+                            triangles[:, 2]-triangles[:, 0])
+    normals = np.zeros_like(vertices)
+    skin_faces = faces if cap_face_start is None else faces[:cap_face_start]
+    skin_normals = face_normals if cap_face_start is None else face_normals[:cap_face_start]
+    for corner in range(3):
+        np.add.at(normals, skin_faces[:, corner], skin_normals)
+    normals /= np.maximum(np.linalg.norm(normals, axis=-1, keepdims=True), 1e-12)
+    cap_normal = None
+    if cap_face_start is not None:
+        # One soft planar normal for the display cap, independent of skin
+        # normals. This adds neither a thick cuff nor a faceted end surface.
+        cap_normal = face_normals[cap_face_start:].sum(axis=0)
+        cap_normal /= max(float(np.linalg.norm(cap_normal)), 1e-12)
+    lights = np.asarray([[-.40, -.62, -.68], [.72, -.12, -.55], [-.22, .72, -.42]],
+                        dtype=np.float32)
+    lights /= np.linalg.norm(lights, axis=-1, keepdims=True)
+    base = np.asarray(color, dtype=np.float32)
+    height, width = shape
+    depth = np.full((height, width), np.inf, dtype=np.float32)
+    colors = np.zeros((height, width, 3), dtype=np.float32)
+    accepted = 0
+    for face_index, face in enumerate(faces):
+        xyz, uv = vertices[face], pixels[face]
+        if (not np.isfinite(xyz).all() or not np.isfinite(uv).all()
+                or np.any(xyz[:, 2] <= 1e-5)):
+            continue
+        low = np.maximum(np.floor(uv.min(0)).astype(np.int64), [0, 0])
+        high = np.minimum(np.ceil(uv.max(0)).astype(np.int64), [width-1, height-1])
+        if np.any(high < low):
+            continue
+        x0, y0 = uv[0]
+        x1, y1 = uv[1]
+        x2, y2 = uv[2]
+        denominator = (y1-y2)*(x0-x2)+(x2-x1)*(y0-y2)
+        if abs(float(denominator)) < 1e-8:
+            continue
+        xx = np.arange(low[0], high[0]+1, dtype=np.float32)[None]+.5
+        yy = np.arange(low[1], high[1]+1, dtype=np.float32)[:, None]+.5
+        w0 = ((y1-y2)*(xx-x2)+(x2-x1)*(yy-y2))/denominator
+        w1 = ((y2-y0)*(xx-x2)+(x0-x2)*(yy-y2))/denominator
+        w2 = 1-w0-w1
+        contained = (w0 >= -1e-6) & (w1 >= -1e-6) & (w2 >= -1e-6)
+        inverse_z = w0/xyz[0, 2]+w1/xyz[1, 2]+w2/xyz[2, 2]
+        distance = 1/np.maximum(inverse_z, 1e-12)
+        region = depth[low[1]:high[1]+1, low[0]:high[0]+1]
+        take = contained & (inverse_z > 0) & (distance < region)
+        if not take.any():
+            continue
+        # Perspective-correct interpolation, including normal/view direction.
+        weights = np.stack((w0[take]/xyz[0, 2], w1[take]/xyz[1, 2],
+                            w2[take]/xyz[2, 2]), axis=-1)/inverse_z[take, None]
+        normal = (weights @ normals[face] if cap_normal is None or face_index < cap_face_start
+                  else np.broadcast_to(cap_normal, (len(weights), 3)).copy())
+        normal /= np.maximum(np.linalg.norm(normal, axis=-1, keepdims=True), 1e-12)
+        view = -(weights @ xyz)
+        view /= np.maximum(np.linalg.norm(view, axis=-1, keepdims=True), 1e-12)
+        normal *= np.where(np.sum(normal*view, axis=-1, keepdims=True) < 0, -1., 1.)
+        diffuse = np.maximum(normal @ lights.T, 0)
+        intensity = .34 + diffuse @ np.asarray([.48, .20, .08], dtype=np.float32)
+        halfway = view+lights[0]
+        halfway /= np.maximum(np.linalg.norm(halfway, axis=-1, keepdims=True), 1e-12)
+        highlight = .22*np.maximum(np.sum(normal*halfway, axis=-1), 0)**32
+        # The soft grazing highlight clarifies curved fingertips and silhouette.
+        grazing = .055*(1-np.clip(np.sum(normal*view, axis=-1), 0, 1))**3
+        shaded = base[None]*intensity[:, None] + 255*(highlight+grazing)[:, None]
+        colors[low[1]:high[1]+1, low[0]:high[0]+1][take] = np.clip(shaded, 0, 255)
+        region[take] = distance[take]
+        accepted += 1
+    mask = np.isfinite(depth)
+    return colors, mask, {'rasterized_triangles': accepted, 'visible_mesh_pixels': int(mask.sum()),
+                          'alpha': alpha, 'double_sided': True}
+
+
 def project(points, camera_to_world, intrinsics):
     import numpy as np
     rotation = camera_to_world[:3, :3].T
@@ -157,36 +281,57 @@ def project(points, camera_to_world, intrinsics):
     return camera, pixels
 
 
-def overlay(image, vertices, joints, faces, c2w, intrinsics, bbox, alpha):
+def overlay(image, vertices, joints, faces, c2w, intrinsics, bbox, alpha,
+            style='polished', supersample=2, show_skeleton=False, cap_face_start=None):
     import cv2
     import numpy as np
-    # Same cyan BGR color and alpha for both models.
-    color = (235, 210, 40)
+    # Both methods share material, lighting, opacity, and sampling settings.
+    color = (235, 210, 40) if style == 'legacy' else (226, 190, 96)
     camera, uv = project(vertices, c2w, intrinsics)
     camera_joints, joint_uv = project(joints, c2w, intrinsics)
-    colors, mask, diagnostics = raster_mesh(camera, uv, faces, image.shape[:2], color, alpha)
-    result = image.copy()
-    result[mask] = np.clip((1-alpha) * image[mask] + alpha * colors[mask], 0, 255).astype(np.uint8)
-    positive = camera_joints[:, 2] > 1e-5
+    sample = 1 if style == 'legacy' else supersample
     height, width = image.shape[:2]
+    render_shape = (height*sample, width*sample)
+    if style == 'legacy':
+        colors, high_mask, diagnostics = raster_mesh_legacy(camera, uv*sample, faces, render_shape, color, alpha)
+    else:
+        colors, high_mask, diagnostics = raster_mesh(camera, uv*sample, faces, render_shape,
+                                                     color, alpha, cap_face_start)
+    result = image.copy()
+    if sample != 1:
+        # Downsample only premultiplied foreground and fractional coverage.
+        # Resampling the RGB background would alter pixels outside the mesh.
+        foreground = cv2.resize(colors*high_mask[..., None], (width, height), interpolation=cv2.INTER_AREA)
+        coverage = cv2.resize(high_mask.astype(np.float32), (width, height), interpolation=cv2.INTER_AREA)
+        mask = coverage > 0
+        result[mask] = np.clip(image[mask]*(1-alpha*coverage[mask, None])+
+                               alpha*foreground[mask], 0, 255).astype(np.uint8)
+        diagnostics['visible_mesh_pixels_supersampled'] = diagnostics['visible_mesh_pixels']
+        diagnostics['visible_mesh_pixels'] = int(mask.sum())
+    else:
+        mask = high_mask
+        result[mask] = np.clip((1-alpha)*image[mask]+alpha*colors[mask], 0, 255).astype(np.uint8)
+    positive = camera_joints[:, 2] > 1e-5
     in_image = positive & (joint_uv[:, 0] >= 0) & (joint_uv[:, 0] < width)
     in_image &= (joint_uv[:, 1] >= 0) & (joint_uv[:, 1] < height)
-    for base in (1, 5, 9, 13, 17):
-        chain = (0, base, base+1, base+2, base+3)
-        for a, b in zip(chain[:-1], chain[1:]):
-            if positive[a] and positive[b]:
-                # Limit integer conversion to finite, reasonably sized coordinates.
-                points = np.clip(joint_uv[[a, b]], -100000, 100000).round().astype(np.int32)
-                cv2.line(result, tuple(points[0]), tuple(points[1]), (20, 20, 20), 3, cv2.LINE_AA)
-                cv2.line(result, tuple(points[0]), tuple(points[1]), color, 1, cv2.LINE_AA)
-    for point in joint_uv[in_image].round().astype(np.int32):
-        cv2.circle(result, tuple(point), 2, (255, 255, 255), -1, cv2.LINE_AA)
+    if show_skeleton or style == 'legacy':
+        for base in (1, 5, 9, 13, 17):
+            chain = (0, base, base+1, base+2, base+3)
+            for a, b in zip(chain[:-1], chain[1:]):
+                if positive[a] and positive[b]:
+                    points = np.clip(joint_uv[[a, b]], -100000, 100000).round().astype(np.int32)
+                    cv2.line(result, tuple(points[0]), tuple(points[1]), (20, 20, 20), 3, cv2.LINE_AA)
+                    cv2.line(result, tuple(points[0]), tuple(points[1]), color, 1, cv2.LINE_AA)
+        for point in joint_uv[in_image].round().astype(np.int32):
+            cv2.circle(result, tuple(point), 2, (255, 255, 255), -1, cv2.LINE_AA)
     x0, y0, x1, y1 = bbox
     yy, xx = np.nonzero(mask)
     inside_box = (xx >= x0) & (xx <= x1) & (yy >= y0) & (yy <= y1)
     diagnostics.update(positive_depth_vertices=int((camera[:, 2] > 1e-5).sum()),
         total_vertices=len(camera), positive_depth_joints=int(positive.sum()),
         in_image_joints=int(in_image.sum()), total_joints=len(camera_joints),
+        material=style, supersample=sample, skeleton=show_skeleton or style == 'legacy',
+        added_display_wrist_cap_faces=0 if cap_face_start is None else int(len(faces)-cap_face_start),
         mesh_pixels_inside_input_bbox=int(inside_box.sum()),
         mesh_pixel_fraction_inside_input_bbox=float(inside_box.mean()) if len(xx) else None)
     return result, diagnostics, joint_uv, positive
@@ -203,17 +348,24 @@ def shared_zoom_box(boxes, ratio):
     return np.concatenate((center - size/2, center + size/2))
 
 
-def zoom(image, box, width, height):
-    import cv2
+def zoom_transform(box, width, height):
+    """Display-only affine transform; never operates on predicted 3D states."""
     import numpy as np
     x0, y0, x1, y1 = box
-    transform = np.asarray([[width/(x1-x0), 0, -x0*width/(x1-x0)],
-                            [0, height/(y1-y0), -y0*height/(y1-y0)]], dtype=np.float32)
+    return np.asarray([[width/(x1-x0), 0, -x0*width/(x1-x0)],
+                       [0, height/(y1-y0), -y0*height/(y1-y0)],
+                       [0, 0, 1]], dtype=np.float32)
+
+
+def zoom(image, box, width, height, background=(247, 246, 243)):
+    import cv2
+    import numpy as np
+    transform = zoom_transform(box, width, height)[:2]
     return cv2.warpAffine(image, transform, (width, height), flags=cv2.INTER_LINEAR,
-                          borderMode=cv2.BORDER_CONSTANT, borderValue=(18, 18, 18))
+                          borderMode=cv2.BORDER_CONSTANT, borderValue=background)
 
 
-def compose(images, box, width, full_height, zoom_height, title, frame_id):
+def compose_legacy(images, box, width, full_height, zoom_height, title, frame_id):
     import cv2
     import numpy as np
     header, zoom_header, footer = 44, 30, 48
@@ -235,12 +387,72 @@ def compose(images, box, width, full_height, zoom_height, title, frame_id):
                     (left+10, header+full_height+21), cv2.FONT_HERSHEY_SIMPLEX, .44,
                     (210, 210, 210), 1, cv2.LINE_AA)
         start = header + full_height + zoom_header
-        canvas[start:start+zoom_height, left:left+width] = zoom(image, box, width, zoom_height)
+        canvas[start:start+zoom_height, left:left+width] = zoom(image, box, width, zoom_height, (18, 18, 18))
     start = height - footer
     cv2.putText(canvas, f'{title} | source frame {frame_id} | nominal 30 fps',
                 (12, start+18), cv2.FONT_HERSHEY_SIMPLEX, .45, (235, 235, 235), 1, cv2.LINE_AA)
     cv2.putText(canvas, 'Unaligned prediction | Same cyan overlay / alpha | Object occlusion unavailable (see-through overlay)',
                 (12, start+38), cv2.FONT_HERSHEY_SIMPLEX, .45, (205, 205, 205), 1, cv2.LINE_AA)
+    return canvas
+
+
+def compose(images, box, width, full_height, zoom_height, title, frame_id,
+            zoom_images=None, error_summary=None, selected=False, show_skeleton=False):
+    """Quiet, bright comparison cards with a large, independently rasterized detail."""
+    import cv2
+    import numpy as np
+    header, zoom_header, footer = 100, 34, 74
+    height = header+full_height+zoom_header+zoom_height+footer
+    canvas = np.full((height, width*3, 3), (247, 246, 243), dtype=np.uint8)
+    ink, secondary, divider = (54, 48, 43), (113, 105, 96), (220, 216, 208)
+
+    def text_line(text, x, y, size=.55, color=ink, thickness=1, max_width=None):
+        if max_width is not None:
+            size = min(size, max_width/max(cv2.getTextSize(str(text), cv2.FONT_HERSHEY_SIMPLEX,
+                                                         1., thickness)[0][0], 1))
+        cv2.putText(canvas, str(text), (x, y), cv2.FONT_HERSHEY_SIMPLEX,
+                    size, color, thickness, cv2.LINE_AA)
+
+    text_line(title, 18, 29, .72, thickness=2, max_width=width*3-36)
+    labels = ('Original RGB', 'HaWoR', 'HandLoop')
+    summary = error_summary or {}
+    metric = summary.get('metric', 'Absolute MPJPE')
+    unit = summary.get('unit', 'mm')
+    for column, (image, label) in enumerate(zip(images, labels)):
+        left = column*width
+        text_line(label, left+18, 64, .76, thickness=2)
+        value = summary.get(('baseline', 'handloop')[column-1]) if column else None
+        subtitle = (f'Segment mean {metric}: {float(value):.1f} {unit}' if value is not None
+                    else 'Calibrated held-out test video' if column == 0 else 'Saved unaligned prediction')
+        text_line(subtitle, left+18, 87, .45, secondary, max_width=width-36)
+        # Fit, rather than stretch, the context RGB into the short context row.
+        scale = min(width/image.shape[1], full_height/image.shape[0])
+        fitted_width = int(round(image.shape[1]*scale))
+        fitted_height = int(round(image.shape[0]*scale))
+        offset_x, offset_y = (width-fitted_width)//2, (full_height-fitted_height)//2
+        context = cv2.resize(image, (fitted_width, fitted_height), interpolation=cv2.INTER_AREA)
+        x0, y0, x1, y1 = box
+        cv2.rectangle(context, (int(round(x0*scale)), int(round(y0*scale))),
+                      (int(round(x1*scale)), int(round(y1*scale))), (232, 227, 212), 1, cv2.LINE_AA)
+        canvas[header+offset_y:header+offset_y+fitted_height,
+               left+offset_x:left+offset_x+fitted_width] = context
+        text_line('HAND DETAIL  /  same crop and scale', left+18,
+                  header+full_height+23, .45, secondary, max_width=width-36)
+        start = header+full_height+zoom_header
+        detail = zoom_images[column] if zoom_images is not None else zoom(image, box, width, zoom_height)
+        canvas[start:start+zoom_height, left:left+width] = detail
+        if column:
+            cv2.line(canvas, (left, 44), (left, height-footer), divider, 1, cv2.LINE_AA)
+    start = height-footer
+    cv2.line(canvas, (0, start), (width*3, start), divider, 1, cv2.LINE_AA)
+    choice = 'Selected qualitative test case' if selected else 'Held-out test segment'
+    text_line(f'{choice} | source frame {frame_id} | nominal 30 fps', 18, start+24,
+              .47, secondary, max_width=width*3-36)
+    skeleton_note = ' | X-ray skeleton diagnostic' if show_skeleton else ''
+    text_line('Same material and opacity | No 3D alignment | Object occlusion unavailable (see-through overlay)'+skeleton_note,
+              18, start+48, .45, secondary, max_width=width*3-36)
+    text_line('Controlled GT-crop evaluation; HaWoR official baseline and HandLoop best4200',
+              18, start+65, .37, secondary, max_width=width*3-36)
     return canvas
 
 
@@ -253,10 +465,20 @@ def main():
     parser.add_argument('--decode-batch-size', type=int, default=64)
     parser.add_argument('--cpu-threads', type=int, default=2)
     parser.add_argument('--panel-width', type=int, default=640)
-    parser.add_argument('--zoom-height', type=int, default=320)
+    parser.add_argument('--zoom-height', type=int, default=440)
+    parser.add_argument('--full-context-height', type=int, default=300,
+                        help='Polished layout fits original RGB without stretching into this short context row')
     parser.add_argument('--zoom-mode', choices=('per-frame', 'segment'), default='per-frame',
                         help='Shared input-bbox zoom per frame; segment preserves the v1 stable union crop')
-    parser.add_argument('--alpha', type=float, default=.5)
+    parser.add_argument('--render-style', choices=('polished', 'legacy'), default='polished',
+                        help='Polished smooth normals/material and bright detail-first layout; legacy preserves faceted X-ray presentation')
+    parser.add_argument('--supersample', type=int, choices=(1, 2, 3), default=2,
+                        help='Mesh edge antialiasing scale; ignored by legacy')
+    parser.add_argument('--show-skeleton', action='store_true',
+                        help='Add the optional X-ray skeleton diagnostic; polished default is mesh only')
+    parser.add_argument('--open-wrist', action='store_true',
+                        help='Keep the original open MANO wrist; polished default adds a display-only cap from existing vertices (legacy is always open)')
+    parser.add_argument('--alpha', type=float, default=.76)
     args = parser.parse_args()
     if not Path('/sciclone/data10/jchen57').is_dir():
         parser.error('Run image/MANO rendering only inside the authorized remote compute Pod')
@@ -264,6 +486,8 @@ def main():
         parser.error('Invalid alpha/batch/thread count')
     if args.panel_width < 320 or args.panel_width % 2 or args.zoom_height < 64 or args.zoom_height % 2:
         parser.error('Use even panel/zoom dimensions with panel width >=320')
+    if args.full_context_height < 64 or args.full_context_height % 2:
+        parser.error('Use an even full context height >=64')
     root = args.root.resolve()
     for name in ('source_root', 'evaluation_root', 'mano_models'):
         path = getattr(args, name).resolve()
@@ -297,11 +521,25 @@ def main():
     if not entries:
         raise ValueError('Selection must contain a nonempty entries list')
     started = time.monotonic()
-    report = {'schema': 'handloop.hand_overlay_demo.v1', 'phase': 'initializing',
+    report = {'schema': 'handloop.hand_overlay_demo.v2', 'phase': 'initializing',
         'started_utc': utc(), 'selection_path': str(args.selection.resolve()),
         'selection_sha256': sha(args.selection), 'script_sha256': sha(__file__),
         'encoder_version': encoder_version, 'device': args.device, 'segments': [],
-        'rendering': {'alpha': args.alpha, 'color_bgr': [235, 210, 40],
+        'rendering': {'alpha': args.alpha,
+            'color_bgr': [235, 210, 40] if args.render_style == 'legacy' else [226, 190, 96],
+            'style': args.render_style, 'supersample': 1 if args.render_style == 'legacy' else args.supersample,
+            'skeleton': args.show_skeleton or args.render_style == 'legacy',
+            'normals': 'flat face' if args.render_style == 'legacy' else 'area-weighted vertex normals, perspective-correct pixel interpolation',
+            'material': 'legacy diffuse' if args.render_style == 'legacy' else 'camera-space three-light soft diffuse + restrained Blinn-Phong specular',
+            'geometry_modification': ('prediction vertices/joints and metric geometry unmodified; display-only wrist cap triangles appended using existing boundary vertices'
+                                      if args.render_style != 'legacy' and not args.open_wrist else
+                                      'none; only normals, shading and display sampling change'),
+            'wrist_cap': args.render_style != 'legacy' and not args.open_wrist,
+            'wrist_cap_policy': 'unique original boundary cycle; fan triangulation using existing vertices only; independent planar cap normal; excluded from metric geometry',
+            'background_sampling': 'original target RGB preserved outside mesh coverage; foreground-only supersampling (optional skeleton is a diagnostic overlay)',
+            'detail_rendering': 'zoom of native overlay' if args.render_style == 'legacy' else 'direct rasterization with display affine @ original K',
+            'full_context_height': args.full_context_height,
+            'zoom_height': args.zoom_height,
             'double_sided': True, 'self_depth_buffer': True, 'object_occlusion_available': False,
             'camera': 'original full-resolution calibrated K and inverse(camera_to_world)',
             'predicted_shape': 'each model own saved beta; left_shapedirs_fix=True',
@@ -356,6 +594,15 @@ def main():
             positions = positions[:int(entry['max_frames'])]
         if not len(positions) or (len(positions) > 1 and not np.all(np.diff(ids[positions]) == 1)):
             raise ValueError('Each selected segment must have consecutive source frame IDs, without gaps')
+        summary = entry.get('error_summary')
+        if summary is not None:
+            if not isinstance(summary, dict):
+                raise ValueError('error_summary must be an object with metric/unit/baseline/handloop')
+            for label in ('baseline', 'handloop'):
+                if label not in summary or not np.isfinite(float(summary[label])) or float(summary[label]) < 0:
+                    raise ValueError('error_summary must contain finite, nonnegative baseline/handloop values')
+            if 'frames' in summary and int(summary['frames']) != len(positions):
+                raise ValueError('error_summary frames must describe exactly the selected segment')
         if not np.allclose(np.diff(arrays['timestamps'][positions]), 1/30, rtol=0, atol=1e-9):
             raise ValueError('Selected timestamps disagree with nominal 30Hz')
         if not np.all(arrays['handedness'] == arrays['handedness'][0]):
@@ -394,6 +641,10 @@ def main():
             handedness = arrays['handedness'][positions].astype(bool)
             side = 'right' if handedness[0] else 'left'
             faces = codec.layers[side].faces.copy()
+            cap_face_start, cap_details = None, None
+            if args.render_style != 'legacy' and not args.open_wrist:
+                cap_face_start = len(faces)
+                faces, cap_details = display_wrist_cap(faces)
             geometry = {}
             for label, (state, beta) in predictions.items():
                 vertex_parts, joint_parts = [], []
@@ -419,6 +670,9 @@ def main():
                 'frame_ids_sha256': hashlib.sha256(arrays['frame_ids'][positions].astype('<i8').tobytes()).hexdigest(),
                 'nominal_fps': 30, 'timestamp_source': record['timestamp_source'],
                 'prediction_sources': prediction_meta, 'zoom_mode': args.zoom_mode,
+                'title': entry.get('title'), 'error_summary': entry.get('error_summary'),
+                'selection_reason': entry.get('selection_reason'),
+                'display_wrist_cap': cap_details,
                 'segment_union_zoom_box_xyxy': box.tolist(),
                 'decode_seconds': decode_seconds, 'frame_diagnostics': []}
             render_start = time.monotonic()
@@ -434,9 +688,12 @@ def main():
                 if image is None:
                     raise ValueError('Cannot decode source RGB: ' + str(image_path))
                 height, width = image.shape[:2]
-                full_height = int(round(height*args.panel_width/width/2))*2
+                full_height = (int(round(height*args.panel_width/width/2))*2
+                               if args.render_style == 'legacy' else args.full_context_height)
                 if not writers:
-                    comparison_height = 44+full_height+30+args.zoom_height+48
+                    comparison_height = ((44+full_height+30+args.zoom_height+48)
+                                         if args.render_style == 'legacy' else
+                                         (100+full_height+34+args.zoom_height+74))
                     writers = [VideoWriter(encoder, args.output/'comparison.mp4', args.panel_width*3, comparison_height, 30),
                                VideoWriter(encoder, args.output/'original.mp4', width, height, 30),
                                VideoWriter(encoder, args.output/'handloop_overlay.mp4', width, height, 30)]
@@ -448,11 +705,20 @@ def main():
                              if args.zoom_mode == 'per-frame' else box)
                 images, diagnostic = [image], {'source_frame_id': frame_id,
                                                'common_zoom_box_xyxy': frame_box.tolist()}
+                zoom_images = None
+                if args.render_style == 'polished':
+                    zoom_images = [zoom(image, frame_box, args.panel_width, args.zoom_height)]
+                    display_affine = zoom_transform(frame_box, args.panel_width, args.zoom_height)
+                    detail_intrinsics = display_affine @ arrays['camera_intrinsics'][position]
+                    x0, y0, x1, y1 = arrays['bbox_xyxy'][position]
+                    detail_bbox_points = np.asarray([[x0, y0, 1.], [x1, y1, 1.]]) @ display_affine.T
+                    detail_bbox = detail_bbox_points[:, :2].reshape(-1)
                 for label in ('baseline', 'best'):
                     rendered, stats, joint_uv, positive = overlay(image,
                         geometry[label]['vertices'][local_index], geometry[label]['joints'][local_index], faces,
                         arrays['camera_to_world'][position], arrays['camera_intrinsics'][position],
-                        arrays['bbox_xyxy'][position], args.alpha)
+                        arrays['bbox_xyxy'][position], args.alpha, args.render_style,
+                        args.supersample, args.show_skeleton, cap_face_start)
                     if stats['positive_depth_vertices'] != 778 or stats['visible_mesh_pixels'] == 0:
                         raise ValueError(f'Projected mesh has nonpositive depth or zero visible pixels: {entry["key"]}/{frame_id}/{label}')
                     if 'diagnostic_reference_joints' in arrays:
@@ -463,8 +729,24 @@ def main():
                         stats['projected_joint_error_pairs'] = int(valid.sum())
                     diagnostic[label] = stats
                     images.append(rendered)
-                title = f'Segment {segment_index+1}/{len(plans)} | {side} hand'
-                comparison = compose(images, frame_box, args.panel_width, full_height, args.zoom_height, title, frame_id)
+                    if zoom_images is not None:
+                        detail, detail_stats, _, _ = overlay(zoom_images[0],
+                            geometry[label]['vertices'][local_index], geometry[label]['joints'][local_index], faces,
+                            arrays['camera_to_world'][position], detail_intrinsics,
+                            detail_bbox, args.alpha, args.render_style, args.supersample,
+                            args.show_skeleton, cap_face_start)
+                        zoom_images.append(detail)
+                        stats['detail_visible_mesh_pixels'] = detail_stats['visible_mesh_pixels']
+                title = (str(entry['title']) if entry.get('title') else
+                         f'Segment {segment_index+1}/{len(plans)} | {side} hand')
+                if args.render_style == 'legacy':
+                    comparison = compose_legacy(images, frame_box, args.panel_width, full_height,
+                                                args.zoom_height, title, frame_id)
+                else:
+                    comparison = compose(images, frame_box, args.panel_width, full_height, args.zoom_height,
+                        title, frame_id, zoom_images, entry.get('error_summary'),
+                        selected=bool(selection.get('selection_uses_test_error') or entry.get('error_summary')),
+                        show_skeleton=args.show_skeleton)
                 for writer, frame in zip(writers, (comparison, image, images[-1])):
                     writer.append(frame)
                 if global_index in sample_indices:

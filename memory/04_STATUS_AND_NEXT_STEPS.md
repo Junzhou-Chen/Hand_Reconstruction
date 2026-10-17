@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-16新版手部渲染及三段优势case已完成：** 新增平滑法线、三点柔光、小高光、2×抗锯齿、高清直接crop渲染、默认去骨架；首末帧检查后补只引用原边界顶点的14面腕口显示端面，原778顶点／指标不变。固定官方baseline与验证best4200，1280视角粗排→159几何候选→54合格视角，选右subject04、左06／07各45帧，三段投影45/45均改善。最终本机outputs/demos/dexycb_showcase_20261016/render_v2：原速135帧4.5s、慢放269帧8.967s，另有原RGB及单独叠加；四视频完整解码、faststart、本机SHA与三段首中末视觉复核通过。selector／renderer投影均值差<.001px，cap相对open版变化0px、原RGB视频SHA相同。旧v1保留；明确精选非整库均值、GTcrop与真实物体透视叠加边界，无新神经推理或训练。[复现与指标](../docs/HAND_SHOWCASE_2026-10-16.md)。
+
 **2026-10-16夜间获取与用户转向：** HumanTouch全数值35,246文件／110.42GB已启动；初8worker遇429，旧失败保留，改4worker／最多4resolver请求秒并按quota退避续传PID6739。03:28UTC17.42GB present、5418verified、failed0、进程存活；未完成／未转99D。DexWild单pour样本558096B回读通过，但公开是71列10点short，批量5task HTTPRangeError全0完成；用户要求放一放后确认无下载进程、status stopped_by_user，不续跑。已按用户澄清完成[可直下99D人手数据调查](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)，推荐先适配已有ARCTIC／HO3D及取InterHand/TACO/Giga/Re，均为建议未获取；新训练未启动。[执行与小型状态](../docs/SENSOR_TRAJECTORY_DOWNLOADS_2026-10-16.md)。
 
 **2026-10-16夜间用户希望重新训练，先要求选库总结：** 已完成官方发布／源码与远程现有清单复查；候选优先级建议为原四库＋已下载ARCTIC先做完整参数验收，HumanTouch／DexWild raw human作为大规模native主扩展，DexCap／DexterHand／MySign补覆盖。当前partial native trainer未实现，HumanTouch仍ready=false，ARCTIC及其他新候选无prepared目录；D37仍complete／10000步。只做总结，未启动新下载／预处理／训练，未选定权重或预算。[报告与来源](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)。

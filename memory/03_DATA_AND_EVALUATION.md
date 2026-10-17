@@ -1,5 +1,7 @@
 # HandLoop 数据与评测记忆
 
+**2026-10-16优势案例选样与benchmark分开：** 用户已授权按test误差主动挑选展示，完整1280视角／78768状态仅粗排已有3D指标，实际2D窗口排序在159候选／9768状态内；54合格视角中取3被试、3录制、2相机、左右手及2种抓取目标，各45帧。不能写成全test最优2D窗口或整库均值。绝对MPJPE为60.441→27.231／83.625→17.725／142.091→32.117mm，投影10.277→4.541／9.019→3.357／11.727→5.466px，三段逐帧2D全改善，腕对齐及PA均值也均改善。GT为supplied21／fitted MANO，ownβ与真实K未对齐显示；腕口追加14个三角面仅渲染、不进指标。完整测试与模型选择不变，无新神经推理／训练。[选样协议](../docs/HAND_SHOWCASE_2026-10-16.md)、[来源与验收](../reports/hand_showcase_20261016.json)。
+
 **2026-10-16夜间完整MANO可获取池扩查：** [新核查表](../docs/TWM_DIRECT_HUMAN_MOTION_DATA_2026-10-16.md)记录InterHand2.6M30fps train326.64MB、TACO Hand_Poses15.23GB、GigaHands hand_poses11.30GB、ReInterHand七train5.52GB的官方公开数值入口；HO3Dv2／ARCTIC已下载但未motion入训。HOI4D已官方直链但未核包，H₂O-3D不同于注册H2O且程序化获取仍待验。Inter/Re正常frame编号步长不恒1，不能统一frame_idx/30；只取官方train、原录制去重并验2秒时间。UNOC／CeTI公开BVH新增sensor候选，非现成MANO；CLUTCH99D／EgoSteer是HaWoR等视觉伪标签，不能因格式相同当独立干净GT。所有新adapter／效果均未验证。
 
 **2026-10-16双片段定性视频与投影诊断：** [视频demo](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)固定右20200820_135810／左20200928_153732、相机836212060125，最长无gap＋ID规则预选，每段frame0–73。对21个GT joint真实K投影的平均像素距离baseline→best：右7.084→5.479px、左6.735→4.228px；这是两段640×480受控例的二维诊断，不是mask IoU或整库新精度。自身β、无PA／GT修正，原完整test预测保持；没有新神经推理。原速148帧／30fps、0.5×295帧／30fps完整解码通过。[完整来源与SHA](../reports/hand_overlay_demo_20261016.json)。

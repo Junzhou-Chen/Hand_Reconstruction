@@ -1,0 +1,506 @@
+{
+  "schema": "handloop.favorable_test_showcase.v1",
+  "phase": "complete",
+  "recorded_utc": "2026-10-17T03:32:32.105107+00:00",
+  "client_date": "2026-10-16",
+  "code_base_revision": "abe352fdc8fbe02f09472f6b3ab23ac4a4fe0c05",
+  "scripts": {
+    "select_hand_demo_cases.py": "b7aa7afa799c8d701e9fb5a76d49cc1d3c2cbac832578791aeb3591d81d114a2",
+    "render_hand_overlay_demo.py": "0fdf584f264c3ca579a155dc42257142c1f3e3814c9f7dbc2e10476882b87290"
+  },
+  "selection": {
+    "script_sha256": "b7aa7afa799c8d701e9fb5a76d49cc1d3c2cbac832578791aeb3591d81d114a2",
+    "source_index_sha256": "91ac13566b4292521e2166f78acc4f62424a9042239407f2a7976256e0dab9d8",
+    "scanned_shards": 1280,
+    "source_frames": 78768,
+    "decoded_candidate_shards": 159,
+    "decoded_candidate_frames": 9768,
+    "qualified_shards": 54,
+    "models": {
+      "baseline": {
+        "checkpoint_sha256": "4d1cc43853c190d6f2c10d9b6295c73109f0faf9ef41ac817a2b31d94b4823f2",
+        "clip_length": 32,
+        "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+        "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+        "label": "baseline",
+        "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+        "precision": "bf16",
+        "smoke_shards": 0,
+        "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+        "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+      },
+      "best": {
+        "checkpoint_sha256": "1953463e7536fb2d62da4bea80a4a6d3bdbe5fcd76153f81f5c063838904b3e3",
+        "clip_length": 32,
+        "evaluator_sha256": "97bf58113c7bbe130fe15c9d8f823d5c91746c9d0c5930f9d25d78d0a5ac6613",
+        "freeze_manifest_sha256": "39b6c160e33d1f44e138a342be7a89f7557d01a88dda06ba379238238a17fbea",
+        "label": "best",
+        "metrics_sha256": "6f7f3db543c4d61ada59c99bde34dda20be10aaf10d2a5c64b5c6377bbe184a9",
+        "precision": "bf16",
+        "smoke_shards": 0,
+        "source_root": "/sciclone/data10/jchen57/Hand_Reconstruction/prepared/visual_dexycb_s0_full_test_20261016",
+        "training_manifest_sha256": "6314ec2aea911709595c31e262a55ffa2831d14eb2aa5299810287c60b6a5db3"
+      }
+    },
+    "disclosure": "Deliberately favorable examples selected by held-out-test reference errors; not representative averages. No checkpoint selection or neural inference. The 2D ranking covers only the disclosed 3D-ranked candidate pool, not every test window.",
+    "geometry": "Own saved predicted beta; original calibrated K and inverse camera_to_world; no PA/GT wrist/rotation/scale correction of displayed poses. PA is diagnostic only. Source GT is fitted DexYCB MANO21, not independent MoCap.",
+    "protocol": "Existing GT-crop full-test saved predictions; 16-frame bidirectional blocks / 32-frame feedback resets.",
+    "selection_rule": {
+      "window_frames": 45,
+      "minimum_consecutive_frames": 30,
+      "minimum_absolute_improvement_mm": 10,
+      "minimum_absolute_relative_improvement": 0.2,
+      "minimum_projected_improvement_px": 2,
+      "minimum_projected_relative_improvement": 0.25,
+      "maximum_handloop_projected_error_px": 10.0,
+      "minimum_improved_frame_fraction_absolute_and_projected": 0.8,
+      "minimum_handloop_in_image_joints_every_frame": 20,
+      "score": "projected improvement * projected improved-frame fraction * (1+.15*clamp(wrist-aligned improvement,0,5)) / (1+HandLoop projected error/10)",
+      "diversity": "best qualifying right and left; subsequent different subjects, grasped objects and physical recordings when available"
+    },
+    "entries": [
+      {
+        "key": "20200903-subject-04++20200903_113236++932122062010",
+        "manifest": "shards/20200903-subject-04++20200903_113236++932122062010/source_manifest.json",
+        "start_frame_id": 9,
+        "end_frame_id": 53,
+        "max_frames": 45,
+        "hand": "right",
+        "subject": "20200903-subject-04",
+        "physical_recording": "20200903-subject-04/20200903_113236",
+        "camera_serial": "932122062010",
+        "object_ids": [
+          2,
+          10,
+          17
+        ],
+        "grasped_object_index": 2,
+        "grasped_object_id": 17,
+        "manifest_sha256": "9941c7ec5ace85a7202dafd95192022cb55929871a7877d89bd53f7a01ce3543",
+        "reference_sha256": "d87bb213a9c94b180aff94d0162d240f9e599c0b0cdf7d67202797158678f878",
+        "prediction_sources": {
+          "baseline": {
+            "branch": "raw",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/baseline/shards/20200903-subject-04++20200903_113236++932122062010/predictions.npz",
+            "sha256": "2d5abe40f8c024468218900cdccf49a36b25876b10bff32fb89b80bbe55397e7"
+          },
+          "best": {
+            "branch": "final",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/best/shards/20200903-subject-04++20200903_113236++932122062010/predictions.npz",
+            "sha256": "2da77d7cad7ff55cf93789618890626d87c30545c63e6dc64687e0a70c3bcf4b"
+          }
+        },
+        "selection_metrics": {
+          "absolute_mpjpe_mm": {
+            "baseline": 60.440711975097656,
+            "handloop": 27.23129653930664,
+            "improvement": 33.209415435791016,
+            "improved_frame_fraction": 0.8888888888888888
+          },
+          "wrist_aligned_mpjpe_mm": {
+            "baseline": 25.27269744873047,
+            "handloop": 11.001565933227539,
+            "improvement": 14.27113151550293,
+            "improved_frame_fraction": 1.0
+          },
+          "pa_mpjpe_mm": {
+            "baseline": 7.907890879382787,
+            "handloop": 6.718835391743193,
+            "improvement": 1.1890554876395947,
+            "improved_frame_fraction": 0.8444444444444444
+          },
+          "projected_joint_error_px": {
+            "baseline": 10.277116775512695,
+            "handloop": 4.540548801422119,
+            "improvement": 5.736567974090576,
+            "improved_frame_fraction": 1.0
+          }
+        },
+        "score": 6.904136901405439,
+        "pool_reasons": [
+          "wrist_aligned_reduction:right"
+        ],
+        "error_summary": {
+          "metric": "Absolute MPJPE",
+          "unit": "mm",
+          "baseline": 60.440711975097656,
+          "handloop": 27.23129653930664,
+          "frames": 45
+        },
+        "title": "Case 1: right hand / 20200903-subject-04"
+      },
+      {
+        "key": "20200918-subject-06++20200918_120717++836212060125",
+        "manifest": "shards/20200918-subject-06++20200918_120717++836212060125/source_manifest.json",
+        "start_frame_id": 29,
+        "end_frame_id": 73,
+        "max_frames": 45,
+        "hand": "left",
+        "subject": "20200918-subject-06",
+        "physical_recording": "20200918-subject-06/20200918_120717",
+        "camera_serial": "836212060125",
+        "object_ids": [
+          5,
+          14,
+          17
+        ],
+        "grasped_object_index": 2,
+        "grasped_object_id": 17,
+        "manifest_sha256": "79c9609ace03aec7142255b1884f0ee3fa0ce9dfa31bb60ca4fdd6b41c495414",
+        "reference_sha256": "a132d20e0744e403fccfb926c877d41ff9d0abbe8ee041757cf209674cebaadf",
+        "prediction_sources": {
+          "baseline": {
+            "branch": "raw",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/baseline/shards/20200918-subject-06++20200918_120717++836212060125/predictions.npz",
+            "sha256": "0fa527c943bb5950f525599ca53182acaed1ae03b7fcdf7bea754e8c28b39c1e"
+          },
+          "best": {
+            "branch": "final",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/best/shards/20200918-subject-06++20200918_120717++836212060125/predictions.npz",
+            "sha256": "379a76b20c7b2ced09c5f3572bcf3ef197928460dd07de36e8a9250cabb49c92"
+          }
+        },
+        "selection_metrics": {
+          "absolute_mpjpe_mm": {
+            "baseline": 83.62486267089844,
+            "handloop": 17.72496795654297,
+            "improvement": 65.89989471435547,
+            "improved_frame_fraction": 0.9555555555555556
+          },
+          "wrist_aligned_mpjpe_mm": {
+            "baseline": 14.295333862304688,
+            "handloop": 7.748470783233643,
+            "improvement": 6.546863555908203,
+            "improved_frame_fraction": 0.9777777777777777
+          },
+          "pa_mpjpe_mm": {
+            "baseline": 4.905588783831016,
+            "handloop": 3.5782515731760056,
+            "improvement": 1.3273372106550108,
+            "improved_frame_fraction": 1.0
+          },
+          "projected_joint_error_px": {
+            "baseline": 9.0193510055542,
+            "handloop": 3.3572373390197754,
+            "improvement": 5.662112236022949,
+            "improved_frame_fraction": 1.0
+          }
+        },
+        "score": 7.418222916571543,
+        "pool_reasons": [
+          "absolute_and_local:left"
+        ],
+        "error_summary": {
+          "metric": "Absolute MPJPE",
+          "unit": "mm",
+          "baseline": 83.62486267089844,
+          "handloop": 17.72496795654297,
+          "frames": 45
+        },
+        "title": "Case 2: left hand / 20200918-subject-06"
+      },
+      {
+        "key": "20200928-subject-07++20200928_153953++836212060125",
+        "manifest": "shards/20200928-subject-07++20200928_153953++836212060125/source_manifest.json",
+        "start_frame_id": 23,
+        "end_frame_id": 67,
+        "max_frames": 45,
+        "hand": "left",
+        "subject": "20200928-subject-07",
+        "physical_recording": "20200928-subject-07/20200928_153953",
+        "camera_serial": "836212060125",
+        "object_ids": [
+          3,
+          4,
+          11
+        ],
+        "grasped_object_index": 2,
+        "grasped_object_id": 11,
+        "manifest_sha256": "e2995636505400a4600f9db82bb852e047758f660991ee2ec3d0e7ed4c583131",
+        "reference_sha256": "8e048c77427cb0fa876e224540029b675018e8d5408b244b04b1d4113ffbb079",
+        "prediction_sources": {
+          "baseline": {
+            "branch": "raw",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/baseline/shards/20200928-subject-07++20200928_153953++836212060125/predictions.npz",
+            "sha256": "452adfc20c919ee5336be9f6e2c3d1b6ed96a08a397ce2b34e293244bfb7435a"
+          },
+          "best": {
+            "branch": "final",
+            "path": "/sciclone/data10/jchen57/Hand_Reconstruction/evaluations/dexycb_s0_full_three_models_20261016/best/shards/20200928-subject-07++20200928_153953++836212060125/predictions.npz",
+            "sha256": "4641a1276f9abf10e4a9b1df84427507db660f3f49147631f37dba0e60d0f298"
+          }
+        },
+        "selection_metrics": {
+          "absolute_mpjpe_mm": {
+            "baseline": 142.09080505371094,
+            "handloop": 32.1171875,
+            "improvement": 109.9736099243164,
+            "improved_frame_fraction": 0.9333333333333333
+          },
+          "wrist_aligned_mpjpe_mm": {
+            "baseline": 31.65052604675293,
+            "handloop": 13.505560874938965,
+            "improvement": 18.144962310791016,
+            "improved_frame_fraction": 1.0
+          },
+          "pa_mpjpe_mm": {
+            "baseline": 7.021780044030224,
+            "handloop": 5.537143467592786,
+            "improvement": 1.4846365764374398,
+            "improved_frame_fraction": 0.8888888888888888
+          },
+          "projected_joint_error_px": {
+            "baseline": 11.727012634277344,
+            "handloop": 5.465917110443115,
+            "improvement": 6.26109504699707,
+            "improved_frame_fraction": 1.0
+          }
+        },
+        "score": 7.084556482490385,
+        "pool_reasons": [
+          "absolute_and_local:left"
+        ],
+        "error_summary": {
+          "metric": "Absolute MPJPE",
+          "unit": "mm",
+          "baseline": 142.09080505371094,
+          "handloop": 32.1171875,
+          "frames": 45
+        },
+        "title": "Case 3: left hand / 20200928-subject-07"
+      }
+    ],
+    "elapsed_seconds": 181.7080285558477
+  },
+  "selection_sha256": "e3cc9db09009ae03354cbb373dbf9331a21f8ed6de2b1360dbf06b144e7fd6f9",
+  "rendering": {
+    "alpha": 0.76,
+    "color_bgr": [
+      226,
+      190,
+      96
+    ],
+    "style": "polished",
+    "supersample": 2,
+    "skeleton": false,
+    "normals": "area-weighted vertex normals, perspective-correct pixel interpolation",
+    "material": "camera-space three-light soft diffuse + restrained Blinn-Phong specular",
+    "geometry_modification": "prediction vertices/joints and metric geometry unmodified; display-only wrist cap triangles appended using existing boundary vertices",
+    "wrist_cap": true,
+    "wrist_cap_policy": "unique original boundary cycle; fan triangulation using existing vertices only; independent planar cap normal; excluded from metric geometry",
+    "background_sampling": "original target RGB preserved outside mesh coverage; foreground-only supersampling (optional skeleton is a diagnostic overlay)",
+    "detail_rendering": "direct rasterization with display affine @ original K",
+    "full_context_height": 300,
+    "zoom_height": 440,
+    "double_sided": true,
+    "self_depth_buffer": true,
+    "object_occlusion_available": false,
+    "camera": "original full-resolution calibrated K and inverse(camera_to_world)",
+    "predicted_shape": "each model own saved beta; left_shapedirs_fix=True",
+    "alignment": "none: no PA, GT wrist translation, rotation or scale correction",
+    "zoom_mode": "per-frame",
+    "zoom": "same per-frame crop in all three columns derived only from current common input GT bbox",
+    "protocol": "saved GT-crop full-test predictions, bidirectional16 blocks / reset32 feedback; not causal detector demo"
+  },
+  "renderer_metadata_sha256": "8485e221e50e33a92dbe9053e6d88637c6eef79250292435d9fe342d0e190a1a",
+  "artifacts": {
+    "local": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2",
+    "remote": "/sciclone/data10/jchen57/Hand_Reconstruction/demos/dexycb_showcase_20261016/render_v2",
+    "remote_selection": "/sciclone/data10/jchen57/Hand_Reconstruction/demos/dexycb_showcase_20261016/selection.json"
+  },
+  "validation": {
+    "render_math": {
+      "phase": "passed",
+      "background_outside_mesh_byte_identical": true,
+      "vertices_unchanged": true,
+      "legacy_overlay_byte_identical": true,
+      "display_affine_max_projection_difference_px": 0.0,
+      "scope": "Synthetic triangle renderer contract in authorized Pod; not a model accuracy experiment"
+    },
+    "video_acceptance": {
+      "schema": "handloop.showcase_video_acceptance.v1",
+      "phase": "passed",
+      "frames": 135,
+      "selection_sha256": "e3cc9db09009ae03354cbb373dbf9331a21f8ed6de2b1360dbf06b144e7fd6f9",
+      "selection_vs_renderer_projected_error_tolerance_px": 0.001,
+      "selection_projected_errors_match_rendered_geometry": true,
+      "positive_depth_vertices_all_frames": true,
+      "videos": [
+        {
+          "name": "comparison.mp4",
+          "frames": 135,
+          "fps": 30.0,
+          "width": 1920,
+          "height": 948,
+          "duration_seconds": 4.5,
+          "sha256": "eb9c13d3ae727061e1a879ba6829f0c4b94a17a01d930d7b558c38e3c9ddc3d6",
+          "bytes": 3062207,
+          "complete_decode": true,
+          "faststart": true
+        },
+        {
+          "name": "original.mp4",
+          "frames": 135,
+          "fps": 30.0,
+          "width": 640,
+          "height": 480,
+          "duration_seconds": 4.5,
+          "sha256": "f28bf1656df8c36a28a772941efb34a7a291ec985a8fc8952f7d09d56a5bf05d",
+          "bytes": 734780,
+          "complete_decode": true,
+          "faststart": true
+        },
+        {
+          "name": "handloop_overlay.mp4",
+          "frames": 135,
+          "fps": 30.0,
+          "width": 640,
+          "height": 480,
+          "duration_seconds": 4.5,
+          "sha256": "66df776ad7fa81443fbe27c9ee0685520f42511b606d52646d07f0d954b1abcd",
+          "bytes": 753359,
+          "complete_decode": true,
+          "faststart": true
+        },
+        {
+          "name": "comparison_slow_0p5x.mp4",
+          "frames": 269,
+          "fps": 30.0,
+          "width": 1920,
+          "height": 948,
+          "duration_seconds": 8.966666666666667,
+          "sha256": "5f0f089dfe995a1f92c47e2299d3d8cad807be4fd7bd90753520e18bfb5e6959",
+          "bytes": 3621931,
+          "complete_decode": true,
+          "faststart": true
+        }
+      ],
+      "display_cap_changes_no_vertices": true,
+      "wrist_cap_vs_open_wrist_max_projected_error_difference_px": 0.0,
+      "source_rgb_identity_matches_open_wrist": true,
+      "original_video_sha256_matches_open_wrist": true,
+      "case_snapshots": [
+        "case1_first.png",
+        "case1_middle.png",
+        "case1_last.png",
+        "case2_first.png",
+        "case2_middle.png",
+        "case2_last.png",
+        "case3_first.png",
+        "case3_middle.png",
+        "case3_last.png"
+      ]
+    },
+    "local_video_sha256_matches": [
+      {
+        "path": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/comparison.mp4",
+        "sha256": "eb9c13d3ae727061e1a879ba6829f0c4b94a17a01d930d7b558c38e3c9ddc3d6",
+        "matches_remote": true
+      },
+      {
+        "path": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/original.mp4",
+        "sha256": "f28bf1656df8c36a28a772941efb34a7a291ec985a8fc8952f7d09d56a5bf05d",
+        "matches_remote": true
+      },
+      {
+        "path": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/handloop_overlay.mp4",
+        "sha256": "66df776ad7fa81443fbe27c9ee0685520f42511b606d52646d07f0d954b1abcd",
+        "matches_remote": true
+      },
+      {
+        "path": "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/comparison_slow_0p5x.mp4",
+        "sha256": "5f0f089dfe995a1f92c47e2299d3d8cad807be4fd7bd90753520e18bfb5e6959",
+        "matches_remote": true
+      }
+    ],
+    "visual_review": {
+      "phase": "passed",
+      "scope": "Each case first/middle/last contact image; full labeled middle frames; final wrist-cap first frame",
+      "case_contacts": [
+        "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/case1_contact.jpg",
+        "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/case2_contact.jpg",
+        "/Users/junzhou/Project/Visual_Hand_Reconstruction/outputs/demos/dexycb_showcase_20261016/render_v2/case3_contact.jpg"
+      ],
+      "limitation": "Case3 hidden fingers require 3D reference metrics; real object depth occlusion unavailable."
+    }
+  },
+  "not_new_neural_inference_or_training": true,
+  "test_selection_does_not_replace_full_benchmark": true,
+  "display_caps": [
+    {
+      "original_faces": 1538,
+      "added_display_faces": 14,
+      "boundary_vertex_indices": [
+        38,
+        92,
+        234,
+        239,
+        279,
+        215,
+        214,
+        121,
+        78,
+        79,
+        108,
+        120,
+        119,
+        117,
+        118,
+        122
+      ],
+      "new_vertices": 0,
+      "vertex_positions_changed": false,
+      "participates_in_metrics": false
+    },
+    {
+      "original_faces": 1538,
+      "added_display_faces": 14,
+      "boundary_vertex_indices": [
+        38,
+        122,
+        118,
+        117,
+        119,
+        120,
+        108,
+        79,
+        78,
+        121,
+        214,
+        215,
+        279,
+        239,
+        234,
+        92
+      ],
+      "new_vertices": 0,
+      "vertex_positions_changed": false,
+      "participates_in_metrics": false
+    },
+    {
+      "original_faces": 1538,
+      "added_display_faces": 14,
+      "boundary_vertex_indices": [
+        38,
+        122,
+        118,
+        117,
+        119,
+        120,
+        108,
+        79,
+        78,
+        121,
+        214,
+        215,
+        279,
+        239,
+        234,
+        92
+      ],
+      "new_vertices": 0,
+      "vertex_positions_changed": false,
+      "participates_in_metrics": false
+    }
+  ]
+}
