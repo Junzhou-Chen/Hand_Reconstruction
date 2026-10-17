@@ -8,6 +8,11 @@ frame through the sorted union of chosen-frame IDs, with a mandatory exact
 length check. Only a hand's own chosen frames are retained; missing hands are
 not filled from the other side or temporally interpolated.
 
+Default selection_mode=pure_motion_all_params uses EVERY released parameter
+clip, including clips without captions. Text labels and caption start/end do
+not filter or trim trajectory GT; they remain audit metadata only. The legacy
+annotated_motion mode is explicit and is not the default pure-motion pool.
+
 The official text-motion loader randomly splits annotation ROWS with seed42.
 This adapter instead defaults to a documented SUBJECT-disjoint engineering
 90/10 train/val split. A supplied split JSON can replace
@@ -86,7 +91,7 @@ def resolve_root(root: Path) -> Path:
     return found[0]
 
 
-def annotation_index(path: Path) -> dict:
+def annotation_index(path: Path, *, include_unqualified: bool = False) -> dict:
     """Keep each physical clip once, merging overlapping annotation intervals."""
     indexed = {}
     with path.open(encoding="utf-8") as stream:
@@ -94,7 +99,7 @@ def annotation_index(path: Path) -> dict:
             if not line.strip():
                 continue
             value = json.loads(line)
-            if str(value.get("clarify_annotation", "")).strip() in ("None", "Buggy"):
+            if not include_unqualified and str(value.get("clarify_annotation", "")).strip() in ("None", "Buggy"):
                 continue
             sequence = value["sequence"]
             if isinstance(sequence, list):
@@ -179,11 +184,15 @@ def audit_missing_source_params(root: Path, missing: list[str], cache_path: Path
     missing = sorted(set(missing))
     if cache_path.is_file():
         previous = read_json(cache_path)
-        if (previous.get("archive_identity") == identity and previous.get("requested_missing") == missing
-                and previous.get("phase") == "complete" and previous.get("gzip_eof_crc_verified") is True):
-            if previous.get("missing_extracted_but_present_in_archive"):
-                raise ValueError("Source params exist in archive but were not extracted; repair extraction, do not exclude")
-            return previous
+        if (previous.get("archive_identity") == identity and previous.get("phase") == "complete"
+                and previous.get("gzip_eof_crc_verified") is True and "source_param_recordings" in previous):
+            present = sorted(set(missing) & set(previous["source_param_recordings"]))
+            if present:
+                raise ValueError(f"Source params exist in archive but were not extracted; repair extraction: {present}")
+            # Reuse immutable full archive inventory even if annotation coverage
+            # changes. The cache's original request remains unchanged on disk.
+            return {**previous, "requested_missing": missing, "source_absent_recordings": missing,
+                    "missing_extracted_but_present_in_archive": [], "reused_complete_archive_inventory": True}
     started = time.monotonic()
     params, members, files = set(), 0, 0
     with gzip.open(archive_path, "rb") as compressed:
@@ -264,9 +273,9 @@ def inspect_source_schema(job: dict) -> dict:
         if n != len(union):
             raise ValueError(f"{job['recording']}/{side}: params rows {n} differ from original union {len(union)}")
         rh, th, beta = (rows(params[key], width, n) for key, width in (("Rh",3),("Th",3),("shapes",10)))
-        in_annotation, slices = annotation_mask(n, job["annotation_ranges"])
+        in_selection, slices = annotation_mask(n, job["motion_ranges"])
         finite = np.isfinite(np.concatenate((pose,rh,th,beta),axis=-1)).all(axis=-1)
-        retained = int(np.count_nonzero(in_annotation & finite & np.isin(union,selected[side])))
+        retained = int(np.count_nonzero(in_selection & finite & np.isin(union,selected[side])))
         raw_path = base/"keypoints_3d"/clip/(side+".jsonl")
         raw_rows = 0
         with raw_path.open("rb") as stream:
@@ -463,11 +472,11 @@ def convert(job: dict) -> dict:
             raise ValueError(f"Cannot prove pose-row/source-frame mapping {job['recording']}/{side}: "
                              f"{n} pose rows vs {len(union)} sorted chosen-frame union")
         rh, th, beta = (rows(params[key], width, n) for key, width in (("Rh", 3), ("Th", 3), ("shapes", 10)))
-        in_annotation, annotation_slices = annotation_mask(n, job["annotation_ranges"])
+        in_selection, annotation_slices = annotation_mask(n, job["motion_ranges"])
         finite = np.isfinite(np.concatenate((pose, rh, th, beta), axis=-1)).all(axis=-1)
         own = np.isin(union, selected[side])
-        indices = np.flatnonzero(in_annotation & finite & own)
-        skipped[side] = {"outside_annotation": int((~in_annotation).sum()), "nonfinite": int((~finite).sum()),
+        indices = np.flatnonzero(in_selection & finite & own)
+        skipped[side] = {"outside_motion_selection": int((~in_selection).sum()), "nonfinite": int((~finite).sum()),
                          "hand_not_chosen": int((~own).sum()), "source_pose_rows": n,
                          "annotation_empty_intervals": sum(item["effective_begin"] >= item["effective_stop_exclusive"]
                                                            for item in annotation_slices),
@@ -555,7 +564,11 @@ def convert(job: dict) -> dict:
                                                   for name in ("left", "right")},
                         "source_frame_mapping": "official set-union expression equals sorted union and exact pose-row count; original side frame IDs retained",
                         "official_frame_order_checked": True,
-                        "annotation_slices": annotation_slices,
+                        "selection_mode": job["selection_mode"],
+                        "selection_slices": annotation_slices,
+                        "annotation_slices": annotation_slices if job["selection_mode"] == "annotated_motion" else [],
+                        "source_annotation_ranges_audit_only": job["source_annotation_ranges"],
+                        "caption_ranges_applied": job["selection_mode"] == "annotated_motion",
                         "triangulated_wrist_audit": raw_wrist_audit,
                         "beta_span": beta_span, "beta_provenance": "source shapes, static only if exactly equal; per-frame otherwise",
                         "fk_roundtrip": {"checked": True, "all_frames": len(check) == len(indices),
@@ -576,6 +589,9 @@ def main():
     parser.add_argument("--mano-models", type=Path)
     parser.add_argument("--mano-asset-version", default=None)
     parser.add_argument("--source-easymocap", type=Path)
+    parser.add_argument("--selection-mode", choices=("pure_motion_all_params", "annotated_motion"),
+                        default="pure_motion_all_params",
+                        help="default pure-motion: all released params and full physical clips; annotations are audit-only")
     parser.add_argument("--missing-params-audit", type=Path, help="reusable complete official archive membership/CRC audit cache")
     parser.add_argument("--schema-only", action="store_true", help="parse all source params/chosen/denseJSONL shapes without MANO FK or writing states")
     parser.add_argument("--split-json", type=Path, help="train/val/test original session/clip lists; session-disjoint required")
@@ -599,30 +615,50 @@ def main():
     if not (args.index_only or args.schema_only) and (args.mano_models is None or args.source_easymocap is None):
         parser.error("--mano-models and --source-easymocap are required for source-FK checked conversion")
     root = resolve_root(args.root)
-    annotations = annotation_index(args.annotations)
-    recordings = []
-    missing = []
-    for recording, intervals in sorted(annotations.items()):
-        session, clip = recording.split("/")
-        path = root / session / "params" / (clip + ".json")
-        if not path.is_file():
-            missing.append(recording)
-            continue
-        recordings.append({"recording": recording, "session": session, "clip": clip,
-                           "subject": session.split("-", 1)[0], "annotation_ranges": intervals})
+    pure_motion = args.selection_mode == "pure_motion_all_params"
+    annotations = annotation_index(args.annotations, include_unqualified=pure_motion)
+    available = {}
+    for source_path in sorted(root.glob("p*/params/*.json")):
+        session, source_clip = source_path.parent.parent.name, source_path.stem
+        if not re.fullmatch(r"p\d+-[A-Za-z0-9_.-]+",session) or not source_clip.isdigit():
+            raise ValueError(f"Unrecognized released parameter identity: {source_path}")
+        recording = session + "/" + str(int(source_clip)).zfill(3)
+        if recording in available:
+            raise ValueError(f"Duplicate normalized original parameter identity: {recording}")
+        available[recording] = {"recording": recording, "session": session, "clip": source_clip,
+                                "subject": session.split("-",1)[0]}
+    missing = sorted(set(annotations)-available.keys())
+    selected_ids = sorted(available if pure_motion else (available.keys() & annotations.keys()))
+    recordings = [{**available[identity], "selection_mode": args.selection_mode,
+                   "source_annotation_ranges": annotations.get(identity,[]),
+                   "motion_ranges": [[0,-1]] if pure_motion else annotations[identity]}
+                  for identity in selected_ids]
     if not recordings:
-        raise ValueError("No matching annotated original params")
-    # Full official annotation identities stabilize subject assignment even for
-    # an explicitly bounded smoke tree that contains only a few downloaded files.
-    all_identities = [{"recording": identity, "session": identity.split("/")[0],
-                       "subject": identity.split("/", 1)[0].split("-", 1)[0]}
-                      for identity in sorted(annotations)]
-    assignments, split_meta = make_splits(all_identities, args.split_json, args.seed)
+        raise ValueError("No original released params selected")
+    # Subject/recording splits come from source motion identities, independently
+    # of captions. Smoke limits never redefine a subject assignment.
+    split_identities = list(available.values()) if pure_motion else [
+        {"recording": identity, "session": identity.split("/")[0],
+         "subject": identity.split("/",1)[0].split("-",1)[0]} for identity in sorted(annotations)]
+    assignments, split_meta = make_splits(split_identities, args.split_json, args.seed)
     missing_audit = None
     missing_audit_path = args.missing_params_audit or args.output/"missing_source_params_audit.json"
-    if missing and not (args.max_sequences or args.index_only):
+    full_motion_selection = pure_motion and not (args.max_sequences or args.index_only)
+    reuse_requested_cache = args.missing_params_audit is not None and args.missing_params_audit.is_file()
+    if full_motion_selection or (missing and (not (args.max_sequences or args.index_only) or reuse_requested_cache)):
         missing_audit = audit_missing_source_params(root, missing, missing_audit_path)
-    excluded_source = [{"recording": recording, "split": assignments[recording],
+    published_complete = False
+    if pure_motion and missing_audit:
+        archive_ids = set(missing_audit["source_param_recordings"])
+        not_extracted = sorted(archive_ids-available.keys())
+        not_in_release = sorted(available.keys()-archive_ids)
+        if not_extracted or not_in_release:
+            raise ValueError(f"Released/extracted params differ: absent_extracted={not_extracted}, "
+                             f"not_in_official_archive={not_in_release}")
+        published_complete = True
+    excluded_source = [{"recording": recording,
+                        "split": assignments.get(recording,split_meta.get("subject_assignments",{}).get(
+                            recording.split("/",1)[0].split("-",1)[0],"not_assigned_missing_source")),
                         "subject": recording.split("/",1)[0].split("-",1)[0],
                         "annotation_ranges": annotations[recording],
                         "reason": "MANO params absent from complete official release archive" if missing_audit else "not available in bounded/index-only source tree"}
@@ -634,6 +670,8 @@ def main():
     save_json(args.output / "source_split_assignment.json", {
         "utc": now(), "split_provenance": split_meta, "recording_split": assignments,
         "source_recording_counts": dict(all_split_counts), "missing_annotated_params": missing,
+        "selection_mode": args.selection_mode, "source_params_recordings_total": len(available),
+        "source_params_without_annotation": sorted(set(available)-annotations.keys()),
         "annotation_sha256": sha256(args.annotations), "split_before_limits": True})
     selected = []
     for split in ("train", "val"):
@@ -655,11 +693,18 @@ def main():
                                        "fingers": "poses[3:] + hand-specific mean exactly once",
                                        "left_shapedirs_fix": False, "coordinate_transform": "none; original source world preserved"},
                 "scope": "train/val only, one original motion per session/clip/hand; no views/captions duplication",
+                "selection_mode": args.selection_mode, "source_params_recordings_total": len(available),
+                "selected_source_params_recordings": len(recordings),
+                "source_params_without_annotation": sorted(set(available)-annotations.keys()),
+                "caption_ranges_applied": not pure_motion,
+                "annotation_role": "coverage/source audit only; full original motion clips selected independently of text" if pure_motion else "legacy official text-motion eligibility and ranges",
                 "annotation_sequence_list_rule": "first entry, matching pinned official dataset_hands.py; no clip concatenation",
-                "annotation_end_semantics": "source end_frame_id is inclusive: motion[start:end+1]; end==-1 uses motion[start:]; native Python slice saturation is preserved and per-sequence effective bounds recorded",
+                "annotation_end_semantics": "legacy annotated_motion only: inclusive[start:end+1] or end==-1[start:]; pure_motion_all_params ignores caption bounds and uses full original clip",
                 "annotation_slice_source": f"https://github.com/brown-ivl/GigaHands/blob/{GIGA_REVISION}/dataset/dataset_hands.py#L66-L70",
                 "split_provenance": split_meta, "source_recording_counts": dict(all_split_counts),
                 "missing_annotated_params": missing, "source_params_complete": not missing,
+                "published_source_params_complete": published_complete,
+                "source_annotation_params_complete": not missing,
                 "missing_params_policy": "official loader gates on os.path.exists; here source absence must be proved by complete archive membership/CRC, while extraction omissions remain fatal",
                 "missing_params_source": f"https://github.com/brown-ivl/GigaHands/blob/{GIGA_REVISION}/dataset/dataset_hands.py#L29-L37",
                 "excluded_source_recordings": excluded_source,
