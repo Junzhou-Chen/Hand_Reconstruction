@@ -1,5 +1,7 @@
 # HandLoop 项目记忆入口
 
+**2026-10-16夜间重训前再次扩查TWM数据（先总结，未开训）：** 实际motion仍Oak／HOT／独立Ume／Dex四库2788135手状态／636610重叠窗；ARCTIC343包已全部下载、未adapter入训，267 train有384780 QC前双手状态，建议先补完整参数池。大规模glove仍优先HumanTouch约100h与DexWild原人体7917episodes／2924588transitions；只有前者1597帧native样本过结构检查，partial trainer未实现，不冒称完整99D GT。新增MySign公开5000FBX／5人可补自由手势；DexCap、DexterHand为小补充；SynData glove-origin95383clips／793volumes是10Hz重定向骨架。GRAB源访问未取得，HandX只计自采，视觉估计扩展另列。ARCTIC source MANO nonflat mean、subject_vtemplates供SMPL-X勘误已存；HOI4D现有独立标注直链但未核包。没有新数据准备、下载或训练，混合比例未定。[完整选库与状态](docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)。
+
 **2026-10-16已交付真实手部重建叠加视频：** 按用户要求把预测mesh／骨架投影回原视频，已在Pod复用完整Dex测试的官方baseline与best4200.final，固定最长连续片段并按ID破同分选左右各74帧，未按误差挑样；原速148帧4.933秒、0.5×慢放295帧9.833秒，三列原RGB／HaWoR／HandLoop＋同一逐帧手部放大。自身β＋真实K投影，无PA／GT腕移位／尺度修正，GT crop标定受控例，不冒称任意野外detector部署。v1固定并集zoom不清晰，v2仅改共同观看裁切，原RGB及单独overlay视频SHA相同。四H264完整解码／本机SHA及左右手中帧视觉验收通过；本机outputs/demos/dexycb_overlay_20261016/v2，媒体不进Git。[效果与复现](docs/HAND_OVERLAY_DEMO_2026-10-16.md)、[小型验收](reports/hand_overlay_demo_20261016.json)。
 
 **2026-10-16精度报告口径广泛文献复核：** 已核11篇手部论文及Ego-Exo4D官方协议，包含2026 Hand3R／ScaleHP／InfiniHand。单图主表普遍突出PA；时序恢复并报PA／非PA或腕对齐及GT动态误差；world方法并报局部与轨迹。助手修正前轮“PA仅辅助”的笼统建议，推荐本项目局部几何与绝对位置并列，未改协议或成为用户新决定。ScaleHP明确CS无对齐／R腕平移／P为PA；InfiniHand无对齐W不同于HaWoR／StableHand开头对齐W，StableHand16joint不同本项目21joint。当前速度／加速度GT误差和PA-MPVPE尚未测。[全文、主表与边界核验](docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)。

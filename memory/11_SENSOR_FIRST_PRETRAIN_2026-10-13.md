@@ -1,5 +1,7 @@
 # 传感器轨迹优先的TWM预训练
 
+**2026-10-16夜间扩查（建议，未开训）：** 新[重训前来源总结](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)汇总已用四库与ARCTIC、HumanTouch、DexWild、DexCap、DexterHand、MySign等候选；保留传感器参考精度／可审计标定优先。MySign实际5000FBX／5人，硬件采集按官方自述，孤立手语且retarget后发布，不能推导毫米级finger GT；SynData95383clips／793volumes严格为glove-origin，10Hz ITW重定向而非原生全MANO。ARCTIC官方MANO use_pca=False／flat_hand_mean=False，meta subject_vtemplates用于SMPL-X，不能照搬GRAB手模板处理。HOI4D官方新增独立HandPose／CameraParameters直链，纠正必须申请的旧概括，但未成功核包且仍视觉拟合来源。当前完整17组loader不接native partial；99D输出保持，来源有效字段分别监督。无新训练结果或用户已定数据混合。
+
 **2026-10-16纽约11:00扩容再次核查（建议，未改训）：** TWM实际仍原四库2788135 train手状态／636610重叠窗（Oak1414552／346860、HOT660300／132008、Ume662422／151390、Dex50861／6352），不是视觉63652 RGB池。ARCTIC已12:38UTC完成343/343，官方P1/P2同267 train，train参数只读统计384780双手状态（QC前，原池13.80%），尚无adapter／新motion入池；替代下文等待授权／下载的历史状态。HumanTouch官方约100h与DexWild原人类7917ep／2924588 transitions发布仍在，前者仅1597帧native结构过验，二者均未入训。现motion loader只接完整17组，glove须新建标定后的native几何／方向partial监督，99D输出可保持。D37原train完整60未来比例Oak96.45%、HOT49.96%、Ume83.60%、Dex0，长连续数据有补充价值；不将现有瓶颈唯一归因于量。建议先ARCTIC、并行glove适配、等预算分阶段验；本轮未改当前5k训练／模型／loss／下载。详见[更新来源审计](../docs/DATA_EXPANSION_SOURCE_AUDIT_2026-10-16.md#纽约10541100再次复核当前twm池与可扩充来源)、[真实池摘要](../reports/twm_data_pool_inventory_20261016.json)。
 
 日期：2026-10-13。用户纠正：TWM不需要视觉，选库应重视更准确的手姿态，初始glove/MoCap方向有价值；论文用库作参考，不主导训练池。**已定的是精度优先原则与99D输出；具体混合仍为建议。**

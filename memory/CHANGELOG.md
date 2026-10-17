@@ -1,5 +1,7 @@
 # HandLoop 项目记忆变更记录
 
+**2026-10-16夜间重训前的数据扩充总结：** 新增[候选优先级与接入状态](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)，链接既有池统计／官方发布，区分完整MANO适配、native部分监督和视觉估计扩展。补MySign、SynData glove子集精确口径、HOI4D当前直链；纠正ARCTIC subject模板属于SMPL-X。ARCTIC下载完成但未入训、HumanTouch样本ready=false，未启动新任务或变更训练方案；仅同步本轮调研文档与新增事实记忆。
+
 **2026-10-16制作并实际验收视频重建demo：** 新增remote-only renderer、[使用与来源文档](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)、[约15KB验收摘要](../reports/hand_overlay_demo_20261016.json)，.gitignore忽略demos。用户现有Dex测试片段与保存预测生成原RGB／baseline／best4200三列、mesh骨架及放大窗；5秒原速／约10秒慢放，四视频完整解码和本机SHA通过。v1显示窗口不够放大，v2仅共同裁切改进且几何／原视频SHA不变；左右手中帧人工查看通过。媒体留忽略目录，无新模型实验。
 
 **2026-10-16广泛复核其他论文如何报告精度：** 新增[11篇官方全文／主表审计](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)，覆盖2024–2025代表作与2026 Hand3R／ScaleHP／InfiniHand；纠正助手“PA仅辅助”的笼统表述，推荐局部与绝对空间并列。记录W对齐、joint数和动态GT定义差异。更新记忆入口／数据／状态／写作／来源；只调研和文档，无远程实验、指标实现或研究方案新增决定。

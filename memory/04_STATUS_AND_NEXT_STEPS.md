@@ -1,5 +1,7 @@
 # HandLoop 进展与下一步
 
+**2026-10-16夜间用户希望重新训练，先要求选库总结：** 已完成官方发布／源码与远程现有清单复查；候选优先级建议为原四库＋已下载ARCTIC先做完整参数验收，HumanTouch／DexWild raw human作为大规模native主扩展，DexCap／DexterHand／MySign补覆盖。当前partial native trainer未实现，HumanTouch仍ready=false，ARCTIC及其他新候选无prepared目录；D37仍complete／10000步。只做总结，未启动新下载／预处理／训练，未选定权重或预算。[报告与来源](../docs/TWM_PRETRAIN_EXPANSION_SUMMARY_2026-10-16.md)。
+
 **2026-10-16可播放overlay demo已完成：** 已按用户要求交付三列原视频／HaWoR／HandLoop best4200，含左右各74帧、全图与共同逐帧放大；原速4.933s、慢放9.833s。原始RGB、单独HandLoop叠加、比较视频均在本机outputs/demos/dexycb_overlay_20261016/v2，已请求Codex文件面板打开；四H264完整解码及拷回SHA通过，人工核左右中帧通过。v1 zoom范围过大已只改显示为v2，姿态投影变化0／单独视频SHA不变。受控GT crop／真实K，未做野外自动检测、物体深度遮挡、新训练或新推理。[复现记录](../docs/HAND_OVERLAY_DEMO_2026-10-16.md)。
 
 **2026-10-16完成其他论文精度报告调研：** [官方全文与表号清单](../docs/HAND_ACCURACY_REPORTING_SURVEY_2026-10-16.md)覆盖单图、时序恢复、世界轨迹及2026新预印本。建议局部PA与绝对定位并列主结果，角误差作99D分解；后续动态精度应计算对GT速度／加速度差，不能只追平滑。该建议尚未用户采纳或实施，当前完整Dex三模型结果不变，无新实验。
